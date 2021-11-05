@@ -4,7 +4,7 @@ import { LstCollectionEnum, RxCollectionEnum, rxdbOperationProxyExec, WsCollecti
 import { Cache } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
-import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
+import { addPouchPlugin, getRxStoragePouch, addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
 import { Event } from 'src/system/rxdb/event'
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
@@ -63,13 +63,9 @@ class ReactiveDocDbMemCache {
    }
 }
 
-// import memdown from 'src/system/rxdb/rxdb_vuex_adapter'
-// import memdown from 'memdown'
-
 let adapter = 'idb'
-// let adapter = 'indexeddb' // глючит
-// let adapter = memdown
-// let adapter = 'memory'
+
+// let adapter = 'indexeddb'  // глючит
 
 class RxDBWrapper {
    constructor () {
@@ -79,11 +75,8 @@ class RxDBWrapper {
       this.removeMutex = new MutexLocal('rxdb-remove')
       this.store = null // vuex
       this.reactiveDocDbMemCache = new ReactiveDocDbMemCache()
-      addRxPlugin(require('pouchdb-adapter-idb'))
-      // addRxPlugin(require('pouchdb-adapter-memory'))
-      // addRxPlugin(require('pouchdb-adapter-indexeddb')) // глючит // IndexedDB (new) https://github.com/pouchdb/pouchdb/tree/master/packages/node_modules/pouchdb-adapter-indexeddb#differences-between-couchdb-and-pouchdbs-find-implementations-under-indexeddb
-      // addRxPlugin(require('pouchdb-adapter-leveldb')) // leveldown adapters need the leveldb plugin to work
-      // addRxPlugin(require('pouchdb-adapter-memory'))
+      addPouchPlugin(require('pouchdb-adapter-idb'))
+      // addRxPlugin(require('pouchdb-adapter-' + adapter)) // глючит // IndexedDB (new) https://github.com/pouchdb/pouchdb/tree/master/packages/node_modules/pouchdb-adapter-indexeddb#differences-between-couchdb-and-pouchdbs-find-implementations-under-indexeddb
 
       addRxPlugin(RxDBQueryBuilderPlugin)
       addRxPlugin(RxDBValidatePlugin)
@@ -141,8 +134,8 @@ class RxDBWrapper {
          return
       }
       try {
-         let dump = await this.db.dump()
-         await this.db.importDump(dump)
+         let dumpJson = await this.db.exportJSON()
+         await this.db.importJSON(dumpJson)
       } catch (err) {
          logE('cant purgeDb', err)
          throw err
@@ -153,16 +146,10 @@ class RxDBWrapper {
    }
 
    async createTestDb () {
-      // const dbTest = await createRxDatabase({
-      //    name: 'test',
-      //    adapter: 'idb',
-      //    multiInstance: true,
-      //    eventReduce: false
-      // });
       const dbTest = this.db
-      await dbTest.collection({ name: 'cache_test', schema: cacheSchema })
+      await dbTest.addCollections({ cache_test: { schema: cacheSchema } })
       await dbTest.cache_test.remove();
-      await dbTest.collection({ name: 'cache_test', schema: cacheSchema })
+      await dbTest.addCollections({ cache_test: { schema: cacheSchema } })
 
       // let collection = dbTest.cache_test
       let collection = dbTest.cache
@@ -236,10 +223,10 @@ class RxDBWrapper {
          this.store = store
          this.db = await createRxDatabase({
             name: 'kalpadb',
-            adapter,
+            storage: getRxStoragePouch(adapter),
             multiInstance: true, // <- multiInstance (optional, default: true)
-            eventReduce: false, // если поставить true - будут теряться события об обновлении (по всей видимости - это баг)<- eventReduce (optional, default: true)
-            pouchSettings: { revs_limit: 1 }
+            eventReduce: false // если поставить true - будут теряться события об обновлении (по всей видимости - это баг)<- eventReduce (optional, default: true)
+            // pouchSettings: { revs_limit: 1 }
          })
          await this.purgeDb() // очистит бд от старых данных
 
@@ -278,7 +265,7 @@ class RxDBWrapper {
          if (this.db.meta) await rxdbOperationProxyExec(this.db.meta, 'destroy')
       }
       if (operation.in('create', 'recreate')) {
-         await this.db.collection({ name: 'meta', schema: schemaKeyValue })
+         await this.db.addCollections({ meta: { schema: schemaKeyValue } })
       }
       for (let collection of collections) {
          if (this[collection]) await this[collection].updateCollections(operation)
@@ -720,7 +707,7 @@ class RxDBWrapper {
       beforeCreate = false,
       mirroredVuexObjectKey = null, // создаст или обновит связанный объект в vuex по этому ключу
       queryId = Date.now(), // id запроса чтобы потом можно было отменить
-      cancel = false, // отменить запрос на сервер если это возможно (используется при прокрутке ленты)
+      cancel = false // отменить запрос на сервер если это возможно (используется при прокрутке ленты)
    } = {}) {
       assert(beforeCreate || this.created, 'cant get! !this.created')
       const f = this.get
@@ -757,7 +744,7 @@ class RxDBWrapper {
             params,
             beforeCreate,
             queryId,
-            cancel,
+            cancel
          })
          if (!rxDoc) return null
          reactiveDoc = getReactive(rxDoc, mirroredVuexObjectKey)

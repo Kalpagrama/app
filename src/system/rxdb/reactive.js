@@ -267,7 +267,7 @@ class ReactiveDocFactory {
             assert(rev, '!_rev')
             this.vm.rev = rev
          }
-         this.setReactiveDoc(rxDoc.toJSON())
+         this.setReactiveDoc(cloneDeep(rxDoc.toJSON())) // rxDoc.toJSON() - иммутабелен
          this.rxDocSubscribe()
          this.reactiveDocSubscribe()
          rxDoc.reactiveItemHolderMaster = this
@@ -474,7 +474,7 @@ class Group {
          nextPageToken: nextPageToken_,
          prevPageToken: prevPageToken_,
          currentPageToken: currentPageToken_
-      } = rxDoc.toJSON().cached.data
+      } = cloneDeep(rxDoc.toJSON().cached.data)
       let mangoQuery = rxDoc.props.mangoQuery
       assert(mangoQuery, '!mangoQuery')
       assert(mangoQuery.selector.rxCollectionEnum, '!rxCollectionEnum')

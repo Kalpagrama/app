@@ -45,7 +45,7 @@ class Cache {
          if (this.db.cache) await rxdbOperationProxyExec(this.db.cache, 'destroy')
       }
       if (operation.in('create', 'recreate')) {
-         await this.db.collection({ name: 'cache', schema: cacheSchema })
+         await this.db.addCollections({ cache: { schema: cacheSchema } })
          assert(this.db.cache, '!this.db.cache')
          this.db.cache.postInsert(async (plainData) => {
             await this.debouncedDumpLru()
