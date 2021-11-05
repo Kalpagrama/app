@@ -95,7 +95,6 @@
     "file-loader": "^6.2.0",
     "fs": "^0.0.1-security",
     "i18next-scanner": "^3.1.0",
-    "node-fetch": "^2.6.1",
     "now": "^21.0.1",
     "pug-loader": "^2.4.0",
     "pug-plain-loader": "^1.0.0",
