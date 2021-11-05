@@ -225,7 +225,7 @@ class RxDBWrapper {
             name: 'kalpadb',
             storage: getRxStoragePouch(adapter),
             multiInstance: true, // <- multiInstance (optional, default: true)
-            eventReduce: false // если поставить true - будут теряться события об обновлении (по всей видимости - это баг)<- eventReduce (optional, default: true)
+            // eventReduce: false // если поставить true - будут теряться события об обновлении (по всей видимости - это баг)<- eventReduce (optional, default: true)
             // pouchSettings: { revs_limit: 1 }
          })
          await this.purgeDb() // очистит бд от старых данных
