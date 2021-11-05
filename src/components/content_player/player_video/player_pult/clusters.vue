@@ -34,7 +34,7 @@ div(
 
 <script>
 export default {
-  name: 'clusters',
+  name: 'nodeClusters',
   props: ['player', 'contentKalpa'],
   computed: {
     clustersTotalCount () {

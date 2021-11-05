@@ -148,7 +148,7 @@ async function shareIn ({ contentUrl } = {}) {
             type: content.type,
             oid: content.oid,
             name: content.name,
-            thumbUrl: content.thumbUrl,
+            thumbUrl: content.thumbUrl
          }
          await rxdb.set(RxCollectionEnum.WS_CONTENT, bookmarkInput)
          // alert('shareIn3')
@@ -207,7 +207,8 @@ function initOfflineEvents (store) {
          {
             position: 'top',
             message: store.state.core.online
-               ? i18n.t('network_available', 'network available') : i18n.t('network_unavailable', 'network unavailable')
+               ? i18n.t('network_available', 'network available')
+               : i18n.t('network_unavailable', 'network unavailable')
          }
       )
    }

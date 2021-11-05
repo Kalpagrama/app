@@ -48,6 +48,7 @@ export default {
     'player.currentTime': {
       handler (to, from) {
         if (this.player.figureFocused) {
+          //
         }
         // this.$log('player.currentTime TO', to)
         if (to >= this.player.figures[1].t + 0.2) {

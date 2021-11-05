@@ -85,7 +85,7 @@ import { ObjectCreateApi } from 'src/api/object_create'
 import {UserRoleEnum} from '../../../../../api/user';
 
 export default {
-  name: 'actions',
+  name: 'accountActions',
   data () {
     return {
       feedbackOpened: false,

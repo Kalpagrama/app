@@ -1070,8 +1070,7 @@ class ReactiveListWithPaginationFactory {
       if (!listId) listId = isRxDocument(rxQueryOrRxDoc) ? rxQueryOrRxDoc.id : JSON.stringify(rxQueryOrRxDoc.mangoQuery)
       assert(listId, '!listId')
       // на один rxQueryOrRxDoc может быть создано несколько  reactiveGroup (в зависимости от populateFunc)
-      if (rxQueryOrRxDoc.reactiveListHolderMaster[listId]) {
-      } else {
+      if (!rxQueryOrRxDoc.reactiveListHolderMaster[listId]) {
          this.mutex = new MutexLocal('ReactiveListHolder::create')
 
          this.group = new Group(listId, 'root', populateFunc, paginateFunc, propsReactive, screenSize)

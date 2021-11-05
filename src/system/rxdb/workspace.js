@@ -171,38 +171,35 @@ class Workspace {
       const f = this.create
       const t1 = performance.now()
       assert(!this.created, 'this.created')
-      try {
-         // синхроним изменения в цикле
-         this.synchroLoop = async () => {
-            const f = this.synchroLoop
-            f.nameExtra = 'synchroLoop'
-            // logD(f, 'start')
-            this.synchroStarted = true // защита от двойного запуска
-            while (true) {
-               if (this.reactiveUser && this.synchro && rxdb.initialized && mutexGlobal.isLeader()) {
-                  try {
-                     await mutexGlobal.lock('ws::synchroLoop')
-                     await this.lock('ws::synchroLoop')
-                     const tLoop = performance.now()
-                     // logD(f, 'next loop start...', this.synchroLoopWaitObj.getTimeOut())
-                     await this.synchronize()
-                     // logD(f, `next loop complete: ${Math.floor(performance.now() - tLoop)} msec`)
-                  } catch (err) {
-                     logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
-                     this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
-                  } finally {
-                     this.release()
-                     await mutexGlobal.release('ws::synchroLoop')
-                  }
+      // синхроним изменения в цикле
+      this.synchroLoop = async () => {
+         const f = this.synchroLoop
+         f.nameExtra = 'synchroLoop'
+         // logD(f, 'start')
+         this.synchroStarted = true // защита от двойного запуска
+         while (true) {
+            if (this.reactiveUser && this.synchro && rxdb.initialized && mutexGlobal.isLeader()) {
+               try {
+                  await mutexGlobal.lock('ws::synchroLoop')
+                  await this.lock('ws::synchroLoop')
+                  const tLoop = performance.now()
+                  // logD(f, 'next loop start...', this.synchroLoopWaitObj.getTimeOut())
+                  await this.synchronize()
+                  // logD(f, `next loop complete: ${Math.floor(performance.now() - tLoop)} msec`)
+               } catch (err) {
+                  logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
+                  this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
+               } finally {
+                  this.release()
+                  await mutexGlobal.release('ws::synchroLoop')
                }
-               await this.synchroLoopWaitObj.wait()
             }
+            await this.synchroLoopWaitObj.wait()
          }
-         if (!this.synchroStarted) this.synchroLoop().catch(err => logE(f, 'не удалось запустить цикл синхронизации', err))
-         this.created = true
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, this.created)
-      } finally {
       }
+      if (!this.synchroStarted) this.synchroLoop().catch(err => logE(f, 'не удалось запустить цикл синхронизации', err))
+      this.created = true
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, this.created)
    }
 
    setUser (reactiveUser) { // для гостей мастерская НЕ синхронится с сервером!
@@ -493,7 +490,7 @@ class Workspace {
          let itemCopy = JSON.parse(JSON.stringify(item))
          if (itemCopy.wsItemType === WsItemTypeEnum.WS_NODE) {
             itemCopy.contentOids = itemCopy.items.reduce((acc, val) => {
-               val.layers.map(l => {
+               val.layers.forEach(l => {
                   acc.push(l.contentOid)
                })
                return acc

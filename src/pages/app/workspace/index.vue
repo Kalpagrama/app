@@ -6,7 +6,8 @@ router-view
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'workspace',
+  // eslint-disable-next-line vue/multi-word-component-names
+  name: 'pageWorkspace',
   data () {
     return {
     }

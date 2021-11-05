@@ -255,9 +255,8 @@ export default {
           }
         })
       }
-          // else if (type === 'vimeo') {}
-      // else if (type === 'instagram') {}
       else if (type === 'player-kalpa') {
+        //
       }
       // Add events bus for every player
       this.events = {

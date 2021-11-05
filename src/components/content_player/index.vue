@@ -12,7 +12,7 @@ component(
 
 <script>
 export default {
-  // name: 'contentPlayerIndex',
+  name: 'contentPlayer',
   components: {
     playerVideo: () => import('./player_video/index.vue'),
     playerImage: () => import('./player_image/index.vue'),

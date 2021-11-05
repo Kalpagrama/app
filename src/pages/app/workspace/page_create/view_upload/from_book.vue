@@ -16,10 +16,7 @@ export default {
     let contentKalpa = await ContentApi.contentCreateFromFile(this.file)
     this.$log('contentKalpa', contentKalpa)
     let {items: [content]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_CONTENT, oid: contentKalpa.oid}})
-    if (content) {
-    }
-    // create content
-    else {
+    if (!content) { // create content
       let contentInput = {
         type: 'BOOK',
         oid: contentKalpa.oid,
