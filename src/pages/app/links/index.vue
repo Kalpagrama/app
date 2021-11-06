@@ -44,7 +44,7 @@ export default {
     // this.$log('mounted')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
   },
-  beforeDestroy () {
+  beforeUnmount () {
     // this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
   }

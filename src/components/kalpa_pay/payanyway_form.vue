@@ -1,13 +1,13 @@
 <template lang="pug">
-  div(:style=`{
-               border: "grey",
-               borderStyle: 'solid',
-               borderWidth: '2px',
-               borderRadius: '15px',
-               overflow: 'hidden',
-      }`).b-30
-    //q-btn(label="test").text-white
-    div(id="payment-form")
+div(:style=`{
+             border: "grey",
+             borderStyle: 'solid',
+             borderWidth: '2px',
+             borderRadius: '15px',
+             overflow: 'hidden',
+    }`).b-30
+  //q-btn(label="test").text-white
+  div(id="payment-form")
 </template>
 
 <script>

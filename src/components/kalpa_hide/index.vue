@@ -1,23 +1,23 @@
 <template lang="pug">
-  div(:style=`{
-  borderRadius: '20px'
-  }`).row.b-40
-    .column.full-width.text-white.q-mx-md
-      //q-icon(name="task_alt" size="40px" color="green").q-mt-md
-      .row.full-width.justify-center.q-mt-sm
-        span.text-grey.text-center.q-mb-md.q-mt-md.q-px-sm {{$t('This publication will be hidden. From now on, we will show less of this content. Why did the publication seem uninteresting to you?')}}
-        q-btn(
-          v-for="(r,i) in reasons" :key="i"
-          :label="r.name" no-caps flat :style=`{borderRadius: '0px', fontSize: fontSize+'px', width: '100%'}` @click="hide(r.id)")
-      div(:style=`{
-        content: '',
-        width: '100%',
-        height: '1px',
-        background: 'rgb(73,66,61)',}`).q-mt-md
-      .row.full-width
-        q-btn(
-          :label="$t('Cancel')" no-caps flat color="red" v-close-popup
-          :style=`{borderRadius: '0 0 20px 20px', width: '100%'}`).q-py-sm
+div(:style=`{
+borderRadius: '20px'
+}`).row.b-40
+  .column.full-width.text-white.q-mx-md
+    //q-icon(name="task_alt" size="40px" color="green").q-mt-md
+    .row.full-width.justify-center.q-mt-sm
+      span.text-grey.text-center.q-mb-md.q-mt-md.q-px-sm {{$t('This publication will be hidden. From now on, we will show less of this content. Why did the publication seem uninteresting to you?')}}
+      q-btn(
+        v-for="(r,i) in reasons" :key="i"
+        :label="r.name" no-caps flat :style=`{borderRadius: '0px', fontSize: fontSize+'px', width: '100%'}` @click="hide(r.id)")
+    div(:style=`{
+      content: '',
+      width: '100%',
+      height: '1px',
+      background: 'rgb(73,66,61)',}`).q-mt-md
+    .row.full-width
+      q-btn(
+        :label="$t('Cancel')" no-caps flat color="red" v-close-popup
+        :style=`{borderRadius: '0 0 20px 20px', width: '100%'}`).q-py-sm
 </template>
 
 <script>

@@ -273,7 +273,7 @@ export default {
     //   this.scrollWrapperRef = this.$refs['scroll-wrapper']
     // })
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])

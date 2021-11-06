@@ -1,50 +1,50 @@
 <template lang="pug">
-  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start
-    tab-list-feed(
-      v-if="pageId"
-      :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
-      :navHeaderText="useNavHeader ? $t('Published') : ''"
-      :searchInputState="searchInputState"
-      :searchString="searchString"
-      :pages="pages"
-      :pageId="pageId"
-      :query="query"
-      :itemHeightApprox="100"
-      :itemActivePersist="itemActivePersist"
-      @searchString="searchString = $event"
-      @pageId="pageId = $event"
-      @searchInputState="$emit('searchInputState', $event)"
-    ).row.full-width
-      template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
-        div(
-          @click="onSelected(item)"
+div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start
+  tab-list-feed(
+    v-if="pageId"
+    :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
+    :navHeaderText="useNavHeader ? $t('Published') : ''"
+    :searchInputState="searchInputState"
+    :searchString="searchString"
+    :pages="pages"
+    :pageId="pageId"
+    :query="query"
+    :itemHeightApprox="100"
+    :itemActivePersist="itemActivePersist"
+    @searchString="searchString = $event"
+    @pageId="pageId = $event"
+    @searchInputState="$emit('searchInputState', $event)"
+  ).row.full-width
+    template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
+      div(
+        @click="onSelected(item)"
+        :style=`{
+                  background: 'rgb(35,35,35)',
+                  borderRadius: '10px',
+                }`
+      ).row.full-width.items-start.content-start.q-mb-sm
+        img(
+          v-if="!['WORD', 'SENTENCE', 'SPHERE'].includes(item.type)"
+          draggable="false"
+          :src="item.thumbUrl"
           :style=`{
-                    background: 'rgb(35,35,35)',
-                    borderRadius: '10px',
-                  }`
-        ).row.full-width.items-start.content-start.q-mb-sm
-          img(
-            v-if="!['WORD', 'SENTENCE', 'SPHERE'].includes(item.type)"
-            draggable="false"
-            :src="item.thumbUrl"
-            :style=`{
-                        height: '60px',
-                        minWidth: '90px',
-                        maxWidth: '90px',
-                        borderRadius: '10px',
-                        objectFit: 'cover',
-                      }`).b-50.q-mt-sm.q-ml-sm.q-mb-sm
-          div(
-            v-else
-            :style=`{width: '90px', height: '60px',}`
-          ).row.items-center.content-center.justify-center.q-mt-sm.q-ml-sm.q-mb-sm
-            q-icon(name="blur_on" size="60px" color="white")
-          .col.full-height
-            .row.fit.items-between.content-between.q-pa-sm
-              .row.full-width
-                span.text-white.q-pt-sm {{ item.name }}
-              .row.full-width
-                small.text-grey-8 {{ itemType(item) }}
+                      height: '60px',
+                      minWidth: '90px',
+                      maxWidth: '90px',
+                      borderRadius: '10px',
+                      objectFit: 'cover',
+                    }`).b-50.q-mt-sm.q-ml-sm.q-mb-sm
+        div(
+          v-else
+          :style=`{width: '90px', height: '60px',}`
+        ).row.items-center.content-center.justify-center.q-mt-sm.q-ml-sm.q-mb-sm
+          q-icon(name="blur_on" size="60px" color="white")
+        .col.full-height
+          .row.fit.items-between.content-between.q-pa-sm
+            .row.full-width
+              span.text-white.q-pt-sm {{ item.name }}
+            .row.full-width
+              small.text-grey-8 {{ itemType(item) }}
 </template>
 
 <script>

@@ -93,7 +93,7 @@ export default {
     this.player.events.on('figures-forward-start', this.figureForwardStartHandle)
     this.player.events.on('figures-forward-end', this.figureForwardEndHandle)
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
     this.player.events.off('figures-forward-start', this.figureForwardStartHandle)
     this.player.events.off('figures-forward-end', this.figureForwardEndHandle)

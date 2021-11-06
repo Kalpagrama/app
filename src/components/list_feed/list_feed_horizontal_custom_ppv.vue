@@ -1,128 +1,128 @@
 // если указан scrollAreaWidth - сделает внутренний скролл - иначе - воспользуется скроллом window
 <template lang="pug">
-  div(
-    :style=`{height: scrollAreaHeight+'px', width: scrollAreaWidth ? scrollAreaWidth+'px' : null, maxWidth: scrollAreaWidth ? scrollAreaWidth+'px' : null }`
-    :class=`{ scroll: !!scrollAreaWidth}`).row.full-width
-    div(ref="scrolledArea").row.full-width.relative-position.no-wrap
-      q-resize-observer(@resize="scrolledAreaResized")
-      //- debug
-      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-        div(
-          v-if="debugPosition && $store.state.ui.useDebug"
-          :style=`{
-          position: 'fixed', zIndex: 10000, top: debugPosition.top, right: debugPosition.right,
-        }`
-        ).row.q-pa-sm
-          //- details
-          div(
-            :style=`{
-            position: 'absolute', zIndex: 10001, top: '0px', right: '46px',
-            overflow: 'hidden',
-          }`
-          ).q-pa-sm
-            transition(enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight")
-              div(
-                v-if="itemsRes && debugOpened"
-                :style=`{
-                borderRadius: '10px',
-                whiteSpace: 'nowrap'
-              }`
-              ).row.text-white.bg-green.q-pa-sm.bg
-                small.full-width scrollTargetIsWindow: {{ scrollTargetIsWindow }}
-                small.full-width scrollTargetWidth: {{ scrollTargetWidth }}
-                small.full-width scrollLeft: {{ scrollLeft }}
-                small.full-width scrollRight: {{ scrollRight }}
-                small.full-width scrolledAreaWidth: {{ scrolledAreaWidth }}
-                small.full-width count: {{ length }}
-                small(v-if="itemActive").full-width itemActive.left: {{ itemActive.left }}
-                q-btn(
-                  @click="itemActiveGetPosition"
-                  outline dense no-caps align="lef" size="sm"
-                  color="purple"
-                ).full-width.q-mb-xs itemActive position?
-          //- default
-          div(
-            v-if="itemsRes"
-            :style=`{width: '36px', borderRadius: '10px',}`).row.b-40
-            q-btn(
-              @click="debugOpened = !debugOpened"
-              :icon="debugOpened ? 'keyboard_arrow_right' : 'keyboard_arrow_left'"
-              round flat dense color="white" ).full-width
-              //- q-tooltip Дебаг вкл/выкл
-            q-btn(
-              @click="scrollToStart"
-              :color="itemsRes.hasPrev ? 'white' : 'red'"
-              :disabled="!itemsRes.hasPrev"
-              round flat dense icon="vertical_align_top").full-width
-              //- q-tooltip В начало
-            q-btn(
-              @click="itemActiveScrollIntoView('BTN')"
-              round flat dense color="white" icon="adjust").full-width
-            q-btn(
-              @click="fill"
-              round flat dense color="white").full-width
-              q-icon(name="flip").rotate-270
-              //- q-tooltip Начать с текущего
-      //- spinner, no itemsRes
-      q-spinner-dots(v-if="!itemsRes" color="green" size="60px" :style=`{left: 'calc(50% - 30px)', top: '60px'}`).absolute-top
-      // items
-      // коробка с итемом. ее размер меняется только тогда, когда скролл стоит
-      div(v-for="({source: item, state, debugInfo}, itemIndex) in vsItems"
-        :ref="`item-${itemIndex}`"
-        :key="`item-${itemIndex}`"
-        :accessKey="`${itemIndex}`"
-        v-observe-visibility=`{
-          throttle: 0,
-          callback: itemActiveHandler,
-          intersection: {
-            root: scrollTargetIsWindow ? null : scrollTarget,
-            rootMargin: rootMargin,
-            //- threshold: 0.9,
-          }
-        }`
+div(
+  :style=`{height: scrollAreaHeight+'px', width: scrollAreaWidth ? scrollAreaWidth+'px' : null, maxWidth: scrollAreaWidth ? scrollAreaWidth+'px' : null }`
+  :class=`{ scroll: !!scrollAreaWidth}`).row.full-width
+  div(ref="scrolledArea").row.full-width.relative-position.no-wrap
+    q-resize-observer(@resize="scrolledAreaResized")
+    //- debug
+    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      div(
+        v-if="debugPosition && $store.state.ui.useDebug"
         :style=`{
-            position: 'relative',
-            // maxHeight: state.currentHeight + 'px',
-            // maxWidth: state.currentWidth + 'px',
-            // minHeight: state.currentHeight + 'px',
-            // minWidth: state.currentWidth + 'px',
-            // overflow: 'hidden',
-            }`
-      )
-        // болванка (должна быть минимальной. их создается очень(очень) много)
-        div(v-if="state.isDummy"
-          :style=`{
-               border: '2px solid rgb(50,50,50)',
-               borderRadius: '10px',
-               height: itemHeightApprox + 'px',
-               width: itemWidthApprox + 'px',
-         }`).row
-        // item
+        position: 'fixed', zIndex: 10000, top: debugPosition.top, right: debugPosition.right,
+      }`
+      ).row.q-pa-sm
+        //- details
         div(
-          v-else
-          :style=`{...itemStyles}`
-          :accessKey="`${item[itemKey]}-${itemIndex}`"
-          v-observe-visibility=`{
-            throttle: 300,
-            callback: itemVisibilityHandler,
-            intersection: {
-               root: scrollTargetIsWindow ? null : scrollTarget,
-               threshold: 0.2},
+          :style=`{
+          position: 'absolute', zIndex: 10001, top: '0px', right: '46px',
+          overflow: 'hidden',
+        }`
+        ).q-pa-sm
+          transition(enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight")
+            div(
+              v-if="itemsRes && debugOpened"
+              :style=`{
+              borderRadius: '10px',
+              whiteSpace: 'nowrap'
             }`
-        ).row.full-width
-          //q-resize-observer(@resize="itemResized(itemIndex, $event.height, $event.width)")
-          slot(
-            name="item"
-            :item="item"
-            :itemState="state"
-            :itemIndex="itemIndex"
-            :isActive="itemActive && itemActive.indx === itemIndex"
-            :isVisible="!!itemsVisibility[item[itemKey]]",
-            :isPreload="true",
-            :scrolling="scrolling"
-          )
-        span(v-if="$store.state.ui.useDebug" :style=`{color: itemActive && itemIndex === itemActive.indx ? 'green' : 'grey'}`
-        ).absolute-top # {{itemIndex}} of {{length}}
+            ).row.text-white.bg-green.q-pa-sm.bg
+              small.full-width scrollTargetIsWindow: {{ scrollTargetIsWindow }}
+              small.full-width scrollTargetWidth: {{ scrollTargetWidth }}
+              small.full-width scrollLeft: {{ scrollLeft }}
+              small.full-width scrollRight: {{ scrollRight }}
+              small.full-width scrolledAreaWidth: {{ scrolledAreaWidth }}
+              small.full-width count: {{ length }}
+              small(v-if="itemActive").full-width itemActive.left: {{ itemActive.left }}
+              q-btn(
+                @click="itemActiveGetPosition"
+                outline dense no-caps align="lef" size="sm"
+                color="purple"
+              ).full-width.q-mb-xs itemActive position?
+        //- default
+        div(
+          v-if="itemsRes"
+          :style=`{width: '36px', borderRadius: '10px',}`).row.b-40
+          q-btn(
+            @click="debugOpened = !debugOpened"
+            :icon="debugOpened ? 'keyboard_arrow_right' : 'keyboard_arrow_left'"
+            round flat dense color="white" ).full-width
+            //- q-tooltip Дебаг вкл/выкл
+          q-btn(
+            @click="scrollToStart"
+            :color="itemsRes.hasPrev ? 'white' : 'red'"
+            :disabled="!itemsRes.hasPrev"
+            round flat dense icon="vertical_align_top").full-width
+            //- q-tooltip В начало
+          q-btn(
+            @click="itemActiveScrollIntoView('BTN')"
+            round flat dense color="white" icon="adjust").full-width
+          q-btn(
+            @click="fill"
+            round flat dense color="white").full-width
+            q-icon(name="flip").rotate-270
+            //- q-tooltip Начать с текущего
+    //- spinner, no itemsRes
+    q-spinner-dots(v-if="!itemsRes" color="green" size="60px" :style=`{left: 'calc(50% - 30px)', top: '60px'}`).absolute-top
+    // items
+    // коробка с итемом. ее размер меняется только тогда, когда скролл стоит
+    div(v-for="({source: item, state, debugInfo}, itemIndex) in vsItems"
+      :ref="`item-${itemIndex}`"
+      :key="`item-${itemIndex}`"
+      :accessKey="`${itemIndex}`"
+      v-observe-visibility=`{
+        throttle: 0,
+        callback: itemActiveHandler,
+        intersection: {
+          root: scrollTargetIsWindow ? null : scrollTarget,
+          rootMargin: rootMargin,
+          //- threshold: 0.9,
+        }
+      }`
+      :style=`{
+          position: 'relative',
+          // maxHeight: state.currentHeight + 'px',
+          // maxWidth: state.currentWidth + 'px',
+          // minHeight: state.currentHeight + 'px',
+          // minWidth: state.currentWidth + 'px',
+          // overflow: 'hidden',
+          }`
+    )
+      // болванка (должна быть минимальной. их создается очень(очень) много)
+      div(v-if="state.isDummy"
+        :style=`{
+             border: '2px solid rgb(50,50,50)',
+             borderRadius: '10px',
+             height: itemHeightApprox + 'px',
+             width: itemWidthApprox + 'px',
+       }`).row
+      // item
+      div(
+        v-else
+        :style=`{...itemStyles}`
+        :accessKey="`${item[itemKey]}-${itemIndex}`"
+        v-observe-visibility=`{
+          throttle: 300,
+          callback: itemVisibilityHandler,
+          intersection: {
+             root: scrollTargetIsWindow ? null : scrollTarget,
+             threshold: 0.2},
+          }`
+      ).row.full-width
+        //q-resize-observer(@resize="itemResized(itemIndex, $event.height, $event.width)")
+        slot(
+          name="item"
+          :item="item"
+          :itemState="state"
+          :itemIndex="itemIndex"
+          :isActive="itemActive && itemActive.indx === itemIndex"
+          :isVisible="!!itemsVisibility[item[itemKey]]",
+          :isPreload="true",
+          :scrolling="scrolling"
+        )
+      span(v-if="$store.state.ui.useDebug" :style=`{color: itemActive && itemIndex === itemActive.indx ? 'green' : 'grey'}`
+      ).absolute-top # {{itemIndex}} of {{length}}
 </template>
 
 <script>
@@ -427,7 +427,7 @@ export default {
     this.scrollTarget.addEventListener('resize', this.scrolledAreaResized)
     this.scrollTargetWidth = this.scrollTargetIsWindow ? this.scrollTarget.innerWidth : this.scrollTarget.clientWidth
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
     this.scrollTarget.removeEventListener('scroll', this.scrollUpdate)
     this.scrollTarget.removeEventListener('resize', this.scrolledAreaResized)

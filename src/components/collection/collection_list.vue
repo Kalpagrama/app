@@ -1,25 +1,25 @@
 <template lang="pug">
-  .row.justify-start.full-width.q-pt-md
-    .col
-    span.q-pl-xl {{$t('Сохранить в коллекцию')}}
-    .col
-    q-btn(flat icon="add" dense no-caps color="green" @click="showMenu=true").q-mr-md
-      q-dialog(v-model="showMenu" transition-show="flip-up" transition-hide="flip-down" :content-style=`{borderRadius: '10px', background: 'rgba(40,40,40,0.7)'}`)
-        div(
-          :style=`{ borderRadius: '10px', color: 'white', border: '2px solid rgb(76,175,79)', paddingLeft: '10px', background: 'rgba(40,40,40)'}`
-        ).row.full-width
-          q-input(v-model="newCollectionName", autofocus, borderless dark :placeholder="$t('New collection')" @keyup.enter="createCollection(true)").col.full-width
-          q-btn(v-close-popup round flat :color="newCollectionName ? 'green' : null", icon="add", :disable="!newCollectionName" @click="createCollection(true)")
-    //div(v-for="(c,ci) in value.collections" :key="c.id").col.full-width.wrap
-    div(:style=`{maxHeight: '180px'}`).row.scroll.full-width
-      q-chip(
-        v-for="(c,ci) in value.collections" :key="c.id"
-        no-caps clickable text-color="white" outline
-        :color="value.selectedCollectionIds.includes(c.id) && highlightSelected? 'green' : 'grey-8'"
-        @click="addRemoveCollection(c)"
-      ).q-pl-sm
-        div(:style=`{maxWidth: $q.screen.width > $store.state.ui.pageMinWidthDesktop ? '500px' : '250px', fontSize: '12px'}`).ellipsis {{ c.name }}
-        q-btn(v-if="showDeleteButton" round flat no-caps :icon="c.id=='all' ? null : 'clear'" color= "red" @click="removeCollection(c.id)")
+.row.justify-start.full-width.q-pt-md
+  .col
+  span.q-pl-xl {{$t('Сохранить в коллекцию')}}
+  .col
+  q-btn(flat icon="add" dense no-caps color="green" @click="showMenu=true").q-mr-md
+    q-dialog(v-model="showMenu" transition-show="flip-up" transition-hide="flip-down" :content-style=`{borderRadius: '10px', background: 'rgba(40,40,40,0.7)'}`)
+      div(
+        :style=`{ borderRadius: '10px', color: 'white', border: '2px solid rgb(76,175,79)', paddingLeft: '10px', background: 'rgba(40,40,40)'}`
+      ).row.full-width
+        q-input(v-model="newCollectionName", autofocus, borderless dark :placeholder="$t('New collection')" @keyup.enter="createCollection(true)").col.full-width
+        q-btn(v-close-popup round flat :color="newCollectionName ? 'green' : null", icon="add", :disable="!newCollectionName" @click="createCollection(true)")
+  //div(v-for="(c,ci) in value.collections" :key="c.id").col.full-width.wrap
+  div(:style=`{maxHeight: '180px'}`).row.scroll.full-width
+    q-chip(
+      v-for="(c,ci) in value.collections" :key="c.id"
+      no-caps clickable text-color="white" outline
+      :color="value.selectedCollectionIds.includes(c.id) && highlightSelected? 'green' : 'grey-8'"
+      @click="addRemoveCollection(c)"
+    ).q-pl-sm
+      div(:style=`{maxWidth: $q.screen.width > $store.state.ui.pageMinWidthDesktop ? '500px' : '250px', fontSize: '12px'}`).ellipsis {{ c.name }}
+      q-btn(v-if="showDeleteButton" round flat no-caps :icon="c.id=='all' ? null : 'clear'" color= "red" @click="removeCollection(c.id)")
 </template>
 
 <script>

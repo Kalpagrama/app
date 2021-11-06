@@ -1,159 +1,159 @@
 // если указан scrollAreaHeight - создаст virtualScroll в q-scroll-area, иначе - в getScrollTarget(this.$el)
 <template lang="pug">
-  div(:style=`{ position: 'relative'}`).row.full-width.items-start.content-start
-    q-spinner-dots(v-if="!itemsRes" color="green" size="60px"
-      :style=`{ position: scrollAreaHeight ? 'absolute' : 'fixed', top: '50%', left: 'calc(50% - 30px)'}`)
-    // debug
-    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+div(:style=`{ position: 'relative'}`).row.full-width.items-start.content-start
+  q-spinner-dots(v-if="!itemsRes" color="green" size="60px"
+    :style=`{ position: scrollAreaHeight ? 'absolute' : 'fixed', top: '50%', left: 'calc(50% - 30px)'}`)
+  // debug
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="debugPosition && $store.state.ui.useDebug"
+      :style=`{
+      position: 'fixed', zIndex: 10000, top: debugPosition.top, right: debugPosition.right,
+    }`
+    ).row.q-pa-sm
       div(
-        v-if="debugPosition && $store.state.ui.useDebug"
         :style=`{
-        position: 'fixed', zIndex: 10000, top: debugPosition.top, right: debugPosition.right,
+        position: 'absolute', zIndex: 10001, top: '0px', right: '46px',
+        overflow: 'hidden',
       }`
-      ).row.q-pa-sm
-        div(
-          :style=`{
-          position: 'absolute', zIndex: 10001, top: '0px', right: '46px',
-          overflow: 'hidden',
-        }`
-        ).q-pa-sm
-          transition(enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight")
-            div(
-              v-if="itemsRes && debugOpened"
-              :style=`{
-              borderRadius: '10px',
-              whiteSpace: 'nowrap'
-            }`
-            ).row.text-white.bg-green.q-pa-sm.bg
-              small.full-width scrollTargetIsWindow: {{ !this.scrollAreaHeight }}
-              small.full-width scrollTargetHeight: {{ scrollTargetHeight }}
-              small.full-width scrollHeight: {{ scrollHeight }}
-              small.full-width scrolling: {{ scrolling }}
-              small.full-width itemMiddleIndx: {{ itemMiddleIndx }}
-        //- default
-        div(
-          v-if="itemsRes"
-          :style=`{width: '36px', borderRadius: '10px',}`).row.b-40
-          q-btn(
-            @click="debugOpened = !debugOpened"
-            :icon="debugOpened ? 'keyboard_arrow_right' : 'keyboard_arrow_left'"
-            round flat dense color="white" ).full-width
-            //- q-tooltip Дебаг вкл/выкл
-          q-btn(
-            @click="gotoStart"
-            :color="itemsRes.hasPrev ? 'white' : 'red'"
-            :disabled="!itemsRes.hasPrev"
-            round flat dense icon="vertical_align_top").full-width
-            //- q-tooltip В начало
-          q-btn(
-            @click="prev()"
-            :loading="itemsResStatus === 'PREV'"
-            :color="itemsRes.hasPrev ? 'white' : 'red'"
-            :disabled="!itemsRes.hasPrev"
-            round flat dense  icon="north").full-width
-            //- q-tooltip Назад
-          q-btn(
-            @click="itemMiddleScrollIntoView('BTN')"
-            round flat dense color="white" icon="adjust").full-width
-          q-btn(
-            @click="gotoCurrent"
-            round flat dense color="white").full-width
-            q-icon(name="flip").rotate-270
-            //- q-tooltip Начать с текущего
-          q-btn(
-            @click="next()"
-            :loading="itemsResStatus === 'NEXT'"
-            :color="itemsRes.hasNext ? 'white' : 'red'"
-            :disabled="!itemsRes.hasNext"
-            round flat dense  icon="south").full-width
-            //- q-tooltip Вперед
-    //- items
-    .row.full-width.items-start.content-start
-      // если указана scrollAreaHeight, то скролл будет в q-scroll-area с указанной высотой
-      component(
-        ref="vsHolder"
-        :is="scrollAreaHeight ? 'q-scroll-area' : 'row-full-width-component'"
-        :id="scrollId"
-        :visible="false"
-        :delay="1500"
-        :style=`{height: scrollAreaHeight ? scrollAreaHeight + 'px' : null}`
-        dark
-        :thumb-style=`{
-          right: '5px',
-          zIndex: 100,
-          borderRadius: '8px',
-          backgroundColor: 'rgb(50,50,50)',
-          width: '8px',
-          opacity: 0.75}`
-        :bar-style=`{
-          right: '2px',
-          borderRadius: '14px',
-          backgroundColor: '#2222',
-          width: '14px',
-          opacity: 0.2,
+      ).q-pa-sm
+        transition(enter-active-class="animated slideInRight" leave-active-class="animated slideOutRight")
+          div(
+            v-if="itemsRes && debugOpened"
+            :style=`{
+            borderRadius: '10px',
+            whiteSpace: 'nowrap'
           }`
-      ).full-width
-        q-scroll-observer(:debounce="100" @scroll="onScrollObserver")
-        // headers + items
-        .row.full-width
-          slot(name="header")
-        // sticky header
-        div(:style=`{ position: 'sticky', top: '0px', zIndex: 100}`).row.full-width
-          q-resize-observer(@resize="stickyHeaderHeight = $event.height")
-          slot(name="sticky-header")
-          //div(:style=`{height: '50px', background: 'red'}`).row.full-width.bg
-        // items list
-        q-virtual-scroll(
-          ref="vs"
-          :scroll-target="scrollAreaHeight ? `#${scrollId} > .scroll` : 'body'"
-          dark
-          :items="vsItems"
-          :virtual-scroll-item-size="itemHeightApprox"
-          :virtual-scroll-sticky-size-start="stickyHeaderHeight"
-          @virtual-scroll="onScrollVS")
-          template(v-slot:default=`{ item: {source: item, state}, index }`)
-            //-item
+          ).row.text-white.bg-green.q-pa-sm.bg
+            small.full-width scrollTargetIsWindow: {{ !this.scrollAreaHeight }}
+            small.full-width scrollTargetHeight: {{ scrollTargetHeight }}
+            small.full-width scrollHeight: {{ scrollHeight }}
+            small.full-width scrolling: {{ scrolling }}
+            small.full-width itemMiddleIndx: {{ itemMiddleIndx }}
+      //- default
+      div(
+        v-if="itemsRes"
+        :style=`{width: '36px', borderRadius: '10px',}`).row.b-40
+        q-btn(
+          @click="debugOpened = !debugOpened"
+          :icon="debugOpened ? 'keyboard_arrow_right' : 'keyboard_arrow_left'"
+          round flat dense color="white" ).full-width
+          //- q-tooltip Дебаг вкл/выкл
+        q-btn(
+          @click="gotoStart"
+          :color="itemsRes.hasPrev ? 'white' : 'red'"
+          :disabled="!itemsRes.hasPrev"
+          round flat dense icon="vertical_align_top").full-width
+          //- q-tooltip В начало
+        q-btn(
+          @click="prev()"
+          :loading="itemsResStatus === 'PREV'"
+          :color="itemsRes.hasPrev ? 'white' : 'red'"
+          :disabled="!itemsRes.hasPrev"
+          round flat dense  icon="north").full-width
+          //- q-tooltip Назад
+        q-btn(
+          @click="itemMiddleScrollIntoView('BTN')"
+          round flat dense color="white" icon="adjust").full-width
+        q-btn(
+          @click="gotoCurrent"
+          round flat dense color="white").full-width
+          q-icon(name="flip").rotate-270
+          //- q-tooltip Начать с текущего
+        q-btn(
+          @click="next()"
+          :loading="itemsResStatus === 'NEXT'"
+          :color="itemsRes.hasNext ? 'white' : 'red'"
+          :disabled="!itemsRes.hasNext"
+          round flat dense  icon="south").full-width
+          //- q-tooltip Вперед
+  //- items
+  .row.full-width.items-start.content-start
+    // если указана scrollAreaHeight, то скролл будет в q-scroll-area с указанной высотой
+    component(
+      ref="vsHolder"
+      :is="scrollAreaHeight ? 'q-scroll-area' : 'row-full-width-component'"
+      :id="scrollId"
+      :visible="false"
+      :delay="1500"
+      :style=`{height: scrollAreaHeight ? scrollAreaHeight + 'px' : null}`
+      dark
+      :thumb-style=`{
+        right: '5px',
+        zIndex: 100,
+        borderRadius: '8px',
+        backgroundColor: 'rgb(50,50,50)',
+        width: '8px',
+        opacity: 0.75}`
+      :bar-style=`{
+        right: '2px',
+        borderRadius: '14px',
+        backgroundColor: '#2222',
+        width: '14px',
+        opacity: 0.2,
+        }`
+    ).full-width
+      q-scroll-observer(:debounce="100" @scroll="onScrollObserver")
+      // headers + items
+      .row.full-width
+        slot(name="header")
+      // sticky header
+      div(:style=`{ position: 'sticky', top: '0px', zIndex: 100}`).row.full-width
+        q-resize-observer(@resize="stickyHeaderHeight = $event.height")
+        slot(name="sticky-header")
+        //div(:style=`{height: '50px', background: 'red'}`).row.full-width.bg
+      // items list
+      q-virtual-scroll(
+        ref="vs"
+        :scroll-target="scrollAreaHeight ? `#${scrollId} > .scroll` : 'body'"
+        dark
+        :items="vsItems"
+        :virtual-scroll-item-size="itemHeightApprox"
+        :virtual-scroll-sticky-size-start="stickyHeaderHeight"
+        @virtual-scroll="onScrollVS")
+        template(v-slot:default=`{ item: {source: item, state}, index }`)
+          //-item
+          div(
+            :ref="`item-${index}`"
+            :accessKey="`${item[itemKey]}-${index}`"
+            v-observe-visibility=`{
+              throttle: 300,
+              callback: itemVisibilityHandler,
+              intersection: {
+                 threshold: 0.0,
+              },
+            }`
+            :style=`{
+                      // height: Math.min($store.state.ui.pageWidth, $q.screen.height) + 'px',
+                      // overflow: 'hide',
+                      position: 'relative'}`
+            @click="onItemClick(index)"
+          ).row.full-width
             div(
-              :ref="`item-${index}`"
+              :key="item[itemKey]"
               :accessKey="`${item[itemKey]}-${index}`"
               v-observe-visibility=`{
                 throttle: 300,
-                callback: itemVisibilityHandler,
+                callback: itemMiddleHandler,
                 intersection: {
-                   threshold: 0.0,
-                },
+                  root: null,
+                  rootMargin: rootMargin,
+                  //- threshold: 0.9,
+                }
               }`
-              :style=`{
-                        // height: Math.min($store.state.ui.pageWidth, $q.screen.height) + 'px',
-                        // overflow: 'hide',
-                        position: 'relative'}`
-              @click="onItemClick(index)"
             ).row.full-width
-              div(
-                :key="item[itemKey]"
-                :accessKey="`${item[itemKey]}-${index}`"
-                v-observe-visibility=`{
-                  throttle: 300,
-                  callback: itemMiddleHandler,
-                  intersection: {
-                    root: null,
-                    rootMargin: rootMargin,
-                    //- threshold: 0.9,
-                  }
-                }`
-              ).row.full-width
-                slot(
-                  name="item"
-                  :item="item"
-                  :itemState="state"
-                  :itemIndex="index"
-                  :isActive="itemActiveIndx === index"
-                  :isVisible="!!itemsVisibility[item[itemKey]]"
-                  :isPreload="index>=preloadInterval.from && index <= preloadInterval.to"
-                  :scrolling="scrolling"
-                )
-                span(v-if="$store.state.ui.useDebug" :style=`{color: itemActiveIndx === index ? 'green' : 'white'}`).absolute-top # {{index}} of {{length-1}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '----VISIBLE' : ''}} {{item.name}}
-                span(v-if="$store.state.ui.useDebug" :style=`{color: itemActiveIndx === index ? 'green' : 'white'}`).absolute-center.text-bold.text-h1.z-max {{index}}
+              slot(
+                name="item"
+                :item="item"
+                :itemState="state"
+                :itemIndex="index"
+                :isActive="itemActiveIndx === index"
+                :isVisible="!!itemsVisibility[item[itemKey]]"
+                :isPreload="index>=preloadInterval.from && index <= preloadInterval.to"
+                :scrolling="scrolling"
+              )
+              span(v-if="$store.state.ui.useDebug" :style=`{color: itemActiveIndx === index ? 'green' : 'white'}`).absolute-top # {{index}} of {{length-1}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '----VISIBLE' : ''}} {{item.name}}
+              span(v-if="$store.state.ui.useDebug" :style=`{color: itemActiveIndx === index ? 'green' : 'white'}`).absolute-center.text-bold.text-h1.z-max {{index}}
 </template>
 
 <script>
@@ -356,7 +356,7 @@ export default {
     this.scrollTarget.addEventListener('resize', this.scrollTargetResized)
     this.scrollTargetResized() // начальное значение
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
     this.scrollTarget.removeEventListener('resize', this.scrollTargetResized)
   }

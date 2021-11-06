@@ -59,14 +59,14 @@ export default {
     // alert('mounted!!!!')
     window.itemRenderMounted = true // puppeteer на бэкенде ждет и не рендерит страничку пока эта переменная = false
   },
-  destroyed () {
+  unmounted () {
     window.itemRenderMounted = false
   },
   created () {
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', false])
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
   }

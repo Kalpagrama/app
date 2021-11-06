@@ -176,7 +176,7 @@ export default {
       this.isMounted = true
     })
   },
-  async beforeDestroy () {
+  async beforeUnmount () {
     this.$log('beforeDestroy')
     let tutorialCurrent = this.$store.getters.currentUser.profile.tutorial
     tutorialCurrent[this.config.id] = true

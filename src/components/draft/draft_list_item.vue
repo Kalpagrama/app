@@ -5,63 +5,63 @@
 </style>
 
 <template lang="pug">
-  div(
-    :style=`{
-    position: 'relative',
-    minHeight: '50px',
-    background: 'rgb(35,35,35)',
-    borderRadius: '10px',
+div(
+  :style=`{
+  position: 'relative',
+  minHeight: '50px',
+  background: 'rgb(35,35,35)',
+  borderRadius: '10px',
 
-  }`
-  ).row.full-width.items-start.content-start.draft-item
-    //- left
-    .col
-      component(
-        :is="mode === 'select' ? 'div' : 'q-btn'"
+}`
+).row.full-width.items-start.content-start.draft-item
+  //- left
+  .col
+    component(
+      :is="mode === 'select' ? 'div' : 'q-btn'"
+      :style=`{
+      minHeight: '50px',
+    }`
+      @click="onSelect"
+    ).row.full-width.items-start.content-start.cursor-pointer
+      //- preview, but not for sphere...
+      img(
+        v-if="!thumbUrlErrored"
+        @error="thumbUrlErrorHandle"
+        draggable="false"
+        :src="draft.thumbUrl"
         :style=`{
-        minHeight: '50px',
+        height: '50px',
+        minWidth: '90px',
+        maxWidth: '90px',
+        borderRadius: '10px',
+        objectFit: 'contain',
+      }`).b-40.q-mt-sm.q-ml-sm.q-mb-sm
+      //- special case is sphere...
+      div(
+        v-else
+        :style=`{
+        height: '50px',
+        width: '50px',
       }`
-        @click="onSelect"
-      ).row.full-width.items-start.content-start.cursor-pointer
-        //- preview, but not for sphere...
-        img(
-          v-if="!thumbUrlErrored"
-          @error="thumbUrlErrorHandle"
-          draggable="false"
-          :src="draft.thumbUrl"
-          :style=`{
-          height: '50px',
-          minWidth: '90px',
-          maxWidth: '90px',
-          borderRadius: '10px',
-          objectFit: 'contain',
-        }`).b-40.q-mt-sm.q-ml-sm.q-mb-sm
-        //- special case is sphere...
-        div(
-          v-else
-          :style=`{
-          height: '50px',
-          width: '50px',
-        }`
-        ).row.items-center.content-center.justify-center
-          q-icon(name="blur_on" color="white" size="30px")
-        //- right side
-        .col
-          div(:style=`{minHeight: '50px',}`).row.full-width.items-start.content-start.q-pt-sm.q-px-sm
-            //- draft name
-            div(:style=`{minHeight:'32px',}`).row.full-width
-              span(:style=`{lineHeight: 1.1,}`).text-white {{ draft.name }}
-            .row.full-width.q-py-xs
-              small.text-grey-8 {{ type }}
-              .col
-              small.text-grey-8 {{ $date(draft.createdAt) }}
-    //- right
-    q-btn(
-      v-if="showMenuBtn"
-      round flat color="grey-8" icon="delete"
-      @click="removeDraft"
-      :loading="loading"
-    ).justify-center.q-mt-md.q-mr-xs
+      ).row.items-center.content-center.justify-center
+        q-icon(name="blur_on" color="white" size="30px")
+      //- right side
+      .col
+        div(:style=`{minHeight: '50px',}`).row.full-width.items-start.content-start.q-pt-sm.q-px-sm
+          //- draft name
+          div(:style=`{minHeight:'32px',}`).row.full-width
+            span(:style=`{lineHeight: 1.1,}`).text-white {{ draft.name }}
+          .row.full-width.q-py-xs
+            small.text-grey-8 {{ type }}
+            .col
+            small.text-grey-8 {{ $date(draft.createdAt) }}
+  //- right
+  q-btn(
+    v-if="showMenuBtn"
+    round flat color="grey-8" icon="delete"
+    @click="removeDraft"
+    :loading="loading"
+  ).justify-center.q-mt-md.q-mr-xs
 </template>
 
 <script>

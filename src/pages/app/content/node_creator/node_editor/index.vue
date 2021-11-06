@@ -1,34 +1,34 @@
 <template lang="pug">
-  .row.full-width.justify-center
-    //- figure editor of node
+.row.full-width.justify-center
+  //- figure editor of node
+  div(
+    :style=`{
+    // position: 'relative',
+    minHeight: '100px',
+    // maxWidth: '600px',
+    // background: background || 'rgba(30,30,30,0.8)',
+    // borderRadius: '20px',
+  }`
+  ).row.full-width.items-start.content-start
+    //- figure
     div(
-      :style=`{
-      // position: 'relative',
-      minHeight: '100px',
-      // maxWidth: '600px',
-      // background: background || 'rgba(30,30,30,0.8)',
-      // borderRadius: '20px',
-    }`
-    ).row.full-width.items-start.content-start
-      //- figure
-      div(
-      ).row.full-width
-        q-input(
-          v-model="node.name"
-          dark borderless color="white"
-          type="textarea" autogrow :rows="1"
-          placeholder="В чем суть?"
-          :input-style=`{
-          padding: '20px',
-          fontSize: fontSize+'px',
-          color: 'white'}`
-        ).full-width
-          q-btn(round flat color="white" icon="clear" @click="close")
-        edit-spheres(:sphereOwner="node")
-        actions(
-          :node="node" :player="player" :contentKalpa="contentKalpa" :showColor="showColor"
-          @close="close"
-        )
+    ).row.full-width
+      q-input(
+        v-model="node.name"
+        dark borderless color="white"
+        type="textarea" autogrow :rows="1"
+        placeholder="В чем суть?"
+        :input-style=`{
+        padding: '20px',
+        fontSize: fontSize+'px',
+        color: 'white'}`
+      ).full-width
+        q-btn(round flat color="white" icon="clear" @click="close")
+      edit-spheres(:sphereOwner="node")
+      actions(
+        :node="node" :player="player" :contentKalpa="contentKalpa" :showColor="showColor"
+        @close="close"
+      )
 </template>
 
 <script>

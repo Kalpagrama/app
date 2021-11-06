@@ -71,9 +71,8 @@ class ReactiveObjFactory {
    constructor (object, mirroredVuexObjectKey = null) {
       assert(typeof object === 'object')
       this.vm = new Vue({
-         data: {
-            reactiveData: {},
-            rev: 1
+         data () {
+            return { reactiveData: {}, rev: 1 }
          }
       })
       this.getReactive = () => {
@@ -94,8 +93,8 @@ class ReactiveObjFactory {
    }
 }
 
-function TMP_CHECK(rxDoc, sss){
-   if (rxDoc?.cached?.data?.oid){
+function TMP_CHECK (rxDoc, sss) {
+   if (rxDoc?.cached?.data?.oid) {
       let oid = getRawIdFromId(rxDoc.id)
       if (oid !== rxDoc?.cached?.data?.oid) {
          alert('oid=' + oid + sss)
@@ -104,6 +103,7 @@ function TMP_CHECK(rxDoc, sss){
       }
    }
 }
+
 // класс-обертка над rxDoc для реактивности
 class ReactiveDocFactory {
    constructor (rxDoc, mirroredVuexObjectKey = null) {
@@ -125,9 +125,8 @@ class ReactiveDocFactory {
          this.rxDoc = rxDoc
          this.mutex = new MutexLocal('ReactiveDocFactory::constructor')
          this.vm = new Vue({
-            data: {
-               reactiveData: {},
-               rev: rxDoc._rev
+            data () {
+               return { reactiveData: {}, rev: rxDoc._rev }
             }
          })
          this.debouncedSave = true
@@ -388,35 +387,37 @@ class Group {
       this.screenSize = screenSize // максимальная длина ленты (при превышении - обрезается снизу или сверху)
       assert(this.propsReactive, '!this.propsReactive')
       this.vm = new Vue({
-         data: {
-            reactiveGroup: {
-               id,
-               name,
-               pages: [], // вся лента разбита на пагинированные блоки(страницы)
-               items: [], // кусочек от this.pages (для каждого item вызывается populate). это отдается в UI. далее пополняется через next/prev
-               itemsHeaderFooter: [], // items + header + footer ( сверху и снизу списка добавляется по служебной строке (для того чтобы при отображении списков добавлять туда кнопки и спиннеры))
-               itemPrimaryKey: null, // имя поля в item (обычно либо 'oid' либо 'id')
-               totalCount: 0,
-               itemType: 'ITEM', // ITEM / GROUP (внутри группы мб подгруппы)
-               goto: this.goto.bind(this),
-               gotoCurrent: this.gotoCurrent.bind(this),
-               gotoStart: this.gotoStart.bind(this),
-               gotoEnd: this.gotoEnd.bind(this),
-               // next: this.next.bind(this),
-               // prev: this.prev.bind(this),
-               next: debounce(this.next.bind(this), 1000, { leading: true, maxWait: 8888 }),
-               next_: this.next.bind(this),
-               prev: debounce(this.prev.bind(this), 1000, { leading: true, maxWait: 8888 }),
-               gotoPercent: debounce(this.gotoPercent.bind(this), 1000, { leading: true, maxWait: 8888 }),
-               hasNext: false,
-               hasPrev: false,
-               loadedLen: 0,
-               fulFilledRange: { startFullFil: -1, endFullFil: -1 },
-               newItemsBelow: 0, // в списке появились новые элементы выше
-               newItemsAbove: 0, // в списке появились новые элементы ниже
-               setProperty: this.setProperty.bind(this),
-               getProperty: this.getProperty.bind(this),
-               refresh: this.refresh.bind(this)
+         data () {
+            return {
+               reactiveGroup: {
+                  id,
+                  name,
+                  pages: [], // вся лента разбита на пагинированные блоки(страницы)
+                  items: [], // кусочек от this.pages (для каждого item вызывается populate). это отдается в UI. далее пополняется через next/prev
+                  itemsHeaderFooter: [], // items + header + footer ( сверху и снизу списка добавляется по служебной строке (для того чтобы при отображении списков добавлять туда кнопки и спиннеры))
+                  itemPrimaryKey: null, // имя поля в item (обычно либо 'oid' либо 'id')
+                  totalCount: 0,
+                  itemType: 'ITEM', // ITEM / GROUP (внутри группы мб подгруппы)
+                  goto: this.goto.bind(this),
+                  gotoCurrent: this.gotoCurrent.bind(this),
+                  gotoStart: this.gotoStart.bind(this),
+                  gotoEnd: this.gotoEnd.bind(this),
+                  // next: this.next.bind(this),
+                  // prev: this.prev.bind(this),
+                  next: debounce(this.next.bind(this), 1000, { leading: true, maxWait: 8888 }),
+                  next_: this.next.bind(this),
+                  prev: debounce(this.prev.bind(this), 1000, { leading: true, maxWait: 8888 }),
+                  gotoPercent: debounce(this.gotoPercent.bind(this), 1000, { leading: true, maxWait: 8888 }),
+                  hasNext: false,
+                  hasPrev: false,
+                  loadedLen: 0,
+                  fulFilledRange: { startFullFil: -1, endFullFil: -1 },
+                  newItemsBelow: 0, // в списке появились новые элементы выше
+                  newItemsAbove: 0, // в списке появились новые элементы ниже
+                  setProperty: this.setProperty.bind(this),
+                  getProperty: this.getProperty.bind(this),
+                  refresh: this.refresh.bind(this)
+               }
             }
          }
       })
@@ -920,7 +921,7 @@ class Group {
    }
 
    // обрежет список сферху и начнет с этого элемента
-   async gotoCurrent() {
+   async gotoCurrent () {
       const f = this.gotoCurrent
       let currentId = this.getProperty('currentId')
       if (currentId) {

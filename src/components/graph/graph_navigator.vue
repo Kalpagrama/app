@@ -1,21 +1,21 @@
 <template lang="pug">
-  div(
-    :style=`{
-    position: 'relative',
-    borderStyle: 'solid',
-    borderRadius: '10px',
-    borderColor: '#222',
-  }`
-  ).row.full-width
-    graph-view(
-      ref="graphView"
-      :showAddBtn="false"
-      :maxHeight="height"
-      :graphD3="graph"
-      detailPosition="bottom"
-      :getJoints="getJoints"
-      :publish="true"
-      :oidRoot="oid")
+div(
+  :style=`{
+  position: 'relative',
+  borderStyle: 'solid',
+  borderRadius: '10px',
+  borderColor: '#222',
+}`
+).row.full-width
+  graph-view(
+    ref="graphView"
+    :showAddBtn="false"
+    :maxHeight="height"
+    :graphD3="graph"
+    detailPosition="bottom"
+    :getJoints="getJoints"
+    :publish="true"
+    :oidRoot="oid")
 </template>
 
 <script>
@@ -72,7 +72,7 @@ export default {
     assert(this.oid)
     if (this.$store.state.ui.graph && this.$store.state.ui.graph.nodes.find(n => n.oid === this.oid)) this.graph = cloneDeep(this.$store.state.ui.graph)
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['graph', cloneDeep(this.graph)])
   }

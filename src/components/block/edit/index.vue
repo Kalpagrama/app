@@ -5,87 +5,87 @@
 </style>
 
 <template lang="pug">
+div(
+  :style=`{
+  position: 'relative',
+  // height: $q.screen.height + 'px',
+  ...styles,
+}`
+).row.full-width.items-start.content-start
   div(
     :style=`{
     position: 'relative',
-    // height: $q.screen.height + 'px',
+    background: 'rgb(40,40,40)',
+    borderRadius: '10px',
     ...styles,
-  }`
-  ).row.full-width.items-start.content-start
-    div(
-      :style=`{
-      position: 'relative',
-      background: 'rgb(40,40,40)',
-      borderRadius: '10px',
-      ...styles,
-    }`).row.full-width.items-start.content-start
-      slot(name="wrapper-inside")
-      //graph
-      graph-view(:maxHeight="graphHeight" :graphD3="block.graph" detailPosition="standard" :style=`{borderColor: 'rgb(40,40,40)', borderStyle: 'solid', background: 'rgb(35,35,35)'}`)
-      //div().row.full-width.full-height.br
-        //q-btn(
-        //  label="graph"
-        //  :style=`{height: graphHeight + 'px',}`
-        //).row.full-width.full-heigh
-      //- name
-      div(ref="nameRef" :style=`{height: '60px'}`).row.full-width
-        q-input(
-          v-model="block.name"
-          borderless dark
-          ref="nameInput"
-          type="textarea" autogrow
-          :placeholder="$t('what is this block about')"
-          :autofocus="false"
-          :input-style=`{
-          paddingTop: '16px',
-          paddingBottom: '10px',
-          paddingLeft: '20px',
-          paddingRight: '10px',
-          //- textAlign: 'center',
-          fontWeight: 'bold',
-          fontSize: fontSize+'px',
-          lineHeight: 1.3,
-          minHeight: '60px',
-        }`
-        ).full-width
-      // category and spheres
-      div(ref="spheresRef").row.full-width.full-height.q-pt-sm
-        edit-spheres(
-          :sphereOwner="block")
-          template(v-slot:left)
-            edit-category(
-              :node="block"
-              :class=`{
-                br: !block.category && categoryError,
-              }`
-              :style=`{
-                borderRadius: '10px',
-              }`)
-          template(v-slot:right)
-            .div(v-if="false").row
-              //- Delete from notes
-              q-btn(
-                outline no-caps color="red"
-                :style=`{}`
-                @click="cancel"
-              ).q-mr-sm
-                span {{$t('Cancel')}}
-              //- Save to notes
-              q-btn(
-                outline no-caps color="white"
-                :style=`{}`
-              ).q-mr-sm
-                span {{$t('Save as draft')}}
-      div(ref="okCancelRef").row.full-width.justify-end
-        q-btn(
-          @click="saveDraft"
-          flat color="grey-5" no-caps) {{$t('Save draft')}}
-        q-btn(
-          @click="publish"
-          flat  no-caps
-          :color="canPublish ? 'green' : 'red'"
-          :disable="!canPublish"
-          :loading="nodePublishing") {{$t('Publish')}}
+  }`).row.full-width.items-start.content-start
+    slot(name="wrapper-inside")
+    //graph
+    graph-view(:maxHeight="graphHeight" :graphD3="block.graph" detailPosition="standard" :style=`{borderColor: 'rgb(40,40,40)', borderStyle: 'solid', background: 'rgb(35,35,35)'}`)
+    //div().row.full-width.full-height.br
+      //q-btn(
+      //  label="graph"
+      //  :style=`{height: graphHeight + 'px',}`
+      //).row.full-width.full-heigh
+    //- name
+    div(ref="nameRef" :style=`{height: '60px'}`).row.full-width
+      q-input(
+        v-model="block.name"
+        borderless dark
+        ref="nameInput"
+        type="textarea" autogrow
+        :placeholder="$t('what is this block about')"
+        :autofocus="false"
+        :input-style=`{
+        paddingTop: '16px',
+        paddingBottom: '10px',
+        paddingLeft: '20px',
+        paddingRight: '10px',
+        //- textAlign: 'center',
+        fontWeight: 'bold',
+        fontSize: fontSize+'px',
+        lineHeight: 1.3,
+        minHeight: '60px',
+      }`
+      ).full-width
+    // category and spheres
+    div(ref="spheresRef").row.full-width.full-height.q-pt-sm
+      edit-spheres(
+        :sphereOwner="block")
+        template(v-slot:left)
+          edit-category(
+            :node="block"
+            :class=`{
+              br: !block.category && categoryError,
+            }`
+            :style=`{
+              borderRadius: '10px',
+            }`)
+        template(v-slot:right)
+          .div(v-if="false").row
+            //- Delete from notes
+            q-btn(
+              outline no-caps color="red"
+              :style=`{}`
+              @click="cancel"
+            ).q-mr-sm
+              span {{$t('Cancel')}}
+            //- Save to notes
+            q-btn(
+              outline no-caps color="white"
+              :style=`{}`
+            ).q-mr-sm
+              span {{$t('Save as draft')}}
+    div(ref="okCancelRef").row.full-width.justify-end
+      q-btn(
+        @click="saveDraft"
+        flat color="grey-5" no-caps) {{$t('Save draft')}}
+      q-btn(
+        @click="publish"
+        flat  no-caps
+        :color="canPublish ? 'green' : 'red'"
+        :disable="!canPublish"
+        :loading="nodePublishing") {{$t('Publish')}}
 </template>
 
 <script>
@@ -166,7 +166,7 @@ export default {
     // this.$log('mounted', this.node.name)
     this.graphHeight = this.height - this.$refs.spheresRef.clientHeight - this.$refs.nameRef.clientHeight - this.$refs.okCancelRef.clientHeight - 70
   },
-  beforeDestroy (to, from, next) {
+  beforeUnmount () {
     if (this.block.name) this.block.temporary = false
   }
 }

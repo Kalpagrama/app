@@ -1,66 +1,66 @@
 <template lang="pug">
-  .row.full-width.items-start.content-start.justify-center
-    div( :style=`{ maxWidth: $store.state.ui.pageWidth+'px' }`).row.full-width.q-mt-sm
-      video(
-        controls
-        :src="fileSrc"
-        :style=`{
-      }`
-      ).full-width.br-10
-      .row.full-width
-        .col
-        q-btn(v-if="!createdContent"
-          @click="uploadContent"
-          :loading="loading"
-          :disable="loading"
-          flat no-caps color="green") {{$t('Upload')}}
-      div(v-if="createdContent").row.full-width
-        q-linear-progress(size='5px' :value="progressValue / 100" color="green-10").row.full-width.q-px-sm
-        //transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-        //  figures-editor(
-        //    :player="player"
-        //    :convert="convertPxToTime"
-        //    :style=`{
-        //            left: 'calc(' + (player.figures[0].t/player.duration)*100+'% - 6px)',
-        //            width:'calc(' + ((player.figures[1].t-player.figures[0].t)/player.duration)*100+'% + 16px)',
-        //          }`
-        //    @first="zoomWorking = true, figureEditing = true"
-        //    @final="zoomWorking = false, figureEditing = false")
-        q-input(
-          v-model="contentVideo.name"
-          borderless dark dense
-          :placeholder="$t('Название видео')"
-          counter maxlength="108"
-          type="textarea" autogrow
-          :input-style=`{
-                padding: '16px',
-                fontSize: '14px',
-                fontWeight: 'bold',
-                background: 'rgb(35,35,35)',
-                borderRadius: '10px',
-                minHeight: '50px',
-              }`
-        ).full-width.q-mt-xs
-        q-input(
-          v-model="contentVideo.description"
-          borderless dark dense
-          :placeholder="$t('Описание видео')"
-          counter maxlength="5000"
-          type="textarea" autogrow
-          :input-style=`{
-                padding: '16px',
-                fontSize: '12px',
-                background: 'rgb(35,35,35)',
-                borderRadius: '10px',
-                minHeight: '100px',
-              }`
-        ).full-width.q-my-sm
-        edit-spheres(
-          ref="editSpheres"
-          :sphereOwner="contentVideo"
-          :maxSphereCnt="10"
-          :placeholderText="$t('Добавьте ключевые слова')"
-          ).q-my-sm
+.row.full-width.items-start.content-start.justify-center
+  div( :style=`{ maxWidth: $store.state.ui.pageWidth+'px' }`).row.full-width.q-mt-sm
+    video(
+      controls
+      :src="fileSrc"
+      :style=`{
+    }`
+    ).full-width.br-10
+    .row.full-width
+      .col
+      q-btn(v-if="!createdContent"
+        @click="uploadContent"
+        :loading="loading"
+        :disable="loading"
+        flat no-caps color="green") {{$t('Upload')}}
+    div(v-if="createdContent").row.full-width
+      q-linear-progress(size='5px' :value="progressValue / 100" color="green-10").row.full-width.q-px-sm
+      //transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      //  figures-editor(
+      //    :player="player"
+      //    :convert="convertPxToTime"
+      //    :style=`{
+      //            left: 'calc(' + (player.figures[0].t/player.duration)*100+'% - 6px)',
+      //            width:'calc(' + ((player.figures[1].t-player.figures[0].t)/player.duration)*100+'% + 16px)',
+      //          }`
+      //    @first="zoomWorking = true, figureEditing = true"
+      //    @final="zoomWorking = false, figureEditing = false")
+      q-input(
+        v-model="contentVideo.name"
+        borderless dark dense
+        :placeholder="$t('Название видео')"
+        counter maxlength="108"
+        type="textarea" autogrow
+        :input-style=`{
+              padding: '16px',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              background: 'rgb(35,35,35)',
+              borderRadius: '10px',
+              minHeight: '50px',
+            }`
+      ).full-width.q-mt-xs
+      q-input(
+        v-model="contentVideo.description"
+        borderless dark dense
+        :placeholder="$t('Описание видео')"
+        counter maxlength="5000"
+        type="textarea" autogrow
+        :input-style=`{
+              padding: '16px',
+              fontSize: '12px',
+              background: 'rgb(35,35,35)',
+              borderRadius: '10px',
+              minHeight: '100px',
+            }`
+      ).full-width.q-my-sm
+      edit-spheres(
+        ref="editSpheres"
+        :sphereOwner="contentVideo"
+        :maxSphereCnt="10"
+        :placeholderText="$t('Добавьте ключевые слова')"
+        ).q-my-sm
 </template>
 
 <script>
@@ -137,7 +137,7 @@ export default {
     this.$eventBus.$on('event-object-created', this.onCreateEvent)
     this.$eventBus.$on('event-progress', this.onProgressEvent)
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
     this.$eventBus.$off('event-object-created', this.onCreateEvent)
     this.$eventBus.$off('event-progress', this.onProgressEvent)

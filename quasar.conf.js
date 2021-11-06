@@ -49,7 +49,7 @@ module.exports = function (ctx) {
 
       // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
       framework: {
-         // lang: 'ru',
+         // lang: 'ru-RU',
          importStrategy: 'auto',
          // components: [
          //    'QLayout',
@@ -119,124 +119,128 @@ module.exports = function (ctx) {
          // gzip: true,
          // analyze: true,
          // extractCSS: false,
-         extendWebpack (cfg) {
-            // cfg.performance = {
-            //    hints: false,
-            //    maxEntrypointSize: 512000000,
-            //    maxAssetSize: 512000000
-            // }
-            cfg.module.rules.push({
-               test: /\.md$/i,
-               use: 'raw-loader'
-            })
-            // cfg.module.rules.push({
-            //    test: /\.dmg$/i,
-            //    use: 'file-loader'
-            // })
-            cfg.module.rules.push({
-               enforce: 'pre',
-               test: /\.(js|vue)$/,
-               loader: 'eslint-loader',
-               exclude: /node_modules/
-            })
-            cfg.module.rules.push({
-               test: /\.(pug)$/,
-               loader: 'pug-plain-loader',
-               exclude: /node_modules/
-            })
-            cfg.plugins.push(
-               new webpack.ProvidePlugin({
-                  Vue: 'vue',
-                  Quasar: 'quasar',
-                  _: 'lodash',
-                  lodash: 'lodash',
-                  gql: 'graphql-tag'
-               })
-            )
-            if (!ctx.mode.capacitor) { // для PWA и SPA такая зависимость не нужна (см src/system/capacitor)
-               cfg.plugins.push(
-                  new webpack.IgnorePlugin(/@capacitor\/core/)
-               )
-            }
-            if (ctx.dev && !ctx.mode.ssr) {
-               cfg.plugins.push(
-                  new BundleAnalyzerPlugin({ analyzerPort: ctx.mode.capacitor ? 7777 : ctx.mode.pwa ? 8888 : 9999 })
-               )
-            }
-            // todo отключить source-map когда не потребуется debug(увеличивает размер js в 2 раза)
-            // eslint-disable-next-line no-constant-condition
-            if (ctx.dev) {
-               if (!ctx.mode.capacitor) {
-                  cfg.devtool = 'inline-source-map' // 'source-map'
-                  cfg.plugins.push(
-                     new webpack.SourceMapDevToolPlugin({
-                        filename: '[file].js.map'
-                     })
-                  )
-                  cfg.plugins.push(
-                     new webpack.EvalSourceMapDevToolPlugin({
-                        filename: '[file].map'
-                     })
-                  )
-               }
-            }
 
-            // cfg.plugins.push(
-            //    new TerserPlugin(),
-            // );
-
-            cfg.resolve.alias = {
-               ...cfg.resolve.alias,
-               schema: path.resolve(__dirname, './src/api'),
-               public: path.resolve(__dirname, './public')
-            }
-            if (!ctx.mode.ssr) {
-               cfg.optimization = {
-                  runtimeChunk: 'single',
-                  splitChunks: {
-                     chunks: 'all',
-                     maxInitialRequests: Infinity,
-                     // minSize: 0,
-                     cacheGroups: {
-                        vendor: {
-                           test: /[\\/]node_modules[\\/]/,
-                           name (module) {
-                              // получает имя, то есть node_modules/packageName/not/this/part.js
-                              // или node_modules/packageName
-                              let packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
-                              if (!packageName) throw new Error('bad package name !!!' + module.context.toString())
-                              // имена npm-пакетов можно, не опасаясь проблем, использовать
-                              // в URL, но некоторые серверы не любят символы наподобие @
-                              if (packageName.startsWith('pouchdb-')) packageName = 'npm.pouchdb'
-                              else if (packageName.startsWith('d3-')) packageName = 'npm.d3js'
-                              else if (packageName.includes('apollo')) packageName = 'npm.apollo'
-                              else if (packageName.includes('lodash')) packageName = 'npm.lodash'
-                              else if (packageName.includes('quasar')) packageName = 'npm.quasar'
-                              else if (packageName.includes('contentful')) packageName = 'npm.contentful'
-                              else packageName = 'npm.' + packageName.replace('@', '_sobaka_').replace(':', '_colon_');
-                              return packageName
-                           }
-                        }
-                     }
-                  }
-               }
-            }
-         }
+         // extendWebpack (cfg) {
+         //    // cfg.performance = {
+         //    //    hints: false,
+         //    //    maxEntrypointSize: 512000000,
+         //    //    maxAssetSize: 512000000
+         //    // }
+         //    cfg.module.rules.push({
+         //       test: /\.md$/i,
+         //       use: 'raw-loader'
+         //    })
+         //    // cfg.module.rules.push({
+         //    //    test: /\.dmg$/i,
+         //    //    use: 'file-loader'
+         //    // })
+         //    cfg.module.rules.push({
+         //       enforce: 'pre',
+         //       test: /\.(js|vue)$/,
+         //       loader: 'eslint-loader',
+         //       exclude: /node_modules/
+         //    })
+         //    cfg.module.rules.push({
+         //       test: /\.(pug)$/,
+         //       loader: 'pug-plain-loader',
+         //       exclude: /node_modules/
+         //    })
+         //    cfg.plugins.push(
+         //       new webpack.ProvidePlugin({
+         //          Vue: 'vue',
+         //          Quasar: 'quasar',
+         //          _: 'lodash',
+         //          lodash: 'lodash',
+         //          gql: 'graphql-tag'
+         //       })
+         //    )
+         //    if (!ctx.mode.capacitor) { // для PWA и SPA такая зависимость не нужна (см src/system/capacitor)
+         //       cfg.plugins.push(
+         //          new webpack.IgnorePlugin({
+         //             resourceRegExp: /@capacitor\/core/,
+         //          })
+         //       )
+         //    }
+         //    if (ctx.dev && !ctx.mode.ssr) {
+         //       cfg.plugins.push(
+         //          new BundleAnalyzerPlugin({ analyzerPort: ctx.mode.capacitor ? 7777 : ctx.mode.pwa ? 8888 : 9999 })
+         //       )
+         //    }
+         //    // todo отключить source-map когда не потребуется debug(увеличивает размер js в 2 раза)
+         //    // eslint-disable-next-line no-constant-condition
+         //    if (ctx.dev) {
+         //       if (!ctx.mode.capacitor) {
+         //          cfg.devtool = 'inline-source-map' // 'source-map'
+         //          cfg.plugins.push(
+         //             new webpack.SourceMapDevToolPlugin({
+         //                filename: '[file].js.map'
+         //             })
+         //          )
+         //          cfg.plugins.push(
+         //             new webpack.EvalSourceMapDevToolPlugin({
+         //                filename: '[file].map'
+         //             })
+         //          )
+         //       }
+         //    }
+         //
+         //    // cfg.plugins.push(
+         //    //    new TerserPlugin(),
+         //    // );
+         //
+         //    cfg.resolve.alias = {
+         //       ...cfg.resolve.alias,
+         //       schema: path.resolve(__dirname, './src/api'),
+         //       public: path.resolve(__dirname, './public')
+         //    }
+         //    // eslint-disable-next-line no-constant-condition
+         //    if (false && !ctx.mode.ssr) {
+         //       cfg.optimization = {
+         //          runtimeChunk: 'single',
+         //          splitChunks: {
+         //             chunks: 'all',
+         //             maxInitialRequests: Infinity,
+         //             // minSize: 0,
+         //             cacheGroups: {
+         //                vendor: {
+         //                   test: /[\\/]node_modules[\\/]/,
+         //                   name (module) {
+         //                      // получает имя, то есть node_modules/packageName/not/this/part.js
+         //                      // или node_modules/packageName
+         //                      let packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+         //                      if (!packageName) throw new Error('bad package name !!!' + module.context.toString())
+         //                      // имена npm-пакетов можно, не опасаясь проблем, использовать
+         //                      // в URL, но некоторые серверы не любят символы наподобие @
+         //                      if (packageName.startsWith('pouchdb-')) packageName = 'npm.pouchdb'
+         //                      else if (packageName.startsWith('d3-')) packageName = 'npm.d3js'
+         //                      else if (packageName.includes('apollo')) packageName = 'npm.apollo'
+         //                      else if (packageName.includes('lodash')) packageName = 'npm.lodash'
+         //                      else if (packageName.includes('quasar')) packageName = 'npm.quasar'
+         //                      else if (packageName.includes('contentful')) packageName = 'npm.contentful'
+         //                      else packageName = 'npm.' + packageName.replace('@', '_sobaka_').replace(':', '_colon_');
+         //                      return packageName
+         //                   }
+         //                }
+         //             }
+         //          }
+         //       }
+         //    }
+         // }
       },
 
       // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
       devServer: {
          // writeToDisk: true,
-         before (app) {
+         onBeforeSetupMiddleware (devServer) {
             // const cors = require('cors')
-            // app.use(cors())
-            // app.use(cors({
+            // devServer.app.use(cors())
+            // devServer.app.use(cors({
             //   origin: 'api.kalpagrama.com',
             //   credentials: true
             // }))
          },
-         setup (app) {
-            app.post('*', (req, res) => {
+         onAfterSetupMiddleware (devServer) {
+            devServer.app.post('*', (req, res) => {
                res.redirect(req.originalUrl)
             })
          },

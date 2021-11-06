@@ -92,7 +92,7 @@ export default {
   async mounted () {
     this.jointsRes = await this.$rxdb.find(this.query)
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
   }
 }

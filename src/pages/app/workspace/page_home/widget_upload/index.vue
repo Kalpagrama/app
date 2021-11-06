@@ -6,47 +6,47 @@
 </style>
 
 <template lang="pug">
-    .row.full-width.justify-center.b-35.br-10
-      .row.full-width.q-pa-sm
-        q-input(
-          v-model="url"
-          color="green"
-          type="text" inputmode="url"
-          :placeholder="$t('Enter link here')"
-          :dark="urlInputFocused"
-          :loading="urlLoading"
-          :debounce="500"
-          borderless
-          :input-style=`{
-            padding: '12px',
-            borderRadius: '10px',
-            color: 'white'
-          }`
-          :style=`{
-            borderRadius: '10px',
-            color: 'white',
-            border: '2px solid rgb(76,175,79)',
-            // height: '50px'
-            //- paddingRight: '10px',
-          }`
-          @focus="urlInputFocused = true"
-          @blur="urlInputFocused = false"
-          ).col.full-width.text-white.b-40
-        //- upload
-        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).q-pl-xs
-          q-btn(
-            outline color="grey-8" no-caps
-            icon="file_upload"
-            :to="'/workspace/create?mode=upload'"
-            ).full-width.full-height
-            //component(
-            //  is='view-upload'
-            //  @started="pageStarted = true")
-            q-tooltip(dense dark) {{$t('Upload content')}}
-            //span.text-grey-6 {{$t('Create')}}
-        div(:style=`{textAlign: 'center'}`).row.full-width.content-center.justify-center.items-center
-          small.text-grey-5 {{$t('Вы можете добавлять с YouTube.')}}
-        slot(name="bottom")
+.row.full-width.justify-center.b-35.br-10
+  .row.full-width.q-pa-sm
+    q-input(
+      v-model="url"
+      color="green"
+      type="text" inputmode="url"
+      :placeholder="$t('Enter link here')"
+      :dark="urlInputFocused"
+      :loading="urlLoading"
+      :debounce="500"
+      borderless
+      :input-style=`{
+        padding: '12px',
+        borderRadius: '10px',
+        color: 'white'
+      }`
+      :style=`{
+        borderRadius: '10px',
+        color: 'white',
+        border: '2px solid rgb(76,175,79)',
+        // height: '50px'
+        //- paddingRight: '10px',
+      }`
+      @focus="urlInputFocused = true"
+      @blur="urlInputFocused = false"
+      ).col.full-width.text-white.b-40
+    //- upload
+    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px',}`).q-pl-xs
+      q-btn(
+        outline color="grey-8" no-caps
+        icon="file_upload"
+        :to="'/workspace/create?mode=upload'"
+        ).full-width.full-height
+        //component(
+        //  is='view-upload'
+        //  @started="pageStarted = true")
+        q-tooltip(dense dark) {{$t('Upload content')}}
+        //span.text-grey-6 {{$t('Create')}}
+    div(:style=`{textAlign: 'center'}`).row.full-width.content-center.justify-center.items-center
+      small.text-grey-5 {{$t('Вы можете добавлять с YouTube.')}}
+    slot(name="bottom")
 </template>
 
 <script>

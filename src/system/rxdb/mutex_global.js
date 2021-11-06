@@ -34,8 +34,8 @@ class MutexGlobal {
          // отслеживание открыта ли вкладка
          const thiz = this
          let vm = new Vue({
-            data: {
-               appVisibility: AppVisibility
+            data() {
+               return { appVisibility: AppVisibility }
             },
             watch: {
                appVisibility: {

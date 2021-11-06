@@ -5,60 +5,60 @@
 </style>
 
 <template lang="pug">
+div(
+  :style=`{
+  position: 'relative',
+  ...styles,
+}`
+).row.full-width.items-start.content-start
   div(
     :style=`{
     position: 'relative',
+    background: 'rgb(35,35,35)',
+    borderRadius: '10px',
     ...styles,
-  }`
-  ).row.full-width.items-start.content-start
-    div(
+  }`).row.full-width.items-start.content-start
+    //- HEADER: author, createdAt, actions, date, views
+    essence-header(
+      v-if="showHeader && node.oid"
+      :essence="node"
+      :showAuthorAlways="showAuthorAlways"
       :style=`{
-      position: 'relative',
-      background: 'rgb(35,35,35)',
-      borderRadius: '10px',
-      ...styles,
-    }`).row.full-width.items-start.content-start
-      //- HEADER: author, createdAt, actions, date, views
-      essence-header(
-        v-if="showHeader && node.oid"
-        :essence="node"
-        :showAuthorAlways="showAuthorAlways"
-        :style=`{
-      }`)
-      composition-editor(:node="node" :isActive="isActive" :isVisible="isVisible")
-      //- NAME: dynamic link/ dynamic fontSize
-      slot(name="name")
-      q-input(
-        v-if="showName"
-        v-model="node.name"
-        :disable="lockName"
-        color="green"
-        borderless dark dense
-        :placeholder="$t('enter your essence')"
-        :input-style=`{
-          // minHeight: '60px',
-          fontSize: fontSize+'px',
-          textAlign: 'center',
-        }`).row.full-width.items-center.content-center.justify-center.q-pa-md
-      edit-spheres(v-if="node.name" ref="editSpheres" :sphereOwner="node")
-      //q-input(
-      //  v-model="node.description"
-      //  borderless dark dense
-      //  filled
-      //  clearable
-      //  autogrow
-      //  :label="$t('enter description')").row.full-width
-      q-expansion-item(v-if="node.name" icon="description" :label="$t('Description')" dark).full-width
-        q-editor(v-model="node.description"
-          dark
-          :definitions=`{bold: {label: 'Bold', icon: null, tip: 'My bold tooltip'}}`
-        )
-      q-btn(v-if="node.name"
-        :label="$t('Create node')"
-        :loading="publishing"
-        :style=`{height: '50px', borderRadius: '0px'}`
-        @click="nodePublish").row.full-width.text-green.text-bold
-      slot(name="footer")
+    }`)
+    composition-editor(:node="node" :isActive="isActive" :isVisible="isVisible")
+    //- NAME: dynamic link/ dynamic fontSize
+    slot(name="name")
+    q-input(
+      v-if="showName"
+      v-model="node.name"
+      :disable="lockName"
+      color="green"
+      borderless dark dense
+      :placeholder="$t('enter your essence')"
+      :input-style=`{
+        // minHeight: '60px',
+        fontSize: fontSize+'px',
+        textAlign: 'center',
+      }`).row.full-width.items-center.content-center.justify-center.q-pa-md
+    edit-spheres(v-if="node.name" ref="editSpheres" :sphereOwner="node")
+    //q-input(
+    //  v-model="node.description"
+    //  borderless dark dense
+    //  filled
+    //  clearable
+    //  autogrow
+    //  :label="$t('enter description')").row.full-width
+    q-expansion-item(v-if="node.name" icon="description" :label="$t('Description')" dark).full-width
+      q-editor(v-model="node.description"
+        dark
+        :definitions=`{bold: {label: 'Bold', icon: null, tip: 'My bold tooltip'}}`
+      )
+    q-btn(v-if="node.name"
+      :label="$t('Create node')"
+      :loading="publishing"
+      :style=`{height: '50px', borderRadius: '0px'}`
+      @click="nodePublish").row.full-width.text-green.text-bold
+    slot(name="footer")
 </template>
 
 <script>
@@ -170,7 +170,7 @@ export default {
     this.node.createdAt = Date.now()
     this.node.countStat.countViews = 0
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
   }
 }

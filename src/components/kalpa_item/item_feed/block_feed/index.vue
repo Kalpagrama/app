@@ -5,81 +5,81 @@
 </style>
 
 <template lang="pug">
+div(
+  :style=`{
+  position: 'relative',
+  ...styles,
+}`
+).row.full-width.items-start.content-start
+  slot(name="wrapper")
+  //- wrapper
   div(
     :style=`{
     position: 'relative',
+    background: 'rgb(35,35,35)',
+    borderRadius: borderRadius,
     ...styles,
-  }`
-  ).row.full-width.items-start.content-start
-    slot(name="wrapper")
-    //- wrapper
-    div(
-      :style=`{
-      position: 'relative',
-      background: 'rgb(35,35,35)',
-      borderRadius: borderRadius,
-      ...styles,
-    }`).row.full-width.items-start.content-start
-      slot(name="wrapper-inside")
-      //- HEADER: author, createdAt, actions, date, views
-      essence-header(
-        v-if="showHeader && block.oid"
-        :essence="block"
-        :itemState="data"
-        :showAuthorAlways="showAuthorAlways"
-        :style=`{
-        order: orderHeader,
-      }`)
-      div(:id="'item_image_for_render'").row.full-width
-        masonry-cover(v-if="data.showMasonry" :block="block" :itemState="data" :style=`{height: '350px'}` @click.native="data.showMasonry = false")
-        graph-view(
-          v-else
-          :maxHeight="450"
-          :showMiniAddBtn="blockIsMine"
-          :graphD3="block.graph"
-          detailPosition="standard"
-          @changed="block.setChanged(true)"
-          :style=`{background: 'rgb(40,40,40)'}`)
-      //- NAME: dynamic link/ dynamic fontSize
-
-      slot(name="name")
-      router-link(
-        v-if="showName && block.oid"
-        :to="'/block/' + this.block.oid"
-        :style=`{
-          order: 4,
-          minHeight: '60px',
-          fontSize: fontSize+'px',
-          textAlign: 'center',
-        }`
-      ).row.full-width.items-center.content-center.justify-center.q-pa-md
-        span(
-          :class=`{
-            'text-bold': block.name.length < 20
-          }`
-        ).text-white {{ block.name }}
-
-      //- SPHERES
-      essence-spheres(
-        v-if="showSpheres && block.spheres.length > 0"
-        :sphereOwner="block"
-        :itemState="data"
-        :style=`{
-        order: 3,
-      }`).q-py-xs
-    //- FOOTER: actions, slot
-    essence-actions(
-      v-if="showActions && block.oid"
+  }`).row.full-width.items-start.content-start
+    slot(name="wrapper-inside")
+    //- HEADER: author, createdAt, actions, date, views
+    essence-header(
+      v-if="showHeader && block.oid"
       :essence="block"
       :itemState="data"
-      :nodeBackgroundColor="nodeBackgroundColor"
-      :nodeActionsColor="nodeActionsColor"
-      :isActive="isActive"
-      :isVisible="isVisible"
+      :showAuthorAlways="showAuthorAlways"
       :style=`{
-      order: 5,
+      order: orderHeader,
     }`)
-    slot(name="footer")
+    div(:id="'item_image_for_render'").row.full-width
+      masonry-cover(v-if="data.showMasonry" :block="block" :itemState="data" :style=`{height: '350px'}` @click.native="data.showMasonry = false")
+      graph-view(
+        v-else
+        :maxHeight="450"
+        :showMiniAddBtn="blockIsMine"
+        :graphD3="block.graph"
+        detailPosition="standard"
+        @changed="block.setChanged(true)"
+        :style=`{background: 'rgb(40,40,40)'}`)
+    //- NAME: dynamic link/ dynamic fontSize
+
+    slot(name="name")
+    router-link(
+      v-if="showName && block.oid"
+      :to="'/block/' + this.block.oid"
+      :style=`{
+        order: 4,
+        minHeight: '60px',
+        fontSize: fontSize+'px',
+        textAlign: 'center',
+      }`
+    ).row.full-width.items-center.content-center.justify-center.q-pa-md
+      span(
+        :class=`{
+          'text-bold': block.name.length < 20
+        }`
+      ).text-white {{ block.name }}
+
+    //- SPHERES
+    essence-spheres(
+      v-if="showSpheres && block.spheres.length > 0"
+      :sphereOwner="block"
+      :itemState="data"
+      :style=`{
+      order: 3,
+    }`).q-py-xs
+  //- FOOTER: actions, slot
+  essence-actions(
+    v-if="showActions && block.oid"
+    :essence="block"
+    :itemState="data"
+    :nodeBackgroundColor="nodeBackgroundColor"
+    :nodeActionsColor="nodeActionsColor"
+    :isActive="isActive"
+    :isVisible="isVisible"
+    :style=`{
+    order: 5,
+  }`)
+  slot(name="footer")
 </template>
 
 <script>

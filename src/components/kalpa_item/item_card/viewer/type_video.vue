@@ -107,7 +107,7 @@
         .row.col
           span(:style=`{lineHeight: 1.2, fontSize: '15px'}`).text-white.text-bold.full-width {{ item.name }}
           //small(:style=`{lineHeight: 1.2}`).text-grey.full-width {{$t('Ознакомительный фрагмент')}}
-        q-btn(v-if="" round flat dense icon="expand_more" color="grey-5" @click="pageId='description'" :style=`{zIndex: '100'}`)
+        q-btn(v-if="true" round flat dense icon="expand_more" color="grey-5" @click="pageId='description'" :style=`{zIndex: '100'}`)
           q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Описание')}}
       .row.item-center.q-px-sm
         small(size="sm").row.items-center.text-grey-7.text-italic.q-pt-xs {{item.countStat.countViews}} {{$getNoun(item.countStat.countViews,$t('просмотр'),$t('просмотра'),$t('просмотров'))}}

@@ -1,42 +1,42 @@
 <template lang="pug">
-  q-btn(
-    round flat
-    icon="bookmark_outline"
-    :loading="data.bookmarkCreating"
-    :color="data.bookmark ? 'green' : color"
-    :dense="dense"
-    @click="onClick()"
-  )
-    q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Save')}}
-    q-dialog(
-      v-if="data.bookmark"
-      v-model="data.bookmarkCreatedDialogShow"
-      position="bottom"
-      auto-close)
-      div(
+q-btn(
+  round flat
+  icon="bookmark_outline"
+  :loading="data.bookmarkCreating"
+  :color="data.bookmark ? 'green' : color"
+  :dense="dense"
+  @click="onClick()"
+)
+  q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Save')}}
+  q-dialog(
+    v-if="data.bookmark"
+    v-model="data.bookmarkCreatedDialogShow"
+    position="bottom"
+    auto-close)
+    div(
+      :style=`{
+      position: 'relative',
+      borderRadius: '20px 20px 0 0',
+      paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)',
+    }`
+    ).row.full-width.q-px-sm.q-pt-sm.b-40
+      q-btn(
+        flat no-caps color="white" align="left"
         :style=`{
-        position: 'relative',
-        borderRadius: '20px 20px 0 0',
-        paddingBottom: 'calc(env(safe-area-inset-bottom) + 16px)',
+        height: '50px',
       }`
-      ).row.full-width.q-px-sm.q-pt-sm.b-40
-        q-btn(
-          flat no-caps color="white" align="left"
-          :style=`{
-          height: '50px',
-        }`
-          @click="saveBookmark()"
-        ).full-width.q-mb-md
-          span.text-white {{ $t('Save to collection') }}
-    //- edit bookmark...
-    q-dialog(
-      v-if="data.bookmark"
-      v-model="data.bookmarkEditorDialogShow"
-      position="bottom")
-      bookmark-editor(
-        :bookmark="data.bookmark"
-        :showHeader="showHeader"
-        @deleted="boookmarkDeleted")
+        @click="saveBookmark()"
+      ).full-width.q-mb-md
+        span.text-white {{ $t('Save to collection') }}
+  //- edit bookmark...
+  q-dialog(
+    v-if="data.bookmark"
+    v-model="data.bookmarkEditorDialogShow"
+    position="bottom")
+    bookmark-editor(
+      :bookmark="data.bookmark"
+      :showHeader="showHeader"
+      @deleted="boookmarkDeleted")
 </template>
 
 // этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!

@@ -1,84 +1,84 @@
 <template lang="pug">
-  kalpa-layout
-    template(v-slot:header=`{scrollTop}`)
-      //nav-tabs(:user="user" v-if="scrollTop > 226")
-    template(v-slot:footer)
-      kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
-    template(v-slot:body)
-      //- followers
-      q-dialog(
-        v-model="showFollowDialog"
-        position="standard"
-        :maximized="false"
-        @hide="showFollowDialog = null")
-        list-following(
-          v-if="followersFollowing === 'following'"
-          :user="user"
-          :useNavHeader="false"
-          :scrollAreaHeight="$q.screen.height/2"
+kalpa-layout
+  template(v-slot:header=`{scrollTop}`)
+    //nav-tabs(:user="user" v-if="scrollTop > 226")
+  template(v-slot:footer)
+    kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
+  template(v-slot:body)
+    //- followers
+    q-dialog(
+      v-model="showFollowDialog"
+      position="standard"
+      :maximized="false"
+      @hide="showFollowDialog = null")
+      list-following(
+        v-if="followersFollowing === 'following'"
+        :user="user"
+        :useNavHeader="false"
+        :scrollAreaHeight="$q.screen.height/2"
+        searchInputState="disabled"
+        :itemActivePersist="false"
+        mode="select").b-30
+      list-followers(
+        v-if="followersFollowing === 'followers'"
+        :user="user"
+        :useNavHeader="false"
+        :scrollAreaHeight="$q.screen.height/2"
+        searchInputState="disabled"
+        :itemActivePersist="false"
+        mode="select").b-30
+    .row.full-width.items-start.content-start.justify-center
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+        tab-list-feed(
+          v-if="user"
+          ref="listFeed"
+          :type="'customPPV'"
+          :scrollAreaHeight="0"
           searchInputState="disabled"
-          :itemActivePersist="false"
-          mode="select").b-30
-        list-followers(
-          v-if="followersFollowing === 'followers'"
-          :user="user"
-          :useNavHeader="false"
-          :scrollAreaHeight="$q.screen.height/2"
-          searchInputState="disabled"
-          :itemActivePersist="false"
-          mode="select").b-30
-      .row.full-width.items-start.content-start.justify-center
-        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-          tab-list-feed(
-            v-if="user"
-            ref="listFeed"
-            :type="'customPPV'"
-            :scrollAreaHeight="0"
-            searchInputState="disabled"
-            :pages="pages"
-            :pageId="pageId"
-            :query="query"
-            :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 222"
-            :itemActivePersist="true"
-            @pageId="pageId = $event"
-          ).row.full-width
-            template(v-slot:externalHeader)
-              nav-header(:user="user" @followers="showFollowDialog=true, followersFollowing='followers'" @following="showFollowDialog=true, followersFollowing='following'")
-            template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
-              div(
-                v-if="pageId === 'votes' && item.votedUserRate"
+          :pages="pages"
+          :pageId="pageId"
+          :query="query"
+          :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 222"
+          :itemActivePersist="true"
+          @pageId="pageId = $event"
+        ).row.full-width
+          template(v-slot:externalHeader)
+            nav-header(:user="user" @followers="showFollowDialog=true, followersFollowing='followers'" @following="showFollowDialog=true, followersFollowing='following'")
+          template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
+            div(
+              v-if="pageId === 'votes' && item.votedUserRate"
+              :style=`{
+              borderRadius: '10px 10px 0 0',
+              background: 'rgba(32,32,32)',
+              marginBottom: '-10px',
+              paddingBottom: '18px',
+            }`
+            ).row.full-width.items-center.content-center.q-px-sm.q-pt-sm
+              img(
+                draggable="false"
+                :src="user.thumbUrl"
                 :style=`{
-                borderRadius: '10px 10px 0 0',
-                background: 'rgba(32,32,32)',
-                marginBottom: '-10px',
-                paddingBottom: '18px',
-              }`
-              ).row.full-width.items-center.content-center.q-px-sm.q-pt-sm
-                img(
-                  draggable="false"
-                  :src="user.thumbUrl"
-                  :style=`{
-                  width: '16px',
-                  height: '16px',
-                  borderRadius: '50%',
-                }`).q-mx-sm
-                small.text-grey-5.q-mr-xs {{ user.name }} {{$t('проголосовал(а)')}}
-                small.text-grey-5 "{{ rateMeta(item.votedUserRate).name }}"
-                div(
-                  :style=`{
-                  width: '14px',
-                  height: '14px',
-                  borderRadius: '50%',
-                  background: rateMeta(item.votedUserRate).colorBackground,
-                }`).row.q-ml-xs.q-mr-sm
-              item-feed(
-                :itemShortOrFull="item"
-                :itemState="itemState"
-                :itemIndex="itemIndex"
-                :isActive="isActive"
-                :isVisible="isVisible"
-                :isPreload="isPreload"
-                :scrolling="scrolling").q-pb-xl
+                width: '16px',
+                height: '16px',
+                borderRadius: '50%',
+              }`).q-mx-sm
+              small.text-grey-5.q-mr-xs {{ user.name }} {{$t('проголосовал(а)')}}
+              small.text-grey-5 "{{ rateMeta(item.votedUserRate).name }}"
+              div(
+                :style=`{
+                width: '14px',
+                height: '14px',
+                borderRadius: '50%',
+                background: rateMeta(item.votedUserRate).colorBackground,
+              }`).row.q-ml-xs.q-mr-sm
+            item-feed(
+              :itemShortOrFull="item"
+              :itemState="itemState"
+              :itemIndex="itemIndex"
+              :isActive="isActive"
+              :isVisible="isVisible"
+              :isPreload="isPreload"
+              :scrolling="scrolling").q-pb-xl
 </template>
 
 <script>
@@ -185,7 +185,7 @@ export default {
     this.$log('mounted')
     this.$eventBus.$on('btn-user-clicked', this.onBusEvent)
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
     this.$eventBus.$off('btn-user-clicked', this.onBusEvent)
   }

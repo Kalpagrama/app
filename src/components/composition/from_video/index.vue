@@ -1,59 +1,59 @@
 <template lang="pug">
-  div(:style=`{ position: 'absolute', zIndex: 10}`).row.fit.items-start.content-start
-    div(
-      v-if="$store.state.ui.useDebug"
-      :style=`{
-      position: 'absolute', zIndex: 200, top: '0px', transform: 'translate3d(0,0,10px)',
-      opacity: 0.8,
-    }`
-    ).row.full-with.bg-red.text-white
-      //- small.full-width currentTime: {{data.currentTime}}
-      small.full-width urlMeta: {{urlMeta}}
-    slot(name="footer" :player="data.player")
-    //span.text-green {{id}} statusPlayer={{statusPlayer}} isPlayerVisible={{isPlayerVisible}} data.playBackReady={{data.playBackReady}}
-    // spinner + playBtn
-    div(
-      v-if="isPlayerVisible && statusPlayer !== 'playing'"
-      :style=`{ position: 'absolute', zIndex: 101, top: '0px', opacity: 0.5}`
-      @click="play()"
-    ).row.fit.items-center.content-center.justify-center
-      q-spinner(v-show="data.statusPlayerLag === 'loading'" color="white" size="50px")
-      q-icon(v-if="data.statusPlayerLag === 'paused'" name="play_circle_outline" size="90px" color="grey")
-    // poster
-    img(
-      :src="composition.thumbUrl"
-      :style=`{
-      position: 'absolute',
-      objectFit: objectFit || 'contain',
-      // borderRadius: '10px',
-      zIndex: data.currentTimeChangedCnt > 0 ? 'auto' : 100
-      // background: 'rgb(35,35,35)',
-    }`
-    ).fit
-    //transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    video(
-      v-if="isPlayerVisible"
-      ref="videoRef"
-      type="video/mp4"
-      preload="metadata"
-      :autoplay="false"
-      :loop="false"
-      :muted="true"
-      :playsinline="true"
-      :style=`{
-      position: 'absolute',
-      objectFit: objectFit || 'contain',
-      // borderRadius: '10px',
-    }`
-      @click="videoClick"
-      @timeupdate="videoTimeupdate"
-      @waiting="data.playBackLoading = true"
-      @canplay="data.playBackLoading = false, data.playBackReady=true, onCanPlay()"
-      @pause="data.playBackState = 'paused'"
-      @play="data.playBackState = 'playing'"
-      @playing="data.playBackState = 'playing'"
-      :src="url"
-    ).fit
+div(:style=`{ position: 'absolute', zIndex: 10}`).row.fit.items-start.content-start
+  div(
+    v-if="$store.state.ui.useDebug"
+    :style=`{
+    position: 'absolute', zIndex: 200, top: '0px', transform: 'translate3d(0,0,10px)',
+    opacity: 0.8,
+  }`
+  ).row.full-with.bg-red.text-white
+    //- small.full-width currentTime: {{data.currentTime}}
+    small.full-width urlMeta: {{urlMeta}}
+  slot(name="footer" :player="data.player")
+  //span.text-green {{id}} statusPlayer={{statusPlayer}} isPlayerVisible={{isPlayerVisible}} data.playBackReady={{data.playBackReady}}
+  // spinner + playBtn
+  div(
+    v-if="isPlayerVisible && statusPlayer !== 'playing'"
+    :style=`{ position: 'absolute', zIndex: 101, top: '0px', opacity: 0.5}`
+    @click="play()"
+  ).row.fit.items-center.content-center.justify-center
+    q-spinner(v-show="data.statusPlayerLag === 'loading'" color="white" size="50px")
+    q-icon(v-if="data.statusPlayerLag === 'paused'" name="play_circle_outline" size="90px" color="grey")
+  // poster
+  img(
+    :src="composition.thumbUrl"
+    :style=`{
+    position: 'absolute',
+    objectFit: objectFit || 'contain',
+    // borderRadius: '10px',
+    zIndex: data.currentTimeChangedCnt > 0 ? 'auto' : 100
+    // background: 'rgb(35,35,35)',
+  }`
+  ).fit
+  //transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  video(
+    v-if="isPlayerVisible"
+    ref="videoRef"
+    type="video/mp4"
+    preload="metadata"
+    :autoplay="false"
+    :loop="false"
+    :muted="true"
+    :playsinline="true"
+    :style=`{
+    position: 'absolute',
+    objectFit: objectFit || 'contain',
+    // borderRadius: '10px',
+  }`
+    @click="videoClick"
+    @timeupdate="videoTimeupdate"
+    @waiting="data.playBackLoading = true"
+    @canplay="data.playBackLoading = false, data.playBackReady=true, onCanPlay()"
+    @pause="data.playBackState = 'paused'"
+    @play="data.playBackState = 'playing'"
+    @playing="data.playBackState = 'playing'"
+    :src="url"
+  ).fit
 </template>
 
 // этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
@@ -265,7 +265,7 @@ export default {
     this.id = Date.now()
     // this.$log('created', this.id, this.isActive, this.isVisible, this?.composition?.layers[0]?.contentName)
   },
-  beforeDestroy () {
+  beforeUnmount () {
     // отменяем загрузку видео (чтобы браузер не грузил в фоне)
     // this.$log('beforeDestroy', this?.composition?.layers[0]?.contentName)
     this.cancelLoad()

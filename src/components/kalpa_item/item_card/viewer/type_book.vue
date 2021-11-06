@@ -1,82 +1,82 @@
 <template lang="pug">
-  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`)
-    .row.no-wrap.full-width
-      .col-5
-        img(
-          :src="item.thumbUrl"
-          :style=`{
-            borderRadius: '15px',
-          }`
-          ).row.full-width
-      // название и автор
-      .column.justify-center.no-wrap.q-pa-sm
-        .row
-          .q-pa-sm.text-white {{author}}
-        .row
-          .q-pa-sm.text-h6.text-white {{ item.name }}
-        .row.item-center.q-pa-sm
-          .q-pa-sm.text-white {{ item.countStat.countViews }}
-            q-icon(name="visibility" color="white" size="20px").q-mx-xs
-              q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Views')}}
-          .q-pa-sm.text-white {{ item.countStat.countSubscribers }}
-            q-icon(name="bookmark_outline" color="white" size="20px").q-mx-xs
-              q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Bookmarks')}}
-          .q-pa-sm.text-white {{ item.countStat.countNodes }}
-            q-icon(name="adjust" color="white" size="20px").q-mx-xs
-              q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Nodes')}}
-          .q-pa-sm.text-white {{ item.countStat.countJoints }}
-            q-icon(name="fas fa-link" color="white" size="20px").q-mx-xs
-              q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Joints')}}
-        .row
-          q-btn(
-            no-caps
-            color="green"
-            label="Читать"
-            @click="$router.push('/content/' + item.oid)"
-            ).col.full-width.q-mx-xs
-          kalpa-save(:item="item" :isActive="true" :showHeader="false" inactiveColor="grey-9").q-mx-xs
-    .row.full-width.q-pt-md
-      //- tabs sticky
-      div(
+div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`)
+  .row.no-wrap.full-width
+    .col-5
+      img(
+        :src="item.thumbUrl"
         :style=`{
-                  position: 'sticky', top: '0px', zIndex: 1000,
-                }`).row.full-width.q-px-md.b-30
-        q-tabs(
-          v-model="pageId"
-          switch-indicator no-caps dense
-          active-color="green"
-        ).full-width.text-grey-8
-          q-tab(
-            v-for="(p,pi) in pages" :key="p.id"
-            :name="p.id" :label="p.name")
-      //- tab panels
-      q-tab-panels(
+          borderRadius: '15px',
+        }`
+        ).row.full-width
+    // название и автор
+    .column.justify-center.no-wrap.q-pa-sm
+      .row
+        .q-pa-sm.text-white {{author}}
+      .row
+        .q-pa-sm.text-h6.text-white {{ item.name }}
+      .row.item-center.q-pa-sm
+        .q-pa-sm.text-white {{ item.countStat.countViews }}
+          q-icon(name="visibility" color="white" size="20px").q-mx-xs
+            q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Views')}}
+        .q-pa-sm.text-white {{ item.countStat.countSubscribers }}
+          q-icon(name="bookmark_outline" color="white" size="20px").q-mx-xs
+            q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Bookmarks')}}
+        .q-pa-sm.text-white {{ item.countStat.countNodes }}
+          q-icon(name="adjust" color="white" size="20px").q-mx-xs
+            q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Nodes')}}
+        .q-pa-sm.text-white {{ item.countStat.countJoints }}
+          q-icon(name="fas fa-link" color="white" size="20px").q-mx-xs
+            q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Joints')}}
+      .row
+        q-btn(
+          no-caps
+          color="green"
+          label="Читать"
+          @click="$router.push('/content/' + item.oid)"
+          ).col.full-width.q-mx-xs
+        kalpa-save(:item="item" :isActive="true" :showHeader="false" inactiveColor="grey-9").q-mx-xs
+  .row.full-width.q-pt-md
+    //- tabs sticky
+    div(
+      :style=`{
+                position: 'sticky', top: '0px', zIndex: 1000,
+              }`).row.full-width.q-px-md.b-30
+      q-tabs(
         v-model="pageId"
-        :swipeable="$q.platform.is.mobile"
-        :animated="$q.platform.is.mobile"
-        :style=`{}`).full-width.b-30
-        q-tab-panel(
-          v-for="(p,pi) in pages" :key="p.id" :name="p.id"
-          :style=`{
-                    background: 'none',
-                    minHeight: '70vh',
-                  }`
-        ).row.full-width.items-start.content-start.justify-center.q-pa-sm
-          //q-list(bordered).row.full-width
-            //q-expansion-item(group="somegroup" icon="chat" :label="$t('Comments')" dark).col-12
-            //  // template(v-slot:header)
-            //    // todo самый лучший коммент
-            //  row.full-width
-            //    page-comments(:item="block")
-            //q-separator
-            //q-expansion-item(group="somegroup" icon="grid_view" :label="$t('Similar')" dark default-opened=false).col-12
-            //  page-similar(:node="block")
-            //q-separator
-          page-comments(v-if="pageId === 'comments'" :item="item")
-          //page-nodes(v-if="pageId === 'nodes'" :sphere="item" :height="700")
-          item-description(v-if="pageId === 'description'" :item="item" :height="700")
-          //page-joints(v-if="pageId === 'joints'" :sphere="item" :height="700")
-          page-similar(v-if="pageId === 'similar'" :node="item" :types="['VIDEO', 'BOOKS', 'IMAGE']")
+        switch-indicator no-caps dense
+        active-color="green"
+      ).full-width.text-grey-8
+        q-tab(
+          v-for="(p,pi) in pages" :key="p.id"
+          :name="p.id" :label="p.name")
+    //- tab panels
+    q-tab-panels(
+      v-model="pageId"
+      :swipeable="$q.platform.is.mobile"
+      :animated="$q.platform.is.mobile"
+      :style=`{}`).full-width.b-30
+      q-tab-panel(
+        v-for="(p,pi) in pages" :key="p.id" :name="p.id"
+        :style=`{
+                  background: 'none',
+                  minHeight: '70vh',
+                }`
+      ).row.full-width.items-start.content-start.justify-center.q-pa-sm
+        //q-list(bordered).row.full-width
+          //q-expansion-item(group="somegroup" icon="chat" :label="$t('Comments')" dark).col-12
+          //  // template(v-slot:header)
+          //    // todo самый лучший коммент
+          //  row.full-width
+          //    page-comments(:item="block")
+          //q-separator
+          //q-expansion-item(group="somegroup" icon="grid_view" :label="$t('Similar')" dark default-opened=false).col-12
+          //  page-similar(:node="block")
+          //q-separator
+        page-comments(v-if="pageId === 'comments'" :item="item")
+        //page-nodes(v-if="pageId === 'nodes'" :sphere="item" :height="700")
+        item-description(v-if="pageId === 'description'" :item="item" :height="700")
+        //page-joints(v-if="pageId === 'joints'" :sphere="item" :height="700")
+        page-similar(v-if="pageId === 'similar'" :node="item" :types="['VIDEO', 'BOOKS', 'IMAGE']")
 </template>
 
 <script>

@@ -98,7 +98,7 @@ export default {
   mounted () {
     this.$log('mounted')
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
     if (this.avatarURL) URL.revokeObjectURL(this.avatarURL)
   }

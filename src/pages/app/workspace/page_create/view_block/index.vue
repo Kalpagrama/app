@@ -1,36 +1,36 @@
 <template lang="pug">
-  kalpa-layout()
-    template(v-slot:footer)
-      //nav-mobile(
-      //  v-if="true || $q.screen.lt.md"
-      //  :pageId="pageId"
-      //  @pageId="pageIdChange")
-    template(v-slot:body)
-      .row.full-width.items-start.content-start
-        //- body
+kalpa-layout()
+  template(v-slot:footer)
+    //nav-mobile(
+    //  v-if="true || $q.screen.lt.md"
+    //  :pageId="pageId"
+    //  @pageId="pageIdChange")
+  template(v-slot:body)
+    .row.full-width.items-start.content-start
+      //- body
+      div(
+        v-if="item"
+        :style=`{
+        //- paddingTop: '8px',
+        paddingBottom: '200px',
+      }`).row.full-width.justify-center.b-30
         div(
-          v-if="item"
-          :style=`{
-          //- paddingTop: '8px',
-          paddingBottom: '200px',
-        }`).row.full-width.justify-center.b-30
+          :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pb-xs
+          //- node wrapper
           div(
-            :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pb-xs
-            //- node wrapper
-            div(
-              v-observe-visibility=`{
-                throttle: 150,
-                callback: nodeVisibilityCallback,
-                intersection: {
-                  //- root: scrollTargetIsWindow ? null : scrollTarget,
-                  //- rootMargin: '-50% 0px'
-                }
-              }`
-            ).row.full-width
-              block-edit(
-                :block="item"
-                :height="height"
-                )
+            v-observe-visibility=`{
+              throttle: 150,
+              callback: nodeVisibilityCallback,
+              intersection: {
+                //- root: scrollTargetIsWindow ? null : scrollTarget,
+                //- rootMargin: '-50% 0px'
+              }
+            }`
+          ).row.full-width
+            block-edit(
+              :block="item"
+              :height="height"
+              )
 </template>
 
 <script>
@@ -65,7 +65,7 @@ export default {
   async mounted () {
     this.$log('mounted')
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
   }
 }

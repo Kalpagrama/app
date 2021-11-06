@@ -1,37 +1,37 @@
 <template lang="pug">
-  kalpa-layout
-    template(v-slot:footer)
-      //kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
-      kalpa-menu-mobile(v-if="$q.screen.lt.md")
-    template(v-slot:body)
-      .row.full-width.items-start.content-start.justify-center
-        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.justify-center
-          list-search-kalpa(v-if="pageInfo.searchInputState === 'opened'" :scrollAreaHeight="scrollAreaHeight"
-            :useNavHeader="false", :searchInputState="pageInfo.searchInputState", @searchInputState="$logW('searchInputState', $event), pageInfo.searchInputState = $event")
-          tab-list-feed(
-            v-else
-            ref="listFeed"
-            :type="'customPPV'"
-            :scrollAreaHeight="0"
-            :searchInputState="pageInfo.searchInputState"
-            :pages="pageInfo.categories"
-            :pageId="pageInfo.categoryId"
-            :query="queryCategory"
-            :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 222"
-            :itemActivePersist="true"
-            @searchString="pageInfo.searchString = $event"
-            @pageId="pageInfo.categoryId = $event"
-            @searchInputState="pageInfo.searchInputState = $event"
-          ).row.full-width
-            template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload,scrolling}`)
-              item-feed(
-                :itemShortOrFull="item"
-                :itemState="itemState"
-                :itemIndex="itemIndex"
-                :isActive="isActive"
-                :isVisible="isVisible"
-                :isPreload="isPreload"
-                :scrolling="scrolling").q-pb-xl
+kalpa-layout
+  template(v-slot:footer)
+    //kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
+    kalpa-menu-mobile(v-if="$q.screen.lt.md")
+  template(v-slot:body)
+    .row.full-width.items-start.content-start.justify-center
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.justify-center
+        list-search-kalpa(v-if="pageInfo.searchInputState === 'opened'" :scrollAreaHeight="scrollAreaHeight"
+          :useNavHeader="false", :searchInputState="pageInfo.searchInputState", @searchInputState="$logW('searchInputState', $event), pageInfo.searchInputState = $event")
+        tab-list-feed(
+          v-else
+          ref="listFeed"
+          :type="'customPPV'"
+          :scrollAreaHeight="0"
+          :searchInputState="pageInfo.searchInputState"
+          :pages="pageInfo.categories"
+          :pageId="pageInfo.categoryId"
+          :query="queryCategory"
+          :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 222"
+          :itemActivePersist="true"
+          @searchString="pageInfo.searchString = $event"
+          @pageId="pageInfo.categoryId = $event"
+          @searchInputState="pageInfo.searchInputState = $event"
+        ).row.full-width
+          template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload,scrolling}`)
+            item-feed(
+              :itemShortOrFull="item"
+              :itemState="itemState"
+              :itemIndex="itemIndex"
+              :isActive="isActive"
+              :isVisible="isVisible"
+              :isPreload="isPreload"
+              :scrolling="scrolling").q-pb-xl
 </template>
 
 <script>
@@ -95,7 +95,7 @@ export default {
   mounted () {
     this.$eventBus.$on('btn-trends-clicked', this.onBusEvent)
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$eventBus.$off('btn-trends-clicked', this.onBusEvent)
   }
 }

@@ -1,27 +1,27 @@
 <template lang="pug">
-  kalpa-layout()
-    template(v-slot:body)
-      .row.full-width.items-start.content-start
-        .row.full-width.justify-center
-          div(
-            :style=`{
-            height: headerHeight + 'px',
-            maxWidth: $store.state.ui.pageWidth+'px',
-            background: 'rgb(40,40,40)',
-            borderRadius: '10px',
-          }`
-          ).row.full-width.items-center.content-center.q-pa-sm
-            q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
-            .col
-              .row.fit.items-center.content-center.justify-center.q-pa-sm
-                span(:style=`{fontSize: '18px',}`).text-white.text-bold {{pageName}}
-            //q-btn(round flat color="white" icon="delete" @click="clearData")
-        .row.full-width
-          component(
-            :is="'view-'+pageId"
-            :item="item"
-            :height="($q.screen.height - headerHeight)"
-            @started="pageStarted = true")
+kalpa-layout()
+  template(v-slot:body)
+    .row.full-width.items-start.content-start
+      .row.full-width.justify-center
+        div(
+          :style=`{
+          height: headerHeight + 'px',
+          maxWidth: $store.state.ui.pageWidth+'px',
+          background: 'rgb(40,40,40)',
+          borderRadius: '10px',
+        }`
+        ).row.full-width.items-center.content-center.q-pa-sm
+          q-btn(round flat color="white" icon="west" @click="$routerKalpa.back()")
+          .col
+            .row.fit.items-center.content-center.justify-center.q-pa-sm
+              span(:style=`{fontSize: '18px',}`).text-white.text-bold {{pageName}}
+          //q-btn(round flat color="white" icon="delete" @click="clearData")
+      .row.full-width
+        component(
+          :is="'view-'+pageId"
+          :item="item"
+          :height="($q.screen.height - headerHeight)"
+          @started="pageStarted = true")
 </template>
 
 <script>

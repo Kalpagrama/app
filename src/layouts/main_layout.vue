@@ -87,7 +87,7 @@ export default {
     this.$log('mounted')
     this.$ym('APP_MOUNTED')
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
   }
 }

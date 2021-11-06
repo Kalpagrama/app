@@ -5,44 +5,44 @@
 </style>
 
 <template lang="pug">
-  div(
-    :style=`{
-      position: 'relative',
-      overflow: 'hidden',
-      borderRadius: '10px',
-      minHeight: height + 'px',
-      maxHeight: height + 'px',
-      minWidth: height*1.6 + 'px',
-      // background: 'linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(40,40,40,0) 100%)',
-    }`).b-0
-    //image
-    composition(
-      v-if="showItems && !$slots.items && node.items.length === 1"
-      :composition="node.items[0]"
-      :showContext="showContext"
-      :itemState="data"
-      :isVisible="isVisible"
-      :isActive="isActive"
-      :nodeOid="node.oid")
-    essence-items(
-      v-if="showItems && !$slots.items && node.items.length === 2"
-      :node="node"
-      :itemState="data"
-      :isActive="isActive"
-      :isVisible="isVisible")
-    div(:style=`{pointerEvents: 'none', background: 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 50%)', zIndex: 10}`).fit.absolute-center
-    div(:style=`{zIndex: 10}`).row.full-width.absolute-bottom
-      //- NAME: dynamic link/ dynamic fontSize
-      router-link(
-        v-if="showName && node.oid"
-        :to="nodeEssenceLink"
-        :style=`{
-          minHeight: '60px',
-          fontSize: fontSize+'px',
-          textAlign: 'center',
-        }`
-      ).row.full-width.items-center.content-end.justify-center
-        span.text-grey-5 {{ nodeName }}
+div(
+  :style=`{
+    position: 'relative',
+    overflow: 'hidden',
+    borderRadius: '10px',
+    minHeight: height + 'px',
+    maxHeight: height + 'px',
+    minWidth: height*1.6 + 'px',
+    // background: 'linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(40,40,40,0) 100%)',
+  }`).b-0
+  //image
+  composition(
+    v-if="showItems && !$slots.items && node.items.length === 1"
+    :composition="node.items[0]"
+    :showContext="showContext"
+    :itemState="data"
+    :isVisible="isVisible"
+    :isActive="isActive"
+    :nodeOid="node.oid")
+  essence-items(
+    v-if="showItems && !$slots.items && node.items.length === 2"
+    :node="node"
+    :itemState="data"
+    :isActive="isActive"
+    :isVisible="isVisible")
+  div(:style=`{pointerEvents: 'none', background: 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 50%)', zIndex: 10}`).fit.absolute-center
+  div(:style=`{zIndex: 10}`).row.full-width.absolute-bottom
+    //- NAME: dynamic link/ dynamic fontSize
+    router-link(
+      v-if="showName && node.oid"
+      :to="nodeEssenceLink"
+      :style=`{
+        minHeight: '60px',
+        fontSize: fontSize+'px',
+        textAlign: 'center',
+      }`
+    ).row.full-width.items-center.content-end.justify-center
+      span.text-grey-5 {{ nodeName }}
 </template>
 
 <script>

@@ -1,40 +1,39 @@
 <template lang="pug">
-    .row.full-width.items-start.content-start.justify-center
-      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-        //- bookmark editor
-        q-dialog(
-          v-model="videoEditorShow"
-          :maximized="$q.screen.xs"
-          @hide="videoEditorContentOid = null, $router.replace('/workspace/contents')")
-          video-editor(
-            v-if="videoEditorContentOid"
-            :showBottomMenu="false"
-            :contentOid="videoEditorContentOid"
-            @close="videoEditorShow = false, videoEditorContentOid = null")
-        tab-list-feed(
-          :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
-          :navHeaderText="useNavHeader ? $t('Contents') : ''"
-          :searchInputState="searchInputState"
-          :searchString="searchString"
-          :pages="pages"
-          :pageId="pageId"
-          :query="query"
-          :itemHeightApprox="100"
-          :itemActivePersist="itemActivePersist"
-          @searchString="searchString = $event"
-          @pageId="pageId = $event"
-        ).row.full-width
-          template(v-slot:externalHeader)
-            widget-upload(@uploaded="bookmarkSelectHandle($event)").q-mt-sm
-          template(v-slot:item=`{item:bookmark,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
-            bookmark-list-item(
-              :item="bookmark"
-              :itemState="itemState"
-              :itemIndex="itemIndex"
-              :mode="mode"
-              @item="bookmarkSelectHandle"
-            ).q-mb-sm
-
+.row.full-width.items-start.content-start.justify-center
+  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+    //- bookmark editor
+    q-dialog(
+      v-model="videoEditorShow"
+      :maximized="$q.screen.xs"
+      @hide="videoEditorContentOid = null, $router.replace('/workspace/contents')")
+      video-editor(
+        v-if="videoEditorContentOid"
+        :showBottomMenu="false"
+        :contentOid="videoEditorContentOid"
+        @close="videoEditorShow = false, videoEditorContentOid = null")
+    tab-list-feed(
+      :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
+      :navHeaderText="useNavHeader ? $t('Contents') : ''"
+      :searchInputState="searchInputState"
+      :searchString="searchString"
+      :pages="pages"
+      :pageId="pageId"
+      :query="query"
+      :itemHeightApprox="100"
+      :itemActivePersist="itemActivePersist"
+      @searchString="searchString = $event"
+      @pageId="pageId = $event"
+    ).row.full-width
+      template(v-slot:externalHeader)
+        widget-upload(@uploaded="bookmarkSelectHandle($event)").q-mt-sm
+      template(v-slot:item=`{item:bookmark,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
+        bookmark-list-item(
+          :item="bookmark"
+          :itemState="itemState"
+          :itemIndex="itemIndex"
+          :mode="mode"
+          @item="bookmarkSelectHandle"
+        ).q-mb-sm
 </template>
 
 <script>

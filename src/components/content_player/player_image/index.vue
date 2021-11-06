@@ -247,7 +247,7 @@ export default {
     }
     this.isFullscreen = true
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
     if (this.urlCropped) URL.revokeObjectURL(this.urlCropped)
   }

@@ -1,37 +1,36 @@
 <template lang="pug">
-  row.full-width.items-start.content-start
-    .row.full-width
-      q-spinner-dots(v-if="!itemsRes" color="green" size="60px").absolute-center
-      //- items
-      div(:style=`{ position: 'relative'}`).row.full-width.items-start.content-start
-        // header
-        .row.full-width.q-pr-md
-          slot(name="header")
-        // sticky header
-        div(:style=`{ position: 'sticky', top: '0px', zIndex: 100}`).row.full-width.q-pr-md
-          q-resize-observer(@resize="stickyHeaderHeight = $event.height")
-          slot(name="sticky-header")
-          //div(:style=`{height: '50px', background: 'red'}`).row.full-width.bg
-        // items list
-        virtual-list(
-          v-if="itemsRes"
-          :style=`{maxHeight: scrollAreaHeight+'px', height: scrollAreaHeight+'px', overflowY: 'auto'}`
-          :data-key="itemKey"
-          :data-sources="itemsCopy"
-          :estimate-size="itemHeightApprox"
-          :page-mode="false"
-        ).full-width
-          template(v-slot:item=`{ item, index, scope }`)
-            //item-component(:index="index", :source="item")
-            slot(
-              name="item"
-              :item="item"
-              :itemIndex="index"
-              :isActive="itemMiddleIndx === index"
-              :isVisible="!!itemsVisibility[item[itemKey]]"
-              :isPreload="index>=preloadInterval.from && index <= preloadInterval.to"
-            )
-
+.row.full-width.items-start.content-start
+  .row.full-width
+    q-spinner-dots(v-if="!itemsRes" color="green" size="60px").absolute-center
+    //- items
+    div(:style=`{ position: 'relative'}`).row.full-width.items-start.content-start
+      // header
+      .row.full-width.q-pr-md
+        slot(name="header")
+      // sticky header
+      div(:style=`{ position: 'sticky', top: '0px', zIndex: 100}`).row.full-width.q-pr-md
+        q-resize-observer(@resize="stickyHeaderHeight = $event.height")
+        slot(name="sticky-header")
+        //div(:style=`{height: '50px', background: 'red'}`).row.full-width.bg
+      // items list
+      virtual-list(
+        v-if="itemsRes"
+        :style=`{maxHeight: scrollAreaHeight+'px', height: scrollAreaHeight+'px', overflowY: 'auto'}`
+        :data-key="itemKey"
+        :data-sources="itemsCopy"
+        :estimate-size="itemHeightApprox"
+        :page-mode="false"
+      ).full-width
+        template(v-slot:item=`{ item, index, scope }`)
+          //item-component(:index="index", :source="item")
+          slot(
+            name="item"
+            :item="item"
+            :itemIndex="index"
+            :isActive="itemMiddleIndx === index"
+            :isVisible="!!itemsVisibility[item[itemKey]]"
+            :isPreload="index>=preloadInterval.from && index <= preloadInterval.to"
+          )
 </template>
 
 <script>
@@ -145,7 +144,7 @@ export default {
   mounted () {
     this.$log('mounted', this.scrollAreaHeight, this.$q.screen.height)
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
   }
 }

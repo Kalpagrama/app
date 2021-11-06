@@ -25,23 +25,23 @@ iframe[id$="_youtube_iframe"]
 </style>
 
 <template lang="pug">
-  video(
-    ref="videoRef"
-    type="video/youtube"
-    :src="url"
-    :playsinline="true"
-    :autoplay="true"
-    :loop="true"
-    :muted="muted"
-    :style=`{
-    objectFit: 'contain'
-  }`
-    @click="videoClick"
-    @loadeddata="videoLoadeddata"
-    @timeupdate="videoTimeupdate"
-    @pause="videoPaused"
-    @play="videoPlaying"
-  ).fit
+video(
+  ref="videoRef"
+  type="video/youtube"
+  :src="url"
+  :playsinline="true"
+  :autoplay="true"
+  :loop="true"
+  :muted="muted"
+  :style=`{
+  objectFit: 'contain'
+}`
+  @click="videoClick"
+  @loadeddata="videoLoadeddata"
+  @timeupdate="videoTimeupdate"
+  @pause="videoPaused"
+  @play="videoPlaying"
+).fit
 </template>
 
 <script>
@@ -278,7 +278,7 @@ export default {
       this.playerCreate(this.playerType)
     })
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
     if (this.playerType === 'player-youtube') {
       this.player_.removeEventListener('loadeddata', this.videoLoadeddata)

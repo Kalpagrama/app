@@ -1,53 +1,53 @@
 <template lang="pug">
-  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-widith.q-px-sm
-    //header + tabs
-    .row.full-width.items-start.content-start.justify-center.q-px-sm
-      q-resize-observer(@resize="headerHeight = $event.height")
-      //- header
-      .row.full-width.items-center.content-center
-        .col
-          span(:style=`{fontSize: '18px'}`).row.justify-center.text-white.text-bold {{ headerTitle_ }}
-        q-btn(round flat color="white" icon="clear" @click="$emit('close')")
-      //search String
-      q-input(
-        v-if="searchStringShow"
-        v-model="searchString"
-        flat borderless dark dense autofocus
-        icon="search"
-        :placeholder="$t('Type here to search...')"
-        :debounce="500"
-        :style=`{height: '40px'}`
-        :input-style=`{
-                width: '500px',
-                color: 'grey',
-                fontSize: '16px',
-                fontWeight: 'bold',
-              }`
-        @focus=""
-      ).row.full-width
-        template(v-slot:prepend)
-          q-icon(name="search" :color="'green'" size="25px").q-mx-md
-      .row.full-width.b-30
-        q-btn(v-if="!searchStringShow" flat no-caps color="grey" icon="search" @click="searchStringShow = true").no-border-radius
-        q-tabs(
-          v-model="pageId"
-          switch-indicator no-caps dense
-          align="justify"
-          active-color="green"
-        ).col.text-grey-8
-          q-tab(
-            v-for="(p,pi) in pages" :key="p.id"
-            :name="p.id" :label="p.name")
-    component(
-      :is="'list-' + pageId"
-      :useNavHeader="false"
-      :scrollAreaHeight="scrollAreaHeight"
-      searchInputState="disabled"
-      :searchString="searchString"
-      :pageFilter="pageFilter"
-      :itemActivePersist="itemActivePersist"
-      mode="select"
-      @item="$emit('item', $event)")
+div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-widith.q-px-sm
+  //header + tabs
+  .row.full-width.items-start.content-start.justify-center.q-px-sm
+    q-resize-observer(@resize="headerHeight = $event.height")
+    //- header
+    .row.full-width.items-center.content-center
+      .col
+        span(:style=`{fontSize: '18px'}`).row.justify-center.text-white.text-bold {{ headerTitle_ }}
+      q-btn(round flat color="white" icon="clear" @click="$emit('close')")
+    //search String
+    q-input(
+      v-if="searchStringShow"
+      v-model="searchString"
+      flat borderless dark dense autofocus
+      icon="search"
+      :placeholder="$t('Type here to search...')"
+      :debounce="500"
+      :style=`{height: '40px'}`
+      :input-style=`{
+              width: '500px',
+              color: 'grey',
+              fontSize: '16px',
+              fontWeight: 'bold',
+            }`
+      @focus=""
+    ).row.full-width
+      template(v-slot:prepend)
+        q-icon(name="search" :color="'green'" size="25px").q-mx-md
+    .row.full-width.b-30
+      q-btn(v-if="!searchStringShow" flat no-caps color="grey" icon="search" @click="searchStringShow = true").no-border-radius
+      q-tabs(
+        v-model="pageId"
+        switch-indicator no-caps dense
+        align="justify"
+        active-color="green"
+      ).col.text-grey-8
+        q-tab(
+          v-for="(p,pi) in pages" :key="p.id"
+          :name="p.id" :label="p.name")
+  component(
+    :is="'list-' + pageId"
+    :useNavHeader="false"
+    :scrollAreaHeight="scrollAreaHeight"
+    searchInputState="disabled"
+    :searchString="searchString"
+    :pageFilter="pageFilter"
+    :itemActivePersist="itemActivePersist"
+    mode="select"
+    @item="$emit('item', $event)")
 </template>
 
 <script>

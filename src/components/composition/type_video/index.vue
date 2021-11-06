@@ -1,49 +1,49 @@
 <template lang="pug">
-  div(
+div(
+  :style=`{
+  position: 'relative',
+  height: styles.height,
+  borderRadius: '10px',
+  background: 'rgb(10,10,10)',
+}`
+).row.full-width.items-start.content-start
+  slot
+  //- preview
+  //- loading="lazy"
+  img(
+    draggable="false"
+    :key="compositionKey"
+    :src="composition.thumbUrl"
     :style=`{
-    position: 'relative',
+    borderRadius: '10px', overflow: 'hidden',
+    userSelect: 'none',
     height: styles.height,
-    borderRadius: '10px',
-    background: 'rgb(10,10,10)',
+    objectFit: styles.objectFit,
+    //- objectFit: 'cover',
+    //- opacity: previewOpacity,
+    //- opacity: isActive ? videoOpacity === 0 ? 1 : 0 : 1,
   }`
-  ).row.full-width.items-start.content-start
-    slot
-    //- preview
-    //- loading="lazy"
-    img(
-      draggable="false"
-      :key="compositionKey"
-      :src="composition.thumbUrl"
-      :style=`{
-      borderRadius: '10px', overflow: 'hidden',
-      userSelect: 'none',
-      height: styles.height,
-      objectFit: styles.objectFit,
-      //- objectFit: 'cover',
-      //- opacity: previewOpacity,
-      //- opacity: isActive ? videoOpacity === 0 ? 1 : 0 : 1,
-    }`
-    ).full-width
-    //- video wrapper
-    content-player(
-      v-if="isActive && isVisible"
-      @player="playerCreated"
-      :contentKalpa=`{
-      oid: composition.layers[0].contentOid,
-      name: composition.layers[0].contentName || 'Контекст',
-      url: url,
-      type: 'VIDEO',
-      // contentSource: 'KALPA',
-    }`
-      :isActive="isActive"
-      :isVisible="isVisible"
-      :isMini="isMini"
-      :options="options"
-      :styles="styles"
-      :style=`{
-      position: 'absolute', zIndex: 100, top: '0px',
-      //- opacity: videoOpacity,
-    }`).fit
+  ).full-width
+  //- video wrapper
+  content-player(
+    v-if="isActive && isVisible"
+    @player="playerCreated"
+    :contentKalpa=`{
+    oid: composition.layers[0].contentOid,
+    name: composition.layers[0].contentName || 'Контекст',
+    url: url,
+    type: 'VIDEO',
+    // contentSource: 'KALPA',
+  }`
+    :isActive="isActive"
+    :isVisible="isVisible"
+    :isMini="isMini"
+    :options="options"
+    :styles="styles"
+    :style=`{
+    position: 'absolute', zIndex: 100, top: '0px',
+    //- opacity: videoOpacity,
+  }`).fit
 </template>
 
 <script>
@@ -137,7 +137,7 @@ export default {
   mounted () {
     // this.$log('mounted')
   },
-  beforeDestroy () {
+  beforeUnmount () {
     // this.$log('beforeDestroy')
   }
 }

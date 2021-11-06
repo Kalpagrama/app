@@ -99,7 +99,7 @@ export default {
   async created () {
     this.$log('created')
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
   }
 }

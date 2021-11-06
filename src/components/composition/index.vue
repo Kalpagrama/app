@@ -1,80 +1,80 @@
 <template lang="pug">
-  //- component(
-  //  :is="data.playerComponent[composition.outputType]"
-  //  v-bind="$props")
-  //  slot
+//- component(
+//  :is="data.playerComponent[composition.outputType]"
+//  v-bind="$props")
+//  slot
+div(
+  :style=`{
+  // borderRadius: '10px',
+  // overflow: 'hidden',
+}`
+).row.full-width.bg-black
+  q-resize-observer(@resize="onResize")
   div(
     :style=`{
+    position: 'relative',
+    paddingBottom: paddingBottom+'%',
+    background: 'rgb(40,40,40)',
     // borderRadius: '10px',
-    // overflow: 'hidden',
   }`
   ).row.full-width.bg-black
-    q-resize-observer(@resize="onResize")
-    div(
+    context(
+      v-if="showContext && composition.outputType !== 'VIDEO'"
+      :nodeOid="nodeOid"
+      :composition="composition"
+      :itemState="data"
+      :isActive="isActive"
+      :isVisible="isVisible"
+      :height="data.height"
+      :width="data.width"
       :style=`{
-      position: 'relative',
-      paddingBottom: paddingBottom+'%',
-      background: 'rgb(40,40,40)',
-      // borderRadius: '10px',
-    }`
-    ).row.full-width.bg-black
-      context(
-        v-if="showContext && composition.outputType !== 'VIDEO'"
-        :nodeOid="nodeOid"
-        :composition="composition"
-        :itemState="data"
-        :isActive="isActive"
-        :isVisible="isVisible"
-        :height="data.height"
-        :width="data.width"
-        :style=`{
-        position: 'absolute', zIndex: 200, bottom: '0px', left: '0px', right: '0px', transform: 'translate3d(0,0,10px)',
-      }`)
-      from-video(
-        v-if="composition.outputType === 'VIDEO'"
-        :composition="composition"
-        :itemState="data"
-        :isActive="isActive"
-        :isVisible="isVisible"
-        :objectFit="isSquare ? 'cover' : null"
-        :height="data.height"
-        :width="data.width"
-        :options="options || data.options"
-        @playing="$emit('playing')"
-        @ended="$emit('ended')"
-      )
-        template(v-slot:footer=`{player}`)
-          context(v-if="showContext"
-            :nodeOid="nodeOid"
-            :composition="composition"
-            :itemState="data"
-            :isActive="isActive"
-            :isVisible="isVisible"
-            :height="data.height"
-            :width="data.width"
-            :player="player"
-            :style=`{
-            position: 'absolute', zIndex: 200, bottom: '0px', left: '0px', right: '0px', transform: 'translate3d(0,0,10px)',
-          }`)
-      from-book(
-        v-else-if="composition.outputType === 'BOOK'"
-        :composition="composition"
-        :itemState="data"
-        :isActive="isActive"
-        :isVisible="isVisible"
-        :objectFit="isSquare ? 'cover' : null"
-        :height="data.height"
-        :width="data.width")
-      div(
-        v-else
-        :style=`{position: 'absolute', zIndex: 10,}`).row.fit.items-start.content-start
-        img(
-          :src="url"
+      position: 'absolute', zIndex: 200, bottom: '0px', left: '0px', right: '0px', transform: 'translate3d(0,0,10px)',
+    }`)
+    from-video(
+      v-if="composition.outputType === 'VIDEO'"
+      :composition="composition"
+      :itemState="data"
+      :isActive="isActive"
+      :isVisible="isVisible"
+      :objectFit="isSquare ? 'cover' : null"
+      :height="data.height"
+      :width="data.width"
+      :options="options || data.options"
+      @playing="$emit('playing')"
+      @ended="$emit('ended')"
+    )
+      template(v-slot:footer=`{player}`)
+        context(v-if="showContext"
+          :nodeOid="nodeOid"
+          :composition="composition"
+          :itemState="data"
+          :isActive="isActive"
+          :isVisible="isVisible"
+          :height="data.height"
+          :width="data.width"
+          :player="player"
           :style=`{
-          objectFit: isSquare ? 'fit' : 'contain',
-          // borderRadius: '10px',
-        }`
-        ).fit
+          position: 'absolute', zIndex: 200, bottom: '0px', left: '0px', right: '0px', transform: 'translate3d(0,0,10px)',
+        }`)
+    from-book(
+      v-else-if="composition.outputType === 'BOOK'"
+      :composition="composition"
+      :itemState="data"
+      :isActive="isActive"
+      :isVisible="isVisible"
+      :objectFit="isSquare ? 'cover' : null"
+      :height="data.height"
+      :width="data.width")
+    div(
+      v-else
+      :style=`{position: 'absolute', zIndex: 10,}`).row.fit.items-start.content-start
+      img(
+        :src="url"
+        :style=`{
+        objectFit: isSquare ? 'fit' : 'contain',
+        // borderRadius: '10px',
+      }`
+      ).fit
 </template>
 
 // этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!

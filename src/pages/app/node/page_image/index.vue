@@ -1,40 +1,40 @@
 // образы на суть
 <template lang="pug">
-  .row.full-width
-    q-dialog(
-      v-model="itemEditorShow"
-      :maximized="false"
-      position="standard")
-      essence-editor(
-        :item="newNode"
-        :publish="true"
-        :lockName="true"
-        @close="itemEditorShow=false")
-    // образ
-    div(:style=`{borderRadius: '10px', overflow: 'hidden', height: imageHeight+'px'}`).row.full-width.relative-position.b-0
-      // верх образа обрезается(потом отресайзится см updateImageHeight)
-      .row.full-width.absolute-bottom.b-0
-        q-resize-observer(@resize="imageHeightReal = $event.height")
-        q-tab-panels(
-          v-model="imagesNodesIndx"
-          :swipeable="true || $q.platform.is.mobile"
-          :animated="true || $q.platform.is.mobile"
-          dark
-          @transition="$event >= 0 ? $emit('set-node', imagesNodes[$event]):null").full-width
-          q-tab-panel(v-for="(n,ix) in imagesNodes" :key="ix" :name="ix").full-width.q-pa-none.b-0
-            transition(appear :enter-active-class="'animated fadeIn'" :leave-active-class="'animated fadeOut'")
-              item-feed(
-                :itemShortOrFull="n"
-                :isActive="isActive"
-                :isVisible="true"
-                :showHeader="false"
-                :showActions="false"
-                :showName="false"
-                :showSpheres="false"
-                :styles=`{borderRadius: '10px 10px 0px 0px',}`
-                )
-        .row.full-width
-          slot(name="bottom")
+.row.full-width
+  q-dialog(
+    v-model="itemEditorShow"
+    :maximized="false"
+    position="standard")
+    essence-editor(
+      :item="newNode"
+      :publish="true"
+      :lockName="true"
+      @close="itemEditorShow=false")
+  // образ
+  div(:style=`{borderRadius: '10px', overflow: 'hidden', height: imageHeight+'px'}`).row.full-width.relative-position.b-0
+    // верх образа обрезается(потом отресайзится см updateImageHeight)
+    .row.full-width.absolute-bottom.b-0
+      q-resize-observer(@resize="imageHeightReal = $event.height")
+      q-tab-panels(
+        v-model="imagesNodesIndx"
+        :swipeable="true || $q.platform.is.mobile"
+        :animated="true || $q.platform.is.mobile"
+        dark
+        @transition="$event >= 0 ? $emit('set-node', imagesNodes[$event]):null").full-width
+        q-tab-panel(v-for="(n,ix) in imagesNodes" :key="ix" :name="ix").full-width.q-pa-none.b-0
+          transition(appear :enter-active-class="'animated fadeIn'" :leave-active-class="'animated fadeOut'")
+            item-feed(
+              :itemShortOrFull="n"
+              :isActive="isActive"
+              :isVisible="true"
+              :showHeader="false"
+              :showActions="false"
+              :showName="false"
+              :showSpheres="false"
+              :styles=`{borderRadius: '10px 10px 0px 0px',}`
+              )
+      .row.full-width
+        slot(name="bottom")
 </template>
 
 <script>
@@ -81,7 +81,7 @@ export default {
       if (this.imageHeightReal > 200) this.$gsap.to(this, 0.5, { imageHeight: this.imageHeightReal })
     }, 2000)
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
   }
 }

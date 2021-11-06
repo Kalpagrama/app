@@ -54,7 +54,7 @@ export default {
   mounted () {
     this.$log('mounted', this.oid)
   },
-  async beforeDestroy () {
+  async beforeUnmount () {
     this.$log('beforeDestroy')
   }
 }

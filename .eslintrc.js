@@ -2,7 +2,7 @@ module.exports = {
     root: true,
 
     parserOptions: {
-        parser: 'babel-eslint',
+        parser: '@babel/eslint-parser',
         sourceType: 'module'
     },
 
@@ -15,7 +15,7 @@ module.exports = {
     // consider switching to `plugin:vue/strongly-recommended` or `plugin:vue/recommended` for stricter rules.
     extends: [
         'standard',
-        'plugin:vue/essential'
+        'plugin:vue/vue3-essential' // or equivalent
     ],
 
     // required to lint *.vue files

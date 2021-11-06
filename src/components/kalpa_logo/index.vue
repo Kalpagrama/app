@@ -50,18 +50,26 @@ export default {
     // this.$log('mounted')
     // window.addEventListener('scroll', this.onScroll)
   },
-  beforeDestroy () {
+  beforeUnmount () {
     // window.removeEventListener('scroll', this.onScroll)
   }
 }
 </script>
 
-<style lang="stylus" scoped>
-svg {
-  cursor:crosshair
+<!--<style lang="stylus" scoped>-->
+<!--svg {-->
+<!--  cursor:crosshair-->
+<!--  -moz-box-shadow: 0px 0px 3px #888-->
+<!--  -webkit-box-shadow: 0px 0px 3px #888;-->
+<!--  box-shadow: 0px 0px 3px #888;-->
+<!--  border-radius: 50%;-->
+<!--}-->
+<!--</style>-->
+<style lang="sass" scoped>
+.svg
+  cursor: crosshair
   -moz-box-shadow: 0px 0px 3px #888
-  -webkit-box-shadow: 0px 0px 3px #888;
-  box-shadow: 0px 0px 3px #888;
-  border-radius: 50%;
-}
+  -webkit-box-shadow: 0px 0px 3px #888
+  box-shadow: 0px 0px 3px #888
+  border-radius: 50%
 </style>

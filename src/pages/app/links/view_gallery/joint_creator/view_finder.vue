@@ -35,7 +35,7 @@ export default {
   mounted () {
     this.$log('mounted')
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
   }
 }

@@ -126,7 +126,7 @@ export default {
     this.$log('mounted')
     this.$gsap.to(this, 0.5, {backgroundOpacity: 1})
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
   }
 }

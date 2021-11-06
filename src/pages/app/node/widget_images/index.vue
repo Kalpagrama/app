@@ -1,41 +1,41 @@
 // образы на суть
 <template lang="pug">
-  div(:style=`{position: 'relative'}`).row.full-width
-    // мини-образы
-    div(v-if="imagesNodesInProgress").row.full-width.justify-center
-      q-spinner-dots(size="20px" color="green")
-    div(v-else-if="length" @click="$emit('images-show')").row.full-width.justify-start.cursor-pointer.q-pb-xs
-      small.text-grey-7.text-weight-thin.q-pl-xs {{$t('На смысл')}}
-      small.text-grey-7.text-weight-bolder.text-italic.q-px-xs {{node.name.substring(0, 22)}}{{node.name.length>22 ? '...': ''}}
-      small.text-grey-7.text-weight-thin {{$getNoun(length,$t('найден'),$t('найдено'),$t('найдено'))}}
-      small.text-green-8.text-weight-bolder.q-px-xs {{length}}
-      small.text-grey-7.text-weight-thin {{$getNoun(length, $t('образ'), $t('образа'), $t('образов'))}}
-      q-icon(dense name="expand_more" color="grey-5"  size="14px")
-    div(:style=`{position: 'relative', height: previewHeight+'px',  maxWidth: Math.min($q.screen.width, $store.state.ui.pageWidth)+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-      q-btn(v-if="false" :disable="!itemsLeft.length" round flat icon="chevron_left" color="white"
-        size="sm" :style=`{zIndex: '100', borderRadius: '10px'}` @click="waitIndx=imagesNodesIndx+1, $emit('set-node', imagesNodes[imagesNodesIndx-1])").absolute-left
-      q-virtual-scroll(ref="vs" :items="imagesNodes" virtual-scroll-horizontal :virtual-scroll-item-size="previewHeight*1.618" :style=`{}` @virtual-scroll="onVsScroll").col
-        template(v-slot="{ item, index: itemIndex}")
-          //transition(appear :enter-active-class="'animated fadeIn'" :leave-active-class="'animated fadeOut'")
-          div(:style=`{position: 'relative', overflow: 'hidden',
-                  height: previewHeight+'px', width: (previewHeight*1.618)+'px',
-                  borderRadius: '10px', border: imagesNodesIndx === itemIndex ? '2px solid '+$getPaletteColor('green-10') : null,
-                  marginLeft: '1px', marginRight: '1px'}`
-            @click="itemIndex!==imagesNodesIndx?waitIndx=itemIndex:null, $emit('set-node', imagesNodes[itemIndex])").row.items-center.center-start.content-center
-            div(:style=`{maxHeight: (previewHeight*4)+'px', width: (previewHeight*2)+'px'}`).absolute-center
-              item-feed(
-                :itemShortOrFull="item"
-                :showContext="false"
-                :isActive="false"
-                :isVisible="true"
-                :showHeader="false"
-                :showActions="false"
-                :showName="false"
-                :showSpheres="false")
-            div(:style=`{minHeight: '200px', width: '100', background: 'rgba(0,0,0,0.5)', zIndex: '50'}`).fit.absolute
-            q-spinner(v-if="waitIndx === itemIndex" size="20px" color="green").fit.absolute.q-pa-sm
-      q-btn(v-if="false" :disable="!itemsRight.length" round flat icon="chevron_right" color="white"
-        size="sm" :style=`{zIndex: '100', borderRadius: '10px'}` @click="waitIndx=imagesNodesIndx+1, $emit('set-node', imagesNodes[imagesNodesIndx+1])").absolute-right
+div(:style=`{position: 'relative'}`).row.full-width
+  // мини-образы
+  div(v-if="imagesNodesInProgress").row.full-width.justify-center
+    q-spinner-dots(size="20px" color="green")
+  div(v-else-if="length" @click="$emit('images-show')").row.full-width.justify-start.cursor-pointer.q-pb-xs
+    small.text-grey-7.text-weight-thin.q-pl-xs {{$t('На смысл')}}
+    small.text-grey-7.text-weight-bolder.text-italic.q-px-xs {{node.name.substring(0, 22)}}{{node.name.length>22 ? '...': ''}}
+    small.text-grey-7.text-weight-thin {{$getNoun(length,$t('найден'),$t('найдено'),$t('найдено'))}}
+    small.text-green-8.text-weight-bolder.q-px-xs {{length}}
+    small.text-grey-7.text-weight-thin {{$getNoun(length, $t('образ'), $t('образа'), $t('образов'))}}
+    q-icon(dense name="expand_more" color="grey-5"  size="14px")
+  div(:style=`{position: 'relative', height: previewHeight+'px',  maxWidth: Math.min($q.screen.width, $store.state.ui.pageWidth)+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+    q-btn(v-if="false" :disable="!itemsLeft.length" round flat icon="chevron_left" color="white"
+      size="sm" :style=`{zIndex: '100', borderRadius: '10px'}` @click="waitIndx=imagesNodesIndx+1, $emit('set-node', imagesNodes[imagesNodesIndx-1])").absolute-left
+    q-virtual-scroll(ref="vs" :items="imagesNodes" virtual-scroll-horizontal :virtual-scroll-item-size="previewHeight*1.618" :style=`{}` @virtual-scroll="onVsScroll").col
+      template(v-slot="{ item, index: itemIndex}")
+        //transition(appear :enter-active-class="'animated fadeIn'" :leave-active-class="'animated fadeOut'")
+        div(:style=`{position: 'relative', overflow: 'hidden',
+                height: previewHeight+'px', width: (previewHeight*1.618)+'px',
+                borderRadius: '10px', border: imagesNodesIndx === itemIndex ? '2px solid '+$getPaletteColor('green-10') : null,
+                marginLeft: '1px', marginRight: '1px'}`
+          @click="itemIndex!==imagesNodesIndx?waitIndx=itemIndex:null, $emit('set-node', imagesNodes[itemIndex])").row.items-center.center-start.content-center
+          div(:style=`{maxHeight: (previewHeight*4)+'px', width: (previewHeight*2)+'px'}`).absolute-center
+            item-feed(
+              :itemShortOrFull="item"
+              :showContext="false"
+              :isActive="false"
+              :isVisible="true"
+              :showHeader="false"
+              :showActions="false"
+              :showName="false"
+              :showSpheres="false")
+          div(:style=`{minHeight: '200px', width: '100', background: 'rgba(0,0,0,0.5)', zIndex: '50'}`).fit.absolute
+          q-spinner(v-if="waitIndx === itemIndex" size="20px" color="green").fit.absolute.q-pa-sm
+    q-btn(v-if="false" :disable="!itemsRight.length" round flat icon="chevron_right" color="white"
+      size="sm" :style=`{zIndex: '100', borderRadius: '10px'}` @click="waitIndx=imagesNodesIndx+1, $emit('set-node', imagesNodes[imagesNodesIndx+1])").absolute-right
 </template>
 
 <script>
@@ -93,7 +93,7 @@ export default {
   async created () {
     this.$log('created ')
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
   }
 }

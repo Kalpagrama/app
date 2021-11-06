@@ -1,37 +1,37 @@
 <template lang="pug">
-  .row.full-width.items-start.content-start.justify-center
-    div(v-if="user" :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-      tab-list-feed(
-        :scrollAreaHeight="(scrollAreaHeight || $q.screen.height)"
-        :navHeaderText="useNavHeader ? $t('Following') : ''"
-        :searchInputState="'enabled'"
-        :searchString="searchString"
-        :query="query"
-        :itemHeightApprox="100"
-        :itemActivePersist="false"
-        @searchString="searchString = $event"
-      ).row.full-width
-        template(v-slot:externalHeader)
-          .full-width
-            span.text-grey {{$t('Following')}}
-        template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
-          div(
-            v-if="item.type === 'USER'"
-            @click="$router.push('/user/'+item.oid)"
+.row.full-width.items-start.content-start.justify-center
+  div(v-if="user" :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+    tab-list-feed(
+      :scrollAreaHeight="(scrollAreaHeight || $q.screen.height)"
+      :navHeaderText="useNavHeader ? $t('Following') : ''"
+      :searchInputState="'enabled'"
+      :searchString="searchString"
+      :query="query"
+      :itemHeightApprox="100"
+      :itemActivePersist="false"
+      @searchString="searchString = $event"
+    ).row.full-width
+      template(v-slot:externalHeader)
+        .full-width
+          span.text-grey {{$t('Following')}}
+      template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
+        div(
+          v-if="item.type === 'USER'"
+          @click="$router.push('/user/'+item.oid)"
+          :style=`{
+            background: 'rgb(35,35,35)',
+            borderRadius: '10px',
+          }`
+        ).row.fit.items-center.content-center.q-pa-sm
+          img(
+            draggable="false"
+            :src="item.thumbUrl"
             :style=`{
-              background: 'rgb(35,35,35)',
-              borderRadius: '10px',
-            }`
-          ).row.fit.items-center.content-center.q-pa-sm
-            img(
-              draggable="false"
-              :src="item.thumbUrl"
-              :style=`{
-                width: '30px',
-                height: '30px',
-                borderRadius: '50%',
-              }`).q-mr-sm
-            span.text-white {{ item.name }}
+              width: '30px',
+              height: '30px',
+              borderRadius: '50%',
+            }`).q-mr-sm
+          span.text-white {{ item.name }}
 </template>
 
 <script>

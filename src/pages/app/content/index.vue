@@ -80,7 +80,7 @@ export default {
       // do something ?
     }
   },
-  async beforeDestroy () {
+  async beforeUnmount () {
     this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
     if (this.$store.getters.isGuest) {

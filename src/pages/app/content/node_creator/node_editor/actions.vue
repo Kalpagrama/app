@@ -129,7 +129,7 @@ export default {
     // this.player.events.on('figure-create', this.playerFigureCreateHandle)
     // this.player.events.on('figure-delete', this.playerFigureDeleteHandle)
   },
-  async beforeDestroy () {
+  async beforeUnmount () {
     this.$log('beforeDestroy', this.node.temporary)
     if (this.node.temporary) {
       this.$log('remove')

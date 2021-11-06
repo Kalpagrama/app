@@ -1,52 +1,51 @@
 <template lang="pug">
-  kalpa-layout
-    template(v-slot:footer)
-      kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
-        template(v-slot:center)
-          q-btn(flat ripple=false icon="add" size="sm" color="green" :label="$t('Добавить образ')" @click="itemEditorShow=true")
-        template(v-slot:left-button)
-          nav-mobile
-    template(v-slot:body)
-      .row.full-width.items-start.content-start.justify-center
-        q-dialog(
-          v-model="itemEditorShow"
-          :maximized="false"
-          position="standard")
-          essence-editor(
-            :item="newNode"
-            :publish="true"
-            @close="itemEditorShow=false")
-        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-          tab-list-feed(
-            v-if="sphere"
-            :type="'customPPV'"
-            :scrollAreaHeight="0"
-            searchInputState="disabled"
-            :pages="pages"
-            :pageId="pageId"
-            :query="query"
-            :itemHeightApprox="pageId === 'contents' ? 30 : (Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 222)"
-            :itemActivePersist="true"
-            @searchString="searchString = $event"
-            @pageId="pageId = $event"
-            @items="items = $event"
-          ).row.full-width
-            template(v-slot:externalHeader)
-              page-header(v-if="sphere" :sphere="sphere" :topNode="topNode").q-mb-sm
-            template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
-              item-feed(
-                :itemShortOrFull="item"
-                :itemState="itemState"
-                :itemIndex="itemIndex"
-                :isActive="isActive"
-                :isVisible="isVisible"
-                :isPreload="isPreload"
-                :scrolling="scrolling"
-                :height="pageId === 'contents' ? 30 : undefined")
-              .row.full-width
-                div(v-if="pageId === 'contents'").q-pb-md
-                div(v-else).q-pb-xl
-
+kalpa-layout
+  template(v-slot:footer)
+    kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
+      template(v-slot:center)
+        q-btn(flat ripple=false icon="add" size="sm" color="green" :label="$t('Добавить образ')" @click="itemEditorShow=true")
+      template(v-slot:left-button)
+        nav-mobile
+  template(v-slot:body)
+    .row.full-width.items-start.content-start.justify-center
+      q-dialog(
+        v-model="itemEditorShow"
+        :maximized="false"
+        position="standard")
+        essence-editor(
+          :item="newNode"
+          :publish="true"
+          @close="itemEditorShow=false")
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+        tab-list-feed(
+          v-if="sphere"
+          :type="'customPPV'"
+          :scrollAreaHeight="0"
+          searchInputState="disabled"
+          :pages="pages"
+          :pageId="pageId"
+          :query="query"
+          :itemHeightApprox="pageId === 'contents' ? 30 : (Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 222)"
+          :itemActivePersist="true"
+          @searchString="searchString = $event"
+          @pageId="pageId = $event"
+          @items="items = $event"
+        ).row.full-width
+          template(v-slot:externalHeader)
+            page-header(v-if="sphere" :sphere="sphere" :topNode="topNode").q-mb-sm
+          template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
+            item-feed(
+              :itemShortOrFull="item"
+              :itemState="itemState"
+              :itemIndex="itemIndex"
+              :isActive="isActive"
+              :isVisible="isVisible"
+              :isPreload="isPreload"
+              :scrolling="scrolling"
+              :height="pageId === 'contents' ? 30 : undefined")
+            .row.full-width
+              div(v-if="pageId === 'contents'").q-pb-md
+              div(v-else).q-pb-xl
 </template>
 
 //  @item="$go('/content/'+item.oid)
@@ -153,7 +152,7 @@ export default {
     this.$log('mounted', this.$route.params, this.$route.query)
     this.pageId = this.$route.query.pageId || 'nodes'
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
   }
 }

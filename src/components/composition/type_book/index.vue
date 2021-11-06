@@ -1,42 +1,42 @@
 <template lang="pug">
-  div(
-    :style=`{
-    position: 'relative',
-    borderRadius: '10px',
-  }`
-  ).row.fit.items-start.content-start.justify-center.b-40
-    q-resize-observer(@resize="height = $event.height")
-    //- footer
-    transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-      context-bar(
-        v-if="isActive"
-        :contentKalpa=`{oid: composition.layers[0].contentOid, name: composition.layers[0].contentName}`
-        :height="height")
-    //- footer gradient
-    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      div(
-        v-if="textContainerOverflowHidden"
-        @click="textContainerOverflowToggle"
-        :style=`{
-        position: 'absolute', zIndex: 10, bottom: '0px', left: '0px',
-        height: '50%',
-        background: 'linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(40,40,40,0) 100%)',
-        borderRadius: '0px 0px 10px 10px',
-      }`
-      ).row.full-width.cursor-pointer
-    //- body
+div(
+  :style=`{
+  position: 'relative',
+  borderRadius: '10px',
+}`
+).row.fit.items-start.content-start.justify-center.b-40
+  q-resize-observer(@resize="height = $event.height")
+  //- footer
+  transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    context-bar(
+      v-if="isActive"
+      :contentKalpa=`{oid: composition.layers[0].contentOid, name: composition.layers[0].contentName}`
+      :height="height")
+  //- footer gradient
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
-      ref="text-container"
+      v-if="textContainerOverflowHidden"
+      @click="textContainerOverflowToggle"
       :style=`{
-      maxHeight: 'calc(100% - 48px)',
-      overflow: textContainerOverflowHidden ? 'hidden' : 'scroll',
-      //- paddingTop: '50px',
+      position: 'absolute', zIndex: 10, bottom: '0px', left: '0px',
+      height: '50%',
+      background: 'linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(40,40,40,0) 100%)',
+      borderRadius: '0px 0px 10px 10px',
     }`
-    ).row.fit.items-start.content-start.q-px-md.q-pt-md
-      div(
-        ref="text-wrapper"
-      ).row.full-width
-        p.text-white.text-caption {{ name }}
+    ).row.full-width.cursor-pointer
+  //- body
+  div(
+    ref="text-container"
+    :style=`{
+    maxHeight: 'calc(100% - 48px)',
+    overflow: textContainerOverflowHidden ? 'hidden' : 'scroll',
+    //- paddingTop: '50px',
+  }`
+  ).row.fit.items-start.content-start.q-px-md.q-pt-md
+    div(
+      ref="text-wrapper"
+    ).row.full-width
+      p.text-white.text-caption {{ name }}
 </template>
 
 <script>
@@ -142,7 +142,7 @@ export default {
       }
     })
   },
-  beforeDestroy () {
+  beforeUnmount () {
     // this.$log('beforeDestroy')
   }
 }

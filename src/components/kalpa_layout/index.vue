@@ -72,7 +72,7 @@ export default {
     //   })
     // })
   },
-  beforeDestroy () {
+  beforeUnmount () {
     // this.$log('beforeDestroy')
     // enableBodyScroll(this.$refs['body-wrapper'])
   }

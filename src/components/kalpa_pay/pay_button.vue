@@ -1,54 +1,54 @@
 <template lang="pug">
-  .row
-    slot(v-if="!formOnly" name="action" :start="start" :content="content")
-      q-btn(
-        v-if="!$scopedSlots.action"
-        round flat no-caps
-        :color="paid ? activeColor : inactiveColor"
-        icon="paid"
-        @click="showDialog = (!paid ? true : false)"
-        :loading="loading")
-        q-tooltip(dense dark) {{paid ? $t('Paid') : $t('Buy')}}
-        q-dialog(
-          v-model="showDialog"
-          position="standard"
-          :maximized="false"
+.row
+  slot(v-if="!formOnly" name="action" :start="start" :content="content")
+    q-btn(
+      v-if="!$scopedSlots.action"
+      round flat no-caps
+      :color="paid ? activeColor : inactiveColor"
+      icon="paid"
+      @click="showDialog = (!paid ? true : false)"
+      :loading="loading")
+      q-tooltip(dense dark) {{paid ? $t('Paid') : $t('Buy')}}
+      q-dialog(
+        v-model="showDialog"
+        position="standard"
+        :maximized="false"
+      )
+        payanyway-form(
+          :amount="12.34"
+          :transactionId="Date.now()"
+          :description="$t('user') + ':' + $store.getters.currentUser.oid + ':' + $store.getters.currentUser.profile.email + ':' + $t('buy item') + ':' + oid"
+          :subscriberId="$store.getters.currentUser.oid + ':' + $store.getters.currentUser.profile.email"
+          :params="{userOid:$store.getters.currentUser.oid, itemOid:oid, amount: 12.34}"
+          @success="onSuccessPay"
         )
-          payanyway-form(
-            :amount="12.34"
-            :transactionId="Date.now()"
-            :description="$t('user') + ':' + $store.getters.currentUser.oid + ':' + $store.getters.currentUser.profile.email + ':' + $t('buy item') + ':' + oid"
-            :subscriberId="$store.getters.currentUser.oid + ':' + $store.getters.currentUser.profile.email"
-            :params="{userOid:$store.getters.currentUser.oid, itemOid:oid, amount: 12.34}"
-            @success="onSuccessPay"
+      q-menu(
+        v-if="false"
+        dark)
+        .row
+          img(
+            :style=`{
+                objectFit: 'cover',
+                maxWidth: '100px',
+                borderRadius: '10px',
+              }`
+            :src="thumbUrl"
           )
-        q-menu(
-          v-if="false"
-          dark)
-          .row
-            img(
-              :style=`{
-                  objectFit: 'cover',
-                  maxWidth: '100px',
-                  borderRadius: '10px',
-                }`
-              :src="thumbUrl"
+          .row.full-width
+            q-btn(
+              @click="onSuccessPay"
+              :label="$t('sberPay')"
+              icon='shopping_cart'
+              round flat no-caps
             )
-            .row.full-width
-              q-btn(
-                @click="onSuccessPay"
-                :label="$t('sberPay')"
-                icon='shopping_cart'
-                round flat no-caps
-              )
-    payanyway-form(v-if="formOnly"
-      :amount="12.34"
-      :transactionId="Date.now()"
-      :description="$t('user') + ':' + $store.getters.currentUser.oid + ':' + $store.getters.currentUser.profile.email + ':' + $t('buy item') + ':' + oid"
-      :subscriberId="$store.getters.currentUser.oid + ':' + $store.getters.currentUser.profile.email"
-      :params="{userOid:$store.getters.currentUser.oid, itemOid:oid, amount: 12.34}"
-      @success="onSuccessPay"
-    )
+  payanyway-form(v-if="formOnly"
+    :amount="12.34"
+    :transactionId="Date.now()"
+    :description="$t('user') + ':' + $store.getters.currentUser.oid + ':' + $store.getters.currentUser.profile.email + ':' + $t('buy item') + ':' + oid"
+    :subscriberId="$store.getters.currentUser.oid + ':' + $store.getters.currentUser.profile.email"
+    :params="{userOid:$store.getters.currentUser.oid, itemOid:oid, amount: 12.34}"
+    @success="onSuccessPay"
+  )
 </template>
 
 <script>

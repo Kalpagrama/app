@@ -19,7 +19,7 @@ export default {
   async mounted () {
     this.$log('mounted')
   },
-  async beforeDestroy () {
+  async beforeUnmount () {
     this.$log('beforeDestroy')
     // await ObjectApi.update(this.$store.getters.currentUser.oid, 'profile.tutorial', tutorialCurrent)
   }

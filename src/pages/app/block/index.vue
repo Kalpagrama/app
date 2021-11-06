@@ -126,7 +126,7 @@ export default {
   async mounted () {
     this.$log('mounted')
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
   }
 }

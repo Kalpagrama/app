@@ -6,94 +6,94 @@ iframe
 </style>
 
 <template lang="pug">
+div(
+  :style=`{
+  position: 'relative',
+  height: '100%',
+  overflow: 'hidden',
+}`
+).column.full-width
+  player-node(:node="selectedEssence" @close="selectedEssence = null")
+  //- fictive/invisible input for emit/on/off events with native html element events
+  input(v-model="name" ref="nameInput" :style=`{display: 'none'}`)
+  //- figure editor + audioplayer
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="true"
+      :style=`{
+      position: 'absolute', zIndex: 1000,
+      bottom: '80px',
+    }`
+    ).row.full-width.justify-center
+      slot(name="tint-bar" :tintFocused="true")
+      //- (currentSelection && !audioPlayer.audio)
+      //div(
+      //  v-if="currentSelection && !selectedDraft"
+      //  :style=`{
+      //  width: '200px',
+      //  borderRadius: '20px',
+      //  background: 'rgba(30,30,30,0.8)',
+      //}`
+      //).row.items-center.content-center.q-pa-md
+      //  //- q-btn(round flat color="green" icon="play_arrow" @click="nextAudio(0, true)")
+      //  .col
+      //  q-btn(round flat color="orange" icon="lens" @click="createColorNodeDraft('orange')")
+      //  q-btn(round flat color="red" icon="lens" @click="createColorNodeDraft('red')")
+      //  q-btn(round flat color="green" icon="lens" @click="createColorNodeDraft('green')")
+      //  q-btn(round flat color='blue' icon="lens" @click="createColorNodeDraft('blue')")
+      //  .col
+      //  //- q-btn(round flat color="white" icon="keyboard_arrow_left" @click="updateSelection(null, null, -1)")
+      //  //- q-btn(round flat color="white" icon="keyboard_arrow_right" @click="updateSelection(null, null, 1)")
+  //- table of contents
+  transition(enter-active-class="animated slideInLeft" leave-active-class="animated slideOutLeft")
+    player-toc(
+      v-if="toc && tocShow"
+      :toc="toc"
+      :tocId="tocId"
+      :style=`{
+      position: 'absolute', top: '0px', left: '0px', zIndex: 1000,
+      height: 'calc(100% - 50px)',
+    }`
+      @close="tocShow = false")
+  //- settings
+  div(
+    v-if="settingsShow"
+    :style=`{zIndex: 1000, width: '70%'}`
+  ).absolute-center
+    player-settings(:settings="settings" @close="settingsShow = false" :style=`{borderRadius: '20px'}`).b-40
+  //- body book area wrapper
   div(
     :style=`{
     position: 'relative',
-    height: '100%',
+    borderRadius: '10px',
+    border: '3px solid #222',
     overflow: 'hidden',
-  }`
-  ).column.full-width
-    player-node(:node="selectedEssence" @close="selectedEssence = null")
-    //- fictive/invisible input for emit/on/off events with native html element events
-    input(v-model="name" ref="nameInput" :style=`{display: 'none'}`)
-    //- figure editor + audioplayer
-    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      div(
-        v-if="true"
-        :style=`{
-        position: 'absolute', zIndex: 1000,
-        bottom: '80px',
-      }`
-      ).row.full-width.justify-center
-        slot(name="tint-bar" :tintFocused="true")
-        //- (currentSelection && !audioPlayer.audio)
-        //div(
-        //  v-if="currentSelection && !selectedDraft"
-        //  :style=`{
-        //  width: '200px',
-        //  borderRadius: '20px',
-        //  background: 'rgba(30,30,30,0.8)',
-        //}`
-        //).row.items-center.content-center.q-pa-md
-        //  //- q-btn(round flat color="green" icon="play_arrow" @click="nextAudio(0, true)")
-        //  .col
-        //  q-btn(round flat color="orange" icon="lens" @click="createColorNodeDraft('orange')")
-        //  q-btn(round flat color="red" icon="lens" @click="createColorNodeDraft('red')")
-        //  q-btn(round flat color="green" icon="lens" @click="createColorNodeDraft('green')")
-        //  q-btn(round flat color='blue' icon="lens" @click="createColorNodeDraft('blue')")
-        //  .col
-        //  //- q-btn(round flat color="white" icon="keyboard_arrow_left" @click="updateSelection(null, null, -1)")
-        //  //- q-btn(round flat color="white" icon="keyboard_arrow_right" @click="updateSelection(null, null, 1)")
-    //- table of contents
-    transition(enter-active-class="animated slideInLeft" leave-active-class="animated slideOutLeft")
-      player-toc(
-        v-if="toc && tocShow"
-        :toc="toc"
-        :tocId="tocId"
-        :style=`{
-        position: 'absolute', top: '0px', left: '0px', zIndex: 1000,
-        height: 'calc(100% - 50px)',
-      }`
-        @close="tocShow = false")
-    //- settings
+    // background: '#f3e8d2',
+  }`).col.full-width
+    q-resize-observer(@resize="onResize" :debounce="300")
+    //- book area
     div(
-      v-if="settingsShow"
-      :style=`{zIndex: 1000, width: '70%'}`
-    ).absolute-center
-      player-settings(:settings="settings" @close="settingsShow = false" :style=`{borderRadius: '20px'}`).b-40
-    //- body book area wrapper
-    div(
+      ref="book-area"
       :style=`{
-      position: 'relative',
-      borderRadius: '10px',
-      border: '3px solid #222',
-      overflow: 'hidden',
-      // background: '#f3e8d2',
-    }`).col.full-width
-      q-resize-observer(@resize="onResize" :debounce="300")
-      //- book area
-      div(
-        ref="book-area"
-        :style=`{
-        borderRadius: '0 0 10px 10px'
-      }`).row.fit
-    // progress
-    q-linear-progress(size='5px' :value="progressValue / 100" color="green-10").row.full-width.q-px-sm
-    //- footer
-    .row.full-width.justify-center.q-pa-xs
-      slot(name="footer")
-      //- input(v-model="cfi" width="500").row.full-width
-      //- q-btn(round flat color="green" icon="check" @click="goToCfiDebug(cfi)")
-      .col
-      q-btn(flat color="white" no-caps icon="keyboard_arrow_left" @click='goToPrevPage')
-        span().gt-xs {{$t('Prev chapter')}}
-      q-btn(flat color="white" no-caps icon-right="keyboard_arrow_right" @click='goToNextPage')
-        span().gt-xs {{$t('Next chapter')}}
-      .col
-      q-btn(round flat :color="tocShow ? 'green' : 'white'" icon="toc" @click="tocShow = !tocShow")
-      q-btn(round flat :color="settingsShow ? 'green' : 'white'" icon="settings" @click="settingsShow = !settingsShow")
-      //- input(size='3' type='range' max='100' min='0' step='1' @change='goToPercent($event.target.value)' :value='progress')
-      //- input(type='text' :value='progress' @change='goToPercent($event.target.value)')
+      borderRadius: '0 0 10px 10px'
+    }`).row.fit
+  // progress
+  q-linear-progress(size='5px' :value="progressValue / 100" color="green-10").row.full-width.q-px-sm
+  //- footer
+  .row.full-width.justify-center.q-pa-xs
+    slot(name="footer")
+    //- input(v-model="cfi" width="500").row.full-width
+    //- q-btn(round flat color="green" icon="check" @click="goToCfiDebug(cfi)")
+    .col
+    q-btn(flat color="white" no-caps icon="keyboard_arrow_left" @click='goToPrevPage')
+      span().gt-xs {{$t('Prev chapter')}}
+    q-btn(flat color="white" no-caps icon-right="keyboard_arrow_right" @click='goToNextPage')
+      span().gt-xs {{$t('Next chapter')}}
+    .col
+    q-btn(round flat :color="tocShow ? 'green' : 'white'" icon="toc" @click="tocShow = !tocShow")
+    q-btn(round flat :color="settingsShow ? 'green' : 'white'" icon="settings" @click="settingsShow = !settingsShow")
+    //- input(size='3' type='range' max='100' min='0' step='1' @change='goToPercent($event.target.value)' :value='progress')
+    //- input(type='text' :value='progress' @change='goToPercent($event.target.value)')
 </template>
 
 <script>
@@ -716,7 +716,7 @@ export default {
     // everything ready, emit player!
     this.$emit('player', this)
   },
-  async beforeDestroy () {
+  async beforeUnmount () {
     this.$log('beforeDestroy')
     // window.removeEventListener('keyup', this.keyListener)
   }

@@ -290,7 +290,7 @@ export default {
     // add listeners
     window.addEventListener('keydown', this.onKeydown)
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['mobileNavigationShow', true])
     this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])

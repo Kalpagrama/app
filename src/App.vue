@@ -1,7 +1,5 @@
 <template lang="pug">
-div(id="q-app")
-  router-view(v-if="$store.getters.nodeCategories.length > 0")
-  //- router-view
+router-view(v-if="$store.getters.nodeCategories.length > 0")
 </template>
 
 <script>
@@ -74,7 +72,7 @@ export default {
     this.$store.commit('ui/stateSet', ['viewportHeight', window.visualViewport.height])
     this.$store.commit('ui/stateSet', ['viewportWidth', window.visualViewport.width])
   },
-  beforeDestroy () {
+  beforeUnmount () {
     // this.$log('beforeDestroy')
     window.removeEventListener('focusin', this.handleFocusin)
     window.removeEventListener('focusout', this.handleFocusout)

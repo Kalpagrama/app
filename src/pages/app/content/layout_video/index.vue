@@ -288,7 +288,7 @@ export default {
     this.$log('mounted')
     window.addEventListener('keydown', this.onKeydown)
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
     this.$store.commit('ui/stateSet', ['nodeOnContent', null])
     if (this.player) this.player.setState('nodePlaying', null)

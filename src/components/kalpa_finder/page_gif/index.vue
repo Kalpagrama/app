@@ -1,51 +1,51 @@
 <template lang="pug">
-  div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
-    // header
-    .row.full-width.q-px-md.q-pb-sm.b-30
-      q-resize-observer(@resize="headerHeight = $event.height")
-      //- tabs sticky
-      q-tabs(
-        v-model="categoryId"
-        switch-indicator="false" no-caps dense
-      active-color="green"
-      ).full-width.text-grey-8
-        q-tab(
-          v-for="(p,pi) in categories" :key="p.name"
-          :name="p.name" :label="p.character")
-
-    //- tab panels
-    q-tab-panels(
+div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
+  // header
+  .row.full-width.q-px-md.q-pb-sm.b-30
+    q-resize-observer(@resize="headerHeight = $event.height")
+    //- tabs sticky
+    q-tabs(
       v-model="categoryId"
-      :swipeable="$q.platform.is.mobile"
-      :animated="$q.platform.is.mobile"
-      :style=`{height: scrollAreaHeight - headerHeight + 'px'}`).full-width.b-30
-      q-tab-panel(
-        v-for="(p,pi) in categories" :key="p.name" :name="p.name"
-        :style=`{
-            background: 'none',
-            minHeight: '70vh',
-          }`
-      ).row.full-width.items-start.content-start.justify-center.q-pa-none
-        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-          masonry(
-            :cols="3"
-            :gutter="{default: 6}").full-width.items-start.content-start
-            div(
-              v-for="(gif, gi) in gifs" :key="gif.id"
+      switch-indicator="false" no-caps dense
+    active-color="green"
+    ).full-width.text-grey-8
+      q-tab(
+        v-for="(p,pi) in categories" :key="p.name"
+        :name="p.name" :label="p.character")
+
+  //- tab panels
+  q-tab-panels(
+    v-model="categoryId"
+    :swipeable="$q.platform.is.mobile"
+    :animated="$q.platform.is.mobile"
+    :style=`{height: scrollAreaHeight - headerHeight + 'px'}`).full-width.b-30
+    q-tab-panel(
+      v-for="(p,pi) in categories" :key="p.name" :name="p.name"
+      :style=`{
+          background: 'none',
+          minHeight: '70vh',
+        }`
+    ).row.full-width.items-start.content-start.justify-center.q-pa-none
+      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+        masonry(
+          :cols="3"
+          :gutter="{default: 6}").full-width.items-start.content-start
+          div(
+            v-for="(gif, gi) in gifs" :key="gif.id"
+            :style=`{
+              position: 'relative',
+              borderRadius: '10px', overflow: 'hidden',
+            }`
+            @click="$emit('item', {oid: null, type: 'GIF', thumbUrl: gif.media[0]['tinygif']['url'], url: gif.media[0]['gif']['url']})"
+          ).row.full-width.items-start.content-start.q-mb-sm
+            //- img
+            img(
+              :src="gif.media[0]['tinygif']['url']"
+              draggable="false"
               :style=`{
-                position: 'relative',
-                borderRadius: '10px', overflow: 'hidden',
+                pointerEvents: 'none',
               }`
-              @click="$emit('item', {oid: null, type: 'GIF', thumbUrl: gif.media[0]['tinygif']['url'], url: gif.media[0]['gif']['url']})"
-            ).row.full-width.items-start.content-start.q-mb-sm
-              //- img
-              img(
-                :src="gif.media[0]['tinygif']['url']"
-                draggable="false"
-                :style=`{
-                  pointerEvents: 'none',
-                }`
-              ).full-width
+            ).full-width
 </template>
 
 <script>

@@ -1,35 +1,35 @@
 <template lang="pug">
-  div(
+div(
+  :style=`{
+    position: 'relative',
+    overflow: 'hidden',
+    borderRadius: '10px',
+    minHeight: height + 'px',
+    maxHeight: height + 'px',
+    minWidth: height + 'px',
+    // background: 'linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(40,40,40,0) 100%)',
+  }`).b-0
+  //image
+  img(
+    :src="item.thumbUrl"
     :style=`{
-      position: 'relative',
-      overflow: 'hidden',
-      borderRadius: '10px',
-      minHeight: height + 'px',
-      maxHeight: height + 'px',
-      minWidth: height + 'px',
-      // background: 'linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(40,40,40,0) 100%)',
-    }`).b-0
-    //image
-    img(
-      :src="item.thumbUrl"
+      height: height + 'px',
+      // opacity: 0.2,
+      objectFit: 'cover',
+      borderRadius: '10px'}`)
+  div(:style=`{pointerEvents: 'none', background: 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 50%)', zIndex: 10}`).fit.absolute-center
+  div(:style=`{zIndex: 10}`).row.full-width.absolute-bottom
+    //- NAME: dynamic link/ dynamic fontSize
+    router-link(
+      v-if="showName && item.oid"
+      :to="`/user/${item.type}/${item.oid}`"
       :style=`{
-        height: height + 'px',
-        // opacity: 0.2,
-        objectFit: 'cover',
-        borderRadius: '10px'}`)
-    div(:style=`{pointerEvents: 'none', background: 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 50%)', zIndex: 10}`).fit.absolute-center
-    div(:style=`{zIndex: 10}`).row.full-width.absolute-bottom
-      //- NAME: dynamic link/ dynamic fontSize
-      router-link(
-        v-if="showName && item.oid"
-        :to="`/user/${item.type}/${item.oid}`"
-        :style=`{
-          minHeight: '60px',
-          fontSize: fontSize+'px',
-          textAlign: 'center',
-        }`
-      ).row.full-width.items-center.content-end.justify-center
-        span.text-grey-5 {{ item.name }}
+        minHeight: '60px',
+        fontSize: fontSize+'px',
+        textAlign: 'center',
+      }`
+    ).row.full-width.items-center.content-end.justify-center
+      span.text-grey-5 {{ item.name }}
 </template>
 
 <script>

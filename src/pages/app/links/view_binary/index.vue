@@ -138,7 +138,7 @@ export default {
     window.addEventListener('keydown', this.onKeydown)
     document.body.style.background = 'black'
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
     window.removeEventListener('keydown', this.onKeydown)
   },

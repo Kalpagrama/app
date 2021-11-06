@@ -376,7 +376,7 @@ export default {
       this.scrollWrapperRef = this.$refs['scroll-wrapper']
     })
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
   }
 }

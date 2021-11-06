@@ -1,40 +1,40 @@
 <template lang="pug">
-      .row.full-width.items-start.content-start.justify-center
-        div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-          //- bookmark editor
-          q-dialog(
-            v-model="bookmarkEditorShow"
-            :full-width="$q.screen.xs"
-            :full-height="$q.screen.xs"
-            :maximized="$q.screen.xs"
-            :square="$q.screen.xs"
-            @hide="bookmarkSelected = null")
-            bookmark-editor(
-              :bookmark="bookmarkSelected"
-              @close="bookmarkEditorShow = false, bookmarkSelected = null")
-          tab-list-feed(
-            :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
-            :navHeaderText="useNavHeader ? $t('Drafts') : ''"
-            :searchInputState="searchInputState"
-            :searchString="searchString"
-            :pages="pages"
-            :pageId="pageId"
-            :query="query"
-            :itemHeightApprox="100"
-            :itemActivePersist="itemActivePersist"
-            showAddBtn=true
-            @searchString="searchString = $event"
-            @pageId="pageId = $event"
-            @add="createItem"
-          ).row.full-width
-            template(v-slot:item=`{item:draft,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
-              draft-list-item(
-                :draft="draft"
-                :itemState="itemState"
-                :itemIndex="itemIndex"
-                :mode="mode"
-                @draft="draftSelectHandle"
-              ).q-mb-sm
+.row.full-width.items-start.content-start.justify-center
+  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+    //- bookmark editor
+    q-dialog(
+      v-model="bookmarkEditorShow"
+      :full-width="$q.screen.xs"
+      :full-height="$q.screen.xs"
+      :maximized="$q.screen.xs"
+      :square="$q.screen.xs"
+      @hide="bookmarkSelected = null")
+      bookmark-editor(
+        :bookmark="bookmarkSelected"
+        @close="bookmarkEditorShow = false, bookmarkSelected = null")
+    tab-list-feed(
+      :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
+      :navHeaderText="useNavHeader ? $t('Drafts') : ''"
+      :searchInputState="searchInputState"
+      :searchString="searchString"
+      :pages="pages"
+      :pageId="pageId"
+      :query="query"
+      :itemHeightApprox="100"
+      :itemActivePersist="itemActivePersist"
+      showAddBtn=true
+      @searchString="searchString = $event"
+      @pageId="pageId = $event"
+      @add="createItem"
+    ).row.full-width
+      template(v-slot:item=`{item:draft,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
+        draft-list-item(
+          :draft="draft"
+          :itemState="itemState"
+          :itemIndex="itemIndex"
+          :mode="mode"
+          @draft="draftSelectHandle"
+        ).q-mb-sm
 </template>
 
 <script>

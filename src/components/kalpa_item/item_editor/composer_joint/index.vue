@@ -1,44 +1,44 @@
 <template lang="pug">
-  .row
-    //- item finder
-    q-dialog(
-      v-model="itemFinderShow"
-      position="standard"
-      :maximized="true")
-      kalpa-finder(
-        :height="$q.screen.height"
-        :headerTitle="$t('Pick new element for joint')",
-        @item="itemFound"
-        @close="itemFinderShow = false"
-      ).b-30
-    item-preview(v-if="joint.items[0]"
-      :item="joint.items[0]"
-      :isActive="true"
-      :showHeader="false"
-      :showSpheres="false"
-      :showActions="false"
-    ).row
-    vertex-editor(:joint="joint").row
-    item-preview(
-      v-if="joint.items[1]"
-      :item="joint.items[1]"
-      :isActive="true"
-      :showHeader="false"
-      :showSpheres="false"
-      :showActions="false"
-    ).row
-    div(v-else).row.full-width.q-px-sm.q-pb-sm
-      q-btn(
-        @click="itemFinderShow = true"
-        flat color="white" no-caps icon="add" size="lg" stack
-      :style=`{minHeight: '200px'}`
-      ).full-width.b-40
-        span(:style=`{fontSize: '18px'}`) {{$t('Pick element for join')}}
+.row
+  //- item finder
+  q-dialog(
+    v-model="itemFinderShow"
+    position="standard"
+    :maximized="true")
+    kalpa-finder(
+      :height="$q.screen.height"
+      :headerTitle="$t('Pick new element for joint')",
+      @item="itemFound"
+      @close="itemFinderShow = false"
+    ).b-30
+  item-preview(v-if="joint.items[0]"
+    :item="joint.items[0]"
+    :isActive="true"
+    :showHeader="false"
+    :showSpheres="false"
+    :showActions="false"
+  ).row
+  vertex-editor(:joint="joint").row
+  item-preview(
+    v-if="joint.items[1]"
+    :item="joint.items[1]"
+    :isActive="true"
+    :showHeader="false"
+    :showSpheres="false"
+    :showActions="false"
+  ).row
+  div(v-else).row.full-width.q-px-sm.q-pb-sm
     q-btn(
-      :label="$t('Create joint')"
-      :loading="jointPublishing"
-      :style=`{height: '50px', borderRadius: '0px'}`
-      @click="jointPublish").row.full-width.text-green.text-bold
+      @click="itemFinderShow = true"
+      flat color="white" no-caps icon="add" size="lg" stack
+    :style=`{minHeight: '200px'}`
+    ).full-width.b-40
+      span(:style=`{fontSize: '18px'}`) {{$t('Pick element for join')}}
+  q-btn(
+    :label="$t('Create joint')"
+    :loading="jointPublishing"
+    :style=`{height: '50px', borderRadius: '0px'}`
+    @click="jointPublish").row.full-width.text-green.text-bold
 </template>
 
 <script>
@@ -134,7 +134,7 @@ export default {
   mounted () {
     this.$log('mounted', this.joint)
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
   }
 }

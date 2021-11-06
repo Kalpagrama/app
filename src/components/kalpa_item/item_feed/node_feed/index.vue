@@ -5,7 +5,7 @@
 </style>
 
 <template lang="pug">
-  div(
+div(
     :style=`{
       position: 'relative',
       borderRadius: '10px',

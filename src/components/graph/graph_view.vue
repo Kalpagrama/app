@@ -10,125 +10,125 @@
 // отображает граф.
 
 <template lang="pug">
-  div(ref="graphArea").row.full-width
-    q-resize-observer(@resize="height = $event.height, width = $event.width")
-    // меню
-    q-dialog(
-      v-model="menuShow"
-      position="standard"
-      :maximized="false")
-      div(:style=`{background: 'rgb(40,40,40)',borderRadius: '10px'}`).row.full-width.q-pa-md
-        q-btn(
-          round flat no-caps outline color="grey" align="left" icon='add'
-          :label="$t('Add item')"
-          @click="menuShow = false, itemFinderShow = true"
-        ).row.full-width.q-pa-sm
-        q-btn(
-          round flat no-caps outline color="grey" align="left" icon='grain'
-          :label="$t('Reset graph layout')"
-          @click="menuShow = false, resetFixedPos()"
-        ).row.full-width.q-pa-sm
-        q-btn(
-          round flat no-caps outline color="grey" align="left" icon='delete'
-          :label="$t('clear graph')"
-          @click="menuShow = false, clearGraph()"
-        ).row.full-width.q-pa-sm
-    //- item finder
-    q-dialog(
-      v-model="itemFinderShow"
-      position="standard"
-      :maximized="true")
-      kalpa-finder(
-        :height="$q.screen.height"
-        :headerTitle="$t('Pick new element for graph')",
-        :style=`{maxWidth: width  + 'px', borderRadius: '10px' }`
-        @item="addItemToGraph"
-        @close="itemFinderShow = false"
-      ).b-30
-    // item detail
-    q-dialog(
-      v-model="itemDetailsShow"
-      :position="detailPosition"
-      @hide="graphD3.selectedItem = null"
-    )
-      div(
-        :style=`{
-            // boxShadow: '1px 1px 20px rgba(192,192,192, .5)',
-            borderRadius: detailPosition === 'bottom' ? '20px 20px 0 0' : '20px',
-            // border: '2px solid green',
-          }`).row.full-width.b-40
-        div(v-if="graphD3.selectedItem").row.full-width.q-ma-sm
-          q-btn(v-if="!$store.getters.isGuest" icon="delete" flat color="grey" @click="removeNode(graphD3.selectedItem)").q-mx-sm
-          //q-btn(
-          //  v-if="selectedItemFull && !graphD3.selectedItem.discovered"
-          //  icon="mediation" flat color="grey"
-          //  v-close-popup
-          //  :label="selectedItemFull.countStat.countJoints || 0"
-          //  @click="discover(graphD3.selectedItem)").q-mx-sm
-          q-btn(icon="view_in_ar" flat color="grey" :to="'/cube/' + graphD3.selectedItem.oid").q-mx-sm
-          q-btn(v-close-popup icon="add_link" flat color="grey" @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить связь авторизуйтесь'}]) : connectNodes(graphD3.selectedItem, null)").q-mx-sm
-          .col
-          q-btn(v-close-popup icon="close" flat color="grey").q-mx-sm
-        .row.full-width.items-center.content-center.justify-center.q-pa-sm
-          //spinner
-          div(v-if="!selectedItemFull")
-            q-spinner(size="50px" color="green")
-          div(v-else )
-            item-preview(:item="selectedItemFull" :isVisible="true" :isActive="true" :showHeader="false" :showActions="true")
-    // меню создания связи
-    q-dialog(
-      v-model="jointCreatorShow"
-      position="standard"
-      :maximized="false"
-      @hide="newJoint = null"
-    )
-      essence-editor(
-        :item="newJoint"
-        :action="addItemToGraph"
-        :publish="publish"
-        @composition="($event ? $set(newJoint.items, 1, $event) : $delete(newJoint.items, 1)), jointCreatorShow = false"
-        @close="jointCreatorShow = false"
-        :style=`{maxWidth:'300px', background: 'rgb(30,30,30)',
-            borderRadius: '10px', boxShadow: '1px 1px 20px rgba(192,192,192, .5)'
-            }`)
-    //tooltip
-    div(ref="graphTooltip"
-      :style=`{
-      position: "absolute",
-      "background-color": "white",
-      "max-width": "200px",
-      height: "auto",
-      padding: "1px",
-      "border-style": "solid",
-      "border-radius": "4px",
-      "border-width": "1px",
-      "box-shadow": "3px 3px 10px rgba(0, 0, 0, .5)",
-      "pointer-events": "none",
-      opacity:0
-      }`)
-    div(:style=`{position: 'relative', maxHeight: maxHeight+'px'}`).row.full-width
-      // меню
-      //q-btn(v-if="showGraph" flat no-caps icon="more_vert" color="grey-8" @click="menuShow = true" :style="{height: '40px', width: '40px', position: 'absolute', top: '5px', right: '0px'}")
+div(ref="graphArea").row.full-width
+  q-resize-observer(@resize="height = $event.height, width = $event.width")
+  // меню
+  q-dialog(
+    v-model="menuShow"
+    position="standard"
+    :maximized="false")
+    div(:style=`{background: 'rgb(40,40,40)',borderRadius: '10px'}`).row.full-width.q-pa-md
       q-btn(
-        v-if="!showGraph && showAddBtn"
-        @click="itemFinderShow = true"
-        outline color="white" no-caps icon="add" size="lg" stack
-      :style=`{minHeight: '500px'}`
-      ).row.full-width.full-height
-        span(:style=`{fontSize: '18px'}`) {{$t('Pick element for graph')}}
-      svg(v-else-if="true || showGraph" ref="graphSvg" :style=`{height: maxHeight+'px'}`).row.full-width
-      // добавление элемента на граф
-      .col
-        div(v-if="showMiniAddBtn && showGraph" :style=`{position: 'relative'}`).row.justify-end.content-end.full-height
-          q-icon(
-            name="add_circle_outline" color="green" size="lg"
-            @click="menuShow = false, $store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить элемент авторизуйтесь'}]) : itemFinderShow = true"
-          ).cursor-pointer.row.q-pa-xs
-            q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Pick new element')}}
+        round flat no-caps outline color="grey" align="left" icon='add'
+        :label="$t('Add item')"
+        @click="menuShow = false, itemFinderShow = true"
+      ).row.full-width.q-pa-sm
+      q-btn(
+        round flat no-caps outline color="grey" align="left" icon='grain'
+        :label="$t('Reset graph layout')"
+        @click="menuShow = false, resetFixedPos()"
+      ).row.full-width.q-pa-sm
+      q-btn(
+        round flat no-caps outline color="grey" align="left" icon='delete'
+        :label="$t('clear graph')"
+        @click="menuShow = false, clearGraph()"
+      ).row.full-width.q-pa-sm
+  //- item finder
+  q-dialog(
+    v-model="itemFinderShow"
+    position="standard"
+    :maximized="true")
+    kalpa-finder(
+      :height="$q.screen.height"
+      :headerTitle="$t('Pick new element for graph')",
+      :style=`{maxWidth: width  + 'px', borderRadius: '10px' }`
+      @item="addItemToGraph"
+      @close="itemFinderShow = false"
+    ).b-30
+  // item detail
+  q-dialog(
+    v-model="itemDetailsShow"
+    :position="detailPosition"
+    @hide="graphD3.selectedItem = null"
+  )
+    div(
+      :style=`{
+          // boxShadow: '1px 1px 20px rgba(192,192,192, .5)',
+          borderRadius: detailPosition === 'bottom' ? '20px 20px 0 0' : '20px',
+          // border: '2px solid green',
+        }`).row.full-width.b-40
+      div(v-if="graphD3.selectedItem").row.full-width.q-ma-sm
+        q-btn(v-if="!$store.getters.isGuest" icon="delete" flat color="grey" @click="removeNode(graphD3.selectedItem)").q-mx-sm
+        //q-btn(
+        //  v-if="selectedItemFull && !graphD3.selectedItem.discovered"
+        //  icon="mediation" flat color="grey"
+        //  v-close-popup
+        //  :label="selectedItemFull.countStat.countJoints || 0"
+        //  @click="discover(graphD3.selectedItem)").q-mx-sm
+        q-btn(icon="view_in_ar" flat color="grey" :to="'/cube/' + graphD3.selectedItem.oid").q-mx-sm
+        q-btn(v-close-popup icon="add_link" flat color="grey" @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить связь авторизуйтесь'}]) : connectNodes(graphD3.selectedItem, null)").q-mx-sm
+        .col
+        q-btn(v-close-popup icon="close" flat color="grey").q-mx-sm
+      .row.full-width.items-center.content-center.justify-center.q-pa-sm
+        //spinner
+        div(v-if="!selectedItemFull")
+          q-spinner(size="50px" color="green")
+        div(v-else )
+          item-preview(:item="selectedItemFull" :isVisible="true" :isActive="true" :showHeader="false" :showActions="true")
+  // меню создания связи
+  q-dialog(
+    v-model="jointCreatorShow"
+    position="standard"
+    :maximized="false"
+    @hide="newJoint = null"
+  )
+    essence-editor(
+      :item="newJoint"
+      :action="addItemToGraph"
+      :publish="publish"
+      @composition="($event ? $set(newJoint.items, 1, $event) : $delete(newJoint.items, 1)), jointCreatorShow = false"
+      @close="jointCreatorShow = false"
+      :style=`{maxWidth:'300px', background: 'rgb(30,30,30)',
+          borderRadius: '10px', boxShadow: '1px 1px 20px rgba(192,192,192, .5)'
+          }`)
+  //tooltip
+  div(ref="graphTooltip"
+    :style=`{
+    position: "absolute",
+    "background-color": "white",
+    "max-width": "200px",
+    height: "auto",
+    padding: "1px",
+    "border-style": "solid",
+    "border-radius": "4px",
+    "border-width": "1px",
+    "box-shadow": "3px 3px 10px rgba(0, 0, 0, .5)",
+    "pointer-events": "none",
+    opacity:0
+    }`)
+  div(:style=`{position: 'relative', maxHeight: maxHeight+'px'}`).row.full-width
+    // меню
+    //q-btn(v-if="showGraph" flat no-caps icon="more_vert" color="grey-8" @click="menuShow = true" :style="{height: '40px', width: '40px', position: 'absolute', top: '5px', right: '0px'}")
+    q-btn(
+      v-if="!showGraph && showAddBtn"
+      @click="itemFinderShow = true"
+      outline color="white" no-caps icon="add" size="lg" stack
+    :style=`{minHeight: '500px'}`
+    ).row.full-width.full-height
+      span(:style=`{fontSize: '18px'}`) {{$t('Pick element for graph')}}
+    svg(v-else-if="true || showGraph" ref="graphSvg" :style=`{height: maxHeight+'px'}`).row.full-width
+    // добавление элемента на граф
+    .col
+      div(v-if="showMiniAddBtn && showGraph" :style=`{position: 'relative'}`).row.justify-end.content-end.full-height
+        q-icon(
+          name="add_circle_outline" color="green" size="lg"
+          @click="menuShow = false, $store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить элемент авторизуйтесь'}]) : itemFinderShow = true"
+        ).cursor-pointer.row.q-pa-xs
+          q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Pick new element')}}
 
-    //// превьюшка узла внутри графа
-    //div(ref="selectedItemPreview" :style=`{position: "absolute", opacity:0}`)
-    //  item-preview(v-if="selectedItemFull" :item="selectedItemFull" :isActive="true" :showHeader="false" :showActions="true")
+  //// превьюшка узла внутри графа
+  //div(ref="selectedItemPreview" :style=`{position: "absolute", opacity:0}`)
+  //  item-preview(v-if="selectedItemFull" :item="selectedItemFull" :isActive="true" :showHeader="false" :showActions="true")
 </template>
 
 <script>
@@ -1071,7 +1071,7 @@ export default {
     if (!this.graphD3.selectedItem) this.$set(this.graphD3, 'selectedItem', null)
     this.debouncedUpdateGraph()
   },
-  destroyed () {
+  unmounted () {
     window.removeEventListener('touchmove', this.handleTouchMove)
   }
 }

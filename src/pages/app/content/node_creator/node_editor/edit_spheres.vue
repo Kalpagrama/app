@@ -75,7 +75,7 @@ export default {
     this.$log('mounted')
     this.$refs.sphereInput.$el.addEventListener('keydown', this.sphereInputOnKeydown)
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
     this.$refs.sphereInput.$el.removeEventListener('keydown', this.sphereInputOnKeydown, false)
   }

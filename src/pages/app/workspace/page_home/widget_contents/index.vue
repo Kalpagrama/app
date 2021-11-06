@@ -87,7 +87,7 @@ export default {
     this.$log('mounted')
     this.bookmarksRes = await this.$rxdb.find(this.query)
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
   }
 }

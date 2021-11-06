@@ -32,7 +32,7 @@ export default {
     await this.$router.push('/content/' + contentKalpa.oid)
     // this.$router.push('/workspace/contents')
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.$log('beforeDestroy')
   }
 }
