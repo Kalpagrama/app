@@ -13,6 +13,13 @@ q-layout(
     kalpa-tutorial(
       :config="$store.state.ui.kalpaTutorial"
       @close="kalpaTutorialShow = null")
+  q-dialog(
+    v-model="kalpaInitialSetupShow"
+    maximized
+    persistent
+    position="standard")
+    kalpa-initial-setup(
+      @close="kalpaInitialSetupShow = null")
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="$q.screen.gt.sm && $store.state.ui.desktopNavigationShow"
@@ -38,16 +45,19 @@ q-layout(
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import kalpaMenu from 'src/components/kalpa_menu/index.vue'
+import kalpaInitialSetup from 'src/components/kalpa_initial_setup/index.vue'
 import kalpaAuthGuard from 'src/components/kalpa_auth_guard/index.vue'
 
 export default {
   name: 'mainLayout',
   components: {
     kalpaMenu,
-    kalpaAuthGuard
+    kalpaAuthGuard,
+    kalpaInitialSetup
   },
   data () {
     return {
+      kalpaInitialSetupShow: true,
     }
   },
   computed: {

@@ -4,7 +4,7 @@
       video(
         controls
         :src="fileSrc"
-        :style=`{
+        :style=`{maxHeight: '400px'
       }`
       ).full-width.br-10
       .row.full-width

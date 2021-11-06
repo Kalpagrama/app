@@ -319,7 +319,7 @@ class AuthApi {
          })
          let currentUser = rxdb.getCurrentUser()
          assert(currentUser && currentUser.settings, '!currentUser && currentUser.settings')
-         currentUser.settings.hasPermanentPassword = true
+         // currentUser.settings.hasPermanentPassword = true
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, setPermanentPassword)
          return setPermanentPassword
       }
