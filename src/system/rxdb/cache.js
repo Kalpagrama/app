@@ -45,7 +45,7 @@ class Cache {
          if (this.db.cache) await rxdbOperationProxyExec(this.db.cache, 'destroy')
       }
       if (operation.in('create', 'recreate')) {
-         await this.db.collection({ name: 'cache', schema: cacheSchema })
+         await this.db.addCollections({ cache: { schema: cacheSchema } })
          assert(this.db.cache, '!this.db.cache')
          this.db.cache.postInsert(async (plainData) => {
             await this.debouncedDumpLru()
@@ -66,85 +66,82 @@ class Cache {
       logD(f, 'start')
       const t1 = performance.now()
       assert(!this.created, 'this.created')
-      try {
-         this.mutex = new MutexLocal('rxdb::cache')
-         // кэш только что вставленных элементов (нужен тк после вставки тут же будут запрошены эти элементы и это обычно долго)
-         this.fastCache = {}
-         this.fastCache.insert = (rxDoc) => {
-            if (!this.fastCache[rxDoc.id]) {
-               this.fastCache[rxDoc.id] = rxDoc
-               this.fastCache.list = this.fastCache.list || []
-               let deleted = this.fastCache.list.splice(88, this.fastCache.list.length) // удалим старые
-               for (let deletedId of deleted) delete this.fastCache[deletedId]
-            }
+      this.mutex = new MutexLocal('rxdb::cache')
+      // кэш только что вставленных элементов (нужен тк после вставки тут же будут запрошены эти элементы и это обычно долго)
+      this.fastCache = {}
+      this.fastCache.insert = (rxDoc) => {
+         if (!this.fastCache[rxDoc.id]) {
+            this.fastCache[rxDoc.id] = rxDoc
+            this.fastCache.list = this.fastCache.list || []
+            let deleted = this.fastCache.list.splice(88, this.fastCache.list.length) // удалим старые
+            for (let deletedId of deleted) delete this.fastCache[deletedId]
          }
-         this.fastCache.get = (id) => this.cacheLru.get(id) ? this.fastCache[id] : null
+      }
+      this.fastCache.get = (id) => this.cacheLru.get(id) ? this.fastCache[id] : null
 
-         // используется для контроля места (при переполнении - объект удалится из rxdb)
-         this.cacheLru = new LruCache({
-            max: defaultCacheSize,
-            length: function (n, id) {
-               return JSON.stringify(n).length + id.length
-            },
-            maxAge: 0, // не удаляем объекты по возрасту (для того чтобы при неудачной попытке взять с сервера - вернуть из кэша)
-            noDisposeOnSet: true,
-            dispose: async (id, { actualUntil, actualAge }) => {
-               const f = this.dispose
-               if (this.lruResetInProgress) return
-               assert(actualUntil && actualAge >= 0, `actualUntil && actualAge >= 0 ${actualUntil} ${actualAge}`)
-               let rxDoc = this.fastCache.get(id) || await rxdbOperationProxyExec(this.db.cache, 'findOne', id)
-               if (rxDoc) {
-                  if (rxDoc.props.notEvict) { // кладем обратно в LRU! (некоторые данные должны жить вечно!)
-                     setTimeout(() => {
-                        this.cacheLru.set(id, { actualUntil, actualAge })
-                     }, 0)
-                  } else { // удалим из rxdb (освобождаем от старых данных)
-                     logD(f, 'элемент вытеснен из кэша', id)
-                     await rxDoc.remove()
-                  }
+      // используется для контроля места (при переполнении - объект удалится из rxdb)
+      this.cacheLru = new LruCache({
+         max: defaultCacheSize,
+         length: function (n, id) {
+            return JSON.stringify(n).length + id.length
+         },
+         maxAge: 0, // не удаляем объекты по возрасту (для того чтобы при неудачной попытке взять с сервера - вернуть из кэша)
+         noDisposeOnSet: true,
+         dispose: async (id, { actualUntil, actualAge }) => {
+            const f = this.dispose
+            if (this.lruResetInProgress) return
+            assert(actualUntil && actualAge >= 0, `actualUntil && actualAge >= 0 ${actualUntil} ${actualAge}`)
+            let rxDoc = this.fastCache.get(id) || await rxdbOperationProxyExec(this.db.cache, 'findOne', id)
+            if (rxDoc) {
+               if (rxDoc.props.notEvict) { // кладем обратно в LRU! (некоторые данные должны жить вечно!)
+                  setTimeout(() => {
+                     this.cacheLru.set(id, { actualUntil, actualAge })
+                  }, 0)
+               } else { // удалим из rxdb (освобождаем от старых данных)
+                  logD(f, 'элемент вытеснен из кэша', id)
+                  await rxDoc.remove()
                }
             }
-         })
-
-         // заполняем cacheLru из idb
-         // let lruDump = await rxdb.get(RxCollectionEnum.META, 'lruDump') // так не делаем чтобы reactiveItem не дергался каждый раз при измнении
-         let lruDumpDoc = await rxdbOperationProxyExec(rxdb.db.meta, 'findOne', 'lruDump')
-         if (lruDumpDoc) {
-            logD(f, 'восстанавливаем Lru')
-            let lruDump = JSON.parse(lruDumpDoc.valueString)
-            this.cacheLru.load(lruDump)
          }
-         this.debouncedDumpLru = debounce(async () => {
-            const f = this.debouncedDumpLru
-            f.nameExtra = 'debouncedDumpLru'
-            if (!mutexGlobal.isLeader()) return // вкладок много (все не могут хранить свои состояния) Храним состояние лидера
-            logD(f, 'start', 'debouncedDumpLru')
-            // logW('todo skip debouncedDumpLru')
-            // return
-            // eslint-disable-next-line no-unreachable
-            const t1 = performance.now()
-            let lruDump = this.cacheLru.dump()
-            let lruDumpStr = JSON.stringify(lruDump)
-            await rxdbOperationProxyExec(this.db.meta, 'atomicUpsert', {
-               id: 'lruDump',
-               valueString: lruDumpStr
-            })
-            logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         }, debounceIntervalDumpLru, { maxWait: 60 * 1000 })
+      })
 
-         // из-за debounce сохранения - на старте может оказаться, что в rxdb запись есть, а в lru - нет!
-         for (let rxDoc of await rxdbOperationProxyExec(this.db.cache, 'find')) {
-            if (!this.cacheLru.get(rxDoc.id)) {
-               this.cacheLru.set(rxDoc.id, {
-                  actualUntil: Date.now() + debounceIntervalDumpLru,
-                  actualAge: 1000 * 60
-               })
-            }
-         }
-         this.created = true
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, this.created)
-      } finally {
+      // заполняем cacheLru из idb
+      // let lruDump = await rxdb.get(RxCollectionEnum.META, 'lruDump') // так не делаем чтобы reactiveItem не дергался каждый раз при измнении
+      let lruDumpDoc = await rxdbOperationProxyExec(rxdb.db.meta, 'findOne', 'lruDump')
+      if (lruDumpDoc) {
+         logD(f, 'восстанавливаем Lru')
+         let lruDump = JSON.parse(lruDumpDoc.valueString)
+         this.cacheLru.load(lruDump)
       }
+      this.debouncedDumpLru = debounce(async () => {
+         const f = this.debouncedDumpLru
+         f.nameExtra = 'debouncedDumpLru'
+         if (!mutexGlobal.isLeader()) return // вкладок много (все не могут хранить свои состояния) Храним состояние лидера
+         logD(f, 'start', 'debouncedDumpLru')
+         // logW('todo skip debouncedDumpLru')
+         // return
+         // eslint-disable-next-line no-unreachable
+         const t1 = performance.now()
+         let lruDump = this.cacheLru.dump()
+         let lruDumpStr = JSON.stringify(lruDump)
+         await rxdbOperationProxyExec(this.db.meta, 'atomicUpsert', {
+            id: 'lruDump',
+            valueString: lruDumpStr
+         })
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      }, debounceIntervalDumpLru, { maxWait: 60 * 1000 })
+
+      // из-за debounce сохранения - на старте может оказаться, что в rxdb запись есть, а в lru - нет!
+      for (let rxDoc of await rxdbOperationProxyExec(this.db.cache, 'find')) {
+         if (!this.cacheLru.get(rxDoc.id)) {
+            this.cacheLru.set(rxDoc.id, {
+               actualUntil: Date.now() + debounceIntervalDumpLru,
+               actualAge: 1000 * 60
+            })
+         }
+      }
+      this.created = true
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, this.created)
    }
 
    async lock (lockOwner) {

@@ -48,11 +48,11 @@
     //  @set-node="$emit('set-node', $event)" @images-show="$emit('images-show', $event)").full-width.q-pt-md
   div(v-else).row.full-width.q-px-sm
     .row.full-width.items-center
-      q-skeleton(v-for="(i, ix) in 4" type="text" dark animation="none" :style=`{height: '20px'}`).col.q-mx-xs
+      q-skeleton(v-for="n in 4" :key="n" type="text" dark animation="none" :style=`{height: '20px'}`).col.q-mx-xs
     q-skeleton(type="QAvatar" dark size="30px" animation="none")
     .row.full-width.q-px-xl
       q-skeleton(type="QBtn" dark animation="fade").full-width
-    q-skeleton(v-for="(i, ix) in 4" type="text" dark animation="none" :style=`{height: '60px'}`).col.q-mx-lg
+    q-skeleton(v-for="n in 4" :key="n" type="text" dark animation="none" :style=`{height: '60px'}`).col.q-mx-lg
 </template>
 
 <script>

@@ -16,8 +16,7 @@ export default async ({ app, store, Vue, router: VueRouter }) => {
     logD(f, 'start')
     const t1 = performance.now()
     router = VueRouter
-    if (isSsr) {
-    } else {
+    if (!isSsr) {
       const {initApplication} = await import('src/system/services_browser')
       Vue.prototype.$systemUtils = await initApplication()
       logD(f, 'try systemInit...')

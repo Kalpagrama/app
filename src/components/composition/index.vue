@@ -86,6 +86,7 @@ import fromBook from './from_book/index.vue'
 import { assert } from 'src/system/common/utils'
 
 export default {
+  // eslint-disable-next-line vue/multi-word-component-names
   name: 'composition',
   components: {
     context,

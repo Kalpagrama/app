@@ -104,7 +104,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import { assert } from 'src/system/common/utils'
 
 export default {
-  name: 'context',
+  name: 'compositionContext',
   props: ['composition', 'itemState', 'isActive', 'isVisible', 'nodeOid', 'width', 'height', 'player'],
   watch: {
     isActive: {

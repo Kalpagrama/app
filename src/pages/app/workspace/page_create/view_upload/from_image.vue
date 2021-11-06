@@ -161,10 +161,7 @@ export default {
       this.$log('contentKalpa', contentKalpa)
       // check bookmark with contentKalpa.oid
       let {items: [content]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_CONTENT, oid: contentKalpa.oid}})
-      if (content) {
-      }
-      // create bookmark
-      else {
+      if (!content) { // create bookmark
         let contentInput = {
           type: 'IMAGE',
           oid: contentKalpa.oid,

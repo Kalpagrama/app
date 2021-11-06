@@ -267,7 +267,7 @@ class ReactiveDocFactory {
             assert(rev, '!_rev')
             this.vm.rev = rev
          }
-         this.setReactiveDoc(rxDoc.toJSON())
+         this.setReactiveDoc(cloneDeep(rxDoc.toJSON())) // rxDoc.toJSON() - иммутабелен
          this.rxDocSubscribe()
          this.reactiveDocSubscribe()
          rxDoc.reactiveItemHolderMaster = this
@@ -474,7 +474,7 @@ class Group {
          nextPageToken: nextPageToken_,
          prevPageToken: prevPageToken_,
          currentPageToken: currentPageToken_
-      } = rxDoc.toJSON().cached.data
+      } = cloneDeep(rxDoc.toJSON().cached.data)
       let mangoQuery = rxDoc.props.mangoQuery
       assert(mangoQuery, '!mangoQuery')
       assert(mangoQuery.selector.rxCollectionEnum, '!rxCollectionEnum')
@@ -1070,8 +1070,7 @@ class ReactiveListWithPaginationFactory {
       if (!listId) listId = isRxDocument(rxQueryOrRxDoc) ? rxQueryOrRxDoc.id : JSON.stringify(rxQueryOrRxDoc.mangoQuery)
       assert(listId, '!listId')
       // на один rxQueryOrRxDoc может быть создано несколько  reactiveGroup (в зависимости от populateFunc)
-      if (rxQueryOrRxDoc.reactiveListHolderMaster[listId]) {
-      } else {
+      if (!rxQueryOrRxDoc.reactiveListHolderMaster[listId]) {
          this.mutex = new MutexLocal('ReactiveListHolder::create')
 
          this.group = new Group(listId, 'root', populateFunc, paginateFunc, propsReactive, screenSize)

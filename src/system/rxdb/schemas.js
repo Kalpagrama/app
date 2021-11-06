@@ -1,6 +1,7 @@
 export const schemaKeyValue = {
   title: 'schemaKeyValue',
   version: 0,
+  primaryKey: 'id',
   description: 'schemaKeyValue',
   type: 'object',
   properties: {
@@ -18,6 +19,7 @@ export const schemaKeyValue = {
 export const wsSchemaItem = {
   title: 'wsSchemaItem',
   version: 3,
+  primaryKey: 'id',
   description: 'wsSchemaItem',
   type: 'object',
   properties: {
@@ -163,6 +165,7 @@ export const wsSchemaItem = {
 export const wsSchemaLocalChanges = {
   title: 'wsSchemaLocalChanges',
   version: 0,
+  primaryKey: 'id',
   description: 'wsSchemaLocalChanges',
   type: 'object',
   properties: {
@@ -183,6 +186,7 @@ export const wsSchemaLocalChanges = {
 export const cacheSchema = {
   title: 'cacheSchema',
   version: 0,
+  primaryKey: 'id',
   description: 'cacheSchema',
   type: 'object',
   properties: {

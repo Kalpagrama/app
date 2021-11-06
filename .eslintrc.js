@@ -24,22 +24,22 @@ module.exports = {
     ],
 
     globals: {
-        'ga': true, // Google Analytics
-        'cordova': true,
-        '__statics': true,
-        'process': true,
-        'Vue': false,
-        'Quasar': false,
-        'lodash': false,
-        '_': false,
-        'gql': false
+        ga: true, // Google Analytics
+        cordova: true,
+        __statics: true,
+        process: true,
+        Vue: false,
+        Quasar: false,
+        lodash: false,
+        _: false,
+        gql: false
     },
 
     // add your custom rules here
     rules: {
-        'max-len': ['off', { 'code': 140 }],
-        'indent': ['off', 4],
-        'semi': 0,
+        'max-len': ['off', { code: 140 }],
+        indent: ['off', 4],
+        semi: 0,
         'comma-dangle': 0,
         'space-before-function-paren': 0,
         'no-alert': 0,
@@ -51,6 +51,7 @@ module.exports = {
         'class-methods-use-this': 'off',
         'no-param-reassign': 'off',
         'space-before-blocks': 'off',
+        'vue/no-mutating-props': 'off',
 
         'import/first': 'off',
 

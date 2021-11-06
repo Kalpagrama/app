@@ -48,6 +48,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
   Vue.component('listFeed', listFeed)
   Vue.component('tabListFeed', tabListFeed)
   // essence
+  // eslint-disable-next-line vue/multi-word-component-names
   Vue.component('composition', composition)
   Vue.component('itemFeed', itemFeed)
   Vue.component('essenceEditor', essenceEditor)

@@ -110,7 +110,7 @@ export default {
       // $rateMeta.find(r => essence.rate >= r.valueMin && essence.rate <= r.valueMax)
       let percentMax = null
       let percentMaxIndex = 0
-      this.essence.rateStat.map((r, ri) => {
+      this.essence.rateStat.forEach((r, ri) => {
         if (percentMax) {
           if (r.percent > percentMax) {
             percentMax = r.percent

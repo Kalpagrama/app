@@ -17,7 +17,7 @@ q-layout(view="hHh LpR fFf" @scroll="onScroll")
 </template>
 
 <script>
-import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
+// import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
 
 export default {
   name: 'kalpaLayout',

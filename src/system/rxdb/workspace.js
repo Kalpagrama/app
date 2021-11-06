@@ -6,7 +6,7 @@ import {
    WsCollectionEnum,
    WsItemTypeEnum
 } from 'src/system/rxdb/common'
-import { wsSchemaItem, wsSchemaLocalChanges } from 'src/system/rxdb/schemas'
+import { cacheSchema, schemaKeyValue, wsSchemaItem, wsSchemaLocalChanges } from 'src/system/rxdb/schemas'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { mutexGlobal } from 'src/system/rxdb/mutex_global'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
@@ -82,17 +82,16 @@ class Workspace {
             if (this.db.ws_changes) await rxdbOperationProxyExec(this.db.ws_changes, 'destroy')
          }
          if (operation.in('create', 'recreate')) {
-            await this.db.collection({
-               name: 'ws_items',
-               schema: wsSchemaItem,
-               migrationStrategies: {
-                  // ..., - см wsSchemaItem.version (из schema.js)
-                  1: oldDoc => oldDoc,
-                  2: oldDoc => oldDoc,
-                  3: oldDoc => oldDoc
-               }
-            })
-            await this.db.collection({ name: 'ws_changes', schema: wsSchemaLocalChanges })
+            await this.db.addCollections({ ws_items: {
+                  schema: wsSchemaItem,
+                  migrationStrategies: {
+                     // ..., - см wsSchemaItem.version (из schema.js)
+                     1: oldDoc => oldDoc,
+                     2: oldDoc => oldDoc,
+                     3: oldDoc => oldDoc
+                  }
+               } })
+            await this.db.addCollections({ ws_changes: { schema: wsSchemaLocalChanges } })
             assert(this.db.ws_items && this.db.ws_changes, '!this.db.ws_items && this.db.ws_changes')
             // обработка события измения мастерской пользователем (запоминает измененные элементы)
             let onWsChangedByUser = async (id, operation, plainData) => {
@@ -129,7 +128,7 @@ class Workspace {
             this.db.ws_items.preSave(async (plainData, rxDoc) => {
                initWsItem(plainData)
                let plainDataCopy = cloneDeep(plainData) // newVal
-               let rxDocCopy = rxDoc.toJSON() // oldVal
+               let rxDocCopy = cloneDeep(rxDoc.toJSON()) // oldVal
                delete plainDataCopy._rev // внутреннее св-во rxdb (мешает при сравненении)
                delete plainDataCopy.rev // rev - присваивается сервером (не реагируем на изменения rev (это происходит в processEvent))
                delete rxDocCopy.rev
@@ -171,38 +170,35 @@ class Workspace {
       const f = this.create
       const t1 = performance.now()
       assert(!this.created, 'this.created')
-      try {
-         // синхроним изменения в цикле
-         this.synchroLoop = async () => {
-            const f = this.synchroLoop
-            f.nameExtra = 'synchroLoop'
-            // logD(f, 'start')
-            this.synchroStarted = true // защита от двойного запуска
-            while (true) {
-               if (this.reactiveUser && this.synchro && rxdb.initialized && mutexGlobal.isLeader()) {
-                  try {
-                     await mutexGlobal.lock('ws::synchroLoop')
-                     await this.lock('ws::synchroLoop')
-                     const tLoop = performance.now()
-                     // logD(f, 'next loop start...', this.synchroLoopWaitObj.getTimeOut())
-                     await this.synchronize()
-                     // logD(f, `next loop complete: ${Math.floor(performance.now() - tLoop)} msec`)
-                  } catch (err) {
-                     logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
-                     this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
-                  } finally {
-                     this.release()
-                     await mutexGlobal.release('ws::synchroLoop')
-                  }
+      // синхроним изменения в цикле
+      this.synchroLoop = async () => {
+         const f = this.synchroLoop
+         f.nameExtra = 'synchroLoop'
+         // logD(f, 'start')
+         this.synchroStarted = true // защита от двойного запуска
+         while (true) {
+            if (this.reactiveUser && this.synchro && rxdb.initialized && mutexGlobal.isLeader()) {
+               try {
+                  await mutexGlobal.lock('ws::synchroLoop')
+                  await this.lock('ws::synchroLoop')
+                  const tLoop = performance.now()
+                  // logD(f, 'next loop start...', this.synchroLoopWaitObj.getTimeOut())
+                  await this.synchronize()
+                  // logD(f, `next loop complete: ${Math.floor(performance.now() - tLoop)} msec`)
+               } catch (err) {
+                  logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
+                  this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
+               } finally {
+                  this.release()
+                  await mutexGlobal.release('ws::synchroLoop')
                }
-               await this.synchroLoopWaitObj.wait()
             }
+            await this.synchroLoopWaitObj.wait()
          }
-         if (!this.synchroStarted) this.synchroLoop().catch(err => logE(f, 'не удалось запустить цикл синхронизации', err))
-         this.created = true
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, this.created)
-      } finally {
       }
+      if (!this.synchroStarted) this.synchroLoop().catch(err => logE(f, 'не удалось запустить цикл синхронизации', err))
+      this.created = true
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, this.created)
    }
 
    setUser (reactiveUser) { // для гостей мастерская НЕ синхронится с сервером!
@@ -326,7 +322,7 @@ class Workspace {
 
       // заполняем с сервера (если еще не заполено)
       await synchronizeWsWhole()
-      let unsavedItems = (await rxdbOperationProxyExec(this.db.ws_changes, 'find')).map(rxDoc => rxDoc.toJSON()) // убираем реактивность
+      let unsavedItems = (await rxdbOperationProxyExec(this.db.ws_changes, 'find')).map(rxDoc => cloneDeep(rxDoc.toJSON())) // убираем реактивность
       let wsRevisionLocal = parseInt(await rxdb.get(RxCollectionEnum.META, 'wsRevision')) || -1
       let wsVersionLocal = await rxdb.get(RxCollectionEnum.META, 'wsVersion') || Date.now()
       let operations = []
@@ -344,7 +340,7 @@ class Workspace {
                await rxdbOperationProxy(this.db.ws_changes, 'find', { selector: { id: id } }).remove() // удаляем информацию из очереди на отправку
                continue
             }
-            wsItemInput = rxDoc.toJSON()
+            wsItemInput = cloneDeep(rxDoc.toJSON())
             delete wsItemInput.hasChanges // это системное поле (не надо отправлять на сервер)
          }
          operations.push({ operation, wsItemInput })
@@ -373,46 +369,6 @@ class Workspace {
             }
          }
       }
-
-      // for (let rxDocUnsavedItem of unsavedItems) {
-      //    let { id, operation, rev } = rxDocUnsavedItem
-      //    let plainDoc
-      //    if (operation === WsOperationEnum.DELETE) {
-      //       plainDoc = { id, wsItemType: getRxCollectionEnumFromId(id), rev }
-      //    } else {
-      //       let rxDoc = await this.db.ws_items.findOne(id).exec()
-      //       if (!rxDoc) { // в мастерской нет такого элемента!
-      //          await this.db.ws_changes.find({ selector: { id: id } }).remove() // удаляем информацию из очереди на отправку
-      //          continue
-      //       }
-      //       plainDoc = rxDoc.toJSON()
-      //       delete plainDoc.hasChanges // это системное поле (не надо отправлять на сервер)
-      //    }
-      //    try {
-      //       // сначала удаляем из очереди, а потом шлем на отправку (processEvent сработает быстрее, чем закончится saveToServer)
-      //       await this.db.ws_changes.find({ selector: { id: id } }).remove() // удаляем информацию из очереди на отправку
-      //       await saveToServer(operation, plainDoc, wsRevision++, this.reactiveUser.wsVersion)
-      //       this.synchroLoopWaitObj.setTimeout(synchroTimeDefault)
-      //    } catch (err) {
-      //       if (err.networkError) { // если ошибка не сетевая - увеличить интервал
-      //          logD(f, 'неудачная попытка отправить данные на сервер. проблемы сети. попоробуем позже...', err)
-      //          this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
-      //          await this.db.ws_changes.upsert(rxDocUnsavedItem.toJSON()) // вставляем обратно
-      //       } else {
-      //          try {
-      //             logE(f, 'критическая ошибка при отправке! пробуем слиться с сервером', err)
-      //             await synchronizeWsWhole(true)
-      //             this.synchroLoopWaitObj.setTimeout(synchroTimeDefault)
-      //          } catch (err) {
-      //             logE(f, 'неудачная синхронизация  с сервером', err)
-      //             if (err.networkError) {
-      //                this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
-      //                await this.db.ws_changes.upsert(rxDocUnsavedItem.toJSON()) // вставляем обратно
-      //             }
-      //          }
-      //       }
-      //    }
-      // }
       this.store.commit('core/stateSet', ['wsReady', true])
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, unsavedItems)
    }
@@ -493,7 +449,7 @@ class Workspace {
          let itemCopy = JSON.parse(JSON.stringify(item))
          if (itemCopy.wsItemType === WsItemTypeEnum.WS_NODE) {
             itemCopy.contentOids = itemCopy.items.reduce((acc, val) => {
-               val.layers.map(l => {
+               val.layers.forEach(l => {
                   acc.push(l.contentOid)
                })
                return acc

@@ -35,7 +35,7 @@ module.exports = function (ctx) {
       css: [
          // 'quasar.variables.sass',
          'fonts.variables.sass',
-         'app.sass',
+         'app.sass'
       ],
 
       animations: 'all',
@@ -203,11 +203,18 @@ module.exports = function (ctx) {
                            name (module) {
                               // получает имя, то есть node_modules/packageName/not/this/part.js
                               // или node_modules/packageName
-                              const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
-
+                              let packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+                              if (!packageName) throw new Error('bad package name !!!' + module.context.toString())
                               // имена npm-пакетов можно, не опасаясь проблем, использовать
                               // в URL, но некоторые серверы не любят символы наподобие @
-                              return 'npm.' + packageName.replace('@', '_sobaka_').replace(':', '_colon_');
+                              if (packageName.startsWith('pouchdb-')) packageName = 'npm.pouchdb'
+                              else if (packageName.startsWith('d3-')) packageName = 'npm.d3js'
+                              else if (packageName.includes('apollo')) packageName = 'npm.apollo'
+                              else if (packageName.includes('lodash')) packageName = 'npm.lodash'
+                              else if (packageName.includes('quasar')) packageName = 'npm.quasar'
+                              else if (packageName.includes('contentful')) packageName = 'npm.contentful'
+                              else packageName = 'npm.' + packageName.replace('@', '_sobaka_').replace(':', '_colon_');
+                              return packageName
                            }
                         }
                      }
@@ -238,10 +245,12 @@ module.exports = function (ctx) {
          // },
          port: ctx.mode.ssr ? 8585 : ctx.mode.capacitor ? 8484 : ctx.mode.pwa ? 8383 : 8282,
          host: ctx.mode.capacitor || ctx.mode.spa ? null : 'mac.kalpa.app',
-         https: ctx.mode.capacitor || ctx.mode.spa ? false : {
-            key: fs.readFileSync('deploy/dev_server_cert/privkey.pem'),
-            cert: fs.readFileSync('deploy/dev_server_cert/cert.pem')
-         },
+         https: ctx.mode.capacitor || ctx.mode.spa
+            ? false
+            : {
+               key: fs.readFileSync('deploy/dev_server_cert/privkey.pem'),
+               cert: fs.readFileSync('deploy/dev_server_cert/cert.pem')
+            },
          open: false // opens browser window automatically
       },
 
@@ -250,7 +259,7 @@ module.exports = function (ctx) {
       //  animations: 'all', // animations: [],
 
       ssr: {
-         pwa: false, // should a PWA take over (default: false), or just a SPA?
+         pwa: false // should a PWA take over (default: false), or just a SPA?
          // manualHydration: true
          // manualHydration: true/false, // (@quasar/app v1.4.2+) Manually hydrate the store
          // componentCache: {...} // lru-cache package options,
