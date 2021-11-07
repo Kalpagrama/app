@@ -91,7 +91,7 @@ div(
               @content="$event => $emit('content', $event)")
             //- tutorial
             q-btn(
-              @click="$store.commit('ui/stateSet', ['kalpaTutorial', {id: 'content_first', useIntro: false, useProfileEditor: false}])"
+              @click=""
               round flat color="white")
               q-icon(name="help_outline" size="22px")
             kalpa-menu-actions(icon="more_vert" color="grey-2" :title="contentKalpa.name" :actions="actions")

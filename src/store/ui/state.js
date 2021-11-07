@@ -28,7 +28,6 @@ export default {
   nodeCreating: false,
   // debug
   useDebug: false,
-  kalpaTutorial: null,
   authGuard: null,
   bookmarkTypes: [
     {

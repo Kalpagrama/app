@@ -316,14 +316,15 @@ class RxDBWrapper {
             this.workspace.setUser(currentUserDb) // для синхронизации мастерской с сервером
          } else {
             assert(dummyUser, '!dummyUser')
-            dummyUser.profile.tutorial = {
-               main: true,
-               content_first: true,
-               node_first: true,
-               joint_first: true,
-               workspace_first: true,
-               workspace_upload: true,
-               workspace_article: true
+            dummyUser.profile.notice = {
+               tutorial_main: false,
+               tutorial_content: false,
+               tutorial_node: false,
+               tutorial_joint: false,
+               tutorial_workspace: false,
+               tutorial_workspace_upload: false,
+               tutorial_workspace_article: false,
+               initial_settings: false,
             }
             currentUserDummy = getReactive(dummyUser, 'currentUser')
          }

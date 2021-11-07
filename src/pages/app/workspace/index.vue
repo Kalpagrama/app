@@ -12,22 +12,12 @@ export default {
     return {
     }
   },
-  watch: {
-    '$store.getters.currentUser.profile.tutorial': {
-      immediate: true,
-      async handler (to, from) {
-        this.$log('user.profile.tutorial changed to', to)
-        if (to && !to.workspace_first) {
-          this.$store.commit('ui/stateSet', ['kalpaTutorial', {id: 'workspace_first', useIntro: true, useProfileEditor: true}])
-        }
-      }
-    }
-  },
   created () {
     this.$log('created')
   },
   mounted () {
     this.$log('mounted')
+    this.$eventBus.$emit('notice-check', 'tutorial_workspace')
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

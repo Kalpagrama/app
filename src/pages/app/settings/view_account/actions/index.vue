@@ -108,8 +108,7 @@ export default {
       window.Chatra('openChat', true)
     },
     showKalpaTutorial () {
-      this.$log('showKalpaTutorial')
-      this.$store.commit('ui/stateSet', ['kalpaTutorial', {id: 'main', useIntro: false, useProfileEditor: false}])
+      this.$log('showKalpaTutorial TODO!')
     },
     async logout () {
       this.$log('logout')

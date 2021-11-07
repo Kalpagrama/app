@@ -100,19 +100,21 @@ div(
 
 <script>
 import { ObjectApi } from 'src/api/object'
+import cloneDeep from 'lodash/cloneDeep';
 
 export default {
   name: 'kalpaTutorial',
   props: {
-    config: {
-      type: Object,
-      required: true,
-    }
+    showTutorial: {type: Boolean, default: false},
+    tutorialId: {type: String, required: true},
+    // config: {
+    //   type: Object,
+    //   required: true,
+    // }
   },
   data () {
     return {
       isMounted: false,
-      showTutorial: false,
       slide: 'welcome',
       doc: null,
     }
@@ -129,15 +131,11 @@ export default {
     }
   },
   watch: {
-    config: {
-      deep: true,
+    tutorialId: {
       immediate: true,
-      async handler (to, from) {
-        if (to) {
-          this.$log('config TO', to)
-          this.doc = await this.getDoc(to.id)
-          if (!to.useIntro) this.showTutorial = true
-        }
+      async handler(to, from) {
+        this.$log('config TO', to)
+        this.doc = await this.getDoc(to)
       }
     },
     slides: {
@@ -178,9 +176,9 @@ export default {
   },
   async beforeDestroy () {
     this.$log('beforeDestroy')
-    let tutorialCurrent = this.$store.getters.currentUser.profile.tutorial
-    tutorialCurrent[this.config.id] = true
-    await ObjectApi.update(this.$store.getters.currentUser.oid, 'profile.tutorial', tutorialCurrent)
+    let notice = cloneDeep(this.$store.getters.currentUser.profile.notice)
+    notice[this.tutorialId] = true
+    await ObjectApi.update(this.$store.getters.currentUser.oid, 'profile.notice', notice)
   }
 }
 </script>

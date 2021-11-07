@@ -85,7 +85,7 @@ const userFragment = gql`
     coverUrl
     subscriptions{...objectShortFragment}
     profile{
-      tutorial
+      notice
       about
       status
       city
@@ -118,7 +118,7 @@ const dummyUserFragment = gql`
     settings
     subscriptions{...objectShortFragment}
     profile{
-      tutorial
+      notice
       about
       status
       city

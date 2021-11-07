@@ -79,7 +79,7 @@
                     ).absolute-top-left.q-pa-xs
       template(v-slot:navigation)
         q-stepper-navigation
-          .row.full-width.justify-end.items-center.content-center
+          .row.full-width.justify-end.items-center.content-center.q-pt-sm
             q-btn(v-if="hasPrev" flat color="grey" @click="prev" :label="$t('Back', 'Назад')" class="q-ml-sm")
             q-btn(@click="next()" :disable="!name" outline color="green-8" :label="hasNext ? $t('Continue', 'Продолжить') : $t('Finish', 'Готово')")
       template(v-slot:message)
@@ -95,6 +95,7 @@ import editPassword from 'src/pages/app/settings/view_account/edit_profile/edit_
 import editAvatar from 'src/pages/app/settings/view_account/edit_avatar/index.vue';
 import cloneDeep from 'lodash/cloneDeep'
 import {UserApi} from '../../api/user';
+import {ObjectApi} from '../../api/object';
 
 const stepEnum = Object.freeze({
   STEP_NAME: 1,
@@ -140,6 +141,9 @@ export default {
         this.step = nextStep
       } else {
         await this.saveCategories()
+        let notice = cloneDeep(this.$store.getters.currentUser.profile.notice)
+        notice.initial_settings = true
+        await ObjectApi.update(this.$store.getters.currentUser.oid, 'profile.notice', notice)
         this.$emit('close')
       }
     },
@@ -165,7 +169,7 @@ export default {
   },
   async beforeDestroy() {
     this.$log('beforeDestroy')
-    // await ObjectApi.update(this.$store.getters.currentUser.oid, 'profile.tutorial', tutorialCurrent)
+    this.$eventBus.$emit('notice-check', 'tutorial_main')
   }
 }
 </script>

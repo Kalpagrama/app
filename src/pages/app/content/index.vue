@@ -47,15 +47,6 @@ export default {
       async handler (to, from) {
         if (!to) this.$go('/cover/' + this.contentKalpa.oid)
       }
-    },
-    '$store.getters.currentUser.profile.tutorial': {
-      immediate: true,
-      async handler (to, from) {
-        this.$log('tutorial changed to', to)
-        if (to && !to.content_first) {
-          this.$store.commit('ui/stateSet', ['kalpaTutorial', {id: 'content_first', useIntro: true, useProfileEditor: true}])
-        }
-      }
     }
   },
   computed: {

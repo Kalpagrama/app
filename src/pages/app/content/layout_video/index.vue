@@ -287,6 +287,7 @@ export default {
   async mounted () {
     this.$log('mounted')
     window.addEventListener('keydown', this.onKeydown)
+    this.$eventBus.$emit('notice-check', 'tutorial_content')
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
