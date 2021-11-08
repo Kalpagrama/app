@@ -78,8 +78,8 @@
 
 <script>
 import { AuthApi } from 'src/api/auth'
-import { initLogRocket, LogLevelEnum, window } from 'src/system/log'
-import { rxdb } from 'src/system/rxdb/index_browser'
+import { initLogRocket, LogLevelEnum } from 'src/system/log'
+import { rxdb } from 'src/system/rxdb'
 import { ObjectApi } from 'src/api/object'
 import { ObjectCreateApi } from 'src/api/object_create'
 import {UserRoleEnum} from '../../../../../api/user';

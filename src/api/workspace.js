@@ -2,7 +2,7 @@ import { apollo } from 'src/boot/apollo'
 import gql from 'graphql-tag'
 import { rxdb, RxModuleEnum } from 'src/system/rxdb'
 import { systemReset } from 'src/system/services'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStorage } from 'src/system/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
 import { apiCall } from 'src/api/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)

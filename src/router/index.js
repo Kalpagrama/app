@@ -1,34 +1,39 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
+import { route } from 'quasar/wrappers'
+import { createRouter, createMemoryHistory, createWebHistory, createWebHashHistory } from 'vue-router'
+
 import {assert} from 'src/system/common/utils'
 import routes from './routes'
 import {i18n} from 'src/boot/i18n'
-import { getLogFunc, localStorage, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { AuthApi } from 'src/api/auth'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.ROUTER)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.ROUTER)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.ROUTER)
-Vue.use(VueRouter)
 
-export default function ({ store, ssrContext }) {
-  const router = new VueRouter({
-    scrollBehavior (to, from, savedPosition) {
-      // console.log('scrollBehavior', to, from)
-      if (savedPosition) {
-        // console.log('### savedPosition', savedPosition)
-        // alert('### savedPosition' + savedPosition.toString())
-        // return savedPosition
-        return {x: 0, y: 0}
-      } else {
-        // console.log('### no savedPosition!')
-        // alert('### no savedPosition !!!')
-        return {x: 0, y: 0}
-      }
-    },
+/*
+ * If not building with SSR mode, you can
+ * directly export the Router instantiation;
+ *
+ * The function below can be async too; either use
+ * async/await or return a Promise which resolves
+ * with the Router instance.
+ */
+
+export default route(function ({ app, store, ssrContext, urlPath, publicPath, redirect }) {
+  const createHistory = process.env.SERVER
+     ? createMemoryHistory
+     : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory)
+  const router = createRouter({
+    scrollBehavior: () => ({ left: 0, top: 0 }),
     routes,
     mode: process.env.VUE_ROUTER_MODE,
-    base: process.env.VUE_ROUTER_BASE
+    base: process.env.VUE_ROUTER_BASE,
+    // Leave this as is and make changes in quasar.conf.js instead!
+    // quasar.conf.js -> build -> vueRouterMode
+    // quasar.conf.js -> build -> publicPath
+    history: createHistory(process.env.MODE === 'ssr' ? undefined : process.env.VUE_ROUTER_BASE)
   })
+
   router.historyKalpa = [] // храним тут историю последних 100 переходов
   router.beforeEach(async (to, from, next) => {
     router.historyKalpa.push(to.path)
@@ -56,4 +61,4 @@ export default function ({ store, ssrContext }) {
     }
   })
   return router
-}
+})

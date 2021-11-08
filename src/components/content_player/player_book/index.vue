@@ -100,7 +100,7 @@ div(
 import { Book } from 'epubjs'
 import debounce from 'lodash/debounce'
 import { assert } from 'src/system/common/utils'
-import { RxCollectionEnum } from 'src/system/rxdb'
+import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { getChapterIdFromCfi, getTocIdFromCfi } from 'src/system/rxdb/common'
 import { ContentApi } from 'src/api/content'
 import cloneDeep from 'lodash/cloneDeep'
@@ -108,7 +108,6 @@ import cloneDeep from 'lodash/cloneDeep'
 import playerToc from './player_toc.vue'
 import playerSettings from './player_settings.vue'
 import playerNode from './player_node.vue'
-import { rxdb } from 'src/system/rxdb/index_browser'
 
 export default {
   name: 'contentPlayer_book',

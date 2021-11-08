@@ -1,6 +1,6 @@
 import { apollo } from 'src/boot/apollo'
 import gql from 'graphql-tag'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStorage } from 'src/system/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
 import { systemInit, systemReset } from 'src/system/services'
 import {assert} from 'src/system/common/utils'
 import { rxdb } from 'src/system/rxdb'

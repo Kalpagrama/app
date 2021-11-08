@@ -1,4 +1,4 @@
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance, localStorage } from 'src/system/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
 import { apollo } from 'src/boot/apollo'
 import {assert} from 'src/system/common/utils'
 import { fragments } from 'src/api/fragments'
