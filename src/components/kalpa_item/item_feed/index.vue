@@ -95,8 +95,8 @@ export default {
   components: {
     blockFeed,
     nodeFeed,
-    joinFeed,
     nodeFeedTiny,
+    joinFeed,
     anyFeedTiny,
     bookmarkListItem
   },

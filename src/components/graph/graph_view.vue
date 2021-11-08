@@ -82,7 +82,7 @@ div(ref="graphArea").row.full-width
     :maximized="false"
     @hide="newJoint = null"
   )
-    essence-editor(
+    item-editor(
       :item="newJoint"
       :action="addItemToGraph"
       :publish="publish"

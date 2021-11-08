@@ -31,7 +31,7 @@ module.exports = configure(function (ctx) {
       'apollo',
       'system',
       'main',
-      // 'components',
+      'components',
       'helpers'
     ],
 

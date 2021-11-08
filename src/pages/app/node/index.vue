@@ -42,7 +42,7 @@ kalpa-layout()
           v-model="itemEditorShow"
           :maximized="false"
           position="standard")
-          essence-editor(
+          item-editor(
             :item="pageId==='images' ? newNodeSameEssence : newNodeSameImage"
             :publish="true"
             @close="setNode($event? $event.oid : node.oid), itemEditorShow=false")

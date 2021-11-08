@@ -5,7 +5,7 @@
     v-model="itemEditorShow"
     :maximized="false"
     position="standard")
-    essence-editor(
+    item-editor(
       :item="newNode"
       :publish="true"
       :lockName="true"

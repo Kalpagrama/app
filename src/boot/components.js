@@ -1,3 +1,4 @@
+import { boot } from 'quasar/wrappers'
 // kalpa
 import kalpaLayout from 'src/components/kalpa_layout/index.vue'
 import kalpaTutorial from 'src/components/kalpa_tutorial/index.vue'
@@ -23,40 +24,38 @@ import kalpaTree from 'src/components/kalpa_tree/index.vue'
 // essence
 import composition from 'src/components/composition/index.vue'
 import itemFeed from 'src/components/kalpa_item/item_feed/index.vue'
-import essenceEditor from 'src/components/kalpa_item/item_editor/essence_editor'
 import itemEditor from 'src/components/kalpa_item/item_editor'
 // user
 import userAvatar from 'src/components/user_avatar/index.vue'
 
-export default async ({ Vue, store: storeVue, router: VueRouter }) => {
+export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath, redirect }) => {
   // kalpa
-  Vue.component('kalpaLayout', kalpaLayout)
-  Vue.component('kalpaTutorial', kalpaTutorial)
-  Vue.component('kalpaShare', kalpaShare)
-  Vue.component('kalpaLogo', kalpaLogo)
-  Vue.component('kalpaFinder', kalpaFinder)
-  Vue.component('kalpaBookmark', kalpaBookmark)
-  Vue.component('kalpaPay', kalpaPay)
-  Vue.component('kalpaSave', kalpaSave)
-  Vue.component('kalpaDocs', kalpaDocs)
+  app.component('kalpaLayout', kalpaLayout)
+  app.component('kalpaTutorial', kalpaTutorial)
+  app.component('kalpaShare', kalpaShare)
+  app.component('kalpaLogo', kalpaLogo)
+  app.component('kalpaFinder', kalpaFinder)
+  app.component('kalpaBookmark', kalpaBookmark)
+  app.component('kalpaPay', kalpaPay)
+  app.component('kalpaSave', kalpaSave)
+  app.component('kalpaDocs', kalpaDocs)
   // menus
-  Vue.component('kalpaMenuMobile', kalpaMenuMobile)
-  Vue.component('kalpaMenuActions', kalpaMenuActions)
-  Vue.component('kalpaMenuPopupGlobal', kalpaMenuPopupGlobal)
+  app.component('kalpaMenuMobile', kalpaMenuMobile)
+  app.component('kalpaMenuActions', kalpaMenuActions)
+  app.component('kalpaMenuPopupGlobal', kalpaMenuPopupGlobal)
   // lists
-  Vue.component('kalpaTree', kalpaTree)
-  Vue.component('listFeed', listFeed)
-  Vue.component('tabListFeed', tabListFeed)
+  app.component('kalpaTree', kalpaTree)
+  app.component('listFeed', listFeed)
+  app.component('tabListFeed', tabListFeed)
   // essence
   // eslint-disable-next-line vue/multi-word-component-names
-  Vue.component('composition', composition)
-  Vue.component('itemFeed', itemFeed)
-  Vue.component('essenceEditor', essenceEditor)
-  Vue.component('itemEditor', itemEditor)
+  app.component('composition', composition)
+  app.component('itemFeed', itemFeed)
+  app.component('itemEditor', itemEditor)
   // user
-  Vue.component('userAvatar', userAvatar)
+  app.component('userAvatar', userAvatar)
 
-  Vue.component('addCollectionBtn', addCollectionBtn)
-  Vue.component('graphView', graphView)
-  Vue.component('collectionList', collectionList)
-}
+  app.component('addCollectionBtn', addCollectionBtn)
+  app.component('graphView', graphView)
+  app.component('collectionList', collectionList)
+})

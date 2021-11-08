@@ -1,12 +1,9 @@
-import { getLogFunc, localStorage, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { AuthApi } from 'src/api/auth'
 import { systemInit } from 'src/system/services'
 import { assert } from 'src/system/common/utils'
 import { vueRoutesRegexp } from 'public/scripts/common_func'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
-
-// components
-// import settingsDocs from 'src/pages/app/settings/view_docs/index.vue'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.ROUTER)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.ROUTER)

@@ -41,7 +41,6 @@ div(:style=`{position: 'relative'}`).row.full-width
 </template>
 
 <script>
-import itemEditor from 'src/components/kalpa_item/item_editor/index.vue'
 import itemPreview from 'src/components/kalpa_item/item_preview/index.vue'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { assert } from 'src/system/common/utils'
@@ -51,7 +50,6 @@ import { ObjectTypeEnum } from 'src/system/common/enums'
 export default {
   name: 'compositionEditor',
   components: {
-    itemEditor,
     itemPreview
   },
   data() {

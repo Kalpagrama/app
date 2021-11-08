@@ -12,7 +12,7 @@ kalpa-layout
         v-model="itemEditorShow"
         :maximized="false"
         position="standard")
-        essence-editor(
+        item-editor(
           :item="newNode"
           :publish="true"
           @close="itemEditorShow=false")

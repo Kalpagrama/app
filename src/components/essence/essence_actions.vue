@@ -15,7 +15,7 @@
     v-model="data.itemEditorShow"
     :maximized="false"
     position="standard")
-    essence-editor(
+    item-editor(
       :item="essence"
       :publish="true"
       @close="data.itemEditorShow = false")
@@ -140,7 +140,6 @@
 import { ObjectApi } from 'src/api/object'
 import essenceVoteBall from 'src/components/essence/essence_vote_ball.vue'
 import essenceVoteStats from './essence_actions/vote_stats.vue'
-import essenceEditor from 'src/components/kalpa_item/item_editor/essence_editor'
 import { assert } from 'src/system/common/utils'
 export default {
   name: 'essenceActions',
@@ -160,7 +159,6 @@ export default {
   components: {
     essenceVoteBall,
     essenceVoteStats,
-    essenceEditor,
   },
   computed: {
     data() {
