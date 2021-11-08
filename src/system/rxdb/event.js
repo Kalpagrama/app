@@ -1,6 +1,6 @@
 import { assert } from 'src/system/common/utils'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
-import { i18n } from 'src/boot/i18n'
+import { t } from 'src/boot/i18n'
 import { notify } from 'src/boot/notify'
 import { EventApi } from 'src/api/event'
 import { rxdb } from 'src/system/rxdb'
@@ -119,28 +119,28 @@ class Event {
       let eventMessage = ''
       switch (eventType) {
          case 'OBJECT_CREATED':
-            eventMessage = i18n.t('object created', 'объект создан')
+            eventMessage = t('object created', 'объект создан')
             break
          case 'OBJECT_DELETED':
-            eventMessage = i18n.t('object deleted', 'объект удален')
+            eventMessage = t('object deleted', 'объект удален')
             break
          case 'VOTED':
-            eventMessage = i18n.t('объект rated', 'объект оценен')
+            eventMessage = t('объект rated', 'объект оценен')
             break
          case 'USER_SUBSCRIBED':
-            eventMessage = i18n.t('user subscribed', 'пользователь подписался')
+            eventMessage = t('user subscribed', 'пользователь подписался')
             break
          case 'USER_UNSUBSCRIBED':
-            eventMessage = i18n.t('user unsubscribed', 'пользователь отписался')
+            eventMessage = t('user unsubscribed', 'пользователь отписался')
             break
          case 'WS_ITEM_CREATED':
-            eventMessage = i18n.t('ws element created', 'элемент создан')
+            eventMessage = t('ws element created', 'элемент создан')
             break
          case 'WS_ITEM_DELETED':
-            eventMessage = i18n.t('ws element deleted', 'элемент удален')
+            eventMessage = t('ws element deleted', 'элемент удален')
             break
          case 'WS_ITEM_UPDATED':
-            eventMessage = i18n.t('ws element updated', 'элемент изменен')
+            eventMessage = t('ws element updated', 'элемент изменен')
             break
       }
       // notify(
@@ -150,7 +150,7 @@ class Event {
       //       // avatar: eventType.startsWith('WS_ITEM') ? null : object.thumbUrl,
       //       actions: [
       //          {
-      //             label: i18n.t('Go', 'Перейти'),
+      //             label: t('Go', 'Перейти'),
       //             noDismiss: true,
       //             color: 'green',
       //             handler: async () => {

@@ -22,18 +22,17 @@ module.exports = configure(function (ctx) {
     supportTS: false,
     // https://quasar.dev/quasar-cli/prefetch-feature
     preFetch: true,
-
-    // app boot file (/src/boot)
-    // --> boot files are part of "main.js"
     // https://quasar.dev/quasar-cli/boot-files
     boot: [
       'log',
-      // 'rxdb',
-      // 'notify',
-      // 'i18n',
-      // 'apollo',
-      // 'system',
-      // 'main',
+      'rxdb',
+      'notify',
+      'i18n',
+      'apollo',
+      'system',
+      'main',
+      // 'components',
+      'helpers'
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
@@ -92,7 +91,7 @@ module.exports = configure(function (ctx) {
         BUILD_DATE: (new Date().toISOString()).split('T')[0],
         BUILD_VERSION: require('./package.json').version
       },
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      vueRouterMode: 'history', // available values: 'hash', 'history'
       // vueCompiler: true, // -- Если нужно компилировать шаблоны на клиенте (например, передаёте строку в опцию template...
       // transpile: false,
       // publicPath: '/',
@@ -162,7 +161,8 @@ module.exports = configure(function (ctx) {
         cfg.resolve.alias = {
           ...cfg.resolve.alias,
           schema: path.resolve(__dirname, './src/api'),
-          public: path.resolve(__dirname, './public')
+          public: path.resolve(__dirname, './public'),
+          vue: '@vue/compat'
         }
         if (!ctx.mode.ssr) {
           cfg.optimization = {

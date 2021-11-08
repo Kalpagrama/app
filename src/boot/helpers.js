@@ -1,3 +1,4 @@
+import { boot } from 'quasar/wrappers'
 import { EventApi } from 'src/api/event'
 import { assert } from 'src/system/common/utils'
 
@@ -49,14 +50,14 @@ const nodeItemType = (type) => {
   return nodeItemTypes.find(t => t.id === type) || {name: '!NOTFOUND! type=' + type}
 }
 
-export default async ({ Vue, store: storeVue, router: VueRouter }) => {
-  Vue.prototype.$rateMeta = rateMeta
-  Vue.prototype.$getRateMeta = (rate) => {
+export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath, redirect }) => {
+  app.config.globalProperties.$rateMeta = rateMeta
+  app.config.globalProperties.$getRateMeta = (rate) => {
     let res = rateMeta.find(r => rate >= r.valueMin && rate <= r.valueMax)
     assert(res)
     return res
   }
-  Vue.prototype.$nodeItemTypes = nodeItemTypes
-  Vue.prototype.$nodeItemType = nodeItemType
-  Vue.prototype.$nodeItemTypesPairs = nodeItemTypesPairs
-}
+  app.config.globalProperties.$nodeItemTypes = nodeItemTypes
+  app.config.globalProperties.$nodeItemType = nodeItemType
+  app.config.globalProperties.$nodeItemTypesPairs = nodeItemTypesPairs
+})

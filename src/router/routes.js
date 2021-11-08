@@ -385,7 +385,7 @@ const routes = [
          },
          {
             name: 'fallback',
-            path: '*',
+            path: '/:catchAll(.*)*',
             redirect: startPage()
          }
       ],
@@ -400,8 +400,9 @@ const routes = [
 
 // Always leave this as last one
 routes.push({
-   path: '*',
-   redirect: '/auth'
+   name: 'fallback',
+   path: '/:catchAll(.*)*',
+   redirect: startPage()
 })
 
 // на эту регулярку опирается сервисворкер, когда отдает index.html вместо vue route. нужно чтобы все роуты ей соответствовали

@@ -2,7 +2,7 @@ import { notify } from 'src/boot/notify'
 import { AuthApi } from 'src/api/auth'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { Notify, Platform } from 'quasar'
-import { i18n } from 'src/boot/i18n'
+import { t } from 'src/boot/i18n'
 import { clear, get, Store } from 'public/scripts/idb-keyval/idb-keyval.mjs'
 import { router } from 'src/boot/system'
 import { makeRoutePath } from 'public/scripts/common_func'
@@ -197,9 +197,9 @@ function showNotifyNewVer () {
    Notify.create(
       {
          position: 'top',
-         message: i18n.t('new_ver_avail', 'new version available'),
+         message: t('new_ver_avail', 'new version available'),
          actions: [{
-            label: i18n.t('update_app', 'Update application'),
+            label: t('update_app', 'Update application'),
             noDismiss: true,
             handler: async () => {
                await updatePWA()
@@ -340,7 +340,7 @@ async function showNotification (title, body, dbEvent) {
          position: 'top',
          message: title,
          actions: [{
-            label: i18n.t('goto...', 'перейти...'),
+            label: t('goto...', 'перейти...'),
             noDismiss: true,
             handler: async () => {
                await router.push(makeRoutePath(dbEvent.object))

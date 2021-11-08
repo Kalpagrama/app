@@ -2,11 +2,10 @@ import { mutexGlobal } from 'src/system/rxdb/mutex_global'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { Loading, Notify, Platform } from 'quasar'
-import { i18n } from 'src/boot/i18n'
+import { t, setLocale } from 'src/boot/i18n'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { askForPwaWebPushPerm, initPWA, pwaReset, pwaShareWith } from 'src/system/pwa'
 import { assert, wait } from 'src/system/common/utils';
-import i18next from 'i18next'
 import { AuthApi } from 'src/api/auth'
 import { router } from 'src/boot/system'
 import store from 'src/store/index'
@@ -207,8 +206,8 @@ function initOfflineEvents (store) {
          {
             position: 'top',
             message: store.state.core.online
-               ? i18n.t('network_available', 'network available')
-               : i18n.t('network_unavailable', 'network unavailable')
+               ? t('network_available', 'network available')
+               : t('network_unavailable', 'network unavailable')
          }
       )
    }
@@ -315,7 +314,7 @@ async function systemInit () {
       }
       // alert(' systemInit 4 ')
       if (await rxdb.isInitializedGlobal()) {
-         await i18next.changeLanguage(rxdb.getCurrentUser().profile.lang)
+         await setLocale(rxdb.getCurrentUser().profile.lang)
          // if (sessionStorage.getItem('k_originalUrl')) { // если зашли по ссылке поделиться(бэкенд редиректит в корень с query =  originalUrl)
          //    logD(f, 'redirect to originalUrl: ' + sessionStorage.getItem('k_originalUrl'))
          //    alert('redirect to originalUrl: ' + sessionStorage.getItem('k_originalUrl'))

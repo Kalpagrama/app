@@ -135,7 +135,6 @@ export default {
       }
       if (this.essenceIsMine || this.$store.getters.currentUser.profile.role.in(UserRoleEnum.MODERATOR, UserRoleEnum.ADMIN)) {
         res.delete = {
-          // name: i18n.t('Delete', 'Удалить'),
           name: this.$t('Delete'),
           color: 'red',
           cb: async () => {
@@ -144,7 +143,6 @@ export default {
           }
         }
         res.hideGlobal = {
-          // name: i18n.t('Delete', 'Удалить'),
           name: this.$t('hide global'),
           color: 'red',
           cb: async () => {

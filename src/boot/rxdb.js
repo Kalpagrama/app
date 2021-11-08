@@ -16,6 +16,7 @@ export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath
       app.config.globalProperties.$rxdb = rxdb
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    } catch (err) {
+      console.error('cant create rxdb!', err)
       logE('cant create rxdb!', err)
       await systemReset(false)
       throw err // без rxdb работать не можем!

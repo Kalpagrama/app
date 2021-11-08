@@ -3,7 +3,7 @@ import { createRouter, createMemoryHistory, createWebHistory, createWebHashHisto
 
 import {assert} from 'src/system/common/utils'
 import routes from './routes'
-import {i18n} from 'src/boot/i18n'
+import { t } from 'src/boot/i18n'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { AuthApi } from 'src/api/auth'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.ROUTER)
@@ -53,7 +53,7 @@ export default route(function ({ app, store, ssrContext, urlPath, publicPath, re
     }
     if (redirectUrl) return next(redirectUrl)
     if (!AuthApi.userMatchMinimalRole(to.meta.roleMinimal || 'GUEST')) {
-      store.commit('ui/stateSet', ['authGuard', { message: i18n.t('Для перехода на эту страницу нужно войти...') }])
+      store.commit('ui/stateSet', ['authGuard', { message: t('Для перехода на эту страницу нужно войти...') }])
       logD('router::need more privileges')
       return next(false)
     } else {

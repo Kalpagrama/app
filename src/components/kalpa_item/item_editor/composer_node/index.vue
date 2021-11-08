@@ -1,9 +1,3 @@
-<style lang="sass">
-.sphere-item
-  &:hover
-    background: rgb(50, 50, 50)
-</style>
-
 <template lang="pug">
 div(
   :style=`{
@@ -60,6 +54,12 @@ div(
       @click="nodePublish").row.full-width.text-green.text-bold
     slot(name="footer")
 </template>
+
+<style lang="sass">
+.sphere-item
+  &:hover
+    background: rgb(50, 50, 50)
+</style>
 
 <script>
 import { ObjectCreateApi } from 'src/api/object_create'

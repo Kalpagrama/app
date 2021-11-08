@@ -2,25 +2,10 @@ import { boot } from 'quasar/wrappers'
 import 'src/system/common/utils' // инициализация toJSON | String.in(...)
 import { initLogger, performance } from 'src/system/log'
 
-import { reactive, watch, ref } from 'vue'
-
 export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath, redirect }) => {
   const { logD, logI, logW, logE, logC } = await initLogger(store, ssrContext)
   const f = { nameExtra: 'boot::log' }
   logD(f, 'start')
-
-  const state = reactive({
-    count: 0
-  })
-
-  let count = ref(0)
-  watch(() => state.count, (to, from) => {
-    alert('state changed!!!!' + to + 'old:' + from)
-  })
-
-  setInterval(() => {
-    state.count++
-  })
 
   const t1 = performance.now()
   app.config.globalProperties.$log = app.config.globalProperties.$logD = logD
