@@ -11807,7 +11807,7 @@
             "deprecationReason": null
           },
           {
-            "name": "tutorial",
+            "name": "notice",
             "description": "показать туториал",
             "args": [],
             "type": {
