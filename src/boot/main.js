@@ -1,4 +1,6 @@
+import { boot } from 'quasar/wrappers'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
+import eventBus from 'tiny-emitter/instance'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
@@ -12,9 +14,6 @@ import axios from 'axios'
 // import VueShowdown from 'vue-showdown'
 import isEqual from 'lodash/isEqual'
 
-// import Vue from 'vue'
-// import VueVirtualScroller from 'vue-virtual-scroller'
-// import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 const contentful = require('contentful')
 
 // image editors
@@ -45,14 +44,15 @@ const time = (sec, addSeconds = true) => {
    return result
 }
 
-let eventBus
-
-export default async ({ Vue, store, router: VueRouter }) => {
+export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath, publicPath, redirect }) => {
    try {
       const f = { nameExtra: 'boot::main' }
       logD(f, 'start')
       const t1 = performance.now()
-      Vue.prototype.$eventBus = eventBus = new Vue({}) // event bus
+      eventBus.$on = eventBus.on
+      eventBus.$off = eventBus.off
+      eventBus.$emit = eventBus.emit
+      app.config.globalProperties.$eventBus = eventBus // event bus
       // Vue.use(VueVirtualScroller)
       // Vue.use(VueShowdown, {
       //   flavor: 'github',
@@ -66,11 +66,11 @@ export default async ({ Vue, store, router: VueRouter }) => {
          accessToken: 'dt4poXVl2-veCdWkW_v02gsZWxBwe-JHZSw2T394kQQ'
       }
       const contentfulClient = contentful.createClient(contentfulConfig)
-      Vue.prototype.$contentful = contentfulClient
-      Vue.use(VueMasonry)
-      Vue.use(VueObserveVisibility)
-      Vue.prototype.$getPaletteColor = colors.getPaletteColor
-      Vue.prototype.$routerKalpa = new Proxy(VueRouter, {
+      app.config.globalProperties.$contentful = contentfulClient
+      app.use(VueMasonry)
+      app.use(VueObserveVisibility)
+      app.config.globalProperties.$getPaletteColor = colors.getPaletteColor
+      app.config.globalProperties.$routerKalpa = new Proxy(VueRouter, {
          get (target, prop) {
             if (prop === 'back') {
                // если в истории пусто (зашли например по ссылке на контент), то переход назад приведет к выходу их приложения
@@ -81,26 +81,26 @@ export default async ({ Vue, store, router: VueRouter }) => {
             return (typeof value === 'function') ? value.bind(target) : value // иначе - this - будет указывать на Proxy
          }
       })
-      Vue.prototype.$htmlToText = (html) => {
+      app.config.globalProperties.$htmlToText = (html) => {
          let tempDivElement = document.createElement('div');
          tempDivElement.innerHTML = html
          return tempDivElement.textContent || tempDivElement.innerText || ''
       }
-      Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
-      Vue.prototype.$axios = axios
-      Vue.prototype.$gsap = gsap
-      Vue.prototype.$date = (ts, format) => {
+      app.config.globalProperties.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+      app.config.globalProperties.$axios = axios
+      app.config.globalProperties.$gsap = gsap
+      app.config.globalProperties.$date = (ts, format) => {
          return date.formatDate(ts, format || 'DD.MM.YYYY', {
             dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
             monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
          })
       }
-      Vue.prototype.$time = time
-      Vue.prototype.$random = function (min, max) {
+      app.config.globalProperties.$time = time
+      app.config.globalProperties.$random = function (min, max) {
          return Math.floor(Math.random() * (max - min + 1)) + min
       }
       // alert("4 " + getNoun(4, 'слон', 'слона', 'слонов')) ->>>>  4 слона
-      Vue.prototype.$getNoun = function (number, one, two, five) {
+      app.config.globalProperties.$getNoun = function (number, one, two, five) {
          let n = Math.abs(number);
          n %= 100;
          if (n >= 5 && n <= 20) {
@@ -119,7 +119,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
 
       // App go, last position, and feeds refresh...
       let goLast = null
-      Vue.prototype.$go = function (to) {
+      app.config.globalProperties.$go = function (to) {
          if (isEqual(goLast, to)) {
             console.log('$go DUPLICATE')
             this.$router.push(to).catch(e => e)
@@ -129,11 +129,11 @@ export default async ({ Vue, store, router: VueRouter }) => {
             this.$router.push(to).catch(e => e)
          }
       }
-      // Vue.prototype.$goDrop = function () {
+      // app.config.globalProperties.$goDrop = function () {
       //   console.log('$goDrop')
       //   goLast = null
       // }
-      Vue.prototype.$ym = function (target, payload) {
+      app.config.globalProperties.$ym = function (target, payload) {
          if (!window.ym) return
          window.ym(
             window.yaCounterId,
@@ -155,6 +155,6 @@ export default async ({ Vue, store, router: VueRouter }) => {
       logC(err)
       throw err
    }
-}
+})
 
 export { time, eventBus }

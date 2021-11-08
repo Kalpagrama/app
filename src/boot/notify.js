@@ -1,3 +1,4 @@
+import { boot } from 'quasar/wrappers'
 import { Notify } from 'quasar'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
@@ -6,7 +7,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
 let notify = null
 // TODO: max count on screen
 
-export default async ({ Vue }) => {
+export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath, redirect }) => {
   try {
     const f = {nameExtra: 'boot::notify'}
     logD(f, 'start')
@@ -48,11 +49,11 @@ export default async ({ Vue }) => {
         }
       }
     }
-    Vue.prototype.$notify = notify
+    app.config.globalProperties.$notify = notify
     logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   } catch (err) {
     logE(err)
   }
-}
+})
 
 export { notify }
