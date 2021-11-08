@@ -1,6 +1,6 @@
 import {assert} from 'src/system/common/utils'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
-import { rxdb } from 'src/system/rxdb/index_browser'
+import { rxdb } from 'src/system/rxdb'
 import {
    RxCollectionEnum,
    LstCollectionEnum,

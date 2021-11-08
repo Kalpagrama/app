@@ -6,7 +6,7 @@ import { i18n } from 'src/boot/i18n'
 import { clear, get, Store } from 'public/scripts/idb-keyval/idb-keyval.mjs'
 import { router } from 'src/boot/system'
 import { makeRoutePath } from 'public/scripts/common_func'
-import { shareIn } from 'src/system/services_browser'
+import { shareIn } from 'src/system/services'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.PWA)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.PWA)

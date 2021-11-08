@@ -5,7 +5,7 @@ import { HapticsImpactStyle, Plugins, StatusBarStyle } from '@capacitor/core'
 // import { Screenshot } from 'com.darktalker.cordova.screenshot'
 import { AuthApi } from 'src/api/auth'
 import { makeRoutePath } from 'public/scripts/common_func'
-import { shareIn } from 'src/system/services_browser'
+import { shareIn } from 'src/system/services'
 
 const { PushNotifications, Share, App, StatusBar, Haptics, Browser } = Plugins
 
