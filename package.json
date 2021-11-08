@@ -33,11 +33,17 @@
     "now-build": "quasar build -m pwa",
     "now": "now"
   },
+  "resolution Comments": {
+    "uuid": "pouchdb7.2.2 (pouchdb-adapter-idb + rxdb) содержит зависимость uuid@8.1.0, который не совместим webpack5 Принудительно ставим 8.3.2"
+  },
+  "resolutions": {
+    "uuid": "^8.3.2"
+  },
   "dependencies": {
     "@apollo/client": "^3.4.5",
     "@capacitor/core": "3.3.1",
-    "@panter/vue-i18next": "^0.15.1",
-    "@quasar/extras": "^1.10.10",
+    "@quasar/extras": "^1.0.0",
+    "@vue/compat": "^3.2.21",
     "apollo-cache-inmemory": "^1.6.5",
     "apollo-link-error": "^1.1.12",
     "apollo-link-ws": "^1.0.19",
@@ -45,46 +51,48 @@
     "axios": "^0.24.0",
     "contentful": "^9.1.4",
     "contentful-rich-text-vue-renderer": "^2.0.1",
+    "core-js": "^3.6.5",
     "cropperjs": "^1.5.7",
     "d3": "^7.0.0",
     "epubjs": "^0.3.90",
     "graphql-tag": "^2.10.1",
     "gsap": "^3.7.1",
-    "i18next": "^21.4.0",
-    "i18next-browser-languagedetector": "^6.0.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "lru-cache": "^6.0.0",
     "mediaelement": "^4.2.14",
     "pouchdb-adapter-idb": "^7.2.2",
     "pug": "^3.0.0",
-    "quasar": "2",
+    "quasar": "^2.0.0",
     "rxdb": "^10.3.0",
     "rxjs": "^7.2.0",
     "subscriptions-transport-ws": "^0.11.0",
+    "tiny-emitter": "^2.1.0",
+    "uuid": "^3.4.0",
+    "vue": "^2.6.14",
+    "vue-i18n": "^9.2.0-beta.17",
     "vue-masonry-css": "^1.0.3",
     "vue-observe-visibility": "^1.0.0",
-    "vue-router": "^3.4.5",
     "vue-showdown": "^3.1.0",
-    "vuex": "4"
+    "vuex": "^4.0.1"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.0.0",
-    "@quasar/app": "3",
+    "@babel/eslint-parser": "^7.13.14",
+    "@quasar/app": "^3.0.0",
     "@sentry/webpack-plugin": "^1.17.1",
+    "@vue/devtools": "^5.3.4",
     "@vue/eslint-config-airbnb": "^5.0.0",
     "apollo": "^2.25.0",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "eslint": "^7.14.0",
-    "eslint-config-standard": "^16.0.3",
-    "eslint-loader": "^4.0.2",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.1.1",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.19.1",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-quasar": "^1.0.0",
     "eslint-plugin-standard": "^5.0.0",
-    "eslint-plugin-vue": "^8.0.3",
-    "eslint-webpack-plugin": "^3.1.0",
+    "eslint-plugin-vue": "^7.0.0",
+    "eslint-webpack-plugin": "^2.4.0",
     "file-loader": "^6.2.0",
     "fs": "^0.0.1-security",
     "i18next-scanner": "^3.1.0",
@@ -96,12 +104,7 @@
     "vue-template-compiler": "^2.6.10",
     "vuelidate": "^0.7.4",
     "webpack-bundle-analyzer": "^4.4.2",
-    "workbox-webpack-plugin": "6.3.0"
-  },
-  "engines": {
-    "node": ">= 14.0.0",
-    "npm": ">= 5.6.0",
-    "yarn": ">= 1.21.1"
+    "workbox-webpack-plugin": "^6.0.0"
   },
   "browserslist": [
     "last 10 Chrome versions",
@@ -113,5 +116,10 @@
     "last 8 FirefoxAndroid versions",
     "last 10 iOS versions",
     "last 5 Opera versions"
-  ]
+  ],
+  "engines": {
+    "node": ">= 12.22.1",
+    "npm": ">= 6.13.4",
+    "yarn": ">= 1.21.1"
+  }
 }
