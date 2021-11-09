@@ -158,6 +158,7 @@ export default {
           if (to) {
             // this.$log(`hasItemFull=${to} #${this.itemIndex}`)
             let checkChData = (parent) => {
+              if (!parent) return
               assert(parent.$options.name.startsWith('Q') || Object.keys(parent.$data).length === 0, 'component ' + parent.$options.name + ' has data!!!' + ' data - запрещено! И во вложенных - тоже!!!')
               for (let ch of parent.$children) {
                 checkChData(ch)
