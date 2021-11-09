@@ -1,4 +1,3 @@
-import Vue from 'vue'
 import { assert, wait } from 'src/system/common/utils'
 import { isRxDocument, isRxQuery } from 'rxdb'
 
@@ -11,6 +10,8 @@ import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { Lists } from 'src/system/rxdb/lists'
 import store from 'src/store/index'
 import cloneDeep from 'lodash/cloneDeep'
+
+import { reactive, watch } from 'vue'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
@@ -56,7 +57,7 @@ async function updateRxDocPayload (rxDocOrId, path, valueOrFunc, debouncedSave =
          logE('err on updateRxDocPayload', cloneDeep(reactiveDoc.getPayload()))
          throw err
       } finally {
-         wait(0).then(() => { // нужно чтобы setDebouncedSave сработала после эвентов reactiveDocSubscribe
+         wait(0).then(() => { // нужно чтобы setDebouncedSave сработала после эвентов reactiveSubscribe
             reactiveDocFactory.setDebouncedSave(true)
             reactiveDocFactory.setSynchro(true)
          })
@@ -70,11 +71,7 @@ const debounceIntervalItem = 2000 // дебаунс сохранения реа�
 class ReactiveObjFactory {
    constructor (object, mirroredVuexObjectKey = null) {
       assert(typeof object === 'object')
-      this.vm = new Vue({
-         data () {
-            return { reactiveData: {}, rev: 1 }
-         }
-      })
+      this.vm = reactive({ reactiveData: {}, rev: 1 })
       this.getReactive = () => {
          assert(this.vm.reactiveData.doc, '!this.vm.reactiveData.doc')
          return this.vm.reactiveData.doc
@@ -82,7 +79,8 @@ class ReactiveObjFactory {
       this.setReactiveDoc = (plainData) => {
          assert(typeof plainData === 'object', 'typeof payload === \'object\'')
          const reactiveDoc = plainData
-         Vue.set(this.vm.reactiveData, 'doc', reactiveDoc)
+         // Vue.set(this.vm.reactiveData, 'doc', reactiveDoc)
+         this.vm.reactiveData.doc = reactiveDoc
          if (mirroredVuexObjectKey) {
             this.vuexKey = mirroredVuexObjectKey
             assert(store && store.state && store.state.mirrorObjects, 'store && store.state && store.state.mirrorObjects')
@@ -124,11 +122,7 @@ class ReactiveDocFactory {
       } else {
          this.rxDoc = rxDoc
          this.mutex = new MutexLocal('ReactiveDocFactory::constructor')
-         this.vm = new Vue({
-            data () {
-               return { reactiveData: {}, rev: rxDoc._rev }
-            }
-         })
+         this.vm = reactive({ reactiveData: {}, rev: rxDoc._rev })
          this.debouncedSave = true
          this.synchro = true
          this.getReactive = () => {
@@ -219,7 +213,7 @@ class ReactiveDocFactory {
                   payload.flushDebounce()
                }
                payload.flushDebounce = () => {
-                  wait(0).then(() => { // для того чтобы reactiveDocSubscribe успел сработать до нас
+                  wait(0).then(() => { // для того чтобы reactiveSubscribe успел сработать до нас
                      if (this.debouncedItemSaveFunc) this.debouncedItemSaveFunc.flush()
                   })
                }
@@ -240,7 +234,8 @@ class ReactiveDocFactory {
                   rxdb.workspace.populateReactiveWsItem(payload)
                }
             }
-            Vue.set(this.vm.reactiveData, 'doc', reactiveDoc)
+            // Vue.set(this.vm.reactiveData, 'doc', reactiveDoc)
+            this.vm.reactiveData.doc = reactiveDoc
             if (mirroredVuexObjectKey) {
                this.vuexKey = mirroredVuexObjectKey
                assert(store && store.state && store.state.mirrorObjects, 'store && store.state && store.state.mirrorObjects')
@@ -268,7 +263,7 @@ class ReactiveDocFactory {
          }
          this.setReactiveDoc(cloneDeep(rxDoc.toJSON())) // rxDoc.toJSON() - иммутабелен
          this.rxDocSubscribe()
-         this.reactiveDocSubscribe()
+         this.reactiveSubscribe()
          rxDoc.reactiveItemHolderMaster = this
       }
    }
@@ -284,7 +279,7 @@ class ReactiveDocFactory {
             return;
          }
       }
-      if (!ignoreNull || value !== null) Vue.set(state, propName, value);
+      if (!ignoreNull || value !== null) state[propName] = value // Vue.set(state, propName, value);
    }
 
    rxDocSubscribe () {
@@ -295,15 +290,15 @@ class ReactiveDocFactory {
       this.rxDocSubscription = this.rxDoc.$.pipe(skip(1)).subscribe(async changePlainDoc => {
          try {
             // logD(f, 'reactiveDoc changed start', changePlainDoc)
-            await this.mutex.lock('rxDocSubscribe') // обязательно сначала блокируем !!! (см reactiveDocSubscribe)
+            await this.mutex.lock('rxDocSubscribe') // обязательно сначала блокируем !!! (см reactiveSubscribe)
             assert(this.getRev() && changePlainDoc._rev, '!this.getRev() && changePlainDoc._rev')
-            if (this.getRev() === changePlainDoc._rev) return // изменения уже применены к reactiveDoc (см this.reactiveDocSubscribe())
-            this.reactiveDocUnsubscribe()
+            if (this.getRev() === changePlainDoc._rev) return // изменения уже применены к reactiveDoc (см this.reactiveSubscribe())
+            this.reactiveUnsubscribe()
             ReactiveDocFactory.mergeReactive(this.getReactive(), changePlainDoc)
             this.setRev(changePlainDoc._rev)
             // logD(f, 'reactiveDoc changed stop')
          } finally {
-            this.reactiveDocSubscribe()
+            this.reactiveSubscribe()
             this.mutex.release()
          }
       })
@@ -316,10 +311,10 @@ class ReactiveDocFactory {
       delete this.rxDocSubscription
    }
 
-   reactiveDocSubscribe () {
-      const f = this.reactiveDocSubscribe
+   reactiveSubscribe () {
+      const f = this.reactiveSubscribe
       if (this.itemUnsubscribeFunc) return
-      this.itemUnsubscribeFunc = this.vm.$watch('reactiveData', async (newVal, oldVal) => {
+      this.itemUnsubscribeFunc = watch(() => this.vm.reactiveData, async (newVal, oldVal) => {
          // reactiveItem изменилась (обычно из UI)
 
          // изменить связанный объект во vuex
@@ -333,7 +328,7 @@ class ReactiveDocFactory {
                const f = this.itemSaveFunc
                if (this.rxDoc.deleted) return // из-за дебаунса такое возможно
                try {
-                  await this.mutex.lock('reactiveDocSubscribe') // обязательно сначала блокируем !!! (см rxDocSubscribe)
+                  await this.mutex.lock('reactiveSubscribe') // обязательно сначала блокируем !!! (см rxDocSubscribe)
                   // this.rxDocUnsubscribe() !!!! --- не отписываемся от изменения тк может быть более одного документа rxDoc ( и на каждый - свой reactiveItem!) работает this._rev
                   logD(f, `try to change rxDoc ${this.rxDoc.id} ${this._rev} ${this.rxDoc._rev}`)
                   let updatedRxDoc = await this.rxDoc.atomicUpdate((oldData) => {
@@ -346,7 +341,7 @@ class ReactiveDocFactory {
                   this.setRev(updatedRxDoc._rev)
                   // logD(f, `rxDoc changed ${updatedRxDoc.id} ${updatedRxDoc._rev}`)
                } catch (err) {
-                  logE('err on reactiveDocSubscribe', cloneDeep(this.getReactive()))
+                  logE('err on reactiveSubscribe', cloneDeep(this.getReactive()))
                   throw err
                } finally {
                   // this.rxDocSubscribe()
@@ -365,8 +360,8 @@ class ReactiveDocFactory {
       }, { deep: true, immediate: false })
    }
 
-   reactiveDocUnsubscribe () {
-      const f = this.reactiveDocUnsubscribe
+   reactiveUnsubscribe () {
+      const f = this.reactiveUnsubscribe
       if (this.itemUnsubscribeFunc) this.itemUnsubscribeFunc()
       delete this.itemUnsubscribeFunc
    }
@@ -386,41 +381,35 @@ class Group {
       this.propsReactive = propsReactive
       this.screenSize = screenSize // максимальная длина ленты (при превышении - обрезается снизу или сверху)
       assert(this.propsReactive, '!this.propsReactive')
-      this.vm = new Vue({
-         data () {
-            return {
-               reactiveGroup: {
-                  id,
-                  name,
-                  pages: [], // вся лента разбита на пагинированные блоки(страницы)
-                  items: [], // кусочек от this.pages (для каждого item вызывается populate). это отдается в UI. далее пополняется через next/prev
-                  itemsHeaderFooter: [], // items + header + footer ( сверху и снизу списка добавляется по служебной строке (для того чтобы при отображении списков добавлять туда кнопки и спиннеры))
-                  itemPrimaryKey: null, // имя поля в item (обычно либо 'oid' либо 'id')
-                  totalCount: 0,
-                  itemType: 'ITEM', // ITEM / GROUP (внутри группы мб подгруппы)
-                  goto: this.goto.bind(this),
-                  gotoCurrent: this.gotoCurrent.bind(this),
-                  gotoStart: this.gotoStart.bind(this),
-                  gotoEnd: this.gotoEnd.bind(this),
-                  // next: this.next.bind(this),
-                  // prev: this.prev.bind(this),
-                  next: debounce(this.next.bind(this), 1000, { leading: true, maxWait: 8888 }),
-                  next_: this.next.bind(this),
-                  prev: debounce(this.prev.bind(this), 1000, { leading: true, maxWait: 8888 }),
-                  gotoPercent: debounce(this.gotoPercent.bind(this), 1000, { leading: true, maxWait: 8888 }),
-                  hasNext: false,
-                  hasPrev: false,
-                  loadedLen: 0,
-                  fulFilledRange: { startFullFil: -1, endFullFil: -1 },
-                  newItemsBelow: 0, // в списке появились новые элементы выше
-                  newItemsAbove: 0, // в списке появились новые элементы ниже
-                  setProperty: this.setProperty.bind(this),
-                  getProperty: this.getProperty.bind(this),
-                  refresh: this.refresh.bind(this)
-               }
-            }
-         }
-      })
+      this.vm = reactive({ reactiveGroup: {
+            id,
+            name,
+            pages: [], // вся лента разбита на пагинированные блоки(страницы)
+            items: [], // кусочек от this.pages (для каждого item вызывается populate). это отдается в UI. далее пополняется через next/prev
+            itemsHeaderFooter: [], // items + header + footer ( сверху и снизу списка добавляется по служебной строке (для того чтобы при отображении списков добавлять туда кнопки и спиннеры))
+            itemPrimaryKey: null, // имя поля в item (обычно либо 'oid' либо 'id')
+            totalCount: 0,
+            itemType: 'ITEM', // ITEM / GROUP (внутри группы мб подгруппы)
+            goto: this.goto.bind(this),
+            gotoCurrent: this.gotoCurrent.bind(this),
+            gotoStart: this.gotoStart.bind(this),
+            gotoEnd: this.gotoEnd.bind(this),
+            // next: this.next.bind(this),
+            // prev: this.prev.bind(this),
+            next: debounce(this.next.bind(this), 1000, { leading: true, maxWait: 8888 }),
+            next_: this.next.bind(this),
+            prev: debounce(this.prev.bind(this), 1000, { leading: true, maxWait: 8888 }),
+            gotoPercent: debounce(this.gotoPercent.bind(this), 1000, { leading: true, maxWait: 8888 }),
+            hasNext: false,
+            hasPrev: false,
+            loadedLen: 0,
+            fulFilledRange: { startFullFil: -1, endFullFil: -1 },
+            newItemsBelow: 0, // в списке появились новые элементы выше
+            newItemsAbove: 0, // в списке появились новые элементы ниже
+            setProperty: this.setProperty.bind(this),
+            getProperty: this.getProperty.bind(this),
+            refresh: this.refresh.bind(this)
+         } })
       this.reactiveGroup = this.vm.reactiveGroup
       this.updateReactiveGroup = () => {
          this.reactiveGroup.hasNext = this.hasNext()
@@ -811,13 +800,19 @@ class Group {
             // }
             assert(items && totalCount >= 0, '!nextItem.items')
             assert(nextGroup.totalCount >= 0, '!nextItem.totalCount')
-            Vue.set(this.propsReactive, '')
+            // Vue.set(this.propsReactive, '')
             let group = new Group(groupId, groupName, this.populateFunc, null, this.propsReactive, this.screenSize)
-            Vue.set(group.reactiveGroup, 'figuresAbsolute', figuresAbsolute)
-            Vue.set(group.reactiveGroup, 'thumbUrl', thumbUrl)
-            Vue.set(group.reactiveGroup, 'nextPageToken', nextPageToken)
-            Vue.set(group.reactiveGroup, 'prevPageToken', prevPageToken)
-            Vue.set(group.reactiveGroup, 'currentPageToken', currentPageToken)
+            // Vue.set(group.reactiveGroup, 'figuresAbsolute', figuresAbsolute)
+            // Vue.set(group.reactiveGroup, 'thumbUrl', thumbUrl)
+            // Vue.set(group.reactiveGroup, 'nextPageToken', nextPageToken)
+            // Vue.set(group.reactiveGroup, 'prevPageToken', prevPageToken)
+            // Vue.set(group.reactiveGroup, 'currentPageToken', currentPageToken)
+            group.reactiveGroup.figuresAbsolute = figuresAbsolute
+            group.reactiveGroup.thumbUrl = thumbUrl
+            group.reactiveGroup.nextPageToken = nextPageToken
+            group.reactiveGroup.prevPageToken = prevPageToken
+            group.reactiveGroup.currentPageToken = currentPageToken
+
             await group.upsertPaginationPage(items, 'whole')
             await group.next(nextSize) // сразу грузим элементы в группе
             return group.reactiveGroup
@@ -1041,7 +1036,8 @@ class Group {
    setProperty (name, value) {
       let groupData = this.propsReactive[this.reactiveGroup.id] || {}
       groupData[name] = value
-      Vue.set(this.propsReactive, this.reactiveGroup.id, groupData)
+      // Vue.set(this.propsReactive, this.reactiveGroup.id, groupData)
+      this.propsReactive[this.reactiveGroup.id] = groupData
       if (name === 'currentId' && value) {
          let localIndx = this.findIndx(value) // индекс элемента в текущих страницах
          this.setProperty('currentAbsoluteIndx', this.getAbsoluteIndex(localIndx)) // индекс с учетом серверной пагинации
