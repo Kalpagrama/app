@@ -53,7 +53,7 @@ div(
                     objectFit: 'contain',
                     borderRadius: '20px',
                   }`)
-                q-btn(flat dense no-caps color="white" :style=`{position: "absolute"}` @click="$refs.inputThumb.click()").fit.br-20
+                div(flat dense no-caps color="white" :style=`{position: "absolute"}` @click="$refs.inputThumb.click()").fit.br-20
               .row.full-width.items-start.content-start.justify-center
                 q-btn(
                   @click="$refs.inputThumb.click()"
@@ -339,17 +339,19 @@ export default {
     async save(){
       try {
         this.loading = true
-        if (this.nameChanged) await ObjectApi.update(this.content.oid, 'name', this.contentCopy.name)
-        if (this.descriptionChanged) await ObjectApi.update(this.content.oid, 'description', this.contentCopy.description)
-        if (this.priceChanged) await ObjectApi.update(this.content.oid, 'payInfo.price', this.contentCopy.payInfo.price)
-        if (this.thumbUrlChanged) {
-          assert(this.fileThumb)
-          await ObjectApi.update(this.content.oid, 'thumb', this.fileThumb)
-        }
-        if (this.previewUrlChanged) {
-          assert(this.filePreview)
-          await ObjectApi.update(this.content.oid, 'preview', this.filePreview)
-        }
+        let name, description, price, fileThumb, filePreview
+
+        if (this.nameChanged) name = this.contentCopy.name
+        if (this.descriptionChanged) description = this.contentCopy.description
+        if (this.priceChanged) price = this.contentCopy.payInfo.price
+        if (this.thumbUrlChanged) fileThumb = this.fileThumb
+        if (this.previewUrlChanged) filePreview = this.filePreview
+
+        if (name !== undefined) await ObjectApi.update(this.content.oid, 'name', name)
+        if (description !== undefined) await ObjectApi.update(this.content.oid, 'description', description)
+        if (price !== undefined) await ObjectApi.update(this.content.oid, 'payInfo.price', price)
+        if (fileThumb !== undefined) await ObjectApi.update(this.content.oid, 'thumb', fileThumb)
+        if (filePreview !== undefined) await ObjectApi.update(this.content.oid, 'preview', filePreview)
         this.$emit('close')
       } finally {
         this.loading = false
@@ -376,7 +378,6 @@ export default {
   },
   async mounted() {
     this.$log('mounted', this.contentOid)
-    // await this.$wait(3000)
     let { items: [bookmark] } = await this.$rxdb.find({
       selector: {
         rxCollectionEnum: RxCollectionEnum.WS_CONTENT,

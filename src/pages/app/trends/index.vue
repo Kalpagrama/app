@@ -28,7 +28,7 @@ kalpa-layout
             template(v-slot:append)
               //q-btn(round flat dense color="white" icon="clear" @click="pageInfo.searchString = '', pageInfo.searchInputState = 'enabled'" ).q-mr-md
           // горизонтальная полоса
-          span.text-grey-5.text-h5.q-py-sm.q-pl-sm {{$t('Популярные смыслы')}}
+          span.text-grey-5.text-h6.q-py-sm.q-pl-sm {{$t('Популярные смыслы')}}
           list-feed-custom-horizontalPPV(
             ref="listFeed"
             :scrollAreaWidth="$store.state.ui.pageWidth"
@@ -57,7 +57,7 @@ kalpa-layout
                       span.text-grey-5.text-h6 {{item.name}}
                     //.row.full-width.justify-center.q-pt-sm
                       q-skeleton(type='text' width='50%' :animation="queryInProgress ? 'wave' : 'none'" dark)
-          span.text-grey-5.text-h5.q-py-sm.q-pl-sm {{$t('Категории')}}
+          span.text-grey-5.text-h6.q-py-sm.q-pl-sm {{$t('Категории')}}
           .row.full-width
             div(v-for="(c, ix) in $store.getters.nodeCategories").col-6.q-pa-xs
               q-responsive(:ratio="1.618" :style=`{overflow: 'hidden', borderRadius: '', position: 'relative'}`).full-width.br-10.relative-position

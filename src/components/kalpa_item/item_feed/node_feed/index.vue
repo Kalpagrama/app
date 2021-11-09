@@ -175,7 +175,6 @@ export default {
       return this.$store.getters.nodeCategories.find(c => c.type === this.node.category)
     },
     fontSize () {
-      this.$logW('data.nodeWidth', this.data.nodeWidth)
       let l = this.node.name.length
       if (l < 20) return 22
       else if (l < 30) return 20

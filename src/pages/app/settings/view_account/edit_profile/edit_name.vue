@@ -5,11 +5,12 @@ div(
   }`
   ).row.full-width.q-px-xs
   .row.full-width.q-pl-sm
-    small.text-grey-6 {{$t('Pick name')}}
+    small.text-grey-6 {{$t('Ваше имя')}}
   q-input(
     v-model="name"
     dark color="white"
     borderless
+    maxlength="32"
     placeholder="Как вас зовут"
     :debounce="500"
     :input-style=`{
@@ -29,11 +30,11 @@ import { ObjectApi } from 'src/api/object'
 
 export default {
   name: 'editName',
-  props: ['currentUser'],
+  props: ['currentUser', 'initialName'],
   data () {
     return {
       locked: false,
-      name: this.currentUser.name || ''
+      name: this.initialName !== undefined ? this.initialName : this.currentUser.name || ''
     }
   },
   watch: {
@@ -42,13 +43,14 @@ export default {
         // if (this.locked) return
         this.$log('status TO', to)
         this.save()
+        if (this.name.length) this.$emit('name', this.name)
       }
     }
   },
   methods: {
     async save () {
       this.$log('save')
-      await ObjectApi.update(this.currentUser.oid, 'profile.name', this.name)
+      if (this.name.length) await ObjectApi.update(this.currentUser.oid, 'profile.name', this.name)
     }
   },
   async mounted () {

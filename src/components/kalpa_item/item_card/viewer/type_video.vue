@@ -1,6 +1,19 @@
 <template lang="pug">
 .row.full-width.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+    //div(
+    //  :style=`{
+    //            maxWidth: $store.state.ui.pageWidth+'px',
+    //            borderRadius: '10px',
+    //          }`).row.full-width.items-center.content-center.q-pa-sm.b-30
+    //  q-btn(@click="$routerKalpa.back()" flat round color="white" icon="west" no-caps)
+    //  .col
+    //  h1.text-white.text-bold {{$t('Превью')}}
+    //  .col
+    //  //- tutorial
+    //  q-btn(
+    //    @click=""
+    //    round flat color="white" icon="fas fa-info" :style=`{opacity:'0'}`)
     div(
       :style=`{
       position: 'relative',
@@ -12,7 +25,7 @@
       q-resize-observer(@resize="bottomHeight = $q.screen.height - $event.height")
       // видео
       .row.full-width
-        div(:style=`{overflow: $q.screen.lt.md ? 'visible' : 'hidden',  borderRadius: '10px',}`).row.full-width.relative-position
+        div(:style=`{overflow: $q.screen.lt.md ? 'visible' : 'hidden',  borderRadius: '10px', maxHeight: '400px'}`).row.full-width.relative-position
           img(
             :src="item.thumbUrl"
             :style=`{

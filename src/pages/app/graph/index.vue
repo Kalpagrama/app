@@ -27,7 +27,7 @@ kalpa-layout()
             @click=""
             round flat color="white" icon="fas fa-info" :style=`{opacity:'0'}`)
           //q-btn(
-          //  @click="$store.commit('ui/stateSet', ['kalpaTutorial', {id: 'node_first', useIntro: false, useProfileEditor: false}])"
+          //  @click=""
           //  round flat color="white" icon="fas fa-info")
       //- body
       div(

@@ -24,6 +24,7 @@ export default {
     onSuccess () {
       this.$log('onSuccess')
       this.$emit('close')
+      this.$eventBus.$emit('notice-check', 'initial_settings')
     }
   },
   mounted() {
