@@ -55,7 +55,7 @@ export default {
   },
   data() {
     return {
-      kalpaInitialSetupShow: true,
+      kalpaInitialSetupShow: false,
       kalpaTutorialShow: false,
       noticeName: null
     }

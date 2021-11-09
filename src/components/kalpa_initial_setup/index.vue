@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.justify-center.items-center.content-center
+div(:style=`{backgroundColor: $q.screen.xs ? 'rgb(29,29,29)' : ''}`).row.full-width.justify-center.items-center.content-center
   q-stepper(
     v-model="step"
     ref="stepper"
@@ -11,7 +11,12 @@
     inactive-color="grey"
     color="green"
     flat
-  ).br-20
+      :style=`{
+        borderRadius: $q.screen.xs ? '0px' : '20px',
+        height: $q.screen.xs ? '100%' : '600px',
+        width: $q.screen.xs ? '100%' : '400px',
+        paddingTop: $q.screen.xs ? '0px' : '0px'
+      }`).relative-position
     q-step(
       :name="1"
       active-icon="fas fa-user-edit"
@@ -22,10 +27,10 @@
       :done="done['1'] && !!name").row.full-width.content-center.items-center.justify-center
       .row.full-width.content-center.items-center.justify-center
         div(:style=`{
-          maxHeight: '350px',
-          height: '350px',
-          maxWidth: '350px',
-          width: '350px'}`)
+            maxHeight: $q.screen.xs ? '55vh' : '350px',
+            height: $q.screen.xs ? '55vh' : '350px',
+            maxWidth: '300px',
+            width: '300px'}`)
           edit-avatar(:currentUser="$store.getters.currentUser")
           edit-name(:initialName="name" :currentUser="$store.getters.currentUser" @name="name = $event")
             //edit-profile(:currentUser="currentUser")
@@ -34,11 +39,12 @@
       :title="$t('Пароль')"
       icon="fas fa-key"
       active-icon="fas fa-key"
+        done-icon="fas fa-key"
       :done="done['2']")
       .row.full-width.content-center.items-center.justify-center
         div(:style=`{
-          maxHeight: '350px',
-          height: '350px',
+            maxHeight: $q.screen.xs ? '55vh' : '350px',
+            height: $q.screen.xs ? '55vh' : '350px',
           maxWidth: '350px',
           width: '350px'}`)
           edit-password(
@@ -48,13 +54,14 @@
     q-step(
       :name="3"
       :title="$t('Интересы')"
-      icon="add"
-      active-icon="add"
+        icon="fas fa-plus"
+        active-icon="fas fa-plus"
+        done-icon="fas fa-plus"
       :done="done['4']")
-      .row.full-width
+      .row.full-width.justify-center
         div(:style=`{
-          maxHeight: '350px',
-          height: '350px',
+            maxHeight: $q.screen.xs ? '55vh' : '350px',
+            height: $q.screen.xs ? '55vh' : '350px',
           maxWidth: '350px',
           width: '350px'}`)
           .row.full-width
@@ -67,7 +74,7 @@
                     // opacity: 0.2,
                     objectFit: 'cover',
                     borderRadius: '10px'}`)
-                div(:style=`{background: 'rgba(0,0,0,0.2)'}` @click="c.checked=true").absolute-full.row.content-end.items-end.justify-center.cursor-pointer
+                div(:style=`{background: 'rgba(0,0,0,0.2)'}` @click="c.checked=!c.checked").absolute-full.row.content-end.items-end.justify-center.cursor-pointer
                   div(v-if="c.type !== 'SYMPOSIUM'").row.q-pb-none
                     span(v-if="$q.screen.lt.md" :style=`{fontSize: '16px', textShadow: '2px 2px 2px '+$getPaletteColor('grey-10')}`).text-grey-1.text-bold.text-center {{c.alias}}
                     span(v-else :style=`{fontSize: '15px', textShadow: '2px 2px 2px '+$getPaletteColor('grey-10')}`).text-grey-1.text-bold.text-center {{c.alias}}
@@ -78,14 +85,15 @@
                   unchecked-icon="clear"
                   ).absolute-top-left.q-pa-xs
     template(v-slot:navigation)
-      q-stepper-navigation
-        .row.full-width.justify-end.items-center.content-center.q-pt-sm
-          q-btn(v-if="hasPrev" flat color="grey" @click="prev" :label="$t('Back', 'Назад')" class="q-ml-sm")
+      q-stepper-navigation.absolute-bottom
+        .row.full-width.justify-end.items-center.content-center
+          q-btn(v-if="hasPrev" flat color="grey" :ripple="false" @click="prev" :label="$t('Back', 'Назад')")
           q-btn(@click="next()" :disable="!name" outline color="green-8" :label="hasNext ? $t('Continue', 'Продолжить') : $t('Finish', 'Готово')")
     template(v-slot:message)
       q-banner(v-if="step === 1").text-white.text-center.b-50 {{$t('Введите ваше имя и добавьте фото')}}
       q-banner(v-if="step === 2").text-white.text-center.b-50 {{$t('Укажите постоянный пароль (необязательно)')}}
       q-banner(v-if="step === 3").text-white.text-center.b-50 {{$t('Подпишитесь на то, что Вам интересно')}}
+
 </template>
 
 <script>
