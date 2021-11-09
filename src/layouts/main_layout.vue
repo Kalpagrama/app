@@ -1,44 +1,44 @@
 <template lang="pug">
-  q-layout(
-    view="lHh lpR lFf"
-    :container="false")
-    q-dialog(
-      v-model="authGuardShow"
-      maximized)
-      kalpa-auth-guard(@close="authGuardShow = null" :message="$store.state.ui.authGuard ? $store.state.ui.authGuard.message : ''")
-    q-dialog(
-      v-model="kalpaTutorialShow"
-      maximized
-      position="bottom")
-      kalpa-tutorial(
-        :tutorialId="noticeName"
-        @close="kalpaTutorialShow = null")
-    q-dialog(
-      v-model="kalpaInitialSetupShow"
-      maximized
-      persistent
-      position="standard")
-      kalpa-initial-setup(
-        @close="kalpaInitialSetupShow = null")
-    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      div(
-        v-if="$q.screen.gt.sm && $store.state.ui.desktopNavigationShow"
+q-layout(
+  view="lHh lpR lFf"
+  :container="false")
+  q-dialog(
+    v-model="authGuardShow"
+    maximized)
+    kalpa-auth-guard(@close="authGuardShow = null" :message="$store.state.ui.authGuard ? $store.state.ui.authGuard.message : ''")
+  q-dialog(
+    v-model="kalpaTutorialShow"
+    maximized
+    position="bottom")
+    kalpa-tutorial(
+      :tutorialId="noticeName"
+      @close="kalpaTutorialShow = null")
+  q-dialog(
+    v-model="kalpaInitialSetupShow"
+    maximized
+    persistent
+    position="standard")
+    kalpa-initial-setup(
+      @close="kalpaInitialSetupShow = null")
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="$q.screen.gt.sm && $store.state.ui.desktopNavigationShow"
+      :style=`{
+      position: 'fixed', zIndex: 3000, left: '0px', top: '0px',
+      maxWidth: ($q.screen.width - $store.state.ui.pageWidth) / 2 + 'px',
+    }`).row.fit.items-start.content-start.justify-end.q-pa-sm
+      kalpa-menu(
+        :mini="($q.screen.width - $store.state.ui.pageWidth) / 2 < 280"
         :style=`{
-        position: 'fixed', zIndex: 3000, left: '0px', top: '0px',
-        maxWidth: ($q.screen.width - $store.state.ui.pageWidth) / 2 + 'px',
-      }`).row.fit.items-start.content-start.justify-end.q-pa-sm
-        kalpa-menu(
-          :mini="($q.screen.width - $store.state.ui.pageWidth) / 2 < 280"
-          :style=`{
-          borderRadius: '10px',
-          maxWidth: ($q.screen.width - $store.state.ui.pageWidth) / 2 < 280 ? '60px' : '280px',
-        }`).fit
-    //- mobile menu navigation
-    //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      q-footer(v-if="$q.screen.lt.md && $store.state.ui.mobileNavigationShow")
-        kalpa-menu-mobile
-    q-page-container
-      router-view(v-if="$store.getters.nodeCategories.length > 0")
+        borderRadius: '10px',
+        maxWidth: ($q.screen.width - $store.state.ui.pageWidth) / 2 < 280 ? '60px' : '280px',
+      }`).fit
+  //- mobile menu navigation
+  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    q-footer(v-if="$q.screen.lt.md && $store.state.ui.mobileNavigationShow")
+      kalpa-menu-mobile
+  q-page-container
+    router-view(v-if="$store.getters.nodeCategories.length > 0")
 </template>
 
 <script>

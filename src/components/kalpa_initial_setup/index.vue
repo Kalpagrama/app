@@ -1,92 +1,91 @@
 <template lang="pug">
-  .row.full-width.justify-center.items-center.content-center
-    q-stepper(
-      v-model="step"
-      ref="stepper"
-      dark swipeable
-      animated alternative-labels
-      :contracted="true"
-      done-color="green"
-      active-color="white"
-      inactive-color="grey"
-      color="green"
-      flat
-    ).br-20
-      q-step(
-        :name="1"
-        active-icon="fas fa-user-edit"
-        :title="$t('Имя')"
-        done-icon="fas fa-user-edit"
-        done-color="green-8"
-        icon="fas fa-user-edit"
-        :done="done['1'] && !!name").row.full-width.content-center.items-center.justify-center
-        .row.full-width.content-center.items-center.justify-center
-          div(:style=`{
-            maxHeight: '350px',
-            height: '350px',
-            maxWidth: '350px',
-            width: '350px'}`)
-            edit-avatar(:currentUser="$store.getters.currentUser")
-            edit-name(:initialName="name" :currentUser="$store.getters.currentUser" @name="name = $event")
-              //edit-profile(:currentUser="currentUser")
-      q-step(
-        :name="2"
-        :title="$t('Пароль')"
-        icon="fas fa-key"
-        active-icon="fas fa-key"
-        :done="done['2']")
-        .row.full-width.content-center.items-center.justify-center
-          div(:style=`{
-            maxHeight: '350px',
-            height: '350px',
-            maxWidth: '350px',
-            width: '350px'}`)
-            edit-password(
-              :currentUser="$store.getters.currentUser"
-              :fold="false"
-              :header="false")
-      q-step(
-        :name="3"
-        :title="$t('Интересы')"
-        icon="add"
-        active-icon="add"
-        :done="done['4']")
-        .row.full-width
-          div(:style=`{
-            maxHeight: '350px',
-            height: '350px',
-            maxWidth: '350px',
-            width: '350px'}`)
-            .row.full-width
-              div(v-for="(c, ix) in categories").col-6.q-pa-xs
-                q-responsive(:ratio="1.618" :style=`{overflow: 'hidden', borderRadius: '', position: 'relative'}`).full-width.br-10.relative-position
-                  img(
-                    :src="c.icon"
-                    :style=`{
-                      // height: '60px',
-                      // opacity: 0.2,
-                      objectFit: 'cover',
-                      borderRadius: '10px'}`)
-                  div(:style=`{background: 'rgba(0,0,0,0.2)'}` @click="c.checked=true").absolute-full.row.content-end.items-end.justify-center.cursor-pointer
-                    div(v-if="c.type !== 'SYMPOSIUM'").row.q-pb-none
-                      span(v-if="$q.screen.lt.md" :style=`{fontSize: '16px', textShadow: '2px 2px 2px '+$getPaletteColor('grey-10')}`).text-grey-1.text-bold.text-center {{c.alias}}
-                      span(v-else :style=`{fontSize: '15px', textShadow: '2px 2px 2px '+$getPaletteColor('grey-10')}`).text-grey-1.text-bold.text-center {{c.alias}}
-                    q-toggle(
-                      v-model="c.checked"
-                      checked-icon="check"
-                      color="green" dense
-                    unchecked-icon="clear"
-                    ).absolute-top-left.q-pa-xs
-      template(v-slot:navigation)
-        q-stepper-navigation
-          .row.full-width.justify-end.items-center.content-center.q-pt-sm
-            q-btn(v-if="hasPrev" flat color="grey" @click="prev" :label="$t('Back', 'Назад')" class="q-ml-sm")
-            q-btn(@click="next()" :disable="!name" outline color="green-8" :label="hasNext ? $t('Continue', 'Продолжить') : $t('Finish', 'Готово')")
-      template(v-slot:message)
-        q-banner(v-if="step === 1").text-white.text-center.b-50 {{$t('Введите ваше имя и добавьте фото')}}
-        q-banner(v-if="step === 2").text-white.text-center.b-50 {{$t('Укажите постоянный пароль (необязательно)')}}
-        q-banner(v-if="step === 3").text-white.text-center.b-50 {{$t('Подпишитесь на то, что Вам интересно')}}
-
+.row.full-width.justify-center.items-center.content-center
+  q-stepper(
+    v-model="step"
+    ref="stepper"
+    dark swipeable
+    animated alternative-labels
+    :contracted="true"
+    done-color="green"
+    active-color="white"
+    inactive-color="grey"
+    color="green"
+    flat
+  ).br-20
+    q-step(
+      :name="1"
+      active-icon="fas fa-user-edit"
+      :title="$t('Имя')"
+      done-icon="fas fa-user-edit"
+      done-color="green-8"
+      icon="fas fa-user-edit"
+      :done="done['1'] && !!name").row.full-width.content-center.items-center.justify-center
+      .row.full-width.content-center.items-center.justify-center
+        div(:style=`{
+          maxHeight: '350px',
+          height: '350px',
+          maxWidth: '350px',
+          width: '350px'}`)
+          edit-avatar(:currentUser="$store.getters.currentUser")
+          edit-name(:initialName="name" :currentUser="$store.getters.currentUser" @name="name = $event")
+            //edit-profile(:currentUser="currentUser")
+    q-step(
+      :name="2"
+      :title="$t('Пароль')"
+      icon="fas fa-key"
+      active-icon="fas fa-key"
+      :done="done['2']")
+      .row.full-width.content-center.items-center.justify-center
+        div(:style=`{
+          maxHeight: '350px',
+          height: '350px',
+          maxWidth: '350px',
+          width: '350px'}`)
+          edit-password(
+            :currentUser="$store.getters.currentUser"
+            :fold="false"
+            :header="false")
+    q-step(
+      :name="3"
+      :title="$t('Интересы')"
+      icon="add"
+      active-icon="add"
+      :done="done['4']")
+      .row.full-width
+        div(:style=`{
+          maxHeight: '350px',
+          height: '350px',
+          maxWidth: '350px',
+          width: '350px'}`)
+          .row.full-width
+            div(v-for="(c, ix) in categories").col-6.q-pa-xs
+              q-responsive(:ratio="1.618" :style=`{overflow: 'hidden', borderRadius: '', position: 'relative'}`).full-width.br-10.relative-position
+                img(
+                  :src="c.icon"
+                  :style=`{
+                    // height: '60px',
+                    // opacity: 0.2,
+                    objectFit: 'cover',
+                    borderRadius: '10px'}`)
+                div(:style=`{background: 'rgba(0,0,0,0.2)'}` @click="c.checked=true").absolute-full.row.content-end.items-end.justify-center.cursor-pointer
+                  div(v-if="c.type !== 'SYMPOSIUM'").row.q-pb-none
+                    span(v-if="$q.screen.lt.md" :style=`{fontSize: '16px', textShadow: '2px 2px 2px '+$getPaletteColor('grey-10')}`).text-grey-1.text-bold.text-center {{c.alias}}
+                    span(v-else :style=`{fontSize: '15px', textShadow: '2px 2px 2px '+$getPaletteColor('grey-10')}`).text-grey-1.text-bold.text-center {{c.alias}}
+                  q-toggle(
+                    v-model="c.checked"
+                    checked-icon="check"
+                    color="green" dense
+                  unchecked-icon="clear"
+                  ).absolute-top-left.q-pa-xs
+    template(v-slot:navigation)
+      q-stepper-navigation
+        .row.full-width.justify-end.items-center.content-center.q-pt-sm
+          q-btn(v-if="hasPrev" flat color="grey" @click="prev" :label="$t('Back', 'Назад')" class="q-ml-sm")
+          q-btn(@click="next()" :disable="!name" outline color="green-8" :label="hasNext ? $t('Continue', 'Продолжить') : $t('Finish', 'Готово')")
+    template(v-slot:message)
+      q-banner(v-if="step === 1").text-white.text-center.b-50 {{$t('Введите ваше имя и добавьте фото')}}
+      q-banner(v-if="step === 2").text-white.text-center.b-50 {{$t('Укажите постоянный пароль (необязательно)')}}
+      q-banner(v-if="step === 3").text-white.text-center.b-50 {{$t('Подпишитесь на то, что Вам интересно')}}
 </template>
 
 <script>

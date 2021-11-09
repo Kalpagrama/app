@@ -126,8 +126,10 @@ const routes = [
    },
    {
       path: '/',
+      // redirect: startPage(),
       component: () => import('src/layouts/main_layout'),
       children: [
+         { name: 'root', path: '', redirect: startPage() },
          {
             name: 'about',
             path: 'about',
@@ -275,7 +277,7 @@ const routes = [
          },
          {
             name: 'trends',
-            path: 'trends/',
+            path: 'trends',
             component: () => import('src/pages/app/trends/index.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
@@ -379,16 +381,12 @@ const routes = [
                   component: () => import('src/pages/app/workspace/page_create/index.vue')
                }
             ]
-         },
-         {
-            name: 'fallback',
-            path: '/:catchAll(.*)*',
-            redirect: startPage()
          }
       ],
       meta: { roleMinimal: 'GUEST' },
       beforeEnter: async (to, from, next) => {
-         // logD('router :: try systemInit...')
+         alert('router / beforeEnter...' + to.path)
+         logD('router / beforeEnter...', to, from)
          await systemInit() // для гостей тоже надо входить (если уже войдено - ничего не сделает)
          return next()
       }
@@ -399,7 +397,7 @@ const routes = [
 routes.push({
    name: 'fallback',
    path: '/:catchAll(.*)*',
-   redirect: startPage()
+   component: () => import('src/pages/Error404.vue'),
 })
 
 // на эту регулярку опирается сервисворкер, когда отдает index.html вместо vue route. нужно чтобы все роуты ей соответствовали
@@ -408,6 +406,7 @@ for (let route of routes) {
    assert(route.path, '!route.path')
    if (route.children) {
       for (let cr of route.children) {
+         if (!cr.path) continue
          assert(cr.path, '!cr.path' + JSON.stringify(cr))
          let path = (route.path + '/' + cr.path).split('/').filter(p => p)[0]
          assert(path, '!path')

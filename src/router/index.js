@@ -20,6 +20,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.ROUTER)
  */
 
 export default route(function ({ app, store, ssrContext, urlPath, publicPath, redirect }) {
+  // alert('process.env.VUE_ROUTER_MODE:' + process.env.VUE_ROUTER_MODE)
   const createHistory = process.env.SERVER
      ? createMemoryHistory
      : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory)
@@ -53,8 +54,8 @@ export default route(function ({ app, store, ssrContext, urlPath, publicPath, re
     }
     if (redirectUrl) return next(redirectUrl)
     if (!AuthApi.userMatchMinimalRole(to.meta.roleMinimal || 'GUEST')) {
-      store.commit('ui/stateSet', ['authGuard', { message: t('Для перехода на эту страницу нужно войти...') }])
       logD('router::need more privileges')
+      store.commit('ui/stateSet', ['authGuard', { message: t('Для перехода на эту страницу нужно войти...') }])
       return next(false)
     } else {
       return next()

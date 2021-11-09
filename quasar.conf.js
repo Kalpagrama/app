@@ -92,10 +92,9 @@ module.exports = configure(function (ctx) {
         BUILD_VERSION: require('./package.json').version
       },
       vueRouterMode: 'history', // available values: 'hash', 'history'
+      publicPath: '/',
       // vueCompiler: true, // -- Если нужно компилировать шаблоны на клиенте (например, передаёте строку в опцию template...
       // transpile: false,
-      // publicPath: '/',
-
       // Add dependencies for transpiling with Babel (Array of string/regex)
       // (from node_modules, which are by default not transpiled).
       // Applies only if "transpile" is set to true.

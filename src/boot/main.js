@@ -121,12 +121,12 @@ export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath,
       let goLast = null
       app.config.globalProperties.$go = function (to) {
          if (isEqual(goLast, to)) {
-            console.log('$go DUPLICATE')
-            this.$router.push(to).catch(e => e)
+            console.log('$go DUPLICATE', to)
+            VueRouter.push(to).catch(e => this.$log('error on route go1', e)).then(() => this.$log('JRJRJR'))
          } else {
-            this.$log('$go FRESH', to, goLast)
+            this.$log('$go FIRST TIME', to, goLast)
             goLast = to
-            this.$router.push(to).catch(e => e)
+            VueRouter.push(to).catch(e => this.$log('error on route go2', e))
          }
       }
       // app.config.globalProperties.$goDrop = function () {
