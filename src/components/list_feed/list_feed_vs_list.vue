@@ -40,7 +40,7 @@ import { assert } from 'src/system/common/utils'
 import VirtualList from 'vue-virtual-scroll-list'
 import cloneDeep from 'lodash/cloneDeep'
 
-const { getScrollTarget, getScrollPosition, setScrollPosition, getScrollHeight } = scroll
+const { getScrollTarget, getVerticalScrollPosition, setVerticalScrollPosition, getScrollHeight } = scroll
 
 export default {
   name: 'listFeedVirtualScroll',

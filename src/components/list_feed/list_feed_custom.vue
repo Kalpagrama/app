@@ -179,7 +179,7 @@ import { scroll } from 'quasar'
 import { LstCollectionEnum, WsCollectionEnum } from 'src/system/rxdb/common'
 import { assert } from 'src/system/common/utils'
 
-const { getScrollTarget, getScrollPosition, setScrollPosition, getScrollHeight } = scroll
+const { getScrollTarget, getVerticalScrollPosition, setVerticalScrollPosition, getScrollHeight } = scroll
 // import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
 
 export default {
@@ -324,8 +324,8 @@ export default {
                   let diff = heightTo - heightFrom
                   if (diff) {
                     this.$log('onResize item', itemIndex, 'diff=', diff)
-                    this.$log('getScrollPosition', getScrollPosition(this.scrollTarget))
-                    // setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) + diff)
+                    this.$log('getVerticalScrollPosition', getVerticalScrollPosition(this.scrollTarget))
+                    // setVerticalScrollPosition(this.scrollTarget, getVerticalScrollPosition(this.scrollTarget) + diff)
                   }
                 }
               }
@@ -397,10 +397,10 @@ export default {
           // just scroll to item
           this.itemMiddle.ref.scrollIntoView()
           // add itemMiddle.top position
-          setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - this.itemMiddle.top)
+          setVerticalScrollPosition(this.scrollTarget, getVerticalScrollPosition(this.scrollTarget) - this.itemMiddle.top)
         } else {
           // get window scrollTop before
-          let windowScrollTopBefore = getScrollPosition(window)
+          let windowScrollTopBefore = getVerticalScrollPosition(window)
           this.$log('windowScrollTopBefore', windowScrollTopBefore)
           // block scrolles
           // disableBodyScroll(this.scrollTarget)
@@ -410,12 +410,12 @@ export default {
           // unblock scrolles
           // enableBodyScroll(this.scrollTarget)
           // get window scrollTop before
-          let windowScrollTopAfter = getScrollPosition(window)
+          let windowScrollTopAfter = getVerticalScrollPosition(window)
           this.$log('windowScrollTopAfter', windowScrollTopAfter)
           // return window scrollTop if
-          setScrollPosition(window, windowScrollTopBefore)
+          setVerticalScrollPosition(window, windowScrollTopBefore)
           // add itemMiddle.top position
-          setScrollPosition(this.scrollTarget, getScrollPosition(this.scrollTarget) - this.itemMiddle.top)
+          setVerticalScrollPosition(this.scrollTarget, getVerticalScrollPosition(this.scrollTarget) - this.itemMiddle.top)
         }
       }
       const scrollWithOffsetTop = () => {
@@ -427,14 +427,14 @@ export default {
         this.$log('imsiv top', top)
         let scrollPosition = offsetTop - offsetTopScrollTarget - top
         this.$log('imsiv scrollPosition', scrollPosition)
-        setScrollPosition(this.scrollTarget, scrollPosition)
+        setVerticalScrollPosition(this.scrollTarget, scrollPosition)
       }
       if (this.itemMiddle) {
         scrollWithScrollIntoView()
         this.$log('imsiv done')
       } else {
         this.$log('imsiv itemMiddle NOT FOUND, failed, go to TOP')
-        setScrollPosition(this.scrollTarget, 0)
+        setVerticalScrollPosition(this.scrollTarget, 0)
       }
     },
     itemMiddleHandler (isVisible, entry) {
@@ -492,13 +492,13 @@ export default {
       this.$log('scrollToStart')
       this.itemMiddleHistory.splice(0, this.itemMiddleHistory.length)
       await this.itemsRes.gotoStart()
-      setScrollPosition(this.scrollTarget, 0)
+      setVerticalScrollPosition(this.scrollTarget, 0)
     },
     async scrollToEnd () {
       this.$log('scrollToEnd')
       this.itemMiddleHistory.splice(0, this.itemMiddleHistory.length)
       await this.itemsRes.gotoEnd()
-      setScrollPosition(this.scrollTarget, 0)
+      setVerticalScrollPosition(this.scrollTarget, 0)
     },
     async prev () {
       if (!this.itemsRes) return
@@ -539,7 +539,7 @@ export default {
     scrollUpdate (e) {
       if (this.scrollTarget?.document?.activeElement?.className?.includes('q-body--prevent-scroll')) return // поверх списка показали диалог не нужно обновлять scrollTop(иначе улетит вверх)
       this.scrolledItemsHeight = this.$refs.scrolledItems.clientHeight // обновится чуть позже в scrollResized (а сейчас scrolledItemsHeight - в неактуальном состоянии. берем актуальные данные)
-      this.scrollTop = getScrollPosition(this.scrollTarget)
+      this.scrollTop = getVerticalScrollPosition(this.scrollTarget)
       this.scrollBottom = this.scrolledItemsHeight - this.scrollTargetHeight - this.scrollTop
       this.emitShowHeader(this.scrollTop)
     },

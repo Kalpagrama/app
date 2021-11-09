@@ -5,7 +5,7 @@ router-view(v-if="$store.getters.nodeCategories.length > 0")
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { scroll } from 'quasar'
-const { getScrollTarget, getScrollPosition, setScrollPosition, getScrollHeight } = scroll
+const { getScrollTarget, getVerticalScrollPosition, setVerticalScrollPosition, getScrollHeight } = scroll
 
 export default {
   name: 'App',
@@ -24,7 +24,7 @@ export default {
             // let i = setInterval(() => {
             //   e.target.scrollIntoView()
             //   const scrollPosition = getScrollPosition(scrollTarget)
-            //   setScrollPosition(scrollTarget, scrollPosition - 90)
+            //   setVerticalScrollPosition(scrollTarget, scrollPosition - 90)
             // }, 0)
             // this.$wait(600).then(() => {
             //   clearInterval(i)
