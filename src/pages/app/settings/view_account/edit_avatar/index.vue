@@ -74,7 +74,7 @@ export default {
   computed: {
     avatarSize () {
       if (this.$q.screen.width < 500) {
-        return this.$q.screen.width - 50
+        return this.$q.screen.width - 150
       }
       else {
         return 200
