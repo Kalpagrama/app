@@ -1,7 +1,7 @@
 import { assert, wait } from 'src/system/common/utils'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import { AppVisibility, Platform } from 'quasar'
-import Vue from 'vue'
+import { reactive, watch } from 'vue'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.MUTEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.MUTEX)
@@ -33,22 +33,12 @@ class MutexGlobal {
       { // leader detection
          // отслеживание открыта ли вкладка
          const thiz = this
-         let vm = new Vue({
-            data() {
-               return { appVisibility: AppVisibility }
-            },
-            watch: {
-               appVisibility: {
-                  deep: true,
-                  immediate: true,
-                  async handler (to, from) {
-                     assert(to, '!to!')
-                     // logD(`appVisibility changed! from:${from ? from.appVisible : false} to: ${to.appVisible}`)
-                     if (to && to.appVisible) thiz.setLeader()
-                  }
-               }
-            }
-         })
+         this.vm = reactive({ appVisibility: AppVisibility })
+         let unwatchFunc = watch(() => this.vm.appVisibility, (to, from) => {
+            assert(to, '!to!')
+            // logD(`appVisibility changed! from:${from ? from.appVisible : false} to: ${to.appVisible}`)
+            if (to && to.appVisible) thiz.setLeader()
+         }, {deep: true, immediate: true})
       }
       // подписываемся на изменение localStorage (Событие НЕ работает на вкладке, которая вносит изменения)
       // upd В сафари событие срабатывает и на вкладке, которая инициировала изменения
