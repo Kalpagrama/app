@@ -193,7 +193,8 @@ export default {
       // this.$log('itemShortOrFull to', to, this.isActive)
       this.cancelItemFull()
       this.cancelItemFullPreload()
-      this.itemState = {}
+      // this.itemState = {} // нельзя модифицировать проперти
+      for (let prop in this.itemState) delete this.itemState[prop]
     },
     isActive(to) {
       // this.$log('isActive to', to)

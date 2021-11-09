@@ -412,9 +412,8 @@ export default {
       if (this.itemActivePersist) this.itemsRes.setProperty('itemActiveIndx', indx)
       let itemRef = this.$refs[`item-${indx}`]
       let item = this.vsItems[indx]
-      assert(itemRef && itemRef[0])
+      assert(itemRef)
       assert(item)
-      itemRef = itemRef[0]
       this.itemActive = {
         indx: indx,
         ref: itemRef,

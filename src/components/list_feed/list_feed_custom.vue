@@ -305,7 +305,7 @@ export default {
           itemMiddle.item = this.itemsRes.itemsHeaderFooter.find(item => item[this.itemKey] === itemMiddle.key)
           // this.$log('ims item.name', item?.name)
           let itemRef = this.$refs[`item-${itemMiddle.key}`]
-          if (itemRef) itemMiddle.ref = itemRef[0]
+          if (itemRef) itemMiddle.ref = itemRef
         }
         this.itemMiddleHistory.splice(0, this.itemMiddleHistory.length, ...this.itemMiddleHistory.filter(im => !!im.item && !!im.ref)) // удаляем те, которых нет в новом списке
         this.itemMiddleTopUpdate()
@@ -463,8 +463,7 @@ export default {
       let item = this.itemsRes.itemsHeaderFooter[idx]
       // this.$log('ims item.name', item?.name)
       let itemRef = this.$refs[`item-${key}`]
-      if (itemRef && itemRef[0]) {
-        itemRef = itemRef[0]
+      if (itemRef) {
         this.itemMiddle = {
           key: key,
           // idx: idx -  можем и запоминать, но тогда надо будет синхронищировать в вотчере при изменении itemsRes
