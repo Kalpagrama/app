@@ -29,11 +29,13 @@ div(
                   borderRadius: '10px',
                 }`
                 )
-            .row.col-3.justify-end
-              .column
-                kalpa-menu-actions(icon="more_vert" dense color="grey-2" :title="contentKalpa.name" :actions="actions")
-                kalpa-save(:item="contentKalpa" dense :isActive="true" inactiveColor="white" color="grey-2")
-                kalpa-share(type="content" color="grey-2" :item="contentKalpa")
+            .row.col-3.justify-end.items-start.content-start
+              kalpa-menu-actions(icon="more_vert" dense color="grey-2" :title="contentKalpa.name" :actions="actions")
+              //.column.full-height
+              //  //kalpa-menu-actions(icon="more_vert" dense color="grey-2" :title="contentKalpa.name" :actions="actions")
+              //  //.col
+              //  //kalpa-save(:item="contentKalpa" dense :isActive="true" inactiveColor="white" color="grey-2")
+              //  kalpa-share(type="content" color="grey-2" :item="contentKalpa")
                 //q-btn(outline icon="share" @click="copyLink()" color="white").br
           .row.full-width.q-py-x
             span(:style=`{fontSize: '16px',}`).text-white.text-bold {{ contentKalpa.name }}
@@ -48,7 +50,7 @@ div(
               @click="goOriginal"
               align="left"
               outline color="grey-3" no-caps
-              :style=`{fontSize: '16px'}`)
+              :style=`{fontSize: '15px'}`)
               //- span.text-bold.text-grey-3 {{ 'Go to original' }}
               span.text-bold.text-grey-3 {{ $t('Источник') }}
               //- handle youtube
@@ -58,6 +60,7 @@ div(
               span(
                 v-if="contentKalpa.contentProvider === 'YOUTUBE'"
               ).text-bold.text-grey-3 YouTube
+            kalpa-save(:item="contentKalpa" dense :isActive="true" inactiveColor="white" color="grey-2").q-pl-md
           //- actions
           //.row.full-width.items-center.content-center
           //  kalpa-share(type="content" color="grey-2" :item="contentKalpa")
@@ -80,8 +83,8 @@ div(
           //    q-icon(name="help_outline" size="22px")
           //  kalpa-menu-actions(icon="more_vert" color="grey-2" :title="contentKalpa.name" :actions="actions")
           // description
-          .row.full-width.q-py-md
-            span(:style=`{fontSize: '14px',}`).text-white {{ contentKalpa.description }}
+          div(:style=`{maxWidth: $q.screen.width, overflow: 'hidden'}`).row.full-width.q-py-md
+            span(:style=`{fontSize: '14px', width: '100%'}`).text-white {{ contentKalpa.description }}
           .row.full-width.q-py-xs
             essence-spheres(
               v-if="showSpheres && itemState.spheres.length > 0"
