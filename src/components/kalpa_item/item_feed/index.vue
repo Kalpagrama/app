@@ -153,20 +153,20 @@ export default {
       immediate: false,
       async handler (to, from) {
         // this.$log('hasItemFull to', to)
-        if (process.env.NODE_ENV === 'development') {
-          // проверяем что во вложенных компонентах нет состояния (должны опираться только на props и itemState)
-          if (to) {
-            // this.$log(`hasItemFull=${to} #${this.itemIndex}`)
-            let checkChData = (parent) => {
-              if (!parent) return
-              assert(parent.$options.name.startsWith('Q') || Object.keys(parent.$data).length === 0, 'component ' + parent.$options.name + ' has data!!!' + ' data - запрещено! И во вложенных - тоже!!!')
-              for (let ch of parent.$children) {
-                checkChData(ch)
-              }
-            }
-            this.$nextTick(() => checkChData(this))
-          }
-        }
+        // if (process.env.NODE_ENV === 'development') {
+        //   // проверяем что во вложенных компонентах нет состояния (должны опираться только на props и itemState)
+        //   if (to) {
+        //     // this.$log(`hasItemFull=${to} #${this.itemIndex}`)
+        //     let checkChData = (parent) => {
+        //       if (!parent) return
+        //       assert(parent.$options.name.startsWith('Q') || Object.keys(parent.$data).length === 0, 'component ' + parent.$options.name + ' has data!!!' + ' data - запрещено! И во вложенных - тоже!!!')
+        //       for (let ch of parent.$children) {
+        //         checkChData(ch)
+        //       }
+        //     }
+        //     this.$nextTick(() => checkChData(this))
+        //   }
+        // }
       }
     },
     isVisible: {

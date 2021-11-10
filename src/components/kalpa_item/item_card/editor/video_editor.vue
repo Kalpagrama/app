@@ -87,8 +87,8 @@ div(
                   :ripple="false"
                   :label="$t('Удалить')"
                   :style=`{}`)
-    input(ref="inputThumb" type="file" @input="thumbChanged" :style=`{display: 'none',}`)
-    input(ref="inputPreview" type="file" @input="previewChanged" :style=`{display: 'none',}`)
+    input(ref="inputThumb" type="file" @update:modelValue="thumbChanged" :style=`{display: 'none',}`)
+    input(ref="inputPreview" type="file" @update:modelValue="previewChanged" :style=`{display: 'none',}`)
     //- form
     div(:style=`{
           paddingLeft: $q.screen.xs ? '0px' : '10px',
