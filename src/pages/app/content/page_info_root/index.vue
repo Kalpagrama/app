@@ -17,84 +17,81 @@ div(
         }`).row.full-width.items-start.content-start
         //- header
         .row.full-width
+          div(:class="$q.screen.xs ? 'q-pt-xs' : 'q-pt-md'").row.full-width
+            .col-9
+              img(
+                draggable="false"
+                :src="contentKalpa.thumbUrl"
+                :style=`{
+                  maxHeight: '160px',
+                  maxWidth: '100%',
+                  objectFit: 'cover',
+                  borderRadius: '10px',
+                }`
+                )
+            .row.col-3.justify-end
+              .column
+                kalpa-menu-actions(icon="more_vert" dense color="grey-2" :title="contentKalpa.name" :actions="actions")
+                kalpa-save(:item="contentKalpa" dense :isActive="true" inactiveColor="white" color="grey-2")
+                kalpa-share(type="content" color="grey-2" :item="contentKalpa")
+                //q-btn(outline icon="share" @click="copyLink()" color="white").br
+          .row.full-width.q-py-x
+            span(:style=`{fontSize: '16px',}`).text-white.text-bold {{ contentKalpa.name }}
+          //- stats
+          .row.full-width.q-pb-sm
+            small.text-grey-3 {{$t('Views')}}: {{ contentKalpa.countStat.countViews }}
+          //- origin
+          div(
+            v-if="!contentKalpa.contentProvider.in('KALPA', 'USER_DEVICE')"
+          ).row.full-width.items-center.content-center
+            q-btn(
+              @click="goOriginal"
+              align="left"
+              outline color="grey-3" no-caps
+              :style=`{fontSize: '16px'}`)
+              //- span.text-bold.text-grey-3 {{ 'Go to original' }}
+              span.text-bold.text-grey-3 {{ $t('Источник') }}
+              //- handle youtube
+              q-icon(
+                v-if="contentKalpa.contentProvider === 'YOUTUBE'"
+                name="fab fa-youtube" color="red" size="30px").q-mx-sm
+              span(
+                v-if="contentKalpa.contentProvider === 'YOUTUBE'"
+              ).text-bold.text-grey-3 YouTube
+          //- actions
+          //.row.full-width.items-center.content-center
+          //  kalpa-share(type="content" color="grey-2" :item="contentKalpa")
+          //  kalpa-save(:item="contentKalpa" :isActive="true" inactiveColor="white" color="grey-2").q-mx-xs
+          //  //- buy
+          //  //kalpa-pay(
+          //  //  v-if="contentKalpa"
+          //  //  :oid="contentKalpa.oid"
+          //  //  :type="contentKalpa.type"
+          //  //  :name="contentKalpa.name"
+          //  //  :thumbUrl="contentKalpa.thumbUrl"
+          //  //  :isActive="true"
+          //  //  inactiveColor="grey-3"
+          //  //  :fields=`{contentType: contentKalpa.type}`
+          //  //  @content="$event => $emit('content', $event)")
+          //  //- tutorial
+          //  q-btn(
+          //    @click=""
+          //    round flat color="white")
+          //    q-icon(name="help_outline" size="22px")
+          //  kalpa-menu-actions(icon="more_vert" color="grey-2" :title="contentKalpa.name" :actions="actions")
+          // description
           .row.full-width.q-py-md
-            img(
-              draggable="false"
-              :src="contentKalpa.thumbUrl"
-              :style=`{
-                height: '160px',
-                maxWidth: '120px',
-                objectFit: 'cover',
-                borderRadius: '10px',
-              }`
-              )
-          .row.full-width.q-py-md
-            span(:style=`{fontSize: '18px',}`).text-white.text-bold {{ contentKalpa.name }}
-          .row.full-width.q-py-md
-            span(:style=`{fontSize: '18px',}`).text-white.text-bold {{ contentKalpa.description }}
-          .row.full-width.q-py-md
+            span(:style=`{fontSize: '14px',}`).text-white {{ contentKalpa.description }}
+          .row.full-width.q-py-xs
             essence-spheres(
-              v-if="showSpheres && node.spheres.length > 0"
+              v-if="showSpheres && itemState.spheres.length > 0"
               :sphereOwner="contentKalpa"
               :itemState="data"
               :style=`{
                 order: 3,
-              }`).q-py-xs
-          //- stats
-          .row.full-width.q-pb-sm
-            span.text-grey-3.q-mr-xs {{$t('Views')}}: {{ contentKalpa.countStat.countViews }}
+              }`)
+          .row.full-width.q-pb-xs
             span.text-grey-3.q-mr-xs • {{ $date(contentKalpa.createdAt, 'DD.MM.YYYY') }}
-          //- origin
-          div(
-            v-if="!contentKalpa.contentProvider.in('KALPA', 'USER_DEVICE')"
-            ).row.full-width.items-center.content-center
-              q-btn(
-                @click="goOriginal"
-                align="left"
-                outline color="grey-3" no-caps
-                :style=`{
-                  fontSize: '16px'
-                }`)
-                //- span.text-bold.text-grey-3 {{ 'Go to original' }}
-                span.text-bold.text-grey-3 {{ $t('Go to original') }}
-                //- handle youtube
-                q-icon(
-                  v-if="contentKalpa.contentProvider === 'YOUTUBE'"
-                  name="fab fa-youtube" color="red" size="30px").q-mx-sm
-                span(
-                  v-if="contentKalpa.contentProvider === 'YOUTUBE'"
-                  ).text-bold.text-grey-3 YouTube
-          //- actions
-          .row.full-width.items-center.content-center
-            kalpa-share(type="content" color="grey-2" :item="contentKalpa")
-            kalpa-save(:item="contentKalpa" :isActive="true" inactiveColor="white" color="grey-2").q-mx-xs
-            //kalpa-bookmark(
-            //  v-if="contentKalpa"
-            //  :oid="contentKalpa.oid"
-            //  :type="contentKalpa.type"
-            //  :name="contentKalpa.name"
-            //  :thumbUrl="contentKalpa.thumbUrl"
-            //  :isActive="true"
-            //  inactiveColor="grey-3"
-            //  :fields=`{contentType: contentKalpa.type}`
-            //  @item="$event => $emit('item', $event)")
-            //- buy
-            kalpa-pay(
-              v-if="contentKalpa"
-              :oid="contentKalpa.oid"
-              :type="contentKalpa.type"
-              :name="contentKalpa.name"
-              :thumbUrl="contentKalpa.thumbUrl"
-              :isActive="true"
-              inactiveColor="grey-3"
-              :fields=`{contentType: contentKalpa.type}`
-              @content="$event => $emit('content', $event)")
-            //- tutorial
-            q-btn(
-              @click=""
-              round flat color="white")
-              q-icon(name="help_outline" size="22px")
-            kalpa-menu-actions(icon="more_vert" color="grey-2" :title="contentKalpa.name" :actions="actions")
         //- related content
         div(
           :style=`{
@@ -146,6 +143,7 @@ div(
 import { openURL } from 'quasar'
 import { ContentApi } from 'src/api/content'
 import {assert} from 'src/system/common/utils'
+import {makeRoutePath} from 'public/scripts/common_func.js';
 
 export default {
   name: 'pageInfoRoot',
@@ -172,13 +170,18 @@ export default {
       let res = {
         copyUrl: {
           name: 'Скопировать ссылку',
-          cb: () => {
+          cb: async () => {
             this.$log('copyUrl')
+            await this.copyLink(true)
           }
         },
       }
       if (this.$store.getters.isGuest) {
         return res
+      }
+      res.tutorial = {
+        name: 'Справка',
+        cb: () => {},
       }
       res.hide = {
         name: 'Скрыть',
@@ -194,6 +197,20 @@ export default {
     },
   },
   methods: {
+    copyLink () {
+      this.$log('copyLink')
+      this.shareLink = makeRoutePath(this.player.content, true)
+      this.clipboardWrite(this.shareLink, this.$t('Link copied to clipboard!', 'Ссылка скопирована !'))
+    },
+    clipboardWrite (val, message) {
+      this.$log('clipboardWrite', val)
+      navigator.permissions.query({name: 'clipboard-write'}).then(async (result) => {
+        if (result.state === 'granted' || result.state === 'prompt') {
+          await navigator.clipboard.writeText(val)
+          if (message) this.$q.notify({type: 'positive', position: 'top', message: message})
+        }
+      })
+    },
     goOriginal () {
       this.$log('goOriginal')
       if (this.contentKalpa.contentProvider === 'YOUTUBE') {
