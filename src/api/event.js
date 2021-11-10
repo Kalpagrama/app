@@ -8,7 +8,7 @@ import { apiCall } from 'src/api/index'
 import { AuthApi } from 'src/api/auth'
 import { router } from 'src/boot/system'
 import { notify } from 'src/boot/notify'
-import store from 'src/store/index'
+import { store } from 'src/store/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)

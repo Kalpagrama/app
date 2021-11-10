@@ -161,7 +161,7 @@ module.exports = configure(function (ctx) {
           ...cfg.resolve.alias,
           schema: path.resolve(__dirname, './src/api'),
           public: path.resolve(__dirname, './public'),
-          vue: '@vue/compat'
+          // vue: '@vue/compat'
         }
         if (!ctx.mode.ssr) {
           cfg.optimization = {

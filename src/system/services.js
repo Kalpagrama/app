@@ -8,7 +8,7 @@ import { askForPwaWebPushPerm, initPWA, pwaReset, pwaShareWith } from 'src/syste
 import { assert, wait } from 'src/system/common/utils';
 import { AuthApi } from 'src/api/auth'
 import { router } from 'src/boot/system'
-import store from 'src/store/index'
+import { store } from 'src/store/index'
 import { ContentApi } from 'src/api/content'
 import { makeRoutePath } from 'public/scripts/common_func'
 

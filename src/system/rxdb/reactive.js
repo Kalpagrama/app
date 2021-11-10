@@ -8,7 +8,7 @@ import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import lodashGet from 'lodash/get'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { Lists } from 'src/system/rxdb/lists'
-import store from 'src/store/index'
+import { store } from 'src/store/index'
 import cloneDeep from 'lodash/cloneDeep'
 
 import { reactive, watch } from 'vue'

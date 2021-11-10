@@ -21,7 +21,7 @@ import LruCache from 'lru-cache'
 import { GqlQueries } from 'src/system/rxdb/gql_query'
 import { setSyncEventStorageValue } from 'src/system/services'
 import { ObjectApi } from 'src/api/object'
-import store from 'src/store'
+import { store } from 'src/store'
 
 const logDT = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.TEST)
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
