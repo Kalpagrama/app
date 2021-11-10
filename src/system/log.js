@@ -286,16 +286,9 @@ async function initLogger (store) {
    }
 
    const detectModuleName = (thiz) => {
-      if (thiz && thiz.logModuleName) {
-         return thiz.logModuleName
-      } else if (thiz && thiz.constructor && thiz.constructor.name === 'VueComponent') {
-         let res = thiz.$options.name
-         // if (thiz.$attrs.index !== undefined) res += `--${thiz.$attrs.index}`
-         // res += `--${thiz.$props.index}`
-         return res
-      } else {
-         return 'unknown module'
-      }
+      // console.log('detectModuleName', thiz)
+      if (thiz && thiz.logModuleName) return thiz.logModuleName
+      else return thiz?.$options?.name || 'unknown module'
    }
    logD = function (...msg) {
       logger.debug(detectModuleName(this), ...msg)
