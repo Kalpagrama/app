@@ -277,7 +277,7 @@ export default {
     itemVisibilityHandler (isVisible, entry) {
       let [key, idxSting] = entry.target.accessKey.split('-')
       if (isVisible) this.$log('isVisible =', isVisible, idxSting, key)
-      this.$set(this.itemsVisibility, key, isVisible)
+      this.$set_deprecated(this.itemsVisibility, key, isVisible)
     },
     onItemClick (index) {
       this.itemActiveIndx = index
@@ -336,7 +336,7 @@ export default {
         this.scrollHeight = details.ref.$el.clientHeight
         if (this.itemActivePersist) this.itemsRes.setProperty('itemActiveIndx', this.itemActiveIndx)
         // itemVisibilityHandler глючит Иногда не срабатывает. Минимизируем проблему.  itemActiveIndx - всегда видимо
-        this.$set(this.itemsVisibility, this.vsItems[this.itemActiveIndx][this.itemKey], true)
+        this.$set_deprecated(this.itemsVisibility, this.vsItems[this.itemActiveIndx][this.itemKey], true)
       }
     },
     scrollTargetResized () {

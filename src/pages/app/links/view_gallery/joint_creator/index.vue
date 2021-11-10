@@ -237,7 +237,7 @@ export default {
           // this.$set(this.node.items, 1, item)
         }
       }
-      this.$set(this.joint.items, 1, item)
+      this.$set_deprecated(this.joint.items, 1, item)
       this.viewId = 'editor'
     },
     async publish () {

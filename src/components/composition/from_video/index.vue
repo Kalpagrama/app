@@ -70,7 +70,7 @@ export default {
       assert(this.itemState)
       let key = this.$options.name + this.composition.oid
       if (!this.itemState[key]) {
-        this.$set(this.itemState, key, {
+        this.$set_deprecated(this.itemState, key, {
           currentTime: null,
           player: null,
           playBackState: 'paused',

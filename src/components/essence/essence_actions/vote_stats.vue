@@ -165,7 +165,7 @@ export default {
   async created () {
     this.$log('created')
     // get essence stats
-    this.$set(this, 'stats', await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'objectStat', {params: {oid: this.essence.oid}}))
+    this.$set_deprecated(this, 'stats', await this.$rxdb.get(RxCollectionEnum.GQL_QUERY, 'objectStat', {params: {oid: this.essence.oid}}))
     // set rateMax
     let percentMax = null
     let percentMaxIndex = 0

@@ -124,7 +124,7 @@ export default {
       if (t < 0) t = 0
       if (t > this.player.duration) t = this.player.duration
       // this.$log('t', t)
-      this.$set(this.player.figures[pointIndex], 't', t)
+      this.$set_deprecated(this.player.figures[pointIndex], 't', t)
       this.player.setCurrentTime(t)
       // check timer ? clear timeout
       if (this.figureForwardTimer) {

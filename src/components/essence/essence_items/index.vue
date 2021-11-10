@@ -45,8 +45,8 @@ div(
                 loop: false,
                 paused: data.compositionPlayBackState[ii]
               }`
-          @playing="$set(data.compositionPlayBackState,ii,'playing'), $set(data.compositionPlayBackState, ii===0?1:0, 'paused')"
-          @ended="$set(data.compositionPlayBackState,ii,'paused'), $set(data.compositionPlayBackState, ii===0?1:0, 'playing')")
+          @playing="$set_deprecated(data.compositionPlayBackState,ii,'playing'), $set_deprecated(data.compositionPlayBackState, ii===0?1:0, 'paused')"
+          @ended="$set_deprecated(data.compositionPlayBackState,ii,'paused'), $set_deprecated(data.compositionPlayBackState, ii===0?1:0, 'playing')")
         //- ===
         //- node
         div(
@@ -71,7 +71,7 @@ div(
             :options=`{
                 playBackState: data.compositionPlayBackState[ii]
               }`
-            @ended="$set(data.compositionPlayBackState,ii,'paused'), $set(data.compositionPlayBackState, ii===0?1:0, 'playing')")
+            @ended="$set_deprecated(data.compositionPlayBackState,ii,'paused'), $set_deprecated(data.compositionPlayBackState, ii===0?1:0, 'playing')")
         //- media content
         //- IMAGE, VIDEO, BOOK, AUDIO
         div(
@@ -128,7 +128,7 @@ export default {
       assert(this.itemState)
       let key = this.$options.name
       if (!this.itemState[key]) {
-        this.$set(this.itemState, key, {
+        this.$set_deprecated(this.itemState, key, {
           compositionPlayBackState: ['playing', 'paused']
         })
       }

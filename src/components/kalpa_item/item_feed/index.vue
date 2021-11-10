@@ -107,7 +107,7 @@ export default {
       let key = this.$options.name
       if (!this.itemState[key]) {
         // assert(this.itemState.id === this.itemShortOrFull.oid)
-        this.$set(this.itemState, key, {
+        this.$set_deprecated(this.itemState, key, {
           oid: this.itemShortOrFull?.oid || this.itemState.itemId,
           itemFull: null,
           queryId: null,
@@ -209,7 +209,7 @@ export default {
         this.$log('getFullItem', this.itemIndex, this.item.name)
         data.queryId = Date.now()
         this.$rxdb.get(RxCollectionEnum.OBJ, data.oid, { queryId: data.queryId })
-            .then(itemFull => this.$set(data, 'itemFull', itemFull))
+            .then(itemFull => this.$set_deprecated(data, 'itemFull', itemFull))
             .catch(err => this.$logE('err on get itemFull', err))
             .finally(() => {
               data.queryId = null
@@ -234,7 +234,7 @@ export default {
         data.queryIdPreload = Date.now()
         this.$rxdb.get(RxCollectionEnum.OBJ, data.oid, { priority: 1, queryId: data.queryIdPreload })
             .then(itemFull => {
-              if (itemFull) this.$set(data, 'itemFull', itemFull)
+              if (itemFull) this.$set_deprecated(data, 'itemFull', itemFull)
             })
             .catch(err => this.$logE('err on preload itemFull', err))
             .finally(() => {

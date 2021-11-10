@@ -61,6 +61,9 @@ export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath,
       //   },
       // })
       // contentful
+      app.config.globalProperties.$set_deprecated = (obj, prop, value) => {
+         obj[prop] = value
+      }
       const contentfulConfig = {
          space: 'f0vpl39owsy8',
          accessToken: 'dt4poXVl2-veCdWkW_v02gsZWxBwe-JHZSw2T394kQQ'

@@ -31,7 +31,8 @@ const store = new Vuex.Store({
          assert(vuexKey && val, '!vuexKey && val')
          let copy = JSON.parse(JSON.stringify(val))
          copy.vuexKey = vuexKey
-         Vue.set(state.mirrorObjects, vuexKey, copy)
+         // Vue.set(state.mirrorObjects, vuexKey, copy)
+         state.mirrorObjects[vuexKey] = copy
       },
       stateSet (state, [key, val]) {
          assert(Object.prototype.hasOwnProperty.call(state, key))

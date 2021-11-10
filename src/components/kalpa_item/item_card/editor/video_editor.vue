@@ -367,13 +367,13 @@ export default {
     async previewChanged (e) {
       this.$log('previewChanged', e)
       assert(e.target.files[0])
-      this.$set(this.contentCopy, 'previewUrlWithFormats', [{format: 'default', url: URL.createObjectURL(e.target.files[0])}])
+      this.$set_deprecated(this.contentCopy, 'previewUrlWithFormats', [{format: 'default', url: URL.createObjectURL(e.target.files[0])}])
       this.filePreview = e.target.files[0]
       // destroy value ?
       this.$refs.inputPreview.value = null
     },
     async previewDelete () {
-      this.$set(this.contentCopy, 'previewUrlWithFormats', [])
+      this.$set_deprecated(this.contentCopy, 'previewUrlWithFormats', [])
     }
   },
   async mounted() {

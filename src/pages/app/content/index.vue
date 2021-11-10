@@ -38,7 +38,7 @@ export default {
       async handler (to, from) {
         this.$log('oid TO', to)
         if (to) {
-          this.$set(this, 'contentKalpa', await this.$rxdb.get(RxCollectionEnum.OBJ, to))
+          this.$set_deprecated(this, 'contentKalpa', await this.$rxdb.get(RxCollectionEnum.OBJ, to))
           this.isActiveStart = Date.now()
         }
       }

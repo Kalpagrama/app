@@ -118,7 +118,7 @@ export default {
     itemVisibilityHandler (isVisible, entry) {
       let [key, idxSting] = entry.target.accessKey.split('-')
       // if (isVisible) this.$log('isVisible =', isVisible, idxSting, key)
-      this.$set(this.itemsVisibility, key, isVisible)
+      this.$set_deprecated(this.itemsVisibility, key, isVisible)
     },
     onScroll (details) {
       if (this.length) {
@@ -137,7 +137,7 @@ export default {
         this.itemsRes.setProperty('itemMiddleIndx', this.itemMiddleIndx)
         // itemVisibilityHandler глючит Иногда не срабатывает. Минимизируем проблему.  itemMiddleIndx - всегда видимо
         this.$log('this.itemsVisibility this.itemMiddleIndx=', this.itemMiddleIndx, this.itemsRes.items.length)
-        this.$set(this.itemsVisibility, this.itemsRes.items[this.itemMiddleIndx][this.itemKey], true)
+        this.$set_deprecated(this.itemsVisibility, this.itemsRes.items[this.itemMiddleIndx][this.itemKey], true)
       }
     }
   },

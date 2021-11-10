@@ -308,7 +308,7 @@ export default {
     },
     async savePosition (epubCfi) {
       if (this.contentBookmark) { // save position
-        if (!this.contentBookmark.meta) this.$set(this.contentBookmark, 'meta', {})
+        if (!this.contentBookmark.meta) this.$set_deprecated(this.contentBookmark, 'meta', {})
         this.contentBookmark.meta.currentCfi = epubCfi
       }
     },

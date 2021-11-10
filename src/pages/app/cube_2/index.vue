@@ -156,7 +156,7 @@ export default {
           this.itemRoot = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
           this.$nextTick(() => {
             this.scrollWrapperRef = this.$refs['scroll-wrapper']
-            this.$set(this, 'rows', [{oid: this.itemRoot.oid, top: 0, height: 0}])
+            this.$set_deprecated(this, 'rows', [{oid: this.itemRoot.oid, top: 0, height: 0}])
           })
         }
       }

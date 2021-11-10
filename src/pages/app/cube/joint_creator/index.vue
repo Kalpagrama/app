@@ -23,7 +23,7 @@ div(
     item-editor(
       v-if="itemFound"
       :item="itemFound"
-      @composition="$log('composition=', $event), ($event ? $set(joint.items, 1, $event) : $delete(joint.items, 1)), itemEditorShow = false"
+      @composition="$log('composition=', $event), ($event ? $set_deprecated(joint.items, 1, $event) : $delete(joint.items, 1)), itemEditorShow = false"
       @close="itemEditorShow = false")
   //- body
   .row.full-width.justify-center.q-px-sm
@@ -159,7 +159,7 @@ export default {
         this.itemFound = item
         this.itemEditorShow = true
       } else {
-        this.$set(this.joint.items, 1, item)
+        this.$set_deprecated(this.joint.items, 1, item)
       }
     },
     itemRemove () {

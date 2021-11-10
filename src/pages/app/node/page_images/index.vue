@@ -62,7 +62,7 @@ export default {
     masonryItemVisibilityCallback (isVisible, entry) {
       let [oid, index] = entry.target.accessKey.split('-')
       this.$log('masonryItemVisibilityCallback', isVisible, oid, index)
-      this.$set(this.masonryVisibleItems, oid, isVisible)
+      this.$set_deprecated(this.masonryVisibleItems, oid, isVisible)
     },
   },
   async created () {

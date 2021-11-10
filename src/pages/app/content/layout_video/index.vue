@@ -232,7 +232,7 @@ export default {
     },
     async playerReady (player) {
       this.$log('playerReady', this.draft)
-      this.$set(this, 'player', player)
+      this.$set_deprecated(this, 'player', player)
       if (this.draftId) this.draftFocused(await this.$rxdb.get(RxCollectionEnum.WS_ANY, this.draftId))
 
       // Handle player.autoplay

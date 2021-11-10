@@ -131,7 +131,7 @@ export default {
   },
   watch: {
     login (newVal) {
-      this.$set(this, 'login', newVal.replace(/[^0-9a-zA-Z-_.@]/g, ''))
+      this.$set_deprecated(this, 'login', newVal.replace(/[^0-9a-zA-Z-_.@]/g, ''))
     },
     '$route.query.email': {
       immediate: true,

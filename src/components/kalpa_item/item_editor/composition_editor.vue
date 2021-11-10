@@ -18,7 +18,7 @@ div(:style=`{position: 'relative'}`).row.full-width
     :no-esc-dismiss="true")
       item-editor(
         :item="itemFound"
-        @composition="($event ? $set(node.items, 0, $event) : $delete(node.items, 0)), itemEditorShow=false"
+        @composition="($event ? $set_deprecated(node.items, 0, $event) : $delete(node.items, 0)), itemEditorShow=false"
         @close="itemEditorShow=false"
         )
   item-preview(

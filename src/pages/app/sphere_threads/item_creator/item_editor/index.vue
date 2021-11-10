@@ -93,7 +93,7 @@ export default {
       this.$log('contentFragmentDone', composition)
       this.content = JSON.parse(JSON.stringify(this.item))
       this.contentFragmenterShow = false
-      this.$set(this.joint.items, 1, composition)
+      this.$set_deprecated(this.joint.items, 1, composition)
     },
     compositionFragmentChange () {
       this.$log('contentFragmentChange')
@@ -103,7 +103,7 @@ export default {
     },
     compositionToContent () {
       this.$log('compositionToContent')
-      this.$set(this.joint.items, 1, this.content)
+      this.$set_deprecated(this.joint.items, 1, this.content)
     },
   },
 }

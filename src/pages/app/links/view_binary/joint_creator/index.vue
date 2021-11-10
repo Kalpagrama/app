@@ -270,7 +270,7 @@ export default {
     },
     itemChanged (item, ii) {
       this.$log('itemChanged', item, ii)
-      this.$set(this.joint.items, ii, item)
+      this.$set_deprecated(this.joint.items, ii, item)
     },
     async itemFound (item) {
       this.$log('itemFound', item)
@@ -300,7 +300,7 @@ export default {
           // this.$set(this.node.items, 1, item)
         }
       }
-      this.$set(this.joint.items, 1, item)
+      this.$set_deprecated(this.joint.items, 1, item)
     },
     cancel () {
       this.$emit('cancel')

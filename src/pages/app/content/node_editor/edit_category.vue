@@ -65,7 +65,7 @@ export default {
     categorySet (c) {
       this.$log('categorySet', c)
       // this.node.category = c.value
-      this.$set(this.node, 'category', c.value)
+      this.$set_deprecated(this.node, 'category', c.value)
     },
   }
 }

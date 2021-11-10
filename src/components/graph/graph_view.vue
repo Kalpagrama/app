@@ -86,7 +86,7 @@ div(ref="graphArea").row.full-width
       :item="newJoint"
       :action="addItemToGraph"
       :publish="publish"
-      @composition="($event ? $set(newJoint.items, 1, $event) : $delete(newJoint.items, 1)), jointCreatorShow = false"
+      @composition="($event ? $set_deprecated(newJoint.items, 1, $event) : $delete(newJoint.items, 1)), jointCreatorShow = false"
       @close="jointCreatorShow = false"
       :style=`{maxWidth:'300px', background: 'rgb(30,30,30)',
           borderRadius: '10px', boxShadow: '1px 1px 20px rgba(192,192,192, .5)'
@@ -1068,7 +1068,7 @@ export default {
       let node = this.addItemToGraph(cloneDeep(rootNode))
       await this.discover(node)
     }
-    if (!this.graphD3.selectedItem) this.$set(this.graphD3, 'selectedItem', null)
+    if (!this.graphD3.selectedItem) this.$set_deprecated(this.graphD3, 'selectedItem', null)
     this.debouncedUpdateGraph()
   },
   unmounted () {

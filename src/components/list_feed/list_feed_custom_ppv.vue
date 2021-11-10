@@ -403,7 +403,7 @@ export default {
     itemVisibilityHandler (isVisible, entry) {
       let [key, idxSting] = entry.target.accessKey.split('-')
       // this.$log('itemVisibilityChanged', isVisible, idxSting, key)
-      this.$set(this.itemsVisibility, key, isVisible)
+      this.$set_deprecated(this.itemsVisibility, key, isVisible)
     },
     itemActiveSet (indx) {
       this.$log('itemActiveSet', indx)

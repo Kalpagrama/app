@@ -55,23 +55,23 @@ export default {
       if (pointIndex === 0) {
         // wanna start AFTER the end
         if (t >= this.player.figures[1].t) {
-          this.$set(this.player.figures[0], 't', t)
-          this.$set(this.player.figures[1], 't', Math.min(t + 10, this.player.duration))
+          this.$set_deprecated(this.player.figures[0], 't', t)
+          this.$set_deprecated(this.player.figures[1], 't', Math.min(t + 10, this.player.duration))
         }
         // before the end is OK
         else {
-          this.$set(this.player.figures[0], 't', t)
+          this.$set_deprecated(this.player.figures[0], 't', t)
         }
       }
       else if (pointIndex === 1) {
         // wanna end BEFORE the start
         if (t <= this.player.figures[0].t) {
-          this.$set(this.player.figures[0], 't', t)
-          this.$set(this.player.figures[1], 't', Math.min(t + 10, this.player.duration))
+          this.$set_deprecated(this.player.figures[0], 't', t)
+          this.$set_deprecated(this.player.figures[1], 't', Math.min(t + 10, this.player.duration))
         }
         // after the start is OK
         else {
-          this.$set(this.player.figures[1], 't', t)
+          this.$set_deprecated(this.player.figures[1], 't', t)
         }
       }
       // go to the layer new (maybe) start and play
@@ -105,7 +105,7 @@ export default {
       if (t < 0) t = 0
       if (t > this.player.duration) t = this.player.duration
       // this.$log('t', t)
-      this.$set(this.player.figures[pointIndex], 't', t)
+      this.$set_deprecated(this.player.figures[pointIndex], 't', t)
       this.player.events.emit('figures-forward-start')
       this.player.setCurrentTime(t)
       // check timer ? clear timeout

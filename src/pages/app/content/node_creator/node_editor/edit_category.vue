@@ -61,7 +61,7 @@ export default {
   methods: {
     categoryClick (c) {
       this.$log('categoryClick', c)
-      this.$set(this.node, 'category', c)
+      this.$set_deprecated(this.node, 'category', c)
     }
   },
   async mounted () {
