@@ -91,9 +91,8 @@ kalpa-layout(
         .row.full-width.q-mb-xl
           //- v-if="rowActiveKey === rowIndex+row.oid"
           joints-row(
-            v-for="(row,rowIndex) in rows" :key="rowIndex+row.oid"
-            v-if="rowItemWidth > 0 && rowActiveKey === rowIndex+row.oid"
-            v-show="rowActiveKey === rowIndex+row.oid ? true : !jointCreatorShow"
+            v-if="rowItemWidth > 0"
+            v-for="(row,rowIndex) in rows.filter((r, ri)=>rowActiveKey === ri+r.oid)" :key="rowIndex+row.oid"
             :ref="`row-${rowIndex+row.oid}`"
             :row="row"
             :rowActive="rowActiveKey === rowIndex+row.oid"
