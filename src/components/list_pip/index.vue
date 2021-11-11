@@ -40,8 +40,7 @@ div(
       :style=`{opacity: 0.8}`)
   //- items wrapper
   div(
-    v-for="(i,ii) in items" :key="ii"
-    v-if="ii >= itemIndex && ii <= itemIndex+1"
+    v-for="(i,ii) in items.filter((i,ix)=>ix >= itemIndex && ix <= itemIndex+1)" :key="ii"
     :style=`{
       position: 'absolute', zIndex: 100+ii, right: '0px', bottom: '-0.5px',
       maxWidth: itemIndex === ii ? nowMaxWidth+'%' : nextMaxWidth+'%',
