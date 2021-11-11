@@ -8,7 +8,8 @@ const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.BOOT)
 
 import { Screen, date, colors } from 'quasar'
 import { gsap } from 'gsap'
-import VueObserveVisibility from 'vue-observe-visibility'
+// import VueObserveVisibility from 'vue-observe-visibility'
+import { ObserveVisibility } from 'vue-observe-visibility'
 import VueMasonry from 'vue-masonry-css'
 import axios from 'axios'
 // import VueShowdown from 'vue-showdown'
@@ -71,7 +72,15 @@ export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath,
       const contentfulClient = contentful.createClient(contentfulConfig)
       app.config.globalProperties.$contentful = contentfulClient
       app.use(VueMasonry)
-      app.use(VueObserveVisibility)
+      // app.use(VueObserveVisibility)
+      app.directive('observe-visibility', {
+         beforeMount: (el, binding, vnode) => {
+            vnode.context = binding.instance;
+            ObserveVisibility.bind(el, binding, vnode);
+         },
+         update: ObserveVisibility.update,
+         unmounted: ObserveVisibility.unbind,
+      })
       app.config.globalProperties.$getPaletteColor = colors.getPaletteColor
       app.config.globalProperties.$routerKalpa = new Proxy(VueRouter, {
          get (target, prop) {
