@@ -11,12 +11,15 @@ component(
 </template>
 
 <script>
+import playerVideo from './player_video/index.vue'
+import playerImage from './player_image/index.vue'
+import playerBook from './player_book/index.vue'
 export default {
   name: 'contentPlayer',
   components: {
-    playerVideo: () => import('./player_video/index.vue'),
-    playerImage: () => import('./player_image/index.vue'),
-    playerBook: () => import('./player_book/index.vue'),
+    playerImage,
+    playerVideo,
+    playerBook
   },
   props: {
     contentKalpa: {type: Object, required: true},

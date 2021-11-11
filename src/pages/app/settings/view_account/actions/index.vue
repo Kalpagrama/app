@@ -56,14 +56,14 @@
     //  ).full-width.b-40.q-mb-md
     //  span(v-if="!$store.state.core.logRocket") {{$t('Report an error')}}
     //  span(v-if="$store.state.core.logRocket").text-yellow {{$t('Stop error logging')}}
-    //- chat
-    q-btn(
-      @click="toggleChat()"
-      outline color="green" no-caps
-      :style=`{
-        height: '50px',
-      }`).full-width.q-mb-md
-      span {{$t('Chat with us')}}
+    ////- chat
+    //q-btn(
+    //  @click="toggleChat()"
+    //  outline color="green" no-caps
+    //  :style=`{
+    //    height: '50px',
+    //  }`).full-width.q-mb-md
+    //  span {{$t('Chat with us')}}
     //- logout
     q-btn(
       @click="logout()"
@@ -94,19 +94,19 @@ export default {
     }
   },
   methods: {
-    async toggleChat () {
-      this.$log('toggleChat')
-      // window.Chatra()
-      // if (!window.Chatra) return
-      // window.ChatraSetup = {
-      //     disabledOnMobile: true,
-      //     // startHidden: false
-      // }
-      // await this.$wait(500)
-      let el = document.getElementById('chatra')
-      el.style.display = 'block'
-      window.Chatra('openChat', true)
-    },
+    // async toggleChat () {
+    //   this.$log('toggleChat')
+    //   // window.Chatra()
+    //   // if (!window.Chatra) return
+    //   // window.ChatraSetup = {
+    //   //     disabledOnMobile: true,
+    //   //     // startHidden: false
+    //   // }
+    //   // await this.$wait(500)
+    //   let el = document.getElementById('chatra')
+    //   el.style.display = 'block'
+    //   window.Chatra('openChat', true)
+    // },
     showKalpaTutorial () {
       this.$log('showKalpaTutorial TODO!')
     },

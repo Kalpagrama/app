@@ -12,9 +12,7 @@ div(
     .row.full-width.items-start.content-start
       //- avatar
       .col-xs-12.col-sm-4.q-px-sm.q-pt-md
-        span kkkkkkkkkkkkkkkkk
         edit-avatar(:currentUser="currentUser")
-        span cccccccccccccccc
       //- right side
       .col-xs-12.col-sm-8.q-px-sm
         edit-profile(:currentUser="currentUser")
@@ -28,12 +26,17 @@ div(
 </template>
 
 <script>
+import editAvatar from 'src/pages/app/settings/view_account/edit_avatar/index.vue'
+import editProfile from 'src/pages/app/settings/view_account/edit_profile/index.vue'
+import actions from 'src/pages/app/settings/view_account/actions/index.vue'
+
 export default {
   name: 'pageApp_settigns_viewAccount',
   components: {
-    editAvatar: () => import('./edit_avatar/index.vue'),
-    editProfile: () => import('./edit_profile/index.vue'),
-    actions: () => import('./actions/index.vue'),
+    editAvatar,
+    // editAvatar,
+    editProfile,
+    actions,
   },
   data () {
     return {

@@ -7,11 +7,14 @@
 </template>
 
 <script>
+import editAvatar from 'src/pages/app/settings/view_account/edit_avatar/index.vue'
+import editProfile from 'src/pages/app/settings/view_account/edit_profile/index.vue'
+
 export default {
   name: 'profileEditor',
   components: {
-    editAvatar: () => import('src/pages/app/settings/view_account/edit_avatar/index.vue'),
-    editProfile: () => import('src/pages/app/settings/view_account/edit_profile/index.vue'),
+    editAvatar,
+    editProfile
   },
   data () {
     return {

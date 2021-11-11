@@ -255,13 +255,14 @@ q-layout(
 <script>
 import sectionVideo from './section_video.vue'
 import nodeVideo from './node_video.vue'
+import essenceVoteBall from 'src/components/essence/essence_vote_ball.vue'
 
 export default {
   name: 'pageApp_about',
   components: {
     sectionVideo,
     nodeVideo,
-    essenceVoteBall: () => import('src/components/essence/essence_vote_ball.vue')
+    essenceVoteBall
   },
   data () {
     return {

@@ -385,8 +385,8 @@ const routes = [
       ],
       meta: { roleMinimal: 'GUEST' },
       beforeEnter: async (to, from, next) => {
-         alert('router / beforeEnter...' + to.path)
-         logD('router / beforeEnter...', to, from)
+         // alert('router / beforeEnter...' + to.path)
+         // logD('router / beforeEnter...', to, from)
          await systemInit() // для гостей тоже надо входить (если уже войдено - ничего не сделает)
          return next()
       }
