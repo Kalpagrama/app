@@ -79,7 +79,7 @@ div(
         no-caps round flat
         icon="crop" color="green"
         @click="cancelCrop")
-      div(v-if="!$slots.right()").row
+      div(v-if="!$slots.right").row
         q-btn(
           v-if="!selectedDraft"
           @click="createNodeDraft()"

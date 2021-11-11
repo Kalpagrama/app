@@ -18,7 +18,7 @@ div(
   q-resize-observer(@resize="data.nodeWidth = $event.width")
   //image
   composition(
-    v-if="showItems && !$slots.items() && node.items.length === 1"
+    v-if="showItems && !$slots.items && node.items.length === 1"
     :composition="node.items[0]"
     :showContext="showContext"
     :itemState="data"
@@ -26,7 +26,7 @@ div(
     :isActive="isActive"
     :nodeOid="node.oid")
   essence-items(
-    v-if="showItems && !$slots.items() && node.items.length === 2"
+    v-if="showItems && !$slots.items && node.items.length === 2"
     :node="node"
     :itemState="data"
     :isActive="isActive"
