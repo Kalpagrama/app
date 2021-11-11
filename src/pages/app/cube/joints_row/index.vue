@@ -19,8 +19,7 @@ div(
         padding: '0px 36px',
       }`).row.full-width.justify-center
       div(
-        v-for="(joint,jointIndex) in jointsRes.items" :key="joint.oid"
-        v-if="!row.oidsHidden.includes(joint.oid)"
+        v-for="(joint,jointIndex) in jointsRes.items.filter(j=>!row.oidsHidden.includes(j.oid))" :key="joint.oid"
         :style=`{
           height: '2px',
         }`
@@ -84,8 +83,7 @@ div(
         }`)
       //- center
       div(
-        v-for="(joint, jointIndex) in jointsRes.items" :key="joint.oid"
-        v-if="!row.oidsHidden.includes(joint.oid)"
+        v-for="(joint, jointIndex) in jointsRes.items.filter(j=>!row.oidsHidden.includes(j.oid))" :key="joint.oid"
         v-intersection=`{
           handler: $throttle(jointVisibilityCallback, 150),
           cfg: {
