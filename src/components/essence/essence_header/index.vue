@@ -133,6 +133,17 @@ export default {
       if (this.$store.getters.isGuest) {
         return res
       }
+      if (this.$store.getters.currentUser.profile.role.in(UserRoleEnum.MODERATOR, UserRoleEnum.ADMIN)) {
+        res.hideGlobal = {
+          // name: i18n.t('Delete', 'Удалить'),
+          name: this.$t('hide global'),
+          color: 'red',
+          cb: async () => {
+            this.$log('hideGlobal...')
+            await ObjectApi.hide(this.essence.oid)
+          }
+        }
+      }
       if (this.essenceIsMine || this.$store.getters.currentUser.profile.role.in(UserRoleEnum.MODERATOR, UserRoleEnum.ADMIN)) {
         res.delete = {
           // name: i18n.t('Delete', 'Удалить'),
@@ -141,15 +152,6 @@ export default {
           cb: async () => {
             this.$log('essenceDelete...')
             await ObjectApi.unPublish(this.essence.oid)
-          }
-        }
-        res.hideGlobal = {
-          // name: i18n.t('Delete', 'Удалить'),
-          name: this.$t('hide global'),
-          color: 'red',
-          cb: async () => {
-            this.$log('hideGlobal...')
-            await ObjectApi.hide(this.essence.oid)
           }
         }
       } else {
