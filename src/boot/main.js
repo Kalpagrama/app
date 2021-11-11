@@ -8,12 +8,12 @@ const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.BOOT)
 
 import { Screen, date, colors } from 'quasar'
 import { gsap } from 'gsap'
-// import VueObserveVisibility from 'vue-observe-visibility'
-import { ObserveVisibility } from 'vue-observe-visibility'
 import VueMasonry from 'vue-masonry-css'
 import axios from 'axios'
 // import VueShowdown from 'vue-showdown'
 import isEqual from 'lodash/isEqual'
+import debounce from 'lodash/debounce'
+import throttle from 'lodash/throttle'
 
 const contentful = require('contentful')
 
@@ -72,15 +72,7 @@ export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath,
       const contentfulClient = contentful.createClient(contentfulConfig)
       app.config.globalProperties.$contentful = contentfulClient
       app.use(VueMasonry)
-      // app.use(VueObserveVisibility)
-      app.directive('observe-visibility', {
-         beforeMount: (el, binding, vnode) => {
-            vnode.context = binding.instance;
-            ObserveVisibility.bind(el, binding, vnode);
-         },
-         update: ObserveVisibility.update,
-         unmounted: ObserveVisibility.unbind,
-      })
+
       app.config.globalProperties.$getPaletteColor = colors.getPaletteColor
       app.config.globalProperties.$routerKalpa = new Proxy(VueRouter, {
          get (target, prop) {
@@ -101,6 +93,9 @@ export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath,
       app.config.globalProperties.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
       app.config.globalProperties.$axios = axios
       app.config.globalProperties.$gsap = gsap
+
+      app.config.globalProperties.$debounce = debounce
+      app.config.globalProperties.$throttle = throttle
       app.config.globalProperties.$date = (ts, format) => {
          return date.formatDate(ts, format || 'DD.MM.YYYY', {
             dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],

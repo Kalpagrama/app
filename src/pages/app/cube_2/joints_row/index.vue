@@ -22,16 +22,15 @@ div(
       //- middle
       div(
         v-for="(j,ji) in jointsRes.items" :key="j.oid"
-        v-observe-visibility=`{
-          throttle: 150,
-          callback: jointsBecameActive,
-          intersection: {
+        v-intersection=`{
+          handler: $throttle(jointsBecameActive, 150),
+          cfg: {
             //- root: scrollWrapperRef,
             rootMargin: '0px -50%',
           }
         }`
         :ref="`joint-${j.oid}`"
-        :accessKey="`${j.oid}-${ji}`"
+        :data-id="`${j.oid}-${ji}`"
         :style=`{
           position: 'relative',
           minWidth: itemWidth+'px',
@@ -70,6 +69,7 @@ div(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import jointItem from '../joint_item/index.vue'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'jointsRow',
@@ -125,10 +125,12 @@ export default {
     },
   },
   methods: {
-    jointsBecameActive (isVisible, entry) {
+    jointsBecameActive (entry) {
+      assert(entry.target.dataset.id)
+      let isVisible = !!entry.isIntersecting
       if (isVisible) {
-        this.$log('jointsBecameActive', entry.target.accessKey)
-        let [oid, idx] = entry.target.accessKey.split('-')
+        this.$log('jointsBecameActive', entry.target.dataset.id)
+        let [oid, idx] = entry.target.dataset.id.split('-')
         idx = parseInt(idx)
         this.jointActiveOid = oid
         let joint = this.jointsRes.items[idx]

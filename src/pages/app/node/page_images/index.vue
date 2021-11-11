@@ -10,10 +10,9 @@
   div(:style=`{maxHeight: height-headerHeight+'px'}`).scroll.full-width
     list-masonry(itemKey="oid" :items="imagesNodes")
       template(v-slot:item=`{item, itemIndex}`)
-        div(:accessKey="`${item.oid}-${itemIndex}`"
-          v-observe-visibility=`{
-            throttle: 150,
-            callback: masonryItemVisibilityCallback,
+        div(:data-id="`${item.oid}-${itemIndex}`"
+          v-intersection=`{
+            handler: $throttle(masonryItemVisibilityCallback, 150)
           }`
           @click="$emit('set-node', item)").full-width
           item-feed(
@@ -36,6 +35,7 @@
 <script>
 import listMasonry from 'src/components/list_masonry/index.vue'
 import cloneDeep from 'lodash/cloneDeep'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'pageImages',
@@ -59,8 +59,10 @@ export default {
     }
   },
   methods: {
-    masonryItemVisibilityCallback (isVisible, entry) {
-      let [oid, index] = entry.target.accessKey.split('-')
+    masonryItemVisibilityCallback (entry) {
+      assert(entry.target.dataset.id)
+      let isVisible = !!entry.isIntersecting
+      let [oid, index] = entry.target.dataset.id.split('-')
       this.$log('masonryItemVisibilityCallback', isVisible, oid, index)
       this.$set_deprecated(this.masonryVisibleItems, oid, isVisible)
     },

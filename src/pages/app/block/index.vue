@@ -41,13 +41,8 @@ kalpa-layout()
             :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pb-xs
             //- block wrapper
             div(
-              v-observe-visibility=`{
-                throttle: 150,
-                callback: nodeVisibilityCallback,
-                intersection: {
-                  //- root: scrollTargetIsWindow ? null : scrollTarget,
-                  //- rootMargin: '-50% 0px'
-                }
+              v-intersection=`{
+                handler: $throttle(nodeVisibilityCallback, 150),
               }`
               ).row.full-width
               item-feed(
@@ -73,6 +68,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import navMobile from 'src/components/kalpa_menu_mobile/nav_mobile.vue'
 import pageComments from '../node/page_comments';
 import pageSimilar from '../node/page_similar';
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'pageApp_node',
@@ -118,7 +114,8 @@ export default {
     }
   },
   methods: {
-    nodeVisibilityCallback (isVisible, entry) {
+    nodeVisibilityCallback (entry) {
+      let isVisible = !!entry.isIntersecting
       this.$log('nodeVisibilityCallback', isVisible)
       this.nodeIsVisible = isVisible
     }

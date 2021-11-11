@@ -78,15 +78,17 @@ div(
     div(v-for="({source: item, state, debugInfo}, itemIndex) in vsItems"
       :ref="`item-${itemIndex}`"
       :key="`item-${itemIndex}`"
-      :accessKey="`${itemIndex}`"
-      v-observe-visibility=`{
-        throttle: 0,
-        callback: itemActiveHandler,
-        intersection: {
+      :data-id="`${itemIndex}`"
+      v-intersection=`{
+        handler: itemActiveHandler,
+        cfg: {
+          // any options from "Intersection observer options"
+          // on https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API
           root: scrollTargetIsWindow ? null : scrollTarget,
           rootMargin: rootMargin,
           //- threshold: 0.9,
-        }
+        },
+        throttle: 0
       }`
       :style=`{
           position: 'relative',
@@ -106,11 +108,10 @@ div(
       div(
         v-else
         :style=`{...itemStyles}`
-        :accessKey="`${item[itemKey]}-${itemIndex}`"
-        v-observe-visibility=`{
-          throttle: 300,
-          callback: itemVisibilityHandler,
-          intersection: {
+        :data-id="`${item[itemKey]}-${itemIndex}`"
+        v-intersection=`{
+          handler: $throttle(itemVisibilityHandler, 300),
+          cfg: {
              root: scrollTargetIsWindow ? null : scrollTarget,
              threshold: 0.2},
           }`
@@ -207,8 +208,12 @@ export default {
       }
     },
     rootMargin () {
-      if (this.scrolledAreaHeight >= this.scrollTargetHeight) return '-50% 0px'
+      if (this.scrolledAreaHeight >= this.scrollTargetHeight) {
+        this.$log('rootMargin', '-50% 0px')
+        return '-50% 0px'
+      }
       else { // скролл не заполнен
+        this.$log('rootMargin', `-${Math.ceil(50 * (this.scrolledAreaHeight / this.scrollTargetHeight))}% 0px`)
         return `-${Math.ceil(50 * (this.scrolledAreaHeight / this.scrollTargetHeight))}% 0px`
       }
     },
@@ -387,21 +392,26 @@ export default {
       //   setVerticalScrollPosition(this.scrollTarget, 0)
       // }
     },
-    itemActiveHandler (isVisible, entry) {
-      // let [key, idxSting] = entry.target.accessKey.split('-')
-      let indx = parseInt(entry.target.accessKey)
+    itemActiveHandler (entry) {
+      // this.$log('itemActiveHandler', entry)
+      assert(entry.target.dataset.id)
+      let isVisible = !!entry.isIntersecting
+      let indx = parseInt(entry.target.dataset.id)
       if (isVisible) {
-        this.$log('itemActiveHandler', entry.target.accessKey)
+        this.$log('itemActiveHandler', entry.target.dataset.id)
         this.itemActiveSet(indx)
-      } else {
+      }
+      else {
         if (this.itemActive && this.itemActive.indx === indx) {
           this.$log('itemActive reset', indx)
           this.itemActive = null
         }
       }
     },
-    itemVisibilityHandler (isVisible, entry) {
-      let [key, idxSting] = entry.target.accessKey.split('-')
+    itemVisibilityHandler (entry) {
+      assert(entry.target.dataset.id)
+      let isVisible = !!entry.isIntersecting
+      let [key, idxSting] = entry.target.dataset.id.split('-')
       // this.$log('itemVisibilityChanged', isVisible, idxSting, key)
       this.$set_deprecated(this.itemsVisibility, key, isVisible)
     },

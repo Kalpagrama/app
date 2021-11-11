@@ -80,17 +80,16 @@ div(
       }`).row.full-width
       joints-row(
         v-for="(r,ri) in rows"
-        v-observe-visibility=`{
-          throttle: 150,
-          callback: rowBecameActive,
-          intersection: {
+        v-intersection=`{
+          handler: $throttle(rowBecameActive, 150),
+          cfg: {
             root: scrollWrapperRef,
             rootMargin: '-50% 0px',
           }
         }`
         :oid="r.oid"
         :key="`${r.oid}-${ri}`"
-        :accessKey="`${r.oid}-${ri}`"
+        :data-id="`${r.oid}-${ri}`"
         :ref="`${r.oid}-${ri}`"
         :isActive="`${r.oid}-${ri}` === rowActiveKey"
         :itemWidth="itemWidth"
@@ -127,6 +126,7 @@ import jointCreator from './joint_creator/index.vue'
 import jointItem from './joint_item/index.vue'
 import jointsRow from './joints_row/index.vue'
 import essenceActions from 'src/components/essence/essence_actions.vue'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'pageAppGraph2',
@@ -179,12 +179,14 @@ export default {
       let rowRef = this.$refs[`row-${this.rowActiveKey}`][0]
       return rowRef
     },
-    rowBecameActive (isVisible, entry) {
+    rowBecameActive (entry) {
+      assert(entry.target.dataset.id)
+      let isVisible = !!entry.isIntersecting
       if (isVisible) {
-        this.$log('rowBecameActive', entry.target.accessKey)
-        let [oid, idx] = entry.target.accessKey.split('-')
+        this.$log('rowBecameActive', entry.target.dataset.id)
+        let [oid, idx] = entry.target.dataset.id.split('-')
         idx = parseInt(idx)
-        this.rowActiveKey = entry.target.accessKey
+        this.rowActiveKey = entry.target.dataset.id
       }
     },
     rowMakeActive (row, useTween = true, useDirection = null) {

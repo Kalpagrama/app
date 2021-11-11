@@ -61,9 +61,8 @@ q-layout(
               ).row.full-width.items-start.content-start
               //- item wrapper
               div(
-                v-observe-visibility=`{
-                  throttle: 150,
-                  callback: nodeVisibilityCallback
+                v-intersection=`{
+                  handler: $throttle(nodeVisibilityCallback, 150)
                 }`
                 ).row.full-width.items-start.content-start
                 item-feed(
@@ -88,6 +87,7 @@ q-layout(
 import { RxCollectionEnum } from 'src/system/rxdb'
 import itemLinks from './item_links/index.vue'
 import itemCreator from './item_creator/index.vue'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'pageApp_sphereFull',
@@ -131,7 +131,8 @@ export default {
     },
   },
   methods: {
-    nodeVisibilityCallback (isVisible, entry) {
+    nodeVisibilityCallback (entry) {
+      let isVisible = !!entry.isIntersecting
       this.nodeIsVisible = isVisible
     }
   },

@@ -86,16 +86,15 @@ div(
       div(
         v-for="(joint, jointIndex) in jointsRes.items" :key="joint.oid"
         v-if="!row.oidsHidden.includes(joint.oid)"
-        v-observe-visibility=`{
-          throttle: 150,
-          callback: jointVisibilityCallback,
-          intersection: {
+        v-intersection=`{
+          handler: $throttle(jointVisibilityCallback, 150),
+          cfg: {
             root: scrollWrapperRef,
             rootMargin: '0px -50%',
           }
         }`
         :ref="`joint-${joint.oid}`"
-        :accessKey="`${joint.oid}-${jointIndex}`"
+        :data-id="`${joint.oid}-${jointIndex}`"
         :class=`{
           //- 'bg-red': jointVisibleOid === joint.oid,
         }`
@@ -140,6 +139,7 @@ div(
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import jointItem from './joint_item.vue'
+import { assert } from 'src/system/common/utils'
 // import widgetBookmarks from 'src/pages/app/workspace/widget_bookmarks/index.vue'
 
 export default {
@@ -240,12 +240,14 @@ export default {
     }
   },
   methods: {
-    async jointVisibilityCallback (isVisible, entry) {
+    async jointVisibilityCallback (entry) {
+      assert(entry.target.dataset.id)
+      let isVisible = !!entry.isIntersecting
       // if (this.jointsWrapperWidthChanging) return
       if (isVisible) {
         this.$log('jointVisibilityCallback', isVisible)
         this.jointVisibilityCallbackCount += 1
-        let [key, idx] = entry.target.accessKey.split('-')
+        let [key, idx] = entry.target.dataset.id.split('-')
         // this.$log('key', key)
         // this.$log('idx', idx)
         idx = parseInt(idx)

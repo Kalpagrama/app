@@ -115,8 +115,10 @@ export default {
       // this.$log('result=', result)
       return result
     },
-    itemVisibilityHandler (isVisible, entry) {
-      let [key, idxSting] = entry.target.accessKey.split('-')
+    itemVisibilityHandler (entry) {
+      assert(entry.target.dataset.id)
+      let isVisible = !!entry.isIntersecting
+      let [key, idxSting] = entry.target.dataset.id.split('-')
       // if (isVisible) this.$log('isVisible =', isVisible, idxSting, key)
       this.$set_deprecated(this.itemsVisibility, key, isVisible)
     },
