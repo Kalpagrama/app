@@ -133,6 +133,16 @@ export default {
       if (this.$store.getters.isGuest) {
         return res
       }
+      if (this.$store.getters.currentUser.profile.role.in(UserRoleEnum.MODERATOR, UserRoleEnum.ADMIN)) {
+        res.hideGlobal = {
+          name: this.$t('hide global'),
+          color: 'red',
+          cb: async () => {
+            this.$log('hideGlobal...')
+            await ObjectApi.hide(this.essence.oid)
+          }
+        }
+      }
       if (this.essenceIsMine || this.$store.getters.currentUser.profile.role.in(UserRoleEnum.MODERATOR, UserRoleEnum.ADMIN)) {
         res.delete = {
           name: this.$t('Delete'),
@@ -140,14 +150,6 @@ export default {
           cb: async () => {
             this.$log('essenceDelete...')
             await ObjectApi.unPublish(this.essence.oid)
-          }
-        }
-        res.hideGlobal = {
-          name: this.$t('hide global'),
-          color: 'red',
-          cb: async () => {
-            this.$log('hideGlobal...')
-            await ObjectApi.hide(this.essence.oid)
           }
         }
       } else {
