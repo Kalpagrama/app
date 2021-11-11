@@ -9,8 +9,7 @@ div(
   ).row.fit
   //- cluster wrapper
   div(
-    v-for="(cluster,clusterIndex) in player.clusters" :key="clusterIndex"
-    v-if="cluster.figuresAbsolute.length > 0"
+    v-for="(cluster,clusterIndex) in player.clusters.filter(c => c.figuresAbsolute.length > 0)" :key="clusterIndex"
     :style=`{
       position: 'absolute', zIndex: 1000+clusterIndex,
       left: (cluster.figuresAbsolute[0].t/player.duration)*100+'%',
