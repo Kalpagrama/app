@@ -71,10 +71,10 @@ div(
       :ref="`item-${itemIndex}`"
       :key="`item-${itemIndex}`"
       :accessKey="`${itemIndex}`"
-      v-observe-visibility=`{
-        throttle: 0,
-        callback: itemActiveHandler,
-        intersection: {
+      :data-id="`${itemIndex}`"
+      v-intersection=`{
+        handler: itemActiveHandler,
+        cfg: {
           root: scrollTargetIsWindow ? null : scrollTarget,
           rootMargin: rootMargin,
           //- threshold: 0.9,
@@ -101,11 +101,10 @@ div(
       div(
         v-else
         :style=`{...itemStyles}`
-        :accessKey="`${item[itemKey]}-${itemIndex}`"
-        v-observe-visibility=`{
-          throttle: 300,
-          callback: itemVisibilityHandler,
-          intersection: {
+        :data-id="`${item[itemKey]}-${itemIndex}`"
+        v-intersection=`{
+          handler: $throttle(itemVisibilityHandler, 300, {leading: false}),
+          cfg: {
              root: scrollTargetIsWindow ? null : scrollTarget,
              threshold: 0.2},
           }`
@@ -347,11 +346,12 @@ export default {
       // без него лучше работает (браузер сам подматывает при измении высоты элементов в скролле)
       // пример в list_feed_custom_ppv.vue
     },
-    itemActiveHandler (isVisible, entry) {
-      // let [key, idxSting] = entry.target.accessKey.split('-')
-      let indx = parseInt(entry.target.accessKey)
+    itemActiveHandler (entry) {
+      assert(entry.target.dataset.id)
+      let isVisible = !!entry.isIntersecting
+      let indx = parseInt(entry.target.dataset.id)
       if (isVisible) {
-        this.$log('itemActiveHandler', entry.target.accessKey)
+        this.$log('itemActiveHandler', entry.target.dataset.id)
         this.itemActiveSet(indx)
       } else {
         if (this.itemActive && this.itemActive.indx === indx) {
@@ -360,8 +360,10 @@ export default {
         }
       }
     },
-    itemVisibilityHandler (isVisible, entry) {
-      let [key, idxSting] = entry.target.accessKey.split('-')
+    itemVisibilityHandler (entry) {
+      assert(entry.target.dataset.id)
+      let isVisible = !!entry.isIntersecting
+      let [key, idxSting] = entry.target.dataset.id.split('-')
       // this.$log('itemVisibilityChanged', isVisible, idxSting, key)
       this.$set_deprecated(this.itemsVisibility, key, isVisible)
     },

@@ -100,6 +100,9 @@ module.exports = configure(function (ctx) {
       // Applies only if "transpile" is set to true.
       // transpileDependencies: [],
 
+      // source-map нужен для debug (увеличивает размер js в 2 раза)
+      // sourceMap: true,
+      devtool: 'eval-source-map',
       preloadChunks: true,
       gzip: true,
       distDir: 'dist',
@@ -139,24 +142,6 @@ module.exports = configure(function (ctx) {
             new webpack.IgnorePlugin({ resourceRegExp: /@capacitor\/core/ })
           )
         }
-        // todo отключить source-map когда не потребуется debug(увеличивает размер js в 2 раза)
-        // eslint-disable-next-line no-constant-condition
-        if (ctx.dev) {
-          if (!ctx.mode.capacitor) {
-            cfg.devtool = 'inline-source-map' // 'source-map'
-            cfg.plugins.push(
-              new webpack.SourceMapDevToolPlugin({
-                filename: '[file].js.map'
-              })
-            )
-            cfg.plugins.push(
-              new webpack.EvalSourceMapDevToolPlugin({
-                filename: '[file].map'
-              })
-            )
-          }
-        }
-
         cfg.resolve.alias = {
           ...cfg.resolve.alias,
           schema: path.resolve(__dirname, './src/api'),

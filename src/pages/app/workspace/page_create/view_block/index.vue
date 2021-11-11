@@ -18,13 +18,8 @@ kalpa-layout()
           :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.q-pb-xs
           //- node wrapper
           div(
-            v-observe-visibility=`{
-              throttle: 150,
-              callback: nodeVisibilityCallback,
-              intersection: {
-                //- root: scrollTargetIsWindow ? null : scrollTarget,
-                //- rootMargin: '-50% 0px'
-              }
+            v-intersection=`{
+              handler: $throttle(nodeVisibilityCallback, 150)
             }`
           ).row.full-width
             block-edit(
@@ -38,6 +33,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import navMobile from 'src/pages/app/node/nav_mobile.vue'
 import blockEdit from 'src/components/block/edit/index.vue'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'viewBlock',
@@ -57,7 +53,8 @@ export default {
   computed: {
   },
   methods: {
-    nodeVisibilityCallback (isVisible, entry) {
+    nodeVisibilityCallback (entry) {
+      let isVisible = !!entry.isIntersecting
       this.$log('nodeVisibilityCallback', isVisible)
       this.nodeIsVisible = isVisible
     }

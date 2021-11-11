@@ -27,7 +27,7 @@ export default {
   nodeOnContent: null,
   nodeCreating: false,
   // debug
-  useDebug: false,
+  useDebug: true,
   authGuard: null,
   bookmarkTypes: [
     {

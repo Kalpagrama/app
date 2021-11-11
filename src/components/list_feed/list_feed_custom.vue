@@ -100,16 +100,15 @@ div(
         v-for="({source: item, state, debugInfo}, itemIndex) in vsItems"
         :key="item[itemKey]"
         :ref="`item-${item[itemKey]}`"
-        :accessKey="`${item[itemKey]}-${itemIndex}`"
+        :data-id="`${item[itemKey]}-${itemIndex}`"
         :class=`{
         //- 'bg-red': item[itemKey] === (itemMiddle ? itemMiddle.key : undefined),
          }`
         :style=`{
         position: 'relative'}`
-        v-observe-visibility=`{
-        throttle: 150,
-        callback: itemMiddleHandler,
-        intersection: {
+        v-intersection=`{
+        handler: $throttle(itemMiddleHandler, 150),
+        cfg: {
           root: scrollTargetIsWindow ? null : scrollTarget,
           rootMargin: rootMargin,
           //- threshold: 0.9,
@@ -132,11 +131,10 @@ div(
           :style=`{
             position: 'relative',
             ...itemStyles}`
-          :accessKey="`${item[itemKey]}-${itemIndex}`"
-          v-observe-visibility=`{
-          throttle: 300,
-          callback: itemVisibilityHandler,
-          intersection: {
+          :data-id="`${item[itemKey]}-${itemIndex}`"
+          v-intersection=`{
+          handler: $throttle(itemVisibilityHandler, 300),
+          cfg: {
              root: scrollTargetIsWindow ? null : scrollTarget,
              threshold: 0.2,
           },
@@ -437,10 +435,12 @@ export default {
         setVerticalScrollPosition(this.scrollTarget, 0)
       }
     },
-    itemMiddleHandler (isVisible, entry) {
-      let [key, idxSting] = entry.target.accessKey.split('-')
+    itemMiddleHandler (entry) {
+      assert(entry.target.dataset.id)
+      let isVisible = !!entry.isIntersecting
+      let [key, idxSting] = entry.target.dataset.id.split('-')
       if (isVisible) {
-        // this.$log('isVisible', entry.target.accessKey)
+        // this.$log('isVisible', entry.target.dataset.id)
         this.itemMiddleSet(key, parseInt(idxSting))
       } else {
         if (this.itemMiddle && this.itemMiddle.key === key) {
@@ -450,8 +450,10 @@ export default {
         }
       }
     },
-    itemVisibilityHandler (isVisible, entry) {
-      let [key, idxSting] = entry.target.accessKey.split('-')
+    itemVisibilityHandler (entry) {
+      assert(entry.target.dataset.id)
+      let isVisible = !!entry.isIntersecting
+      let [key, idxSting] = entry.target.dataset.id.split('-')
       // this.$log('itemVisibilityChanged', isVisible, idxSting, key)
       this.$set_deprecated(this.itemsVisibility, key, isVisible)
     },

@@ -1,9 +1,8 @@
 <template lang="pug">
 div(
-  v-observe-visibility=`{
-    throttle: 150,
-    callback: visibilityCallback,
-    intersection: {
+  v-intersection=`{
+    handler: $throttle(visibilityCallback, 150),
+    cfg: {
       rootMargin: '-50% 0px',
     }
   }`
@@ -74,6 +73,8 @@ div(
 </template>
 
 <script>
+import { assert } from 'src/system/common/utils'
+
 export default {
   name: 'typeJoint',
   props: ['oidPinned', 'joint', 'isLast'],
@@ -93,7 +94,8 @@ export default {
     // showAuthor () {}
   },
   methods: {
-    visibilityCallback (isVisible, entry) {
+    visibilityCallback (entry) {
+      let isVisible = !!entry.isIntersecting
       this.isVisible = isVisible
     }
   }

@@ -7,9 +7,8 @@
       maxWidth: 500+'px',
       //- marginBottom: '500px',
     }`
-    v-observe-visibility=`{
-      throttle: 150,
-      callback: contentIsVisibleCallback,
+    v-intersection=`{
+      handler: $throttle(contentIsVisibleCallback, 150)
       }`
     ).row.full-width.items-start.content-start.q-mt-xl.q-mb-md
     q-resize-observer(@resize="contentHeightCallback")
@@ -52,6 +51,7 @@
 
 <script>
 import contentPlayer from 'src/components/content_player/index.vue'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'sectionVideo',
@@ -71,7 +71,8 @@ export default {
     }
   },
   methods: {
-    contentIsVisibleCallback (isVisible, entry) {
+    contentIsVisibleCallback (entry) {
+      let isVisible = !!entry.isIntersecting
       this.$log('contentIsVisibleCallback', isVisible)
       this.contentIsVisible = isVisible
     },
