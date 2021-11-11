@@ -2,7 +2,7 @@
 .row
   slot(name="action" :start="start" :bookmark="bookmark")
   q-btn(
-    v-if="!$scopedSlots.action"
+    v-if="!$slots.action"
     @click="start()"
     round flat no-caps
     :color="bookmark ? activeColor : inactiveColor"

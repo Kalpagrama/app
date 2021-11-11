@@ -2,7 +2,7 @@
 .row
   slot(v-if="!formOnly" name="action" :start="start" :content="content")
     q-btn(
-      v-if="!$scopedSlots.action"
+      v-if="!$slots.action"
       round flat no-caps
       :color="paid ? activeColor : inactiveColor"
       icon="paid"

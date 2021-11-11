@@ -12,7 +12,9 @@ div(
     .row.full-width.items-start.content-start
       //- avatar
       .col-xs-12.col-sm-4.q-px-sm.q-pt-md
+        span kkkkkkkkkkkkkkkkk
         edit-avatar(:currentUser="currentUser")
+        span cccccccccccccccc
       //- right side
       .col-xs-12.col-sm-8.q-px-sm
         edit-profile(:currentUser="currentUser")

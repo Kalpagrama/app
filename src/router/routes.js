@@ -145,7 +145,7 @@ const routes = [
          {
             name: 'settings',
             path: 'settings',
-            redirect: 'settings/account',
+            redirect: '/settings/account',
             component: () => import('src/pages/app/settings'),
             children: [
                {
