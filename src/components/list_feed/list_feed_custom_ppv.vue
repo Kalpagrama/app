@@ -209,11 +209,9 @@ export default {
     },
     rootMargin () {
       if (this.scrolledAreaHeight >= this.scrollTargetHeight) {
-        this.$log('rootMargin', '-50% 0px')
         return '-50% 0px'
       }
       else { // скролл не заполнен
-        this.$log('rootMargin', `-${Math.ceil(50 * (this.scrolledAreaHeight / this.scrollTargetHeight))}% 0px`)
         return `-${Math.ceil(50 * (this.scrolledAreaHeight / this.scrollTargetHeight))}% 0px`
       }
     },

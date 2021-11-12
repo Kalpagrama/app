@@ -40,7 +40,7 @@ q-layout(
         //- content
         .row.full-width.justify-center.q-mt-lg
           q-icon(name="select_all" color="grey-5" size="40px").q-pr-xs
-          p.text-h4.text-bold.text-white {{$t('Contents', 'Контент')}}
+          p.text-h4.text-bold.text-white {{$t('Контент')}}
         div(:style=`{zIndex: 10,}`).row.full-width.justify-center
           div(
             :style=`{
@@ -70,7 +70,7 @@ q-layout(
         //- nodes
         .row.full-width.justify-center.q-pt-xl
           q-icon(name="adjust" color="grey-5" size="40px").q-pr-xs
-          p.text-h4.text-bold.text-white {{$t('Essence core', 'Смысловое ядро')}}
+          p.text-h4.text-bold.text-white {{$t('Смысловое ядро')}}
         div(:style=`{zIndex: 10,}`).row.full-width.justify-center
           div(
             :style=`{
@@ -178,7 +178,7 @@ q-layout(
                 padding: '4px',
               }`
               ).row.items-center.content-center.justify-center.b-30
-          p.text-h4.text-white.text-bold.q-pl-sm {{$t('Voting', 'Голосование')}}
+          p.text-h4.text-white.text-bold.q-pl-sm {{$t('Голосование')}}
         //- voting extended
         div(:style=`{zIndex: 10,}`).row.full-width.justify-center
           div(

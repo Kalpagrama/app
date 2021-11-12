@@ -98,8 +98,8 @@ q-page(:style=`{paddingBottom: '200px',}`)
               height: '60px',
             }`
             ).full-width
-            span(:style=`{fontSize: '18px',}`).text-white.text-bold {{$t('auth_Sign in', 'Войти')}}
-      with-socials(:title="$t('auth_Sign in with Google!', 'Войти через Google')")
+            span(:style=`{fontSize: '18px',}`).text-white.text-bold {{$t('Войти')}}
+      with-socials(:title="$t('Войти через Google')")
       kalpa-docs(title="Продолжая, вы соглашаетесь с:")
 </template>
 

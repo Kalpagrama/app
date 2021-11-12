@@ -36,7 +36,7 @@ module.exports = {
     ns: [
       'translation'
     ],
-    defaultLng: 'en',
+    defaultLng: 'ru',
     defaultNs: 'translation',
     // defaultValue: '__STRING_NOT_TRANSLATED__',
     resource: {

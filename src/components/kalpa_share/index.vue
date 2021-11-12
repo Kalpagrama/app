@@ -121,7 +121,7 @@ export default {
     },
     async shareLinkCopy () {
       this.$log('shareLinkCopy')
-      this.clipboardWrite(this.data.shareLink, this.$t('Link copied to clipboard!', 'Ссылка скопирована !'))
+      this.clipboardWrite(this.data.shareLink, this.$t('Ссылка скопирована!'))
       // await this.$wait(500)
       this.data.shareDialogOpened = false
     },

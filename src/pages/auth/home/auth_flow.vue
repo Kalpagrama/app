@@ -74,7 +74,7 @@ div(
       q-input(
         v-model="password"
         borderless dark
-        :placeholder="$t('Enter password', 'Введите пароль')"
+        :placeholder="$t('Введите пароль')"
         :type="passwordShow ? 'text' : 'password'"
         :inputmode="needConfirm ? 'numeric' : 'text'"
         autocomplete="on" name="password"

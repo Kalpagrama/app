@@ -104,7 +104,7 @@ div(
         type="text" autogrow
         counter maxlength="108"
         :style=`{minHeight: '60px'}`
-        :placeholder="$t('enter content name', 'Введите название контента')"
+        :placeholder="$t('Введите название контента')"
         :input-style=`{
         background: 'rgb(45,45,45)',
         borderRadius: '10px',
@@ -163,7 +163,7 @@ div(
               :debounce="1000"
               dark outlined dense
               :style=`{borderRadius: '10px', height: '40px'}`
-              :placeholder="$t('enter the cost', 'Введите стоимость')"
+              :placeholder="$t('Введите стоимость')"
               :input-style=`{
               // background: 'rgb(45,45,45)',
               // borderRadius: '10px',
@@ -182,7 +182,7 @@ div(
         flat icon="delete"
         :loading="contentDeleting"
         @click="contentDelete")
-        q-tooltip(dense dark) {{$t('Delete content', 'Удалить контент')}}
+        q-tooltip(dense dark) {{$t('Удалить контент')}}
     .col
     q-btn(outline no-caps color="red" :label="$t('Cancel')" v-close-popup).q-mr-sm
     q-btn(outline no-caps color="green" :disable="!needSave" :loading="loading" :label="$t('Save')" @click="save")
@@ -236,8 +236,8 @@ export default {
       paidUsersListShow: false,
       pageId: 'cover',
       pages: [
-        {id: 'cover', name: this.$t('Сover', 'Обложка')},
-        {id: 'preview', name: this.$t('Preview', 'Превью')}]
+        {id: 'cover', name: this.$t('Обложка')},
+        {id: 'preview', name: this.$t('Превью')}]
     }
   },
   computed: {

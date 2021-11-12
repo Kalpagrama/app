@@ -8,7 +8,7 @@ kalpa-layout()
            @pageId="pageIdChange")
       template(v-slot:center)
         .row.content-center
-          span.text-grey-7 {{$t('Graph view', 'Граф связей')}}
+          span.text-grey-7 {{$t('Граф связей')}}
   template(v-slot:body)
     .row.full-width.items-start.content-start
       //- header

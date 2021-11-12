@@ -40,7 +40,7 @@ div(
                 color="green"
                 borderless dark dense outlined
                 :debounce="1000"
-                :placeholder="$t('enter the cost', 'Введите стоимость')"
+                :placeholder="$t('Введите стоимость')"
                 :input-style=`{
                   // background: 'rgb(45,45,45)',
                   borderRadius: '10px',
@@ -89,7 +89,7 @@ div(
         color="green"
         borderless dark dense
         :style=`{minHeight: '60px'}`
-        :placeholder="$t('enter content name', 'Введите название контента')"
+        :placeholder="$t('Введите название контента')"
         :input-style=`{
         background: 'rgb(45,45,45)',
         borderRadius: '10px',
@@ -133,7 +133,7 @@ div(
               color="green"
               borderless dark dense outlined
               :style=`{borderRadius: '10px'}`
-              :placeholder="$t('enter the cost', 'Введите стоимость')"
+              :placeholder="$t('Введите стоимость')"
               :input-style=`{
               // background: 'rgb(45,45,45)',
               borderRadius: '10px',
