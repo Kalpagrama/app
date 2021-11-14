@@ -3,7 +3,7 @@ import {assert} from 'src/system/common/utils'
 import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 import {WsItemTypeEnum as WsItemTypeEnumOrig} from 'src/system/common/enums'
 
-const logDT = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.TEST)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
 
 const RxModuleEnum = Object.freeze({
    WS: 'WS',
@@ -97,7 +97,7 @@ function getTocIdFromCfi (epubCfi) {
 function rxdbOperationProxy (collection, operation, ...params) {
    assert(collection && isRxCollection(collection) && operation, 'bad rxdbOperationProxy params1 : ' + JSON.stringify({isRxCollection: isRxCollection(collection), operation}))
    const f = rxdbOperationProxy
-   logDT(f, collection.name, operation)
+   // logD(f, collection.name, operation)
    const t1 = performance.now()
    switch (operation) {
       case 'remove':
@@ -122,7 +122,7 @@ function rxdbOperationProxy (collection, operation, ...params) {
 async function rxdbOperationProxyExec (collection, operation, ...params) {
    assert(collection && isRxCollection(collection) && operation, 'bad rxdbOperationProxy params2 : ' + JSON.stringify({has: !!collection, props: Object.keys(collection || {empty: '_empty_'}), isRxCollection: isRxCollection(collection), operation}))
    const f = rxdbOperationProxyExec
-   // logDT(f, collection.name, operation)
+   // logD(f, collection.name, operation)
    const t1 = performance.now()
    try {
       switch (operation) {
@@ -144,7 +144,7 @@ async function rxdbOperationProxyExec (collection, operation, ...params) {
             throw operation + ' not impl'
       }
    } finally {
-      logDT(f, `${collection.name} ${operation} ${params} complete: ${Math.floor(performance.now() - t1)} msec)`)
+      // logD(f, `${collection.name} ${operation} ${params} complete: ${Math.floor(performance.now() - t1)} msec)`)
    }
 }
 

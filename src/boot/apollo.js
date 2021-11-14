@@ -37,7 +37,7 @@ export default boot(async ({
 }) => {
   try {
     const f = { nameExtra: 'boot::apollo' }
-    logW(f, 'start')
+    logD(f, 'start')
     // logW(f, 'SERVICES_URL_DEBUG=', process.env.SERVICES_URL_DEBUG)
     // logW(f, 'SERVICES_URL=', process.env.SERVICES_URL)
     // logW(f, 'DOCKER_MACHINE_NAME=', process.env.DOCKER_MACHINE_NAME)

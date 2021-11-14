@@ -32,7 +32,8 @@ module.exports = configure(function (ctx) {
       'system',
       'main',
       'components',
-      'helpers'
+      'helpers',
+      'tests',
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
@@ -83,6 +84,7 @@ module.exports = configure(function (ctx) {
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       env: {
+        RUN_TESTS: process.env.RUN_TESTS, // запустить рантайм-тесты после инициализации приложения
         DOCKER_MACHINE_NAME: process.env.DOCKER_MACHINE_NAME || 'local', // имя контенйнера, в котором собран фронт (для того чтобы различать production от dev) (api-dev,api-yc,vercel,local)
         ORIGIN_URL: process.env.ORIGIN_URL,
         ORIGIN_URL_DEBUG: ctx.mode.pwa && ctx.dev ? process.env.ORIGIN_URL_DEBUG_MAC : process.env.ORIGIN_URL_DEBUG,
@@ -147,6 +149,7 @@ module.exports = configure(function (ctx) {
           ...cfg.resolve.alias,
           schema: path.resolve(__dirname, './src/api'),
           public: path.resolve(__dirname, './public'),
+          tests: path.resolve(__dirname, './tests'),
           // vue: '@vue/compat'
         }
         if (!ctx.mode.ssr) {

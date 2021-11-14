@@ -23,7 +23,6 @@ import { setSyncEventStorageValue } from 'src/system/services'
 import { ObjectApi } from 'src/api/object'
 import { store } from 'src/store'
 
-const logDT = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.TEST)
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB)
@@ -178,7 +177,7 @@ class RxDBWrapper {
       let collection = dbTest.cache
 
       let allObjects = await ObjectApi.objectListAllTest()
-      logDT('allObjects', allObjects.length)
+      logD('allObjects', allObjects.length)
       let f = this.createTestDb
       let tmpObj
       const findCycle = async () => {
@@ -187,7 +186,7 @@ class RxDBWrapper {
             let id = RxCollectionEnum.OBJ + '::' + obj.oid + '::' + JSON.stringify({})
             let finded1 = await collection.find({ selector: { 'cached.data.name': obj.name } }).exec()
             let finded2 = await collection.findOne(id).exec()
-            logDT(f, `find complete: ${Math.floor(performance.now() - t)} msec`, finded1.length, finded2 ? 1 : 0)
+            logD(f, `find complete: ${Math.floor(performance.now() - t)} msec`, finded1.length, finded2 ? 1 : 0)
             // await wait(5)
          }
       }
@@ -211,7 +210,6 @@ class RxDBWrapper {
          }
          let oids = inserted.map(item => item.id)
          let updatedRxDocs = await collection.find({ selector: { id: { $in: oids } } }).exec()
-         // if (updatedRxDocs.length) logDT(f, 'updatedRxDocs: ', updatedRxDocs.length)
          for (let updated of updatedRxDocs) {
             let itemForUpdate = inserted.find(item => item.id === updated.id)
             assert(itemForUpdate, '!inserted')
@@ -229,11 +227,11 @@ class RxDBWrapper {
             await insert(prefix, curr, curr + 100)
             curr = next
             // await wait(100)
-            logDT(f, `${prefix}:${curr} cycle complete: ${Math.floor(performance.now() - t)} msec`)
+            logD(f, `${prefix}:${curr} cycle complete: ${Math.floor(performance.now() - t)} msec`)
          }
       }
 
-      logDT(f, 'complete')
+      logD(f, 'complete')
    }
 
    async create (store) {
