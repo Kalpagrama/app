@@ -4,7 +4,7 @@ import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.VUEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.VUEX)
 
-export function stateSet (state, [key, val]) {
+function stateSet (state, [key, val]) {
    if (!Object.prototype.hasOwnProperty.call(state, key)) {
       logE('cant find prop in store/ui state: ' + key)
       return
@@ -12,3 +12,5 @@ export function stateSet (state, [key, val]) {
    // assert(Object.prototype.hasOwnProperty.call(state, key), 'cant find prop: ' + key)
    state[key] = val
 }
+
+export default { stateSet }
