@@ -15,7 +15,7 @@ export default {
    logRocket: false,
    logRocketSessionUrl: null,
    logDbgModulesBlackList: [
-      LogSystemModulesEnum.SYSTEM,
+      // LogSystemModulesEnum.SYSTEM,
       // LogSystemModulesEnum.TESTS,
       LogSystemModulesEnum.SW,
       LogSystemModulesEnum.PWA,

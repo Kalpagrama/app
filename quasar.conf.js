@@ -33,8 +33,8 @@ module.exports = configure(function (ctx) {
       'main',
       'components',
       'helpers',
-      'tests',
-    ],
+      process.env.RUN_TESTS ? 'tests' : undefined, // запустить рантайм-тесты после инициализации приложения
+    ].filter(b => !!b),
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
     css: [
@@ -84,7 +84,6 @@ module.exports = configure(function (ctx) {
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       env: {
-        RUN_TESTS: process.env.RUN_TESTS, // запустить рантайм-тесты после инициализации приложения
         DOCKER_MACHINE_NAME: process.env.DOCKER_MACHINE_NAME || 'local', // имя контенйнера, в котором собран фронт (для того чтобы различать production от dev) (api-dev,api-yc,vercel,local)
         ORIGIN_URL: process.env.ORIGIN_URL,
         ORIGIN_URL_DEBUG: ctx.mode.pwa && ctx.dev ? process.env.ORIGIN_URL_DEBUG_MAC : process.env.ORIGIN_URL_DEBUG,
