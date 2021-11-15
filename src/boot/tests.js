@@ -9,8 +9,8 @@ let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnu
 export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath, redirect }) => {
    logD('start tests!')
    alert('start tests!')
-   await testsDeInit({ app, router, store, ssrContext, urlPath, publicPath, redirect })
-   alert('testsDeInit passed OK!')
+   // await testsDeInit({ app, router, store, ssrContext, urlPath, publicPath, redirect })
+   // alert('testsDeInit passed OK!')
    await testsInit({ app, router, store, ssrContext, urlPath, publicPath, redirect })
    alert('testsInit passed OK!')
    await testsRxdb({ app, router, store, ssrContext, urlPath, publicPath, redirect })
