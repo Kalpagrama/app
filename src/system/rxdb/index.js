@@ -126,7 +126,6 @@ class RxDBWrapper {
                }
             } catch (err) {
                logE('cant process rxdb event! before reload!', err)
-               alert('error on processStoreEvent: ' + JSON.stringify(err))
                await window.location.reload()
                logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
             }

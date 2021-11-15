@@ -27,13 +27,17 @@ async function checkLogin ({ app, router, store }) {
 }
 
 export default async function ({ app, router, store }) {
-   let check = async (func) => assert((await func({ app, router, store }).catch((err) => {
+   let check = async (func) => assert((await func({ app, router, store })
+      .then((res) => {
+         logD('check passed', func.name)
+         return res
+      })
+      .catch((err) => {
       logE('err on test', err)
       return false
    })), 'test not passed: ' + func.name)
    await check(checkSystemInit)
    await check(checkCurrentUser)
    await check(checkLogin)
-   alert('all tests passed OK!')
    return true
 }

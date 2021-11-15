@@ -366,7 +366,7 @@ class Workspace {
          }
       }
       this.store.commit('core/stateSet', ['wsReady', true])
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, unsavedItems)
+      logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`, unsavedItems)
    }
 
    // от сервера прилетел эвент об изменении в мастерской (скорей всего - ответ на наши действия)

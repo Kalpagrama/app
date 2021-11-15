@@ -255,7 +255,7 @@ async function systemReset (clearAuthData = false, clearRxdb = true, reload = tr
          logW('systemReset::before reload')
          window.location.reload()
       }
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    } catch (err) {
       alert(`Критическая ошибка ${JSON.stringify(err)}.\n Очистка данных и перезагрузка`)
       await systemHardReset()
@@ -324,7 +324,7 @@ async function systemInit () {
       }
       // alert(' systemInit 7 ')
       window.KALPA_LOAD_COMPLETE = true
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    } catch (err) {
       logE('error on systemInit!', err)
       await systemReset(true, true, true, true)
