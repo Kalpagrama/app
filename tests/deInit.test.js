@@ -33,5 +33,6 @@ export default async function ({ app, router, store }) {
    })), 'test not passed: ' + func.name)
    await check(checkLogout)
    await check(checkSystemReset)
+   alert('testsDeInit passed!')
    return true
 }

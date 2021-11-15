@@ -97,7 +97,7 @@ div(
       }`
     ).row.full-width.items-start.content-start
       div(
-        v-for="({source: item, state, debugInfo}, itemIndex) in vsItems"
+        v-for="({source: item, state}, itemIndex) in vsItems"
         :key="item[itemKey]"
         :ref="`item-${item[itemKey]}`"
         :data-id="`${item[itemKey]}-${itemIndex}`"
@@ -150,9 +150,9 @@ div(
             :isPreload="true"
             )
           span(v-if="$store.state.ui.useDebug" :style=`{color: item[itemKey] === (itemMiddle ? itemMiddle.key : undefined) ? 'green' : 'grey'}`
-          ).absolute-top # {{itemIndex-1}} of {{itemsRes.itemsHeaderFooter.length-2}} orig# {{debugInfo().indxHF }} of {{debugInfo().loadedLen}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '-----VISIBLE' : ''}}
+          ).absolute-top # {{itemIndex-1}} of {{itemsRes.itemsHeaderFooter.length-2}} {{item[itemKey]}} {{!!itemsVisibility[item[itemKey]] ? '-----VISIBLE' : ''}}
           span(v-if="$store.state.ui.useDebug" :style=`{color: item[itemKey] === (itemMiddle ? itemMiddle.key : undefined) ? 'green' : 'grey'}`
-          ).absolute-center.text-bold.text-h1.z-max {{debugInfo().indx}}
+          ).absolute-center.text-bold.text-h1.z-max {{'debugInfo().indx'}}
     slot(name="append")
   //// scrollbar
   //div(
@@ -310,7 +310,7 @@ export default {
         this.itemMiddleScrollIntoView('itemsRes.itemsHeaderFooter WATCHER')
         this.vsItems = this.vsItems = this.itemsRes.itemsHeaderFooter.map(item => {
           return {
-            debugInfo: item.debugInfo,
+            // debugInfo: item.debugInfo,
             source: item.populatedObject || item,
             state: {
               itemId: item[this.itemKey],
@@ -376,7 +376,7 @@ export default {
       let itemsResWrapperOffsetParent = itemsResWrapperRef.offsetParent
       this.$log('itemsResWrapper', { itemsResWrapperRect, itemsResWrapperOffsetTop, itemsResWrapperOffsetParent })
       this.$log('itemsVisibility', this.itemsVisibility)
-      if (this.itemMiddle) this.$log('itemMiddle.item.debugInfo()', this.itemMiddle.item.debugInfo())
+      // if (this.itemMiddle) this.$log('itemMiddle.item.debugInfo()', this.itemMiddle.item.debugInfo())
       // let scrollTarget
     },
     // обновит itemMiddle.top для каждого элемента в itemMiddleHistory

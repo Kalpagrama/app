@@ -34,7 +34,6 @@ export default async function ({ app, router, store }) {
       return false
    })), 'test not passed: ' + func.name)
    await check(checkRxdb)
-   // await check(checkCurrentUser)
-   // await check(checkLogin)
+   alert('testsRxdb passed!')
    return true
 }

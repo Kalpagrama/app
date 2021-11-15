@@ -286,7 +286,7 @@ class ReactiveDocFactory {
       // skip - для пропуска n первых эвантов (после subscribe - сразу генерится эвент(даже если данные не менялись))
       this.rxDocSubscription = this.rxDoc.$.pipe(skip(1)).subscribe(async changePlainDoc => {
          try {
-            // logD(f, 'reactiveDoc changed start', changePlainDoc)
+            logD(f, 'reactiveDoc changed start', changePlainDoc)
             await this.mutex.lock('rxDocSubscribe') // обязательно сначала блокируем !!! (см reactiveSubscribe)
             assert(this.getRev() && changePlainDoc._rev, '!this.getRev() && changePlainDoc._rev')
             if (this.getRev() === changePlainDoc._rev) return // изменения уже применены к reactiveDoc (см this.reactiveSubscribe())
@@ -313,7 +313,6 @@ class ReactiveDocFactory {
       if (this.itemUnsubscribeFunc) return
       this.itemUnsubscribeFunc = watch(() => this.vm.reactiveData, async (newVal, oldVal) => {
          // reactiveItem изменилась (обычно из UI)
-
          // изменить связанный объект во vuex
          if (this.vuexKey) {
             store.commit('setMirrorObject', [this.vuexKey, this.getReactive().getPayload()])
@@ -821,16 +820,17 @@ class Group {
          }
       }
       for (let item of filtered) {
-         item.debugInfo = () => {
-            let indx = this.findIndx(item[this.reactiveGroup.itemPrimaryKey])
-            return {
-               indx,
-               indxHF: indx + 1,
-               loadedLen: this.loadedLen(),
-               totalCount: this.reactiveGroup.totalCount,
-               fulFilledRange: this.fulFilledRange()
-            }
-         }
+         // !!!  нельзя менять item (он реактивен и связан с исходником в rxdb)
+         // item.debugInfo = () => {
+         //    let indx = this.findIndx(item[this.reactiveGroup.itemPrimaryKey])
+         //    return {
+         //       indx,
+         //       indxHF: indx + 1,
+         //       loadedLen: this.loadedLen(),
+         //       totalCount: this.reactiveGroup.totalCount,
+         //       fulFilledRange: this.fulFilledRange()
+         //    }
+         // }
       }
       items.splice(startPos, deleteCount, ...filtered) // добавляем новые
       if (this.screenSize) {
