@@ -4,7 +4,7 @@ import { isRxDocument, isRxQuery } from 'rxdb'
 import { skip } from 'rxjs/operators'
 import { getRawIdFromId, RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import debounce from 'lodash/debounce'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import lodashGet from 'lodash/get'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { Lists } from 'src/system/rxdb/lists'
@@ -12,10 +12,7 @@ import { store } from 'src/store/index'
 import cloneDeep from 'lodash/cloneDeep'
 
 import { reactive, watch } from 'vue'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_REACTIVE)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_REACTIVE)
 
 // dummyObject - не создавать реактивный объект с нуля, а использовать dummyObject (нужно когда dummyObject уже ушел в UI и нужно сохранить реактивность)
 function getReactive (rxDocOrObject, mirroredVuexObjectKey = null) {

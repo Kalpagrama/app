@@ -29,11 +29,11 @@ module.exports = configure(function (ctx) {
       'notify',
       'i18n',
       'apollo',
-      'system',
-      'main',
-      'components',
       'helpers',
-      process.env.RUN_TESTS ? 'tests' : undefined, // запустить рантайм-тесты после инициализации приложения
+      process.env.RUN_TESTS ? 'tests' : null, // запустить рантайм-тесты после инициализации приложения
+      'libs',
+      'components',
+      'system',
     ].filter(b => !!b),
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css

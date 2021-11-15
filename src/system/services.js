@@ -1,6 +1,6 @@
 import { mutexGlobal } from 'src/system/rxdb/mutex_global'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { Loading, Notify, Platform } from 'quasar'
 import { t, setLocale } from 'src/boot/i18n'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
@@ -11,15 +11,8 @@ import { router } from 'src/boot/system'
 import { store } from 'src/store/index'
 import { ContentApi } from 'src/api/content'
 import { makeRoutePath } from 'public/scripts/common_func'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.SYSTEM)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.SYSTEM)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.SYSTEM)
-
-const logMD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.MUTEX)
-const logME = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.MUTEX)
-const logMW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.MUTEX)
-
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.SYSTEM)
+let { logD: logMD, logT: logMT, logI: logMI, logW: logMW, logE: logME, logC: logMC } = getLogFunctions(LogSystemModulesEnum.MUTEX)
 let initialized = false
 
 let capacitor

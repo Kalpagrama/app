@@ -1,10 +1,7 @@
 import { boot } from 'quasar/wrappers'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import eventBus from 'tiny-emitter/instance'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
-const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.BOOT)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.BOOT)
 
 import { Screen, date, colors } from 'quasar'
 import { gsap } from 'gsap'

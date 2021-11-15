@@ -1,9 +1,15 @@
 import { boot } from 'quasar/wrappers'
-import { getLogFunc, initLogger, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
+import testsDeInit from 'tests/deInit.test'
+import testsRxdb from 'tests/rxdb.test'
+import testsInit from 'tests/init.test'
 import testsReactive from 'tests/reactive.test'
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.TESTS)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.TESTS)
 
 export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath, redirect }) => {
    logD('start tests!')
+   await testsInit({ app, router, store, ssrContext, urlPath, publicPath, redirect })
+   await testsRxdb({ app, router, store, ssrContext, urlPath, publicPath, redirect })
    await testsReactive({ app, router, store, ssrContext, urlPath, publicPath, redirect })
+   await testsDeInit({ app, router, store, ssrContext, urlPath, publicPath, redirect })
 })

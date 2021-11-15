@@ -4,11 +4,9 @@ import { createRouter, createMemoryHistory, createWebHistory, createWebHashHisto
 import {assert} from 'src/system/common/utils'
 import routes from './routes'
 import { t } from 'src/boot/i18n'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { AuthApi } from 'src/api/auth'
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.ROUTER)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.ROUTER)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.ROUTER)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.ROUTER)
 
 /*
  * If not building with SSR mode, you can

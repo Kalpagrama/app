@@ -1,10 +1,7 @@
 import {assert} from 'src/system/common/utils'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import cloneDeep from 'lodash/cloneDeep'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.VUEX_DBG)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.VUEX_DBG)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.VUEX_DBG)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.VUEX_DBG)
 
 function addReactiveItem (state, { id, reactiveItem }) {
    // if (process.env.NODE_ENV !== 'development') return

@@ -1,5 +1,5 @@
 import {assert} from 'src/system/common/utils'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { rxdb } from 'src/system/rxdb'
 import {
    RxCollectionEnum,
@@ -12,11 +12,7 @@ import { ListsApi as ListApi, ListsApi } from 'src/api/lists'
 import { getReactive, ReactiveListWithPaginationFactory, updateRxDocPayload } from 'src/system/rxdb/reactive'
 import { EpubCFI } from 'epubjs'
 import { makeId } from 'src/system/rxdb/index'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_LST)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_LST)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_LST)
-const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_LST)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_LST)
 
 export function makeListCacheId (mangoQuery) {
    assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 3' + JSON.stringify(mangoQuery))

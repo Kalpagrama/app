@@ -1,14 +1,29 @@
 import { boot } from 'quasar/wrappers'
+// eslint-disable-next-line import/no-duplicates
 import 'src/system/common/utils' // инициализация toJSON | String.in(...)
-import { initLogger, performance } from 'src/system/log'
+import { initLogger, performance, getLogFunc, LogLevelEnum, LogSystemModulesEnum, initLogRocket } from 'src/system/log'
+// eslint-disable-next-line import/no-duplicates
+import { assert } from 'src/system/common/utils'
+
+function getLogFunctions(logSystemModulesEnum) {
+  assert(Object.values(LogSystemModulesEnum).includes(logSystemModulesEnum))
+  const logD = getLogFunc(LogLevelEnum.DEBUG, logSystemModulesEnum)
+  const logT = getLogFunc(LogLevelEnum.TRACE, logSystemModulesEnum)
+  const logI = getLogFunc(LogLevelEnum.INFO, logSystemModulesEnum)
+  const logW = getLogFunc(LogLevelEnum.WARNING, logSystemModulesEnum)
+  const logE = getLogFunc(LogLevelEnum.ERROR, logSystemModulesEnum)
+  const logC = getLogFunc(LogLevelEnum.CRITICAL, logSystemModulesEnum)
+  return { logD, logT, logI, logW, logE, logC }
+}
 
 export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath, redirect }) => {
-  const { logD, logI, logW, logE, logC } = await initLogger(store, ssrContext)
+  const { logD, logT, logI, logW, logE, logC } = await initLogger(store, ssrContext)
   const f = { nameExtra: 'boot::log' }
   logD(f, 'start')
 
   const t1 = performance.now()
   app.config.globalProperties.$log = app.config.globalProperties.$logD = logD
+  app.config.globalProperties.$logT = logT
   app.config.globalProperties.$logI = logI
   app.config.globalProperties.$logW = logW
   app.config.globalProperties.$logE = logE
@@ -31,3 +46,5 @@ export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath
   }
   logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 })
+
+export { LogSystemModulesEnum, LogLevelEnum, getLogFunctions, performance, initLogRocket }

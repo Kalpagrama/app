@@ -1,11 +1,8 @@
 import { assert, wait } from 'src/system/common/utils'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { AppVisibility, Platform } from 'quasar'
 import { reactive, watch } from 'vue'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.MUTEX)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.MUTEX)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.MUTEX)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.MUTEX)
 
 const actualLockUpdateInterval = 500 // интервал обновления статуса активной блокировки
 

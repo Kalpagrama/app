@@ -1,8 +1,6 @@
 import Vue from 'vue'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.VUEX)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.VUEX)
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.VUEX)
 
 function stateSet (state, [key, val]) {
    if (!Object.prototype.hasOwnProperty.call(state, key)) {

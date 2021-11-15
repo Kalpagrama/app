@@ -1,15 +1,12 @@
 import { apollo } from 'src/boot/apollo'
 import gql from 'graphql-tag'
 import { fragments } from 'src/api/fragments'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { rxdb, RxCollectionEnum } from 'src/system/rxdb'
 import { LstCollectionEnum } from 'src/system/rxdb/common'
 import { apiCall } from 'src/api/index'
 import {assert} from 'src/system/common/utils'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.API)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.API)
 
 const UserRoleEnum = Object.freeze({
   ADMIN: 'ADMIN',

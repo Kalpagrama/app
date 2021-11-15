@@ -1,9 +1,7 @@
 import Vue from 'vue'
 import {assert} from 'src/system/common/utils'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.VUEX_CORE)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.VUEX_CORE)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.VUEX_CORE)
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.VUEX_CORE)
 
 function stateSet (state, [key, val]) {
   assert(Object.prototype.hasOwnProperty.call(state, key))

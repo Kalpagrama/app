@@ -1,9 +1,6 @@
 import {assert} from 'src/system/common/utils'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.MUTEX)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.MUTEX)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.MUTEX)
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.MUTEX)
 
 // локальный мьютекс с соблюдением очереди захвата
 class MutexLocal {

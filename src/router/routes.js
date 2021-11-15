@@ -1,13 +1,10 @@
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { AuthApi } from 'src/api/auth'
 import { systemInit } from 'src/system/services'
 import { assert } from 'src/system/common/utils'
 import { vueRoutesRegexp } from 'public/scripts/common_func'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.ROUTER)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.ROUTER)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.ROUTER)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.ROUTER)
 
 async function saveHistory (oid) {
    logD('saveHistory', oid)

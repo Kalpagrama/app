@@ -21,10 +21,11 @@ if (!('toJSON' in Error.prototype)) {
 const performance = window.performance
 const LogLevelEnum = Object.freeze({
    DEBUG: 0,
-   INFO: 1,
-   WARNING: 2,
-   ERROR: 3,
-   CRITICAL: 4
+   TRACE: 1, // профилирование | замеры производительности
+   INFO: 2,
+   WARNING: 3,
+   ERROR: 4,
+   CRITICAL: 5
 })
 Object.freeze(LogLevelEnum)
 const LogSystemModulesEnum = Object.freeze({
@@ -144,13 +145,28 @@ class Logger {
       assert(['gui', 'any', 'sys'].includes(this.store.state.core.logDbgFilter))
       if (this.store.state.core.logDbgFilter === 'gui' && logSystemModulesValueSet.has(module)) return
       if (this.store.state.core.logDbgFilter === 'sys' && !logSystemModulesValueSet.has(module)) return
-      if (this.store.state.core.logDbgModulesBlackList.includes(module)) return
+      if (this.store.state.core.logModulesFilter[module] !== undefined && this.store.state.core.logModulesFilter[module] > LogLevelEnum.DEBUG) return
       if (LogLevelEnum.DEBUG >= this.store.state.core.logLevel) {
          this.prepareParams(module, msg)
          console.log(...msg)
          // this.getLoggerFunc(module, null)(...msg)
       }
       if (LogLevelEnum.DEBUG >= this.store.state.core.logLevelSentry) {
+         // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
+      }
+   }
+
+   trace (module, ...msg) {
+      assert(['gui', 'any', 'sys'].includes(this.store.state.core.logDbgFilter))
+      if (this.store.state.core.logDbgFilter === 'gui' && logSystemModulesValueSet.has(module)) return
+      if (this.store.state.core.logDbgFilter === 'sys' && !logSystemModulesValueSet.has(module)) return
+      if (this.store.state.core.logModulesFilter[module] !== undefined && this.store.state.core.logModulesFilter[module] > LogLevelEnum.TRACE) return
+      if (LogLevelEnum.TRACE >= this.store.state.core.logLevel) {
+         this.prepareParams(module, msg)
+         console.log(...msg)
+         // this.getLoggerFunc(module, null)(...msg)
+      }
+      if (LogLevelEnum.TRACE >= this.store.state.core.logLevelSentry) {
          // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
       }
    }
@@ -218,6 +234,7 @@ class Logger {
 }
 
 let logD = (...msg) => console.log(...msg)
+let logT = (...msg) => console.log(...msg)
 let logI = (...msg) => console.log(...msg)
 let logW = (...msg) => console.warn(...msg)
 let logE = (...msg) => console.error(...msg)
@@ -227,6 +244,8 @@ function getLogFunc (level, module) {
    switch (level) {
       case LogLevelEnum.DEBUG:
          return (...args) => logD.call({ logModuleName: module }, ...args)
+      case LogLevelEnum.TRACE:
+         return (...args) => logT.call({ logModuleName: module }, ...args)
       case LogLevelEnum.INFO:
          return (...args) => logI.call({ logModuleName: module }, ...args)
       case LogLevelEnum.WARNING:
@@ -293,6 +312,9 @@ async function initLogger (store) {
    logD = function (...msg) {
       logger.debug(detectModuleName(this), ...msg)
    }
+   logT = function (...msg) {
+      logger.trace(detectModuleName(this), ...msg)
+   }
    logI = function (...msg) {
       logger.info(detectModuleName(this), ...msg)
    }
@@ -305,7 +327,7 @@ async function initLogger (store) {
    logC = function (...msg) {
       logger.critical(detectModuleName(this), ...msg)
    }
-   return { logD, logI, logW, logE, logC }
+   return { logD, logT, logI, logW, logE, logC }
 }
 
 async function initLogRocket(oidUser, username, userEmail, issueDescription, store) {

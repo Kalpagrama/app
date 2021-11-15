@@ -1,16 +1,13 @@
 import { apollo } from 'src/boot/apollo'
 import gql from 'graphql-tag'
 import { fragments } from 'src/api/fragments'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import {assert} from 'src/system/common/utils'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { apiCall } from 'src/api/index'
 import { EventApi } from 'src/api/event'
 import cloneDeep from 'lodash/cloneDeep'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.API)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.API)
 
 const FindCollectionEnum = Object.freeze({
    WS: 'WS',

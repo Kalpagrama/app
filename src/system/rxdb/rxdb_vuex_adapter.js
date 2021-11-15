@@ -1,11 +1,9 @@
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 
 var util = require('util')
 const AbstractLevelDOWN = require('abstract-leveldown').AbstractLevelDOWN
 import state from 'src/store'
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB)
 
 // Constructor
 function FakeLevelDOWN () {

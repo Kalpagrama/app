@@ -1,5 +1,5 @@
 // import { assert } from 'src/system/common/utils'
-// import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+// import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 //
 // const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.VUEX)
 //

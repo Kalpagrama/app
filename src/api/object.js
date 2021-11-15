@@ -1,7 +1,7 @@
 import { apollo } from 'src/boot/apollo'
 import gql from 'graphql-tag'
 import { fragments } from 'src/api/fragments'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { assert } from 'src/system/common/utils'
 import { ActionEnum, AuthApi } from 'src/api/auth'
@@ -11,10 +11,7 @@ import throttle from 'lodash/throttle'
 import { ObjectCreateApi } from 'src/api/object_create'
 import cloneDeep from 'lodash/cloneDeep'
 import { WsItemTypeEnum } from 'src/system/rxdb/common'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.API)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.API)
 
 const StatKeyEnum = Object.freeze({
    VIEWED_TIME: 'VIEWED_TIME',

@@ -1,6 +1,6 @@
 import { apollo } from 'src/boot/apollo'
 import gql from 'graphql-tag'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { systemInit, systemReset } from 'src/system/services'
 import {assert} from 'src/system/common/utils'
 import { rxdb } from 'src/system/rxdb'
@@ -8,9 +8,7 @@ import { apiCall } from 'src/api'
 import { fragments } from 'src/api/fragments'
 import { EventApi } from 'src/api/event'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.AUTH)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.AUTH)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.AUTH)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.AUTH)
 
 let currentWebPushToken
 
@@ -131,8 +129,8 @@ class AuthApi {
       return settings
    }
 
-   // если токен не указан - выйдет из всех сессий
-   static async logout (token) {
+   // если токен = null - выйдет из всех сессий
+   static async logout (token = localStorage.getItem('k_token')) {
       const f = AuthApi.logout
       logD(f, 'start')
       const t1 = performance.now()

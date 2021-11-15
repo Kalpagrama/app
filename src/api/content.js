@@ -1,4 +1,4 @@
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { apollo } from 'src/boot/apollo'
 import {assert} from 'src/system/common/utils'
 import { fragments } from 'src/api/fragments'
@@ -6,9 +6,7 @@ import { apiCall } from 'src/api/index'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import gql from 'graphql-tag'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.API)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.API)
 
 const BookUploadFormatEnum = Object.freeze({
    EPUB: 'epub'

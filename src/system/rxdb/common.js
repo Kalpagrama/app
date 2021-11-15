@@ -1,9 +1,8 @@
 import { isRxCollection } from 'rxdb'
 import {assert} from 'src/system/common/utils'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import {WsItemTypeEnum as WsItemTypeEnumOrig} from 'src/system/common/enums'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB)
 
 const RxModuleEnum = Object.freeze({
    WS: 'WS',

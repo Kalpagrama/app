@@ -3,7 +3,7 @@ import { Workspace } from 'src/system/rxdb/workspace'
 import { LstCollectionEnum, RxCollectionEnum, rxdbOperationProxyExec, WsCollectionEnum } from 'src/system/rxdb/common'
 import { Cache } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { addPouchPlugin, getRxStoragePouch, addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
 import { Event } from 'src/system/rxdb/event'
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
@@ -22,10 +22,7 @@ import { GqlQueries } from 'src/system/rxdb/gql_query'
 import { setSyncEventStorageValue } from 'src/system/services'
 import { ObjectApi } from 'src/api/object'
 import { store } from 'src/store'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB)
 
 const purgePeriod = 1000 * 60 * 60 * 24 // раз в сутки очищать бд от мертвых строк
 const defaultCacheSize = 10 * 1024 * 1024 // кэш реактивных объектов
@@ -262,7 +259,7 @@ class RxDBWrapper {
          await this.workspace.create()
          await this.cache.create()
          this.created = true
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+         logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } catch (err) {
          // alert('!!!!!!')
          logE(f, 'ошибка при создания RxDatabase! очищаем и пересоздаем!', err)
@@ -361,7 +358,7 @@ class RxDBWrapper {
          this.initialized = true
          store.commit('stateSet', ['rxdbInitialized', true])
          if (currentUserDbFetched) this.workspace.switchOnSynchro() // на тот случай, когда onFetchFunc сработает до "this.initialized = true". надо аовторно сбросить таймер ожидания
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+         logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } catch (err) {
          logE('cant init rxdb. err = ', err)
       } finally {
@@ -382,7 +379,7 @@ class RxDBWrapper {
          if (fromDeinitGlobal) await this.updateCollections('recreate', ['workspace', 'cache']) // fromDeinitGlobal - кейс только для  deInitGlobal
          this.initialized = false
          store.commit('stateSet', ['rxdbInitialized', false])
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+         logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } finally {
          this.release()
       }
@@ -401,7 +398,7 @@ class RxDBWrapper {
          await this.set(RxCollectionEnum.META, { id: 'authUser', valueString: JSON.stringify({ userOid, dummyUser }) })
          await this.init() // инициализируем текущую вкладку
          setSyncEventStorageValue('k_rxdb_init_global_date', Date.now().toString()) // сообщаем другим вкладкам
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+         logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } finally {
          await mutexGlobal.release('rxdb::initGlobal')
       }
@@ -416,7 +413,7 @@ class RxDBWrapper {
          await mutexGlobal.lock('rxdb::deinitGlobal')
          if (this.created) await this.deInit(true) // деинициализируем текущую вкладку
          setSyncEventStorageValue('k_rxdb_deinit_global_date', Date.now().toString()) // сообщаем другим вкладкам
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+         logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } catch (err) {
          logE(f, 'err on deInitGlobal! remove db!', err)
          if (this.db) await this.db.remove() // предпочтительно, тк removeRxDatabase иногда глючит

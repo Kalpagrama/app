@@ -5,11 +5,11 @@ import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log
 import { assert } from 'src/system/common/utils'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.TESTS)
 
-async function check ({ app, router, store }) {
-   const f = check
+async function checkRxdb ({ app, router, store }) {
+   const f = checkRxdb
    logD(f, 'start')
    const t1 = performance.now()
-   await systemInit()
+   // await systemInit()
    logD(f, `systemInit complete: ${Math.floor(performance.now() - t1)} msec`)
    return true
 }
@@ -19,7 +19,7 @@ export default async function ({ app, router, store }) {
       logE('err on test', err)
       return false
    })), 'test not passed: ' + func.name)
-   // await check(checkSystemInit)
+   await check(checkRxdb)
    // await check(checkCurrentUser)
    // await check(checkLogin)
    alert('all tests passed OK!')

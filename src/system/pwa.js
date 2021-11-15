@@ -1,16 +1,13 @@
 import { notify } from 'src/boot/notify'
 import { AuthApi } from 'src/api/auth'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { Notify, Platform } from 'quasar'
 import { t } from 'src/boot/i18n'
 import { clear, get, Store } from 'public/scripts/idb-keyval/idb-keyval.mjs'
 import { router } from 'src/boot/system'
 import { makeRoutePath } from 'public/scripts/common_func'
 import { shareIn } from 'src/system/services'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.PWA)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.PWA)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.PWA)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.PWA)
 
 let registration = null // ServiceWorkerRegistration
 const forceUpdatePWA = true // обновлять приложение без разрешения прользователя

@@ -5,9 +5,8 @@ import core from './core'
 import ui from './ui'
 import debug from './debug'
 import {assert} from 'src/system/common/utils'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.VUEX)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.VUEX)
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.VUEX)
 
 let Store
 
