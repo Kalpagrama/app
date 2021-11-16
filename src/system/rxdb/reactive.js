@@ -149,7 +149,8 @@ class ReactiveDocFactory {
             //          throw new Error('bad itemType: ' + this.itemType)
             //    }
             // }
-            const reactiveDoc = plainData
+            this.vm.reactiveData.doc = plainData
+            const reactiveDoc = this.vm.reactiveData.doc
             reactiveDoc.getPayload = () => {
                switch (this.itemType) {
                   case 'wsItem':
@@ -231,8 +232,6 @@ class ReactiveDocFactory {
                   rxdb.workspace.populateReactiveWsItem(payload)
                }
             }
-            // Vue.set(this.vm.reactiveData, 'doc', reactiveDoc)
-            this.vm.reactiveData.doc = reactiveDoc
             if (mirroredVuexObjectKey) {
                this.vuexKey = mirroredVuexObjectKey
                assert(store && store.state && store.state.mirrorObjects, 'store && store.state && store.state.mirrorObjects')
@@ -315,7 +314,7 @@ class ReactiveDocFactory {
          // reactiveItem изменилась (обычно из UI)
          // изменить связанный объект во vuex
          if (this.vuexKey) {
-            store.commit('setMirrorObject', [this.vuexKey, this.getReactive().getPayload()])
+            store.commit('mergeMirrorObject', [this.vuexKey, this.getReactive().getPayload()])
          }
          if (!this.debouncedItemSaveFunc) {
             // itemSaveFunc - сохраняет текущий reactiveItem в rxdb

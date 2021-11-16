@@ -30,7 +30,7 @@ module.exports = configure(function (ctx) {
       'i18n',
       'apollo',
       'helpers',
-      process.env.RUN_TESTS ? 'tests' : null, // запустить рантайм-тесты после инициализации приложения
+      // process.env.RUN_TESTS ? 'tests' : null, // запустить рантайм-тесты после инициализации приложения
       'libs',
       'components',
       'system',

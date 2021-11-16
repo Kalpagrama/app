@@ -266,7 +266,7 @@ class Workspace {
                newItems = itemsServer
             }
             if (extraItems.length) { // удаляем те, которых нет на сервере
-               await rxdbOperationProxy(this.db.ws_items, 'find').update({ $set_deprecated: { rev: 0 } }) // для того чтобы события об удалении не отправлялись на сервер
+               await rxdbOperationProxy(this.db.ws_items, 'find').update({ $set: { rev: 0 } }) // для того чтобы события об удалении не отправлялись на сервер
                await rxdbOperationProxy(this.db.ws_items, 'find', { selector: { id: { $in: extraItems.map(item => item.id) } } }).remove()
             }
             await rxdbOperationProxyExec(this.db.ws_items, 'bulkInsert', newItems)
