@@ -7,6 +7,7 @@
         :style=`{
           position: 'relative',
           maxWidth: '900px',
+          height: '500px',
           borderRadius: '30px',
           overflow: 'hidden',
         }`

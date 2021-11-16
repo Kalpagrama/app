@@ -143,11 +143,12 @@
             span(:style=`{fontSize: '12px'}`).text-grey-5 {{item.author.name}}
             small(v-if="author" :style=`{marginTop: '-4px', fontSize: '10px'}`).text-grey-7.text-italic {{author.countStat.countSubscriptions}} {{$getNoun(author.countStat.countSubscriptions,$t('подписчик'),$t('подписчика'),$t('подписчиков'))}}
         .col
-        q-btn(flat no-caps=false size="sm" color="green-8" :label="$t('подписаться')")
+        q-btn(v-if="item.author.oid !== $store.getters.currentUser.oid" flat no-caps=false size="sm" color="green-8" :label="$t('подписаться')")
       .row.full-width.items-center
-        span(@click="pageId='nodes'").text-grey-5.q-py-sm.q-pl-sm {{$t('Популярные смыслы')}} {{ item.countStat.countNodes }}
-        q-icon(@click="pageId='nodes'" dense name="expand_more" color="grey-5"  size="14px")
-        list-feed-custom-horizontalPPV(
+        span(@click="pageId='nodes'").text-grey-5.q-py-sm.q-pl-sm.cursor-pointer {{$t('Популярные смыслы')}}
+        span(@click="pageId='nodes'").text-grey-8.q-pl-xs.cursor-pointer {{ item.countStat.countNodes }}
+        q-icon(@click="pageId='nodes'" dense name="expand_more" color="grey-5"  size="14px").cursor-pointer
+        list-feed-custom-horizontalPPV(v-if="item.countStat.countNodes > 0"
           ref="listFeed"
           :scrollAreaWidth="$store.state.ui.pageWidth"
           :scrollAreaHeight="120"
@@ -178,7 +179,7 @@
       .row.full-width.content-end.q-pt-md
         div(@click="pageId='comments'").cursor-pointer.row.full-width.items-center
           // div(:style=`{height: '1px', background: 'rgb(40,40,40)'}`).full-width
-          span.text-grey-5.q-px-sm {{$t('Comments')}}
+          span.text-grey-5.q-px-xs {{$t('Comments')}}
           span.text-grey-8 {{item.countStat.countComments}}
           .col
           q-btn(round flat dense :icon="pageId ? 'expand_less' : 'expand_more'" color="grey-5" :style=`{zIndex: '100'}`  @click="pageId='comments'")
