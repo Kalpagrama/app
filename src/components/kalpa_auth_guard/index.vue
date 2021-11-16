@@ -1,8 +1,19 @@
 <template lang="pug">
-page-auth(
-  :message="message"
-  :onSuccess="onSuccess"
-  @close="$emit('close')"
+.row.full-width.justify-center
+  div(v-if="!authScreenShow && message"
+      :style=`{
+        // height: '200px',
+        width: $q.screen.xs ? '100%' : '500px',
+        borderRadius: '20px 20px 0 0'
+      }`).row.justify-center.q-pa-md.b-45
+    span.text-grey-4.text-bold.text-center.q-pb-md {{message}}
+    .row.full-width.justify-center.content-center.items-center
+      q-btn(outline color="grey-6" icon="login" :label="$t('Войти')" @click="authScreenShow=true")
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    page-auth(v-if="authScreenShow || !message"
+    :message="message"
+    :onSuccess="onSuccess"
+    @close="$emit('close')"
 )
 </template>
 
@@ -14,6 +25,12 @@ export default {
   props: ['message'],
   components: {
     pageAuth,
+  },
+  data() {
+    return {
+      guardScreenShow: true,
+      authScreenShow: false
+    }
   },
   computed: {
     authGuard () {
