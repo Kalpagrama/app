@@ -87,8 +87,8 @@ div(:style=`{backgroundColor: $q.screen.xs ? 'rgb(29,29,29)' : ''}`).row.full-wi
     template(v-slot:navigation)
       q-stepper-navigation.absolute-bottom
         .row.full-width.justify-end.items-center.content-center
-          q-btn(v-if="hasPrev" flat color="grey" :ripple="false" @click="prev" :label="$t('Back', 'Назад')")
-          q-btn(@click="next()" :disable="!name" outline color="green-8" :label="hasNext ? $t('Continue', 'Продолжить') : $t('Finish', 'Готово')")
+          q-btn(v-if="hasPrev" flat color="grey" :ripple="false" @click="prev" :label="$t('Назад')")
+          q-btn(@click="next()" :disable="!name" outline color="green-8" :label="hasNext ? $t('Продолжить') : $t('Готово')")
     template(v-slot:message)
       q-banner(v-if="step === 1").text-white.text-center.b-50 {{$t('Введите ваше имя и добавьте фото')}}
       q-banner(v-if="step === 2").text-white.text-center.b-50 {{$t('Укажите постоянный пароль (необязательно)')}}
