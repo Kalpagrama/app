@@ -4,6 +4,7 @@ div(
   ).row.full-width.justify-center
   item-feed(
     :itemShortOrFull="node"
+    :itemState="{}"
     :isActive="true"
     :isVisible="true"
     :style=`{

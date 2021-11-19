@@ -25,6 +25,7 @@ div(
           :style=`{textAlign: 'center'}`).row.full-width.justify-center.q-pa-lg
           h1(:style=`{fontSize: '36px',}`).text-white.text-bold Ядро создано 🎉
       item-feed(
+        :itemState="{}"
         :isActive="true"
         :isVisible="true"
         :itemShortOrFull="player.node"

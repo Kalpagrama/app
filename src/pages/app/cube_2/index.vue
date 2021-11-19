@@ -65,6 +65,7 @@ div(
           item-feed(
             v-if="jointActive"
             :itemShortOrFull="jointActive"
+            :itemState="{}"
             :showItems="false"
             :showActions="false"
             :showName="false"
@@ -103,6 +104,7 @@ div(
           item-feed(
             v-if="`${r.oid}-${ri}` === rowActiveKey && jointActive"
             :itemShortOrFull="jointActive"
+            :itemState="{}"
             :nodeBackgroundColor="'rgb(30,30,30)'"
             :nodeActionsColor="'rgb(255,255,255)'"
             :isActive="false"

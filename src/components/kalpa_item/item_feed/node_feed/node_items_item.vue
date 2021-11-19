@@ -24,6 +24,7 @@ div(
   item-feed(
     v-if="item && item.type === 'NODE'"
     :itemShortOrFull="item"
+    :itemState="{}"
     :isVisible="itemActive"
     :isActive="itemActive"
     :showHeader="itemOpened"

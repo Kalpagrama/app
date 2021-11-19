@@ -18,6 +18,7 @@
           item-feed(
             :itemIndex="itemIndex"
             :itemShortOrFull="item"
+            :itemState="{}"
             :showContext="false"
             :isActive="false"
             :isVisible="masonryVisibleItems[item.oid]"

@@ -36,6 +36,7 @@
   //- body
   item-feed(
     :itemShortOrFull="joint"
+    :itemState="{}"
     :isActive="true"
     :isVisible="true"
     :showItems="true"

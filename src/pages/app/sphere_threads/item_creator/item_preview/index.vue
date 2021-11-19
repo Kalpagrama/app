@@ -6,6 +6,7 @@
     ).row.full-width
     item-feed(
       :itemShortOrFull="item"
+      :itemState="{}"
       :isActive="true"
       :isVisible="true")
   //- content

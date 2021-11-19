@@ -84,6 +84,7 @@
     item-feed(
       v-if="item.type === 'NODE'"
       :itemShortOrFull="item"
+      :itemState="{}"
       :isActive="itemActive"
       :isVisible="itemActive"
       :showActions="false"
@@ -186,6 +187,7 @@
         ).row.full-width
         item-feed(
           :itemShortOrFull="joint"
+          :itemState="{}"
           :isActive="false"
           :isVisible="false"
           :showName="false"

@@ -3,6 +3,7 @@
   item-feed(
     v-if="node"
     :itemShortOrFull="node"
+    :itemState="{}"
     :isActive="isOpened"
     :isVisible="isOpened"
     :showActions="isOpened"
