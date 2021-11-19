@@ -270,7 +270,7 @@ export default {
       if (['ArrowLeft', 'ArrowRight'].includes(e.key)) {
         e.preventDefault()
         // find active row and go somewhere...
-        let rowRef = this.$refs[`row-${this.rowActiveKey}`][0]
+        let rowRef = this.$refs[`row-${this.rowActiveKey}`]
         this.$log('rowRef', rowRef)
         if (!rowRef) return
         rowRef.jointMakeVisible(null, true, e.key === 'ArrowRight' ? 'right' : 'left')
