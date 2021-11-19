@@ -45,7 +45,7 @@
       .row.full-width.justify-center.q-pa-sm
         //- edit
         //- fake input...
-        input(ref="inputAvatar" type="file" @update:modelValue="avatarChanged" :style=`{display: 'none',}`)
+        input(ref="inputAvatar" type="file" @update:model-value="avatarChanged" :style=`{display: 'none',}`)
         q-btn(
           v-if="$store.getters.currentUser.thumbUrl"
           @click="$refs.inputAvatar.click()"
