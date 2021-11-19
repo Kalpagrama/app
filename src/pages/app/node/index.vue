@@ -261,11 +261,6 @@ export default {
     }
   },
   watch: {
-    'state.essencesNodes': {
-      handler(to, from) {
-        // this.$log('state.essencesNodes TO', to)
-      }
-    },
     'state.essencesNodesIndx': {
       handler(to, from) {
         // this.$log('state.essencesNodesIndx TO', to)
@@ -288,6 +283,7 @@ export default {
       this.state.essencesNodesIndxPage = to + 1
     },
     'state.imagesNodesRes.items': {
+      deep: true,
       handler(to, from){
         if (to) {
           // this.$log('imagesNodesRes changed', this.state?.node?.oid, cloneDeep(itemsRes.items))
@@ -302,6 +298,7 @@ export default {
       }
     },
     'state.essencesNodesRes.items': {
+      deep: true,
       handler(to, from){
         if (to) {
           // this.$log('essenceNodesRes changed', this.state?.node?.oid, cloneDeep(itemsRes.items))

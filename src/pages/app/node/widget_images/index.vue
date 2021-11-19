@@ -26,6 +26,7 @@ div(:style=`{position: 'relative'}`).row.full-width
           div(:style=`{maxHeight: (previewHeight*4)+'px', width: (previewHeight*2)+'px'}`).absolute-center
             item-feed(
               :itemShortOrFull="item"
+              :itemState="{}"
               :showContext="false"
               :isActive="false"
               :isVisible="true"
@@ -82,9 +83,12 @@ export default {
           if (this.$refs.vs) this.$refs.vs.scrollTo(to, 'center-force')
         })
       }
-    }
-    // imagesNodes(to, from){
-    //   this.$log('imagesNodes from->to', from, to)
+    },
+    // imagesNodes: {
+    //   deep: true,
+    //   handler (to, from) {
+    //     this.$log('imagesNodes from->to', from, to)
+    //   }
     // }
   },
   methods: {
