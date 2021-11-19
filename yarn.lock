@@ -1849,6 +1849,11 @@
   resolved "https://registry.yarnpkg.com/@vercel/ruby/-/ruby-1.2.7.tgz#516d1c45f4961619338f3d3bb518ee43b863a5da"
   integrity sha512-ZG2VxMHHSKocL57UWsfNc9UsblwYGm55/ujqGIBnkNUURnRgtUrwtWlEts1eJ4VHD754Lc/0/R1pfJXoN5SbRw==
 
+"@vue/compat@^3.2.22":
+  version "3.2.22"
+  resolved "https://registry.yarnpkg.com/@vue/compat/-/compat-3.2.22.tgz#fcc930d658255c0192e3f568757a030948d0bd4f"
+  integrity sha512-v4TjBP5xDjpHX7i9pUvLVMe6Gyy6O5W3YuNnyLKJgJVzChQc8FMriWbia+oechiCYTRUzv+F+V5cFghYY8Gn3Q==
+
 "@vue/compiler-core@3.2.21":
   version "3.2.21"
   resolved "https://registry.yarnpkg.com/@vue/compiler-core/-/compiler-core-3.2.21.tgz#26566c32b2ad838199d471ef5df620a83846f24e"

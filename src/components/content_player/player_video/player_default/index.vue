@@ -65,6 +65,7 @@ export default {
       }
     }
   },
+  emits: ['player', 'error'],
   data () {
     return {
       events: null,
