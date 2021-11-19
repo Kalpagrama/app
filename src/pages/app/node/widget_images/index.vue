@@ -17,10 +17,11 @@ div(:style=`{position: 'relative'}`).row.full-width
     q-virtual-scroll(ref="vs" :items="imagesNodes" virtual-scroll-horizontal :virtual-scroll-item-size="previewHeight*1.618" :style=`{}` @virtual-scroll="onVsScroll").col
       template(v-slot="{ item, index: itemIndex}")
         //transition(appear :enter-active-class="'animated fadeIn'" :leave-active-class="'animated fadeOut'")
-        div(:style=`{position: 'relative', overflow: 'hidden',
-                height: previewHeight+'px', width: (previewHeight*1.618)+'px',
-                borderRadius: '10px', border: imagesNodesIndx === itemIndex ? '2px solid '+$getPaletteColor('green-10') : null,
-                marginLeft: '1px', marginRight: '1px'}`
+        div(:style=`{
+          position: 'relative', overflow: 'hidden',
+          height: previewHeight+'px', width: (previewHeight*1.618)+'px',
+          borderRadius: '10px', border: imagesNodesIndx === itemIndex ? '2px solid '+$getPaletteColor('green-10') : null,
+          marginLeft: '1px', marginRight: '1px'}`
           @click="itemIndex!==imagesNodesIndx?waitIndx=itemIndex:null, $emit('set-node', imagesNodes[itemIndex])").row.items-center.center-start.content-center
           div(:style=`{maxHeight: (previewHeight*4)+'px', width: (previewHeight*2)+'px'}`).absolute-center
             item-feed(
@@ -32,6 +33,8 @@ div(:style=`{position: 'relative'}`).row.full-width
               :showActions="false"
               :showName="false"
               :showSpheres="false")
+              template(v-slot:skeleton=`{queryInProgress}`)
+                q-skeleton(type="QBtn" :height="previewHeight+'px'" dark :animation="queryInProgress ? 'wave' : 'none'").full-width.br
           div(:style=`{minHeight: '200px', width: '100', background: 'rgba(0,0,0,0.5)', zIndex: '50'}`).fit.absolute
           q-spinner(v-if="waitIndx === itemIndex" size="20px" color="green").fit.absolute.q-pa-sm
     q-btn(v-if="false" :disable="!itemsRight.length" round flat icon="chevron_right" color="white"

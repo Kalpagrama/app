@@ -46,6 +46,7 @@ import { UserApi } from 'src/api/user'
 
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 import { assert } from 'src/system/common/utils'
+import { reactive } from 'vue'
 
 export default {
   name: 'kalpaSave',
@@ -57,7 +58,7 @@ export default {
     itemState: {
       type: Object,
       default () {
-        return {}
+        return reactive({})
       }
     },
     color: { type: String, default: 'grey-9' },

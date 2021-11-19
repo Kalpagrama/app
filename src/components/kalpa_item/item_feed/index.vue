@@ -49,6 +49,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import cloneDeep from 'lodash/cloneDeep'
 import { ObjectTypeEnum } from 'src/system/common/enums'
 import { assert } from 'src/system/common/utils'
+import { reactive } from 'vue'
 
 export default {
   name: 'itemFeed',
@@ -57,7 +58,7 @@ export default {
     itemState: {
       type: Object,
       default () {
-        return {}
+        return reactive({})
       }
     },
     itemIndex: { type: Number },

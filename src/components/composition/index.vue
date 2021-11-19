@@ -84,6 +84,7 @@ import context from './context/index.vue'
 import fromVideo from './from_video/index.vue'
 import fromBook from './from_book/index.vue'
 import { assert } from 'src/system/common/utils'
+import { reactive } from 'vue'
 
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
@@ -100,7 +101,7 @@ export default {
     itemState: {
       type: Object,
       default () {
-        return {}
+        return reactive({})
       }
     },
     isVisible: {},

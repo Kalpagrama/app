@@ -141,6 +141,7 @@ import { ObjectApi } from 'src/api/object'
 import essenceVoteBall from 'src/components/essence/essence_vote_ball.vue'
 import essenceVoteStats from './essence_actions/vote_stats.vue'
 import { assert } from 'src/system/common/utils'
+import { reactive } from 'vue'
 export default {
   name: 'essenceActions',
   props: {
@@ -148,7 +149,7 @@ export default {
     itemState: {
       type: Object,
       default () {
-        return {}
+        return reactive({})
       }
     },
     nodeBackgroundColor: {type: String, default: 'rgb(30,30,30)'},
