@@ -45,7 +45,7 @@ div(
     //- Desktop page wrapper
     template(v-slot:pult)
       div(
-        v-if="player && $q.screen.gt.sm"
+        v-if="pageId && player && $q.screen.gt.sm"
         :style=`{
           minHeight: [null,'node','node-editor'].includes(pageId) ? '0px' : '500px',
           maxHeight: 500+'px',
@@ -70,7 +70,7 @@ div(
     //- Mobile page wrapper
     template(v-slot:footer)
       div(
-        v-if="player && $q.screen.lt.md"
+        v-if="pageId && player && $q.screen.lt.md"
         :style=`{height: $q.screen.height-50-contentHeight+'px',}`).row.full-width
         component(
           :is="`page-${pageId}`"
@@ -127,6 +127,7 @@ import figuresControls from 'src/components/content_player/player_video/player_p
 export default {
   name: 'layoutVideo',
   props: ['contentKalpa', 'draftId'],
+  emits: ['notice-check'],
   components: {
     contentPlayer,
     pageNodes,
@@ -234,7 +235,6 @@ export default {
       this.$log('playerReady', this.draft)
       this.$set_deprecated(this, 'player', player)
       if (this.draftId) this.draftFocused(await this.$rxdb.get(RxCollectionEnum.WS_ANY, this.draftId))
-
       // Handle player.autoplay
       this.$nextTick(() => {
         // this.$q.notify('Player.play !')

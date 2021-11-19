@@ -7,7 +7,7 @@ import {
    WsItemTypeEnum
 } from 'src/system/rxdb/common'
 import { cacheSchema, schemaKeyValue, wsSchemaItem, wsSchemaLocalChanges } from 'src/system/rxdb/schemas'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { mutexGlobal } from 'src/system/rxdb/mutex_global'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { WorkspaceApi } from 'src/api/workspace'
@@ -16,11 +16,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import differenceWith from 'lodash/differenceWith'
 import intersectionWith from 'lodash/intersectionWith'
 import { getRxCollectionEnumFromId, rxdb } from 'src/system/rxdb'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_WS)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_WS)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_WS)
-const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_WS)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_WS)
 
 const synchroTimeDefault = 1000 * 60 * 1 // раз в 1 минут шлем изменения на сервер
 // const synchroTimeDefault = 1000// раз в 1 минут шлем изменения на сервер
@@ -270,7 +266,7 @@ class Workspace {
                newItems = itemsServer
             }
             if (extraItems.length) { // удаляем те, которых нет на сервере
-               await rxdbOperationProxy(this.db.ws_items, 'find').update({ $set_deprecated: { rev: 0 } }) // для того чтобы события об удалении не отправлялись на сервер
+               await rxdbOperationProxy(this.db.ws_items, 'find').update({ $set: { rev: 0 } }) // для того чтобы события об удалении не отправлялись на сервер
                await rxdbOperationProxy(this.db.ws_items, 'find', { selector: { id: { $in: extraItems.map(item => item.id) } } }).remove()
             }
             await rxdbOperationProxyExec(this.db.ws_items, 'bulkInsert', newItems)
@@ -370,7 +366,7 @@ class Workspace {
          }
       }
       this.store.commit('core/stateSet', ['wsReady', true])
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, unsavedItems)
+      logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`, unsavedItems)
    }
 
    // от сервера прилетел эвент об изменении в мастерской (скорей всего - ответ на наши действия)

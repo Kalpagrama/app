@@ -59,7 +59,6 @@ q-menu(
         :maximized="false"
         )
         div(:style=`{background: 'rgb(35,35,35)',borderRadius: '10px'}`).row.full-width.q-pa-md.justify-center
-          //span.text-green.text-h6.q-my-md {{$t('Creation Menu', 'Меню создания')}}
           q-btn(
             outline color="grey-8"
             size="xl"

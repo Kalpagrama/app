@@ -75,7 +75,7 @@ div(
       q-resize-observer(@resize="stickyHeaderHeight = $event.height")
       slot(name="sticky-header")
     // коробка с итемом. ее размер меняется только тогда, когда скролл стоит
-    div(v-for="({source: item, state, debugInfo}, itemIndex) in vsItems"
+    div(v-for="({source: item, state}, itemIndex) in vsItems"
       :ref="`item-${itemIndex}`"
       :key="`item-${itemIndex}`"
       :data-id="`${itemIndex}`"
@@ -209,11 +209,9 @@ export default {
     },
     rootMargin () {
       if (this.scrolledAreaHeight >= this.scrollTargetHeight) {
-        this.$log('rootMargin', '-50% 0px')
         return '-50% 0px'
       }
       else { // скролл не заполнен
-        this.$log('rootMargin', `-${Math.ceil(50 * (this.scrolledAreaHeight / this.scrollTargetHeight))}% 0px`)
         return `-${Math.ceil(50 * (this.scrolledAreaHeight / this.scrollTargetHeight))}% 0px`
       }
     },
@@ -247,7 +245,7 @@ export default {
         this.$log('itemsRes.items:', to.length, this.itemsRes.getProperty('itemActiveIndx'), this.noDummyAreaCenterIndx)
         this.vsItems = this.vsItems = this.itemsRes.items.map(item => {
           return {
-            debugInfo: item.debugInfo,
+            // debugInfo: item.debugInfo,
             source: item.populatedObject || item,
             state: {
               itemId: item[this.itemKey],

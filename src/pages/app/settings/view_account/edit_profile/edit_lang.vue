@@ -47,7 +47,7 @@ export default {
     async langSet (l) {
       this.$log('langSet', l)
       await ObjectApi.update(this.currentUser.oid, 'profile.lang', l.id)
-      await setLocale(l.id)
+      await setLocale(l.id === 'RUS' ? 'ru' : 'en')
     },
   },
   mounted () {

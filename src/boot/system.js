@@ -1,9 +1,7 @@
 import { boot } from 'quasar/wrappers'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { systemInit } from 'src/system/services'
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
-const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.BOOT)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.BOOT)
 
 function t (str) {
   return str
@@ -19,7 +17,7 @@ export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath,
     router = VueRouter
     const {initApplication} = await import('src/system/services')
     app.config.globalProperties.$systemUtils = await initApplication()
-    await systemInit() // для гостей тоже надо входить (если уже войдено - ничего не сделает)
+    await systemInit()
     logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   } catch (err) {
     logC(err)

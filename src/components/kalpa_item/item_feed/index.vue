@@ -49,6 +49,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import cloneDeep from 'lodash/cloneDeep'
 import { ObjectTypeEnum } from 'src/system/common/enums'
 import { assert } from 'src/system/common/utils'
+import { reactive } from 'vue'
 
 export default {
   name: 'itemFeed',
@@ -107,12 +108,12 @@ export default {
       let key = this.$options.name
       if (!this.itemState[key]) {
         // assert(this.itemState.id === this.itemShortOrFull.oid)
-        this.$set_deprecated(this.itemState, key, {
+        this.$set_deprecated(this.itemState, key, reactive({
           oid: this.itemShortOrFull?.oid || this.itemState.itemId,
           itemFull: null,
           queryId: null,
           queryIdPreload: null
-        })
+        }))
       }
       return this.itemState[key]
     },

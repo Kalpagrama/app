@@ -132,7 +132,7 @@ export default {
     searchInputState: {
       immediate: true,
       handler (to, from) {
-        this.$logW('searchInputState:', to)
+        // this.$logW('searchInputState:', to)
         assert(this.searchInputState.in('enabled', 'disabled', 'opened'), this.searchInputState)
         this.$emit('searchInputState', to)
       }

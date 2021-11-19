@@ -1,4 +1,4 @@
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { assert } from 'src/system/common/utils'
 import { router } from 'src/boot/system'
 import { HapticsImpactStyle, Plugins, StatusBarStyle } from '@capacitor/core'
@@ -8,10 +8,7 @@ import { makeRoutePath } from 'public/scripts/common_func'
 import { shareIn } from 'src/system/services'
 
 const { PushNotifications, Share, App, StatusBar, Haptics, Browser } = Plugins
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.CP)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.CP)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.CP)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.CP)
 
 // let PushNotifications, Share
 async function init (store) {

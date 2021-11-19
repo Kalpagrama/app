@@ -20,15 +20,15 @@ div.row
         }`
         ).row.full-width.b-50.q-pa-md
         .row.full-width.q-pb-md
-          span.text-white {{$t('Unfollow? You no longer see updates.', 'Отписаться?')}}
+          span.text-white {{$t('Отписаться?')}}
         .row.full-width
           q-btn(
             @click="$refs.userUnfollowMenu.hide()"
-            flat no-caps).b-60 {{$t('cancel', 'Отмена')}}
+            flat no-caps).b-60 {{$t('Отмена')}}
           .col
           q-btn(
             @click="unFollow()"
-            color="red" no-caps) {{ $t('Unfollow', 'Отписаться') }}
+            color="red" no-caps) {{ $t('Отписаться') }}
 </template>
 
 <script>

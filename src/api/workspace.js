@@ -2,12 +2,9 @@ import { apollo } from 'src/boot/apollo'
 import gql from 'graphql-tag'
 import { rxdb, RxModuleEnum } from 'src/system/rxdb'
 import { systemReset } from 'src/system/services'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { apiCall } from 'src/api/index'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.API)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.API)
 
 class WorkspaceApi {
    // очистить мастерскую на сервере

@@ -1,4 +1,4 @@
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { apollo } from 'src/boot/apollo'
 import gql from 'graphql-tag'
 import {assert} from 'src/system/common/utils'
@@ -9,10 +9,7 @@ import { AuthApi } from 'src/api/auth'
 import { router } from 'src/boot/system'
 import { notify } from 'src/boot/notify'
 import { store } from 'src/store/index'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.API)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.API)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.API)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.API)
 
 class EventApi {
    static verbalizeRate(float){

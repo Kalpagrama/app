@@ -102,6 +102,7 @@ export default {
       }
     }
   },
+  emits: ['player'],
   data () {
     return {
       player: null

@@ -1,15 +1,15 @@
 <template lang="pug">
 .row.full-width.q-py-md.q-px-sm
   .row.full-width.q-px-sm
-    span(v-if="header").text-bold.text-white {{ $t('Password', 'Пароль') }}
+    span(v-if="header").text-bold.text-white {{ $t('Пароль') }}
   //- set password
   div(v-if="!$store.getters.currentUser.settings.hasPermanentPassword").row.full-width
     //- set header
     .row.full-width.q-py-xs
-      small.text-white {{ $t('You can set a permanent password if you dont want to use temporary login codes', 'Вы можете установить постоянный пароль, если не хотите использовать одноразовые пароли') }}
+      small.text-white {{ $t('Вы можете установить постоянный пароль, если не хотите использовать одноразовые пароли') }}
     //- set action
     div(v-if="fold").row.full-width
-      q-btn(flat color="white" no-caps @click="fold = false").b-50 {{ $t('Set password', 'Установить пароль') }}
+      q-btn(flat color="white" no-caps @click="fold = false").b-50 {{ $t('Установить пароль') }}
     //- set body
     div(v-if="!fold").row.full-width.q-py-sm
       //- new password
@@ -17,8 +17,8 @@
         q-input(
           v-model="passwordNew"
           stack-label
-          :label="$t('New passwor', 'Новый пароль')"
-          :placeholder="$t('Enter new password', 'Введите новый пароль')"
+          :label="$t('Новый пароль')"
+          :placeholder="$t('Введите новый пароль')"
           type="password" required
           filled dark color="white"
           ).full-width
@@ -29,8 +29,8 @@
         q-input(
           v-model="passwordNewConfirm"
           stack-label
-          :label="$t('Repeat passwor', 'Повторите пароль')"
-          :placeholder="$t('Enter new password', 'Введите пароль')"
+          :label="$t('Повторите пароль')"
+          :placeholder="$t('Введите пароль')"
           type="password" required
           filled dark color="white"
           @keyup.enter="passwordSet()").full-width
@@ -40,16 +40,16 @@
         q-btn(
           @click="passwordSet()"
           color="green-8" dense outline size="12px" no-caps
-          :loading="loading").q-px-sm {{ $t('Set password', 'Установить пароль') }}
+          :loading="loading").q-px-sm {{ $t('Установить пароль') }}
         q-btn(
           @click="setting = false, reset()"
           flat color="grey-9" dense no-caps
-          ) {{ $t('Cancel', 'Отмена') }}
+          ) {{ $t('Отмена') }}
   //- change password
   div(v-if="$store.getters.currentUser.settings.hasPermanentPassword").row.full-width
     //- change action
     div(v-if="!changing").row.full-width.q-py-sm
-      q-btn(flat color="white" no-caps @click="changing = true").b-50 {{ $t('Change password', 'Изменить пароль') }}
+      q-btn(flat color="white" no-caps @click="changing = true").b-50 {{ $t('Изменить пароль') }}
     //- change body
     div(v-if="changing").row.full-width.q-py-sm
       //- old password
@@ -58,8 +58,8 @@
         q-input(
           v-model="passwordOld"
           stack-label
-          :label="$t('Old passwor', 'Старый пароль')"
-          :placeholder="$t('Enter old password', 'Введите пароль')"
+          :label="$t('Старый пароль')"
+          :placeholder="$t('Введите пароль')"
           type="password" required
           filled dark color="white"
           ).full-width
@@ -70,8 +70,8 @@
         q-input(
           v-model="passwordNew"
           stack-label
-          :label="$t('New passwor', 'Новый пароль')"
-          :placeholder="$t('Enter new password', 'Введите новый пароль')"
+          :label="$t('Новый пароль')"
+          :placeholder="$t('Введите новый пароль')"
           type="password" required
           filled dark color="white"
           ).full-width
@@ -82,8 +82,8 @@
         q-input(
           v-model="passwordNewConfirm"
           stack-label
-          :label="$t('Repeat passwor', 'Повторите пароль')"
-          :placeholder="$t('Enter new password', 'Введите пароль')"
+          :label="$t('Повторите пароль')"
+          :placeholder="$t('Введите пароль')"
           type="password" required
           filled dark color="white"
           @keyup.enter="passwordChange()").full-width
@@ -94,11 +94,11 @@
         q-btn(
           @click="passwordChange()"
           color="green" dense no-caps
-          :loading="loading").q-px-sm {{$t('Change password', 'Изменить пароль')}}
+          :loading="loading").q-px-sm {{$t('Изменить пароль')}}
         q-btn(
           @click="changing = false, reset()"
           flat color="grey-9" dense no-caps
-          ) {{ $t('Cancel', 'Отмена') }}
+          ) {{ $t('Отмена') }}
 </template>
 
 <script>

@@ -29,11 +29,12 @@ module.exports = configure(function (ctx) {
       'notify',
       'i18n',
       'apollo',
-      'system',
-      'main',
+      'helpers',
+      // process.env.RUN_TESTS ? 'tests' : null, // запустить рантайм-тесты после инициализации приложения
+      'libs',
       'components',
-      'helpers'
-    ],
+      'system',
+    ].filter(b => !!b),
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
     css: [
@@ -106,7 +107,8 @@ module.exports = configure(function (ctx) {
       preloadChunks: true,
       gzip: true,
       distDir: 'dist',
-      analyze: { analyzerPort: ctx.mode.capacitor ? 7777 : ctx.mode.pwa ? 8888 : 9999 },
+      // отключено для pwa (иначе проблемы при деплое в vercel (не отдается управление в консоль))
+      analyze: ctx.mode.pwa ? false : { analyzerPort: ctx.mode.capacitor ? 7777 : ctx.mode.pwa ? 8888 : 9999 },
 
       // Options below are automatically set depending on the env, set them if you want to override
       // extractCSS: false,
@@ -146,6 +148,7 @@ module.exports = configure(function (ctx) {
           ...cfg.resolve.alias,
           schema: path.resolve(__dirname, './src/api'),
           public: path.resolve(__dirname, './public'),
+          tests: path.resolve(__dirname, './tests'),
           // vue: '@vue/compat'
         }
         if (!ctx.mode.ssr) {

@@ -56,6 +56,7 @@ import essenceHeader from 'src/components/essence/essence_header'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { assert } from 'src/system/common/utils'
 import cloneDeep from 'lodash/cloneDeep'
+import { reactive } from 'vue'
 
 // этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
 export default {
@@ -104,10 +105,10 @@ export default {
       assert(this.itemState)
       let key = this.$options.name
       if (!this.itemState[key]) {
-        this.$set_deprecated(this.itemState, key, {
+        this.$set_deprecated(this.itemState, key, reactive({
          // key: value
           nodeWidth: 100
-        })
+        }))
       }
       return this.itemState[key]
     },

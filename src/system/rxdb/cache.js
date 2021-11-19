@@ -1,17 +1,13 @@
 import LruCache from 'lru-cache'
 import { assert } from 'src/system/common/utils'
 import { cacheSchema } from 'src/system/rxdb/schemas'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { mutexGlobal } from 'src/system/rxdb/mutex_global'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import debounce from 'lodash/debounce'
 import { getRxCollectionEnumFromId, rxdb } from 'src/system/rxdb'
 import { rxdbOperationProxyExec } from 'src/system/rxdb/common'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_CACHE)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_CACHE)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_CACHE)
-const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_CACHE)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_CACHE)
 
 const debounceIntervalDumpLru = 1000 * 30 // сохраняем весь LRU в idb с дебаунсом 30 сек
 const defaultActualAge = 1000 * 60 * 60 // время жизни объекта в кэше (по умолчанию час)

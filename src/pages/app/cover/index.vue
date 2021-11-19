@@ -8,7 +8,7 @@ kalpa-layout()
           @pageId="pageIdChange")
       template(v-slot:center)
         .row.content-center
-          span.text-grey-7 {{$t('Content page', 'Страница контента')}}
+          span.text-grey-7 {{$t('Страница контента')}}
   template(v-slot:body)
     .row.full-width.justify-center
       item-card(

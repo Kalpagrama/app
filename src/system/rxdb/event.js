@@ -1,17 +1,13 @@
 import { assert } from 'src/system/common/utils'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { t } from 'src/boot/i18n'
 import { notify } from 'src/boot/notify'
 import { EventApi } from 'src/api/event'
 import { rxdb } from 'src/system/rxdb'
 import { RxCollectionEnum } from 'src/system/rxdb/common'
 import { getReactive } from 'src/system/rxdb/reactive'
-import { eventBus } from 'src/boot/main'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_EVENT)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_EVENT)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_EVENT)
-const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_EVENT)
+import { eventBus } from 'src/boot/libs'
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_EVENT)
 
 class Event {
    constructor (workspace, objects, lists, cache) {

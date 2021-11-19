@@ -1,4 +1,4 @@
-import { LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 
 export default {
    initialized: false,
@@ -10,34 +10,34 @@ export default {
    installPrompt: null, // ф-я вызова диалога "установить приложение"
    logLevel: LogLevelEnum.DEBUG,
    logLevelSentry: LogLevelEnum.CRITICAL,
-   logDbgFilter: 'any', // gui | system | any
    logFormat: {time: false, moduleName: true, funcName: true},
    logRocket: false,
    logRocketSessionUrl: null,
-   logDbgModulesBlackList: [
-      LogSystemModulesEnum.SYSTEM,
-      LogSystemModulesEnum.TEST,
-      LogSystemModulesEnum.SW,
-      LogSystemModulesEnum.PWA,
-      LogSystemModulesEnum.AUTH,
-      LogSystemModulesEnum.API,
-      LogSystemModulesEnum.ROUTER,
-      LogSystemModulesEnum.VUEX,
-      LogSystemModulesEnum.VUEX_CACHE,
-      LogSystemModulesEnum.VUEX_CORE,
-      LogSystemModulesEnum.VUEX_DBG,
-      LogSystemModulesEnum.RXDB,
-      LogSystemModulesEnum.RXDB_REACTIVE,
-      LogSystemModulesEnum.RXDB_WS,
-      LogSystemModulesEnum.RXDB_CACHE,
-      LogSystemModulesEnum.RXDB_OBJ,
-      LogSystemModulesEnum.RXDB_GQL,
-      LogSystemModulesEnum.RXDB_LST,
-      LogSystemModulesEnum.RXDB_EVENT,
-      LogSystemModulesEnum.MUTEX,
-      LogSystemModulesEnum.BOOT,
-      LogSystemModulesEnum.CP,
-   ],
+   logDbgFilter: 'any', // gui | system | any
+   logModulesFilter: {
+      [LogSystemModulesEnum.SYSTEM]: LogLevelEnum.TRACE,
+      [LogSystemModulesEnum.TESTS]: LogLevelEnum.DEBUG,
+      [LogSystemModulesEnum.SW]: LogLevelEnum.TRACE,
+      [LogSystemModulesEnum.PWA]: LogLevelEnum.TRACE,
+      [LogSystemModulesEnum.AUTH]: LogLevelEnum.TRACE,
+      [LogSystemModulesEnum.API]: LogLevelEnum.TRACE,
+      [LogSystemModulesEnum.ROUTER]: LogLevelEnum.TRACE,
+      [LogSystemModulesEnum.VUEX]: LogLevelEnum.TRACE,
+      [LogSystemModulesEnum.VUEX_CACHE]: LogLevelEnum.TRACE,
+      [LogSystemModulesEnum.VUEX_CORE]: LogLevelEnum.TRACE,
+      [LogSystemModulesEnum.VUEX_DBG]: LogLevelEnum.TRACE,
+      [LogSystemModulesEnum.RXDB]: LogLevelEnum.TRACE,
+      [LogSystemModulesEnum.RXDB_REACTIVE]: LogLevelEnum.DEBUG,
+      [LogSystemModulesEnum.RXDB_WS]: LogLevelEnum.TRACE,
+      [LogSystemModulesEnum.RXDB_CACHE]: LogLevelEnum.TRACE,
+      [LogSystemModulesEnum.RXDB_OBJ]: LogLevelEnum.TRACE,
+      [LogSystemModulesEnum.RXDB_GQL]: LogLevelEnum.TRACE,
+      [LogSystemModulesEnum.RXDB_LST]: LogLevelEnum.TRACE,
+      [LogSystemModulesEnum.RXDB_EVENT]: LogLevelEnum.TRACE,
+      [LogSystemModulesEnum.MUTEX]: LogLevelEnum.TRACE,
+      [LogSystemModulesEnum.BOOT]: LogLevelEnum.TRACE,
+      [LogSystemModulesEnum.CP]: LogLevelEnum.TRACE,
+   },
    colors: {
       hello: 'goodbye'
    },

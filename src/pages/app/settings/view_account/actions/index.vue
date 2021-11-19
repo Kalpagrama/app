@@ -78,7 +78,7 @@
 
 <script>
 import { AuthApi } from 'src/api/auth'
-import { initLogRocket, LogLevelEnum } from 'src/system/log'
+import { initLogRocket, LogLevelEnum, getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { rxdb } from 'src/system/rxdb'
 import { ObjectApi } from 'src/api/object'
 import { ObjectCreateApi } from 'src/api/object_create'
@@ -133,7 +133,7 @@ export default {
         if (description && confirm('Теперь продемонстрируйте ошибку.\nМы запишем ваши действия и сможем понять в чем проблема\nПо окончанию - нажмите на кнопку "закончить запись ошибки"')) {
           this.$store.commit('core/stateSet', ['logRocket', true])
           this.$store.commit('core/stateSet', ['logDbgFilter', 'any'])
-          this.$store.commit('core/stateSet', ['logDbgModulesBlackList', []])
+          this.$store.commit('core/stateSet', ['logModulesFilter', {}])
           this.$store.commit('core/stateSet', ['logFormat', {time: true, moduleName: true, funcName: true}])
           this.$store.commit('core/stateSet', ['logLevel', LogLevelEnum.DEBUG])
           await initLogRocket(this.$rxdb.getCurrentUser().oid, this.$rxdb.getCurrentUser().username, this.$rxdb.getCurrentUser().profile.email, description, this.$store)

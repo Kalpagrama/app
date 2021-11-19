@@ -14,7 +14,7 @@
       @close="avatarEditorOpened = false")
   //- header
   //- .row.full-width.q-px-md
-    span.text-bold.text-white {{ $t('Avatar', 'Аватар') }}
+    span.text-bold.text-white {{ $t('Фото') }}
   //- preview & actions
   .row.full-width.justify-center.q-py-sm
     div(

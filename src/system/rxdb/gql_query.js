@@ -1,15 +1,11 @@
 // сцепляет запросы и отправляет пачкой
 import {assert} from 'src/system/common/utils'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { getRawIdFromId } from 'src/system/rxdb'
 import { AuthApi } from 'src/api/auth'
 import { ObjectCreateApi } from 'src/api/object_create'
 import { ObjectApi } from 'src/api/object'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_GQL)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_GQL)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_GQL)
-const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_GQL)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_GQL)
 
 // класс для запроса списков и отдельных объектов
 class GqlQueries {

@@ -34,6 +34,7 @@ div(
 // этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
 <script>
 import { assert } from 'src/system/common/utils'
+import { reactive } from 'vue'
 
 export default {
   name: 'fromBook',
@@ -44,10 +45,10 @@ export default {
       assert(this.itemState)
       let key = this.$options.name + this.composition.oid
       if (!this.itemState[key]) {
-        this.$set_deprecated(this.itemState, key, {
+        this.$set_deprecated(this.itemState, key, reactive({
           heightWrapper: 0,
           heightP: 0,
-        })
+        }))
       }
       return this.itemState[key]
     },

@@ -113,7 +113,6 @@
           :maximized="false"
         )
           div(:style=`{background: 'rgb(35,35,35)',borderRadius: '10px'}`).row.full-width.q-pa-md.justify-center
-            //span.text-green.text-h6.q-my-md {{$t('Creation Menu', 'Меню создания')}}
             q-btn(
               outline color="grey-8"
               size="xl"
@@ -159,7 +158,7 @@
           q-icon(size="37px" name="help_outline" color="grey-5")
         div(v-if="!mini").col.full-height
           .row.fit.items-center.content-center
-            span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-grey-5.text-bold {{$t('How to use?', 'Как это работает')}}
+            span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-grey-5.text-bold {{$t('Как это работает')}}
       //- docs
       .row.full-width.q-mt-sm
         kalpa-docs(
@@ -172,7 +171,7 @@
       div(v-if="!mini").row.full-width.items-center
         small(
           :style=`{userSelect: 'none', marginLeft: '0px'}`
-        ).text-grey-9 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
+        ).text-grey-9 {{$t('Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
 </template>
 
 <script>

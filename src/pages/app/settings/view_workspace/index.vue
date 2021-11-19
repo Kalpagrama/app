@@ -30,7 +30,7 @@ export default {
   name: 'pageApp_settings_viewWorkspace',
   methods: {
     async wsClear () {
-      if (!confirm(this.$t('confirm_ws_delete', 'Удалить мастерскую? Потеряешь все ядра...'))) return
+      if (!confirm(this.$t('Удалить мастерскую?'))) return
       this.$log('wsClear start')
       let wsClear = await WorkspaceApi.wsClear()
       this.$log('wsClear done', wsClear)

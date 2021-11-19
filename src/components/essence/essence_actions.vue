@@ -141,6 +141,7 @@ import { ObjectApi } from 'src/api/object'
 import essenceVoteBall from 'src/components/essence/essence_vote_ball.vue'
 import essenceVoteStats from './essence_actions/vote_stats.vue'
 import { assert } from 'src/system/common/utils'
+import { reactive } from 'vue'
 export default {
   name: 'essenceActions',
   props: {
@@ -166,7 +167,7 @@ export default {
       assert(this.itemState)
       let key = this.$options.name
       if (!this.itemState[key]) {
-        this.$set_deprecated(this.itemState, key, {
+        this.$set_deprecated(this.itemState, key, reactive({
           showStats: false,
           isActiveStart: 0,
           votesShow: false,
@@ -175,7 +176,7 @@ export default {
           itemEditorShow: false,
           voteVoting: null,
           rateOver: null,
-        })
+        }))
       }
       return this.itemState[key]
     }

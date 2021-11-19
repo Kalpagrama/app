@@ -3,11 +3,8 @@ import { createI18n } from 'vue-i18n'
 import messages from 'src/i18n'
 
 let i18n
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.BOOT)
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.BOOT)
 
 let setLocale, t
 

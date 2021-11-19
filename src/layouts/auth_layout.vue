@@ -8,7 +8,7 @@ import { AuthApi } from 'src/api/auth'
 export default {
   name: 'authLayout',
   // meta () {
-  //   return this.$t('Kalpagrama - Authentication', 'Кальпаграма - Авторизация')
+  //   return this.$t('Кальпаграма - Авторизация')
   // },
   watch: {
     '$route.query.token': {

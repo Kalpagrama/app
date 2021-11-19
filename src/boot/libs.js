@@ -1,10 +1,8 @@
 import { boot } from 'quasar/wrappers'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum, performance } from 'src/system/log'
+import { isReactive } from 'vue'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import eventBus from 'tiny-emitter/instance'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
-const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.BOOT)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.BOOT)
 
 import { Screen, date, colors } from 'quasar'
 import { gsap } from 'gsap'
@@ -14,6 +12,7 @@ import axios from 'axios'
 import isEqual from 'lodash/isEqual'
 import debounce from 'lodash/debounce'
 import throttle from 'lodash/throttle'
+import { assert } from 'src/system/common/utils'
 
 const contentful = require('contentful')
 
@@ -63,6 +62,8 @@ export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath,
       // })
       // contentful
       app.config.globalProperties.$set_deprecated = (obj, prop, value) => {
+         // eslint-disable-next-line no-prototype-builtins
+         assert((obj.$data && obj.$data.hasOwnProperty(prop)) || isReactive(obj) || isReactive(value) || (obj[prop] && isReactive(obj[prop])), 'в итоге ДОЛЖЕН получится реактивный элемент!!!')
          obj[prop] = value
       }
       const contentfulConfig = {

@@ -9,7 +9,7 @@ kalpa-layout()
           ).row.full-width.items-center.content-center.justify-between.q-pa-sm.b-40
           q-icon(name="settings" color="white" size="30px").q-mx-sm
           .col
-            span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white {{$t('pageSettings_title', 'Настройки')}}
+            span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white {{$t('Настройки')}}
   template(v-slot:body)
     .row.full-width.items-start.content-start.justify-center
       view-guest(
@@ -33,9 +33,7 @@ export default {
   computed: {
     views () {
       return [
-        {id: 'settings.account', name: this.$t('pageSettings_account_title', 'Профиль')},
-        // {id: 'settings.workspace', name: this.$t('pageSettings_workspace_title', 'Мастерская')},
-        // {id: 'settings.docs', name: this.$t('pageSettings_docs_title', 'Документы')}
+        {id: 'settings.account', name: this.$t('Профиль')},
       ]
     }
   },

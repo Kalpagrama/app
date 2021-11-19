@@ -46,6 +46,7 @@ import { UserApi } from 'src/api/user'
 
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 import { assert } from 'src/system/common/utils'
+import { reactive } from 'vue'
 
 export default {
   name: 'kalpaSave',
@@ -71,12 +72,12 @@ export default {
       assert(this.itemState)
       let key = this.$options.name
       if (!this.itemState[key]) {
-        this.$set_deprecated(this.itemState, key, {
+        this.$set_deprecated(this.itemState, key, reactive({
           bookmark: null,
           bookmarkCreating: false,
           bookmarkCreatedDialogShow: false,
           bookmarkEditorDialogShow: false
-        })
+        }))
       }
       return this.itemState[key]
     }

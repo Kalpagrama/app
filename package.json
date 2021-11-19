@@ -29,7 +29,7 @@
     "icons": "icongenie generate -p .icongenie.profile.json",
     "tr": "i18next-scanner --config src/i18n/i18next-scanner.config.js",
     "lint": "eslint --ext .js,.vue src",
-    "test": "echo \"No test specified\" && exit 0",
+    "test": "cross-env RUN_TESTS=true yarn dev",
     "now-build": "quasar build -m pwa",
     "now": "now"
   },
@@ -78,6 +78,7 @@
     "@vue/eslint-config-airbnb": "^5.0.0",
     "apollo": "^2.25.0",
     "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
     "eslint": "^7.14.0",
     "eslint-config-standard": "^16.0.2",

@@ -84,6 +84,7 @@ import context from './context/index.vue'
 import fromVideo from './from_video/index.vue'
 import fromBook from './from_book/index.vue'
 import { assert } from 'src/system/common/utils'
+import { reactive } from 'vue'
 
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
@@ -138,7 +139,7 @@ export default {
       assert(this.itemState)
       let key = this.$options.name + this.composition.oid
       if (!this.itemState[key]) {
-        this.$set_deprecated(this.itemState, key, {
+        this.$set_deprecated(this.itemState, key, reactive({
           playerComponent: {
             VIDEO: 'type-video',
             IMAGE: 'type-image',
@@ -148,7 +149,7 @@ export default {
           height: 0,
           width: 0,
           options: {}
-        })
+        }))
       }
       return this.itemState[key]
     }

@@ -50,6 +50,7 @@ import { ContentApi } from 'src/api/content'
 import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'
 import { debounceIntervalItem } from 'src/system/rxdb/reactive'
+import { reactive } from 'vue'
 
 export default {
   name: 'playerDefault',
@@ -65,6 +66,7 @@ export default {
       }
     }
   },
+  emits: ['player', 'error'],
   data () {
     return {
       events: null,

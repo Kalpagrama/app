@@ -2,16 +2,12 @@
 import { assert, wait } from 'src/system/common/utils'
 import { ObjectApi } from 'src/api/object'
 import { updateRxDocPayload } from 'src/system/rxdb/reactive'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { makeId, rxdb } from 'src/system/rxdb'
 import { RxCollectionEnum } from 'src/system/rxdb/common'
 import debounce from 'lodash/debounce'
 import cloneDeep from 'lodash/cloneDeep'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_OBJ)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_OBJ)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_OBJ)
-const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_OBJ)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_OBJ)
 
 const QUEUE_MAX_SZ = 111 // макимальное число сущностей в очереди на запрос
 const QUEUE_MAX_SZ_PRELOAD = 22 // макимальное число сущностей в очереди на запрос на предзагрузку

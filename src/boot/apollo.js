@@ -9,20 +9,10 @@ import { createUploadLink } from 'apollo-upload-client'
 import { assert } from 'src/system/common/utils'
 import isEqual from 'lodash/isEqual'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
-
-import {
-  getLogFunc,
-  LogLevelEnum,
-  LogSystemModulesEnum,
-  performance
-} from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { AuthApi } from 'src/api/auth'
 import { systemReset } from 'src/system/services'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
-const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.BOOT)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.BOOT)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.BOOT)
 
 let apollo
 
@@ -37,7 +27,7 @@ export default boot(async ({
 }) => {
   try {
     const f = { nameExtra: 'boot::apollo' }
-    logW(f, 'start')
+    logD(f, 'start')
     // logW(f, 'SERVICES_URL_DEBUG=', process.env.SERVICES_URL_DEBUG)
     // logW(f, 'SERVICES_URL=', process.env.SERVICES_URL)
     // logW(f, 'DOCKER_MACHINE_NAME=', process.env.DOCKER_MACHINE_NAME)
@@ -62,7 +52,7 @@ export default boot(async ({
           err.message = err.code + ':' + err.message
           if (err.code === 'USER_NOT_AUTH' || err.code === 'BAD_SESSION' || err.code === 'UNCONFIRMED_LOGIN_DISABLED') {
             // alert('error on gql request: ' + JSON.stringify(err))
-            AuthApi.logout(null)
+            AuthApi.logout()
               .then(() => {
                 logW('AuthApi. before reload!')
                 window.location.reload()
@@ -79,7 +69,7 @@ export default boot(async ({
       if (networkError) {
         logE('gql network error', networkError)
         if (networkError.message === 'bad auth token!') {
-          // AuthApi.logout(null)
+          // AuthApi.logout()
           //    .then(() => {
           //       window.location.reload()
           //    })

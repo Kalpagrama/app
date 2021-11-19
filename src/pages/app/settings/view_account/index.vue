@@ -22,7 +22,7 @@ div(
           .row.full-width.q-py-lg
             small(
               :style=`{userSelect: 'none'}`
-              ).text-grey-9 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
+              ).text-grey-9 {{$t('Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
 </template>
 
 <script>

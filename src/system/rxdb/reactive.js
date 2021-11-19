@@ -4,7 +4,7 @@ import { isRxDocument, isRxQuery } from 'rxdb'
 import { skip } from 'rxjs/operators'
 import { getRawIdFromId, RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import debounce from 'lodash/debounce'
-import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/system/log'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import lodashGet from 'lodash/get'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { Lists } from 'src/system/rxdb/lists'
@@ -12,10 +12,7 @@ import { store } from 'src/store/index'
 import cloneDeep from 'lodash/cloneDeep'
 
 import { reactive, watch } from 'vue'
-
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_REACTIVE)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_REACTIVE)
 
 // dummyObject - не создавать реактивный объект с нуля, а использовать dummyObject (нужно когда dummyObject уже ушел в UI и нужно сохранить реактивность)
 function getReactive (rxDocOrObject, mirroredVuexObjectKey = null) {
@@ -53,6 +50,7 @@ async function updateRxDocPayload (rxDocOrId, path, valueOrFunc, debouncedSave =
             assert(value, '!value')
          } else value = valueOrFunc
          reactiveDoc.updatePayloadByPath(path, value)
+         // logD('after updatePayloadByPath')
       } catch (err) {
          logE('err on updateRxDocPayload', cloneDeep(reactiveDoc.getPayload()))
          throw err
@@ -152,7 +150,8 @@ class ReactiveDocFactory {
             //          throw new Error('bad itemType: ' + this.itemType)
             //    }
             // }
-            const reactiveDoc = plainData
+            this.vm.reactiveData.doc = plainData
+            const reactiveDoc = this.vm.reactiveData.doc
             reactiveDoc.getPayload = () => {
                switch (this.itemType) {
                   case 'wsItem':
@@ -168,18 +167,10 @@ class ReactiveDocFactory {
             }
             const payload = reactiveDoc.getPayload()
             reactiveDoc.updatePayloadByPath = (payloadPath, value) => {
-               // if (this.itemType.in('wsItem', 'object')) {
-               //    assert(payloadPath, '!payloadPath')
-               //    let propPathParent = payloadPath.split('.').slice(0, -1).join('.')
-               //    let changedPropName = payloadPath.split('.').slice(-1).join('.')
-               //    let valueParent = propPathParent === '' ? payload : lodashGet(payload, payloadPath.split('.').slice(0, -1).join('.')) // родитель измененного свойства
-               //    if (valueParent) {
-               //       Vue.set(valueParent, changedPropName, value)
-               //    } else logE(`cant find prop ${payloadPath} in object`, payload)
-               // } else if (this.itemType.in('meta')) {
-               //    assert(payloadPath === '', '!payloadPath === emptyStr')
-               //    Vue.set(reactiveDoc, 'valueString', value)
-               // } else throw new Error('bad itemType: ' + this.itemType)
+               if (this.rxDoc.deleted) {
+                  logE('rxDoc deleted!', payload)
+                  // return
+               }
                let fullPath
                switch (this.itemType) {
                   case 'wsItem':
@@ -200,7 +191,7 @@ class ReactiveDocFactory {
                let changedPropName = fullPath.split('.').slice(-1).join('.')
                let valueParent = propPathParent ? lodashGet(reactiveDoc, propPathParent) : reactiveDoc // родитель измененного свойства
                if (valueParent) {
-                  ReactiveDocFactory.mergeReactive(valueParent, { [changedPropName]: value })
+                     ReactiveDocFactory.mergeReactive(valueParent, { [changedPropName]: value })
                } else logE(`cant find prop ${fullPath} in object`, reactiveDoc)
             }
 
@@ -224,8 +215,13 @@ class ReactiveDocFactory {
                         return
                      }
                      if (payload.beforeRemove) await payload.beforeRemove(permanent)
-                     await updateRxDocPayload(this.rxDoc, 'deletedAt', Date.now(), false) // ставим всегда (чтобы списки реактивно обновились)
-                     if (permanent) await this.rxDoc.remove() // удаляем навсегда (отловим в ws_items.postRemove и отправим на сервер)
+                     if (permanent) {
+                        // logW('remove permanent')
+                        await this.rxDoc.remove() // удаляем навсегда (отловим в ws_items.postRemove и отправим на сервер)
+                     } else {
+                        // нельзя вызывать совместно с this.rxDoc.remove() тк remove всегда обгонит обновление rxDoc (из-за подписок)
+                        await updateRxDocPayload(this.rxDoc, 'deletedAt', Date.now(), false) // чтобы списки реактивно обновились
+                     }
                      logD('complete')
                   }
                   payload.restoreFromTrash = async () => {
@@ -234,8 +230,6 @@ class ReactiveDocFactory {
                   rxdb.workspace.populateReactiveWsItem(payload)
                }
             }
-            // Vue.set(this.vm.reactiveData, 'doc', reactiveDoc)
-            this.vm.reactiveData.doc = reactiveDoc
             if (mirroredVuexObjectKey) {
                this.vuexKey = mirroredVuexObjectKey
                assert(store && store.state && store.state.mirrorObjects, 'store && store.state && store.state.mirrorObjects')
@@ -289,7 +283,7 @@ class ReactiveDocFactory {
       // skip - для пропуска n первых эвантов (после subscribe - сразу генерится эвент(даже если данные не менялись))
       this.rxDocSubscription = this.rxDoc.$.pipe(skip(1)).subscribe(async changePlainDoc => {
          try {
-            // logD(f, 'reactiveDoc changed start', changePlainDoc)
+            logD(f, 'reactiveDoc changed start', changePlainDoc)
             await this.mutex.lock('rxDocSubscribe') // обязательно сначала блокируем !!! (см reactiveSubscribe)
             assert(this.getRev() && changePlainDoc._rev, '!this.getRev() && changePlainDoc._rev')
             if (this.getRev() === changePlainDoc._rev) return // изменения уже применены к reactiveDoc (см this.reactiveSubscribe())
@@ -316,10 +310,9 @@ class ReactiveDocFactory {
       if (this.itemUnsubscribeFunc) return
       this.itemUnsubscribeFunc = watch(() => this.vm.reactiveData, async (newVal, oldVal) => {
          // reactiveItem изменилась (обычно из UI)
-
          // изменить связанный объект во vuex
          if (this.vuexKey) {
-            store.commit('setMirrorObject', [this.vuexKey, this.getReactive().getPayload()])
+            store.commit('mergeMirrorObject', [this.vuexKey, this.getReactive().getPayload()])
          }
          if (!this.debouncedItemSaveFunc) {
             // itemSaveFunc - сохраняет текущий reactiveItem в rxdb
@@ -351,13 +344,13 @@ class ReactiveDocFactory {
             this.debouncedItemSaveFunc = debounce(this.itemSaveFunc, debounceIntervalItem, { maxWait: 8888 })
          }
          if (this.getDebouncedSave()) {
-            // logD(f, `reactiveItem changed (rxDoc will change via debounce later)`)
+            // logD(f, 'reactiveItem changed (rxDoc will change via debounce later)')
             this.debouncedItemSaveFunc(this.getSynchro())
          } else {
-            // logD(f, `reactiveItem changed without debounce`)
+            // logD(f, 'reactiveItem changed without debounce NOW')
             await this.itemSaveFunc(this.getSynchro())
          }
-      }, { deep: true, immediate: false })
+      }, { deep: true, immediate: false, flush: 'sync' })
    }
 
    reactiveUnsubscribe () {
@@ -824,16 +817,17 @@ class Group {
          }
       }
       for (let item of filtered) {
-         item.debugInfo = () => {
-            let indx = this.findIndx(item[this.reactiveGroup.itemPrimaryKey])
-            return {
-               indx,
-               indxHF: indx + 1,
-               loadedLen: this.loadedLen(),
-               totalCount: this.reactiveGroup.totalCount,
-               fulFilledRange: this.fulFilledRange()
-            }
-         }
+         // !!!  нельзя менять item (он реактивен и связан с исходником в rxdb)
+         // item.debugInfo = () => {
+         //    let indx = this.findIndx(item[this.reactiveGroup.itemPrimaryKey])
+         //    return {
+         //       indx,
+         //       indxHF: indx + 1,
+         //       loadedLen: this.loadedLen(),
+         //       totalCount: this.reactiveGroup.totalCount,
+         //       fulFilledRange: this.fulFilledRange()
+         //    }
+         // }
       }
       items.splice(startPos, deleteCount, ...filtered) // добавляем новые
       if (this.screenSize) {
