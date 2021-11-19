@@ -62,7 +62,7 @@ export default {
     options: {
       type: Object,
       default () {
-        return reactive({})
+        return {}
       }
     }
   },

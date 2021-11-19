@@ -122,6 +122,7 @@
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { assert } from 'src/system/common/utils'
+import { reactive } from 'vue'
 
 // этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
 export default {
@@ -138,10 +139,10 @@ export default {
       assert(this.itemState)
       let key = this.$options.name
       if (!this.itemState[key]) {
-        this.$set_deprecated(this.itemState, key, {
+        this.$set_deprecated(this.itemState, key, reactive({
           itemActive: 0,
           compositionPlayState: ['play', 'pause']
-        })
+        }))
       }
       return this.itemState[key]
     }

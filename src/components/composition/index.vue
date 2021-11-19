@@ -101,7 +101,7 @@ export default {
     itemState: {
       type: Object,
       default () {
-        return reactive({})
+        return {}
       }
     },
     isVisible: {},
@@ -139,7 +139,7 @@ export default {
       assert(this.itemState)
       let key = this.$options.name + this.composition.oid
       if (!this.itemState[key]) {
-        this.$set_deprecated(this.itemState, key, {
+        this.$set_deprecated(this.itemState, key, reactive({
           playerComponent: {
             VIDEO: 'type-video',
             IMAGE: 'type-image',
@@ -149,7 +149,7 @@ export default {
           height: 0,
           width: 0,
           options: {}
-        })
+        }))
       }
       return this.itemState[key]
     }

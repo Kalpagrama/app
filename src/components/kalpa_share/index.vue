@@ -69,6 +69,7 @@ q-btn(
 import { Platform, openURL } from 'quasar'
 import { makeRoutePath } from 'public/scripts/common_func'
 import { assert } from 'src/system/common/utils'
+import { reactive } from 'vue'
 
 export default {
   name: 'kalpaShare',
@@ -86,12 +87,12 @@ export default {
       assert(this.itemState)
       let key = this.$options.name
       if (!this.itemState[key]) {
-        this.$set_deprecated(this.itemState, key, {
+        this.$set_deprecated(this.itemState, key, reactive({
           loading: false,
           shareLink: '',
           shareDialogOpened: false,
           shareTarget: null,
-        })
+        }))
       }
       return this.itemState[key]
     },

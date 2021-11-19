@@ -102,6 +102,7 @@ div(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { assert } from 'src/system/common/utils'
+import { reactive } from 'vue'
 
 export default {
   name: 'compositionContext',
@@ -127,10 +128,10 @@ export default {
       assert(this.itemState)
       let key = this.$options.name + this.composition.oid
       if (!this.itemState[key]) {
-        this.$set_deprecated(this.itemState, key, {
+        this.$set_deprecated(this.itemState, key, reactive({
           heightMax: 0,
           contentKalpa: null,
-        })
+        }))
       }
       return this.itemState[key]
     },

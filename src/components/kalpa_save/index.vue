@@ -58,7 +58,7 @@ export default {
     itemState: {
       type: Object,
       default () {
-        return reactive({})
+        return {}
       }
     },
     color: { type: String, default: 'grey-9' },
@@ -72,12 +72,12 @@ export default {
       assert(this.itemState)
       let key = this.$options.name
       if (!this.itemState[key]) {
-        this.$set_deprecated(this.itemState, key, {
+        this.$set_deprecated(this.itemState, key, reactive({
           bookmark: null,
           bookmarkCreating: false,
           bookmarkCreatedDialogShow: false,
           bookmarkEditorDialogShow: false
-        })
+        }))
       }
       return this.itemState[key]
     }

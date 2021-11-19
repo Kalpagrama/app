@@ -119,6 +119,7 @@ div(
 <script>
 import { ContentApi } from 'src/api/content'
 import { assert } from 'src/system/common/utils'
+import { reactive } from 'vue'
 export default {
   name: 'essenceItems',
   props: ['node', 'isActive', 'isVisible', 'itemState', 'showContext'],
@@ -128,9 +129,9 @@ export default {
       assert(this.itemState)
       let key = this.$options.name
       if (!this.itemState[key]) {
-        this.$set_deprecated(this.itemState, key, {
+        this.$set_deprecated(this.itemState, key, reactive({
           compositionPlayBackState: ['playing', 'paused']
-        })
+        }))
       }
       return this.itemState[key]
     }

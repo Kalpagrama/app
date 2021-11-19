@@ -58,7 +58,7 @@ export default {
     itemState: {
       type: Object,
       default () {
-        return reactive({})
+        return {}
       }
     },
     itemIndex: { type: Number },
@@ -108,12 +108,12 @@ export default {
       let key = this.$options.name
       if (!this.itemState[key]) {
         // assert(this.itemState.id === this.itemShortOrFull.oid)
-        this.$set_deprecated(this.itemState, key, {
+        this.$set_deprecated(this.itemState, key, reactive({
           oid: this.itemShortOrFull?.oid || this.itemState.itemId,
           itemFull: null,
           queryId: null,
           queryIdPreload: null
-        })
+        }))
       }
       return this.itemState[key]
     },

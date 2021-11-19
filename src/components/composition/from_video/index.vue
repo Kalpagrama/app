@@ -60,6 +60,7 @@ div(:style=`{ position: 'absolute', zIndex: 10}`).row.fit.items-start.content-st
 <script>
 import { ContentApi } from 'src/api/content'
 import { assert } from 'src/system/common/utils'
+import { reactive } from 'vue'
 
 export default {
   name: 'fromVideo',
@@ -70,7 +71,7 @@ export default {
       assert(this.itemState)
       let key = this.$options.name + this.composition.oid
       if (!this.itemState[key]) {
-        this.$set_deprecated(this.itemState, key, {
+        this.$set_deprecated(this.itemState, key, reactive({
           currentTime: null,
           player: null,
           playBackState: 'paused',
@@ -79,7 +80,7 @@ export default {
           statusPlayerLag: null,
           currentTimeChangedCnt: 0,
           videoRef: null
-        })
+        }))
       }
       return this.itemState[key]
     },

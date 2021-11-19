@@ -1,4 +1,5 @@
 import { boot } from 'quasar/wrappers'
+import { isReactive } from 'vue'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import eventBus from 'tiny-emitter/instance'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.BOOT)
@@ -11,6 +12,7 @@ import axios from 'axios'
 import isEqual from 'lodash/isEqual'
 import debounce from 'lodash/debounce'
 import throttle from 'lodash/throttle'
+import { assert } from 'src/system/common/utils'
 
 const contentful = require('contentful')
 
@@ -60,6 +62,8 @@ export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath,
       // })
       // contentful
       app.config.globalProperties.$set_deprecated = (obj, prop, value) => {
+         // eslint-disable-next-line no-prototype-builtins
+         assert((obj.$data && obj.$data.hasOwnProperty(prop)) || isReactive(value) || (obj[prop] && isReactive(obj[prop])), 'в итоге ДОЛЖЕН получится реактивный элемент!!!')
          obj[prop] = value
       }
       const contentfulConfig = {

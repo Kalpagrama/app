@@ -72,6 +72,7 @@ import { UserRoleEnum } from 'src/api/user'
 import kalpaReport from 'src/components/kalpa_report/index.vue'
 import kalpaHide from 'src/components/kalpa_hide/index.vue'
 import {assert} from '../../../system/common/utils';
+import { reactive } from 'vue'
 export default {
   name: 'essenceHeader',
   components: {
@@ -91,10 +92,10 @@ export default {
       assert(this.itemState)
       let key = this.$options.name
       if (!this.itemState[key]) {
-        this.$set_deprecated(this.itemState, key, {
+        this.$set_deprecated(this.itemState, key, reactive({
           reportShow: false,
           hideShow: false
-        })
+        }))
       }
       return this.itemState[key]
     },

@@ -149,7 +149,7 @@ export default {
     itemState: {
       type: Object,
       default () {
-        return reactive({})
+        return {}
       }
     },
     nodeBackgroundColor: {type: String, default: 'rgb(30,30,30)'},
@@ -167,7 +167,7 @@ export default {
       assert(this.itemState)
       let key = this.$options.name
       if (!this.itemState[key]) {
-        this.$set_deprecated(this.itemState, key, {
+        this.$set_deprecated(this.itemState, key, reactive({
           showStats: false,
           isActiveStart: 0,
           votesShow: false,
@@ -176,7 +176,7 @@ export default {
           itemEditorShow: false,
           voteVoting: null,
           rateOver: null,
-        })
+        }))
       }
       return this.itemState[key]
     }
