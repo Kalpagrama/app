@@ -3651,10 +3651,10 @@ contentful-resolve-response@^1.3.0:
   dependencies:
     fast-copy "^2.1.0"
 
-contentful-rich-text-vue-renderer@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/contentful-rich-text-vue-renderer/-/contentful-rich-text-vue-renderer-2.0.1.tgz#9684f40162a355ec009ad14d822ddce43ddd69b6"
-  integrity sha512-S0nXqN5N2FDORKVulK1L29/jeTRO1BKgCJS4kbAZGy6B+udUfGDckmVj8qSNB6J4wcDryyfNZmDdJqbioZ1y0Q==
+contentful-rich-text-vue-renderer@^3.0.0-rc.3:
+  version "3.0.0-rc.3"
+  resolved "https://registry.yarnpkg.com/contentful-rich-text-vue-renderer/-/contentful-rich-text-vue-renderer-3.0.0-rc.3.tgz#5812da0f92d7203c3cfc77cf7d4bd9625067bc9b"
+  integrity sha512-ZHGU6I4lDHcG2Zmbe4WjeQ+9CMWvg9bQ7PjPT+zshtYhSY0uFXVTvDMSGZfJmUhwF6Fn4II7cw3vpL5cXB7F9A==
   dependencies:
     "@contentful/rich-text-types" "^14.1.2"
 
