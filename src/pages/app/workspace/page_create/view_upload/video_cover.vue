@@ -45,10 +45,10 @@
       .row.full-width.justify-center.q-pa-sm
         //- edit
         //- fake input...
-        input(ref="inputAvatar" type="file" @update:model-value="avatarChanged" :style=`{display: 'none',}`)
+        q-file(ref="inputAvatar" @update:model-value="avatarChanged" :style=`{display: 'none',}`)
         q-btn(
           v-if="$store.getters.currentUser.thumbUrl"
-          @click="$refs.inputAvatar.click()"
+          @click="$refs.inputAvatar.pickFiles()"
           flat dense color="grey-6" no-caps) {{$t('Change')}}
         //- remove
         //- random
@@ -60,7 +60,7 @@ import { ObjectApi } from 'src/api/object'
 import editor from './editor.vue'
 
 export default {
-  name: 'editAvatar',
+  name: 'videoCover',
   props: ['currentUser'],
   components: {
     editor,
@@ -82,12 +82,10 @@ export default {
     }
   },
   methods: {
-    async avatarChanged (e) {
-      this.$log('avatarChanged', e)
-      this.avatarUrl = URL.createObjectURL(e.target.files[0])
+    async avatarChanged (file) {
+      this.$log('avatarChanged', file)
+      this.avatarUrl = URL.createObjectURL(file)
       this.avatarEditorOpened = true
-      // destroy value ?
-      this.$refs.inputAvatar.value = null
     },
     async avatarEdited (file) {
       this.$log('avatarEdited', file)
