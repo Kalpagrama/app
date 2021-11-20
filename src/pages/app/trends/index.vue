@@ -127,7 +127,7 @@ export default {
       return '/sphere/' + c.sphere.oid + '/' + (c.type === 'ALL' ? 'AGE' : 'HOT')
     },
     onBusEvent (ev) {
-      this.$refs.listFeed.scrollTo('start')
+      this.$refs.listFeed.scrollToStart()
     }
   },
   mounted () {

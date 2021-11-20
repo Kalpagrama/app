@@ -78,7 +78,9 @@ export default {
       currentTime: 0,
       node: null,
       nodeMode: null,
-      clusters: []
+      clusters: [],
+      figureFocused: null,
+      nodePlaying: null
     }
   },
   computed: {

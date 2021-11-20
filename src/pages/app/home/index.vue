@@ -72,7 +72,7 @@ export default {
   },
   methods: {
     onBusEvent(ev) {
-      this.$refs.listFeed.scrollTo('start')
+      this.$refs.listFeed.scrollToStart()
     }
   },
   computed: {
