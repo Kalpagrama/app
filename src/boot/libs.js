@@ -64,7 +64,7 @@ export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath,
       // contentful
       app.config.globalProperties.$set_deprecated = (obj, prop, value) => {
          // eslint-disable-next-line no-prototype-builtins
-         assert((obj.$data && obj.$data.hasOwnProperty(prop)) || isReactive(obj) || isReactive(value) || (obj[prop] && isReactive(obj[prop])), 'в итоге ДОЛЖЕН получится реактивный элемент!!!')
+         assert((obj.$data && obj.$data.hasOwnProperty(prop)) || isReactive(obj) || isReactive(value) || (obj[prop] && isReactive(obj[prop])), 'в итоге ДОЛЖЕН получится реактивный элемент!!! prop=' + prop)
          obj[prop] = value
       }
       const contentfulConfig = {

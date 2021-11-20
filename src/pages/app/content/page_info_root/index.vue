@@ -222,7 +222,7 @@ export default {
   methods: {
     copyLink () {
       this.$log('copyLink')
-      this.shareLink = makeRoutePath(this.player.content, true)
+      this.shareLink = makeRoutePath(this.player.contentKalpa, true)
       this.clipboardWrite(this.shareLink, this.$t('Ссылка скопирована!'))
     },
     clipboardWrite (val, message) {
