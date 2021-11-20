@@ -26,6 +26,7 @@ div(:style=`{position: 'relative'}`).row.full-width
           div(:style=`{maxHeight: (previewHeight*4)+'px', width: (previewHeight*2)+'px'}`).absolute-center
             item-feed(
               :itemShortOrFull="item"
+              :itemState="{}"
               :showContext="false"
               :isActive="false"
               :isVisible="true"
@@ -34,7 +35,7 @@ div(:style=`{position: 'relative'}`).row.full-width
               :showName="false"
               :showSpheres="false")
               template(v-slot:skeleton=`{queryInProgress}`)
-                q-skeleton(type="QBtn" :height="previewHeight+'px'" dark :animation="queryInProgress ? 'wave' : 'none'").full-width.br
+                q-skeleton(type="QBtn" :height="previewHeight+'px'" dark :animation="queryInProgress ? 'wave' : 'none'").full-width
           div(:style=`{minHeight: '200px', width: '100', background: 'rgba(0,0,0,0.5)', zIndex: '50'}`).fit.absolute
           q-spinner(v-if="waitIndx === itemIndex" size="20px" color="green").fit.absolute.q-pa-sm
     q-btn(v-if="false" :disable="!itemsRight.length" round flat icon="chevron_right" color="white"
@@ -82,9 +83,12 @@ export default {
           if (this.$refs.vs) this.$refs.vs.scrollTo(to, 'center-force')
         })
       }
-    }
-    // imagesNodes(to, from){
-    //   this.$log('imagesNodes from->to', from, to)
+    },
+    // imagesNodes: {
+    //   deep: true,
+    //   handler (to, from) {
+    //     this.$log('imagesNodes from->to', from, to)
+    //   }
     // }
   },
   methods: {

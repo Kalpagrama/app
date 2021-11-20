@@ -12,6 +12,7 @@
   item-feed(
     v-if="node"
     :itemShortOrFull="node"
+    :itemState="{}"
     :showHeader="showHeader"
     :showSpheres="showSpheres"
     :isActive="isActive"

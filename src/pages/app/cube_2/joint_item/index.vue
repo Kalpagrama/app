@@ -3,6 +3,7 @@
   item-feed(
     v-if="item.type === 'NODE'"
     :itemShortOrFull="item"
+    :itemState="{}"
     :isActive="isActive"
     :isVisible="isActive"
     :showHeader="false"

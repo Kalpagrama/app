@@ -2,6 +2,7 @@
 .row.full-width.justify-center
   item-feed(
     :itemShortOrFull="item"
+    :itemState="{}"
     :isActive="false"
     :isVisible="false"
     :showAuthorAlways="true"

@@ -18,6 +18,7 @@
       template(v-slot:item=`{item,itemIndex,isActive,isVisible,isPreload, scrolling}`)
         item-feed(
           :itemShortOrFull="item.populatedObject"
+          :itemState="{}"
           :isActive="isActive_ && isActive"
           :isVisible="isVisible"
           :isPreload="isPreload"

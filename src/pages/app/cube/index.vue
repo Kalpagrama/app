@@ -16,7 +16,7 @@ kalpa-layout(
         //  round color="green" icon="add"
         //  :style=`{width: '46px', height: '46px', borderRadius: '50%',}`)
         q-btn(
-          @click="jointCreateStart()"
+          @click="jointCreateStart"
           color="green" icon="add" flat no-caps
           :label="$t('Add joint')"
           :style=`{}`)
@@ -83,6 +83,7 @@ kalpa-layout(
               item-feed(
                 v-if="jointActive"
                 :itemShortOrFull="jointActive"
+                :itemState="{}"
                 :showItems="false"
                 :showActions="false"
                 :showName="false"
@@ -215,8 +216,8 @@ export default {
         // get rowActiveIndex position of top
         // move there ?
         let rowRef = this.$refs[`row-${this.rowActiveKey}`]
-        if (rowRef && rowRef[0]) {
-          rowRef = rowRef[0].$el
+        if (rowRef) {
+          rowRef = rowRef.$el
           this.$log('rowRef', rowRef)
           let top = rowRef.getBoundingClientRect().top
           this.jointCreatorTop = top
@@ -232,8 +233,7 @@ export default {
       this.$log('jointCreated', joint)
       // go to current row and go
       let rowRef = this.$refs[`row-${this.rowActiveKey}`]
-      if (rowRef && rowRef[0]) {
-        rowRef = rowRef[0]
+      if (rowRef) {
         this.$log('jointCreated rowRef', rowRef)
         await rowRef.jointsRes.setProperty('currentId', joint.oid)
         await rowRef.jointsRes.gotoCurrent()
@@ -271,7 +271,7 @@ export default {
       if (['ArrowLeft', 'ArrowRight'].includes(e.key)) {
         e.preventDefault()
         // find active row and go somewhere...
-        let rowRef = this.$refs[`row-${this.rowActiveKey}`][0]
+        let rowRef = this.$refs[`row-${this.rowActiveKey}`]
         this.$log('rowRef', rowRef)
         if (!rowRef) return
         rowRef.jointMakeVisible(null, true, e.key === 'ArrowRight' ? 'right' : 'left')

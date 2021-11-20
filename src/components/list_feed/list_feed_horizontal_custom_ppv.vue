@@ -260,7 +260,6 @@ export default {
           if (this.itemActivePersist && !this.itemActive) {
             let ref = this.$refs[`item-${this.itemsRes.getProperty('itemActiveIndx')}`]
             if (ref) {
-              ref = ref[0]
               ref.scrollIntoView(false)
               this.$nextTick(() => {
                 let itemLeftOffset = this.scrollTargetWidth / 2 - ref.clientWidth / 2

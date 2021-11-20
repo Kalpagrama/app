@@ -67,6 +67,7 @@ q-layout(
                 ).row.full-width.items-start.content-start
                 item-feed(
                   :itemShortOrFull="node.populatedObject"
+                  :itemState="{}"
                   :isActive="nodeIsVisible"
                   :isVisible="nodeIsVisible"
                   :showName="false"

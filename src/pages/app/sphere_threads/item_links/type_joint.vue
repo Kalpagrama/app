@@ -66,6 +66,7 @@ div(
       //- item-wrapper
       item-feed(
         :itemShortOrFull="item"
+        :itemState="{}"
         :isActive="isVisible"
         :isVisible="isVisible"
         :showHeader="false"

@@ -65,6 +65,7 @@ div(
           item-feed(
             v-if="jointActive"
             :itemShortOrFull="jointActive"
+            :itemState="{}"
             :showItems="false"
             :showActions="false"
             :showName="false"
@@ -103,6 +104,7 @@ div(
           item-feed(
             v-if="`${r.oid}-${ri}` === rowActiveKey && jointActive"
             :itemShortOrFull="jointActive"
+            :itemState="{}"
             :nodeBackgroundColor="'rgb(30,30,30)'"
             :nodeActionsColor="'rgb(255,255,255)'"
             :isActive="false"
@@ -176,7 +178,7 @@ export default {
     },
     getActiveRow () {
       this.$log('getActiveRow')
-      let rowRef = this.$refs[`row-${this.rowActiveKey}`][0]
+      let rowRef = this.$refs[`row-${this.rowActiveKey}`]
       return rowRef
     },
     rowBecameActive (entry) {
@@ -193,7 +195,7 @@ export default {
       // this.$log('rowMakeActive', row)
       if (useDirection) {
         if (useDirection === 'next') {
-          row = this.$refs[this.rowActiveKey][0]
+          row = this.$refs[this.rowActiveKey]
         }
         if (useDirection === 'prev') {
           // need to select prev row...
@@ -253,7 +255,7 @@ export default {
       if (e.direction === 'up') {
         this.rowMakeActive(null, true, 'next')
         // go next
-        // let rowRef = this.$refs[`row-${this.rowActiveKey}`][0]
+        // let rowRef = this.$refs[`row-${this.rowActiveKey}`]
         // let scrollWrapperRef = this.$refs['scroll-wrapper']
         // scrollWrapperRef.scrollTop = rowRef.offsetTop
         // window.scrollTo(0, 100)

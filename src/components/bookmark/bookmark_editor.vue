@@ -78,7 +78,7 @@ div(
         ).row.full-width.justify-end
           q-btn(round flat color="white" icon="clear" v-close-popup)
     div(v-if="!showEditMenu").row.full-width.items-center.content-center.text-white.q-py-xs.wrap
-      collectionList(
+      collection-list(
         v-model="collectionsModel"
         :highlightSelected="true"
         :showDeleteButton="false"
@@ -208,8 +208,11 @@ export default {
     }
   },
   watch: {
-    'collectionsModel.selectedCollectionIds'(to){
-      this.synchronizeSelectedCollectionIds(to)
+    'collectionsModel.selectedCollectionIds': {
+      deep: true,
+      handler(to, from){
+        this.synchronizeSelectedCollectionIds(to)
+      }
     }
   },
   methods: {

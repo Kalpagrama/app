@@ -53,10 +53,10 @@ div(
                     objectFit: 'contain',
                     borderRadius: '20px',
                   }`)
-                div(flat dense no-caps color="white" :style=`{position: "absolute"}` @click="$refs.inputThumb.click()").fit.br-20
+                div(flat dense no-caps color="white" :style=`{position: "absolute"}` @click="$refs.inputThumb.pickFiles()").fit.br-20
               .row.full-width.items-start.content-start.justify-center
                 q-btn(
-                  @click="$refs.inputThumb.click()"
+                  @click="$refs.inputThumb.pickFiles()"
                   flat no-caps color="grey"
                   :ripple="false"
                   :label="$t('Изменить')"
@@ -73,7 +73,7 @@ div(
                   :style=`{maxHeight: $q.screen.width > 320 ? "200px" : "160px",}`
                 ).full-width.br-20
                 q-btn(v-if="!previewUrl"
-                  @click="$refs.inputPreview.click()"
+                  @click="$refs.inputPreview.pickFiles()"
                   flat no-caps color="green" stack
                   :label="$t('Загрузить')"
                   icon="add"
@@ -87,8 +87,8 @@ div(
                   :ripple="false"
                   :label="$t('Удалить')"
                   :style=`{}`)
-    input(ref="inputThumb" type="file" accept="image/*" @update:modelValue="thumbChanged" :style=`{display: 'none',}`)
-    input(ref="inputPreview" type="file" accept="video/*" @update:modelValue="previewChanged" :style=`{display: 'none',}`)
+    q-file(ref="inputThumb" accept="image/*" @update:model-value="thumbChanged" :style=`{display: 'none',}`)
+    q-file(ref="inputPreview" accept="video/*" @update:model-value="previewChanged" :style=`{display: 'none',}`)
     //- form
     div(:style=`{
           paddingLeft: $q.screen.xs ? '0px' : '10px',
@@ -357,20 +357,16 @@ export default {
         this.loading = false
       }
     },
-    async thumbChanged (e) {
-      this.$log('thumbChanged', e)
-      this.contentCopy.thumbUrl = URL.createObjectURL(e.target.files[0])
-      this.fileThumb = e.target.files[0]
-      // destroy value ?
-      this.$refs.inputThumb.value = null
+    async thumbChanged (file) {
+      this.$log('thumbChanged', file)
+      this.contentCopy.thumbUrl = URL.createObjectURL(file)
+      this.fileThumb = file
     },
-    async previewChanged (e) {
-      this.$log('previewChanged', e)
-      assert(e.target.files[0])
-      this.$set_deprecated(this.contentCopy, 'previewUrlWithFormats', [{format: 'default', url: URL.createObjectURL(e.target.files[0])}])
-      this.filePreview = e.target.files[0]
-      // destroy value ?
-      this.$refs.inputPreview.value = null
+    async previewChanged (file) {
+      this.$log('previewChanged', file)
+      assert(file)
+      this.$set_deprecated(this.contentCopy, 'previewUrlWithFormats', [{format: 'default', url: URL.createObjectURL(file)}])
+      this.filePreview = file
     },
     async previewDelete () {
       this.$set_deprecated(this.contentCopy, 'previewUrlWithFormats', [])

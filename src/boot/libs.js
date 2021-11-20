@@ -6,7 +6,8 @@ let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnu
 
 import { Screen, date, colors } from 'quasar'
 import { gsap } from 'gsap'
-import VueMasonry from 'vue-masonry-css'
+// import VueMasonry from 'vue-masonry-css'
+import VueMasonry from 'vue-next-masonry'
 import axios from 'axios'
 // import VueShowdown from 'vue-showdown'
 import isEqual from 'lodash/isEqual'

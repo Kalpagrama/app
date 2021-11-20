@@ -8,6 +8,7 @@ q-dialog(
     @click.self="node = null"
     ).row.fit.items-center.content-center.justify-center
     item-feed(
+      :itemState="{}"
       :isActive="true"
       :isVisible="true"
       :itemShortOrFull="node"

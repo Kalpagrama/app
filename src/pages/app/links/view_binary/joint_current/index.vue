@@ -15,6 +15,7 @@ div(
     ).row.full-width.b-30
     item-feed(
       :itemShortOrFull="joint"
+      :itemState="{}"
       :showHeader="jointOpened"
       :showSpheres="false"
       :showActions="jointOpened"

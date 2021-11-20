@@ -25,6 +25,7 @@
           transition(appear :enter-active-class="'animated fadeIn'" :leave-active-class="'animated fadeOut'")
             item-feed(
               :itemShortOrFull="n"
+              :itemState="{}"
               :isActive="isActive"
               :isVisible="true"
               :showHeader="false"

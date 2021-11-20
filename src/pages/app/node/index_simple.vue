@@ -42,6 +42,7 @@ kalpa-layout()
               ).row.full-width
               item-feed(
                 :itemShortOrFull="node"
+                :itemState="{}"
                 :isActive="nodeIsVisible"
                 :isVisible="nodeIsVisible")
             .row.full-width.q-pt-lg.q-px-xs
