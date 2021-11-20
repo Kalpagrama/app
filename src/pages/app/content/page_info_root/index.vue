@@ -40,13 +40,14 @@ div(
           .row.full-width.q-py-x
             span(:style=`{fontSize: '16px',}`).text-white.text-bold {{ contentKalpa.name }}
           //- stats
-          .row.full-width.q-pb-sm
+          .row.full-width.content-center.items-center
             small.text-grey-3 {{$t('Views')}}: {{ contentKalpa.countStat.countViews }}
+            .col
+            kalpa-save(:item="contentKalpa" dense :isActive="true" inactiveColor="white" color="grey-2").q-pl-md
+            kalpa-share(:item="contentKalpa" :itemState="itemState" :isActive="true" inactiveColor="white" color="grey-2" :headerText="$t('Share')")
           //- origin
-          div(
-            v-if="!contentKalpa.contentProvider.in('KALPA', 'USER_DEVICE')"
-          ).row.full-width.items-center.content-center
-            q-btn(
+          .row.full-width.items-center.content-center
+            q-btn(v-if="!contentKalpa.contentProvider.in('KALPA', 'USER_DEVICE')"
               @click="goOriginal"
               align="left"
               outline color="grey-3" no-caps
@@ -60,7 +61,20 @@ div(
               span(
                 v-if="contentKalpa.contentProvider === 'YOUTUBE'"
               ).text-bold.text-grey-3 YouTube
-            kalpa-save(:item="contentKalpa" dense :isActive="true" inactiveColor="white" color="grey-2").q-pl-md
+            div(v-else).row.full-width.q-py-md
+              q-btn(:to="'/user/'+contentKalpa.author.oid" size="sm" round flat no-caps padding="none" :style=`{zIndex: '100'}`).q-px-sm
+                q-avatar(:size="'30px'" :style=`{position:'relative', overflow: 'hidden'}`).q-mr-xs
+                  //img(:src="contentKalpa.author.thumbUrl" :to="'/user/'+contentKalpa.author.oid")
+                  img(:src="contentKalpa.author.thumbUrl" :to="'/user/'+contentKalpa.author.oid")
+                  div(:style=`{background: 'rgba(0,0,0,0.4)', zIndex: '50'}`).fit.absolute
+                .column.items-start
+                  span(:style=`{fontSize: '12px'}`).text-grey-5 {{contentKalpa.author.name}}
+                  small(v-if="author" :style=`{marginTop: '-4px', fontSize: '10px'}`).text-grey-7.text-italic {{author.countStat.countSubscriptions}} {{$getNoun(author.countStat.countSubscriptions,$t('подписчик'),$t('подписчика'),$t('подписчиков'))}}
+              .col
+              q-btn(v-if="contentKalpa.author.oid !== $store.getters.currentUser.oid" flat no-caps=false size="sm" color="green-8" :label="$t('подписаться')")
+            //.col
+            //kalpa-save(:item="contentKalpa" dense :isActive="true" inactiveColor="white" color="grey-2").q-pl-md
+            //kalpa-share(:item="contentKalpa" :itemState="itemState" :isActive="true" inactiveColor="white" color="grey-2" :headerText="$t('Share')")
           //- actions
           //.row.full-width.items-center.content-center
           //  kalpa-share(type="content" color="grey-2" :item="contentKalpa")
@@ -147,6 +161,7 @@ import { openURL } from 'quasar'
 import { ContentApi } from 'src/api/content'
 import {assert} from 'src/system/common/utils'
 import {makeRoutePath} from 'public/scripts/common_func.js';
+import {RxCollectionEnum} from '../../../../system/rxdb';
 
 export default {
   name: 'pageInfoRoot',
@@ -165,6 +180,7 @@ export default {
   data () {
     return {
       relatedContentLoading: null,
+      author: null,
     }
   },
   computed: {
@@ -198,6 +214,10 @@ export default {
       }
       return res
     },
+  },
+  async mounted() {
+    // this.$log('item!!!!!=', JSON.parse(JSON.stringify(this.item)))
+    this.author = await this.$rxdb.get(RxCollectionEnum.OBJ, this.contentKalpa.author.oid)
   },
   methods: {
     copyLink () {
