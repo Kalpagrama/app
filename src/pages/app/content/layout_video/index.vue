@@ -45,12 +45,13 @@ div(
     //- Desktop page wrapper
     template(v-slot:pult)
       div(
-        v-if="pageId && player && $q.screen.gt.sm"
+        v-if="player && $q.screen.gt.sm"
         :style=`{
           minHeight: [null,'node','node-editor'].includes(pageId) ? '0px' : '500px',
           maxHeight: 500+'px',
         }`).row.full-width
         component(
+          v-if="pageId"
           :is="`page-${pageId}`"
           :contentKalpa="contentKalpa"
           :player="player"
