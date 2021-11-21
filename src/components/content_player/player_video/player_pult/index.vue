@@ -47,7 +47,7 @@ div(
           v-if="zoomed"
           :style=`{
             position: 'absolute', zIndex: 200,
-            left: 'calc(50% + 1px)',
+            left: 'calc(50% + 0px)',
             width: '2px',
             top: (heightWrapper-heightBar)/2+'px',
             height: heightBar+'px',
@@ -124,12 +124,8 @@ div(
                 v-if="player && player.figures && player.nodeMode === 'edit'"
                 :player="player"
                 :convert="convertPxToTime"
-                :style=`{
-                  left: 'calc(' + (player.figures[0].t/player.duration)*100+'% - 6px)',
-                  width:'calc(' + ((player.figures[1].t-player.figures[0].t)/player.duration)*100+'% + 16px)',
-                }`
                 @first="zoomWorking = true, figureEditing = true"
-                @final="zoomWorking = false, figureEditing = false")
+                @final="zoomWorking = false, figureEditing = false").fit.absolute.z-top
             //- clusters
             clusters(
               v-if="player.clusters.length > 0 && zoomed !== true"
