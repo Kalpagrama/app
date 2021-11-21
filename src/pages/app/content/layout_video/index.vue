@@ -54,6 +54,7 @@ div(
           v-if="pageId"
           :is="`page-${pageId}`"
           :contentKalpa="contentKalpa"
+          :itemState="{}"
           :player="player"
           @node="nodeFocused"
           @draft="draftFocused"
@@ -76,6 +77,7 @@ div(
         component(
           :is="`page-${pageId}`"
           :contentKalpa="contentKalpa"
+          :itemState="{}"
           :player="player"
           @node="nodeFocused"
           @draft="draftFocused"
@@ -234,7 +236,7 @@ export default {
     },
     async playerReady (player) {
       this.$log('playerReady', this.draft)
-      this.$set_deprecated(this, 'player', player)
+      this.player = player
       if (this.draftId) this.draftFocused(await this.$rxdb.get(RxCollectionEnum.WS_ANY, this.draftId))
       // Handle player.autoplay
       this.$nextTick(() => {
