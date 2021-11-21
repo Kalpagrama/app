@@ -177,15 +177,12 @@ export default {
     }
   },
   watch: {
-    'jointsRes.items': {
+    'jointsRes.items.length': {
       async handler (to, from) {
         if (!this.jointVisibleOid) return
-        this.$log('jointsRes.items TO', to.length)
+        this.$log('jointsRes.items TO', to)
         this.$nextTick(() => {
           this.$log('jointsRes.items $nextTick')
-          // if (!this.itemMiddle && this.itemsRes.getProperty('currentId')) {
-          //   this.itemMiddleSet(this.itemsRes.getProperty('currentId'), 0, false)
-          // }
           this.jointMakeVisible({oid: this.jointVisibleOid}, false)
         })
       }
@@ -277,8 +274,7 @@ export default {
         jointRef = this.$refs[`joint-${joint.oid}`]
       }
       // check and go
-      if (jointRef && jointRef[0]) {
-        jointRef = jointRef[0]
+      if (jointRef) {
         this.$log('jointMakeVisible', jointRef.offsetLeft)
         // drop visible item
         // this.$wait(0).then(() => {
