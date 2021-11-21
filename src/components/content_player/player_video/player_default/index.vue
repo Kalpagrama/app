@@ -33,6 +33,7 @@ video(
   :autoplay="true"
   :loop="true"
   :muted="muted"
+  :velocity="velocity"
   :style=`{
   objectFit: 'contain'
 }`
@@ -78,7 +79,8 @@ export default {
       currentTime: 0,
       node: null,
       nodeMode: null,
-      clusters: []
+      clusters: [],
+      velocity: 1.0
     }
   },
   computed: {
