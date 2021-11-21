@@ -206,13 +206,15 @@ export default {
         } else this.selectedItemFull = null
       }
     },
-    'graphD3.nodes': {
+    'graphD3.nodes.length': {
+      // deep: true,
       handler (to, from) {
         this.$log('graphD3.nodes changed!!!', this.graphD3)
         this.debouncedUpdateGraph()
       }
     },
-    'graphD3.joints': {
+    'graphD3.joints.length': {
+      // deep: true,
       handler (to, from) {
         this.$log('graphD3.joints changed!!!', this.graphD3)
         this.debouncedUpdateGraph()
