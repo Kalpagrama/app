@@ -43,8 +43,8 @@ div(
       fontWeight: fontWeight,
       textAlign: 'center',
     }`
-    ).row.full-width.items-center.content-end.justify-center
-      span.text-grey-5.ellipsis.q-px-sm {{ nodeName }}
+    ).row.full-width.items-end.content-end.justify-center
+      span.text-grey-5.ellipsis.q-px-sm.q-pb-xs {{ nodeName }}
 </template>
 
 <script>
