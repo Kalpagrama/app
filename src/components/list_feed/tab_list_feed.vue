@@ -32,9 +32,9 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
       .row.full-width.justify-center
         slot(name="externalHeader")
     template(v-slot:sticky-header)
-      .row.full-width.items-center.content-center.justify-center.b-30
+      div(:style=`{maxWidth: $q.screen.width+'px'}`).row.full-width.items-center.content-center.justify-center.b-30
         slot(name="stickyHeaderTop")
-      div(v-if="pages.length > 1").row.full-width.items-center.content-center.justify-center
+      div(v-if="pages.length > 1" :style=`{maxWidth: $q.screen.width+'px'}`).row.full-width.items-center.content-center.justify-center
         //- search bar
         //search String
         q-input(
@@ -65,7 +65,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
             v-model="pageId"
             align="justify"
             switch-indicator="false" no-caps dense
-          active-color="green"
+            active-color="green"
           ).col.text-grey-8
             q-tab(
               v-for="(p,pi) in pages" :key="p.id"
