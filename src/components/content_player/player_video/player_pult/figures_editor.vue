@@ -11,6 +11,7 @@
   //  }`
   //).row.absolute.z-max.bb
   div(
+    accessKey="figures-wrapper"
     :style=`{
     left: 'calc(' + (this.player.figures[0].t/player.duration)*100+'% - 8px)',
     width:'calc(' + ((this.player.figures[1].t-this.player.figures[0].t)/player.duration)*100+'% + 16px)',
@@ -67,10 +68,11 @@ import cloneDeep from 'lodash/cloneDeep'
 import { assert } from 'src/system/common/utils'
 
 export default {
-  name: 'figureEditor',
+  name: 'figuresEditor',
   props: ['player', 'convert'],
   data () {
     return {
+      maxDurationSec: 60,
       pointDragging: false,
       pointDraggingIndex: -1,
       // pointClicked: null,
@@ -79,11 +81,11 @@ export default {
   },
   computed: {
     canPublish () {
-      return this.player.figures[1].t - this.player.figures[0].t <= 60
+      return this.player.figures[1].t - this.player.figures[0].t <= this.maxDurationSec
     },
     borderColor () {
       if (this.player.figures) {
-        if (this.player.figures[1].t - this.player.figures[0].t > 60) {
+        if (this.player.figures[1].t - this.player.figures[0].t > this.maxDurationSec) {
           return this.$getPaletteColor('red-8')
         }
         else {

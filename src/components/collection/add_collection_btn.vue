@@ -37,6 +37,7 @@ export default {
   },
   watch: {
     'collectionsRes.items': {
+      deep: true,
       handler (to, from) {
         if (to) {
           const collectionAll = {
