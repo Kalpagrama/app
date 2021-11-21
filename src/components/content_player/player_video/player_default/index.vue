@@ -81,7 +81,7 @@ export default {
       nodeMode: null,
       clusters: [],
       figureFocused: null,
-      velocity: 1.0
+      velocity: 1.0,
       nodePlaying: null
     }
   },
