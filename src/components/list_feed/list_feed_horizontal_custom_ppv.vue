@@ -236,6 +236,7 @@ export default {
       }
     },
     'itemsRes.items': {
+      deep: true,
       async handler (to, from) {
         if (!to) return
         this.$log('itemsRes.items:', to.length, this.itemsRes.getProperty('itemActiveIndx'), this.noDummyAreaCenterIndx)

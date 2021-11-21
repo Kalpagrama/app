@@ -296,6 +296,7 @@ export default {
       }
     },
     'itemsRes.itemsHeaderFooter': {
+      deep: true,
       async handler (to, from) {
         this.$log('itemsRes.itemsHeaderFooter:', to.length, this.itemsRes.getProperty('currentId'))
         // удаляем те, которых нет в новом списке
