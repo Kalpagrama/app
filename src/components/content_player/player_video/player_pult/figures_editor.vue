@@ -72,7 +72,7 @@ export default {
   props: ['player', 'convert'],
   data () {
     return {
-      maxDurationSec: 60,
+      maxDurationSec: this.$store.getters.currentUser.settings.quota.nodeMaxDurationSec,
       pointDragging: false,
       pointDraggingIndex: -1,
       // pointClicked: null,
