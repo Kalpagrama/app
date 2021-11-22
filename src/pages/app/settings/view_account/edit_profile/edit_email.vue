@@ -15,7 +15,7 @@
   .row.full-width.q-px-sm
     //- change or create password call to action btns
     div(
-      v-if="!passwordChanging && !passwordCreating"
+      v-if="!passwordChanging && !passwordCreating && false"
       :style=`{
         background: 'rgb(40,40,40)',
         borderRadius: '10px',

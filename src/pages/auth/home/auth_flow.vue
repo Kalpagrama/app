@@ -19,7 +19,7 @@ div(
     span(:style=`{fontSize: '20px',}`).text-white.text-bold.full-width {{$t('Welcome')}}
   div(:style=`{height: '40px'}`).row.full-width
     span(v-if="!emailSent" :style=`{fontSize: '12px',}`).text-white.text-bold {{$t('Для входа или регистрации введите вашу почту')}}
-    span(v-if="needConfirm && emailSent" :style=`{fontSize: '12px',}`).text-white.text-bold {{$t('Мы отправили проверочный код на почту ')}} {{email}} {{$t(', введите его')}}
+    span(v-if="needConfirm && emailSent" :style=`{fontSize: '12px',}`).text-white.text-bold {{$t('Код проверки отправлен на почту ')}} {{email}}
     span(v-if="hasPermanentPassword && emailSent" :style=`{fontSize: '12px',}`).text-white.text-bold {{$t('Enter your permanent password')}}
   .row.full-width
     q-form.full-width
@@ -90,12 +90,11 @@ div(
           :autofocus="true"
           :disable="false"
           mask="#   #   #   #"
-          fill-mask="•"
           unmasked-value
           :style=`{display: emailSent ? '' : 'none'}`
           :input-style=`{
             padding: '16px',
-            fontSize: '25px',
+            fontSize: '20px',
             fontWeight: 'bold',
             textAlign: 'center',
             color: 'white',

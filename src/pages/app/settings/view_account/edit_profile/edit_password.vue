@@ -40,6 +40,7 @@
         q-btn(
           @click="passwordSet()"
           color="green-8" dense outline size="12px" no-caps
+          :disable="!passwordNew || !passwordNewConfirm"
           :loading="loading").q-px-sm {{ $t('Установить пароль') }}
         q-btn(
           @click="setting = false, reset()"

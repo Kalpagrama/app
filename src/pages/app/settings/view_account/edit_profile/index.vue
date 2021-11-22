@@ -4,11 +4,13 @@
   edit-name(:currentUser="currentUser").q-mb-sm
   edit-status(:currentUser="currentUser")
   edit-email(:currentUser="currentUser")
+  edit-password(:currentUser="currentUser")
   edit-lang(:currentUser="currentUser")
 </template>
 
 <script>
 import editUsername from './edit_username.vue'
+import editPassword from './edit_password.vue'
 import editName from './edit_name.vue'
 import editStatus from './edit_status.vue'
 import editEmail from './edit_email.vue'
@@ -22,6 +24,7 @@ export default {
     editName,
     editStatus,
     editEmail,
+    editPassword,
     editLang
   },
   data () {
