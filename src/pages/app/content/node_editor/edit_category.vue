@@ -7,19 +7,19 @@ div(
   q-btn(
     flat color="white" no-caps icon-right="keyboard_arrow_down" align="between"
     ).full-width
-    span {{ categoryLabel }}
+    span.text-bold {{ categoryLabel }}
   //- TODO styling the select component... maybe the fallback to native from quasar
   select(
     v-if="true || $q.platform.is.mobile"
     ref="categoryInput"
-    :name="$t('Pick category')"
     @change="categoryChanged"
     :style=`{
       position: 'absolute', zIndex: 100,
       opacity: 0
     }`
     ).fit
-    option(:value="null") {{$t('Nothing')}}
+    //option(:value="null") {{$t('Выберите категорию')}}
+    option(disabled selected value) -- {{$t('Выберите категорию')}} --
     option(
       v-for="(c,ci) in categories" :key="ci"
       :value="c.value"
@@ -53,7 +53,7 @@ export default {
         return `${this.$t('Category - ')} ${name}`
       }
       else {
-        return this.$t('Pick category')
+        return this.$t('Выберите категорию')
       }
     },
   },
