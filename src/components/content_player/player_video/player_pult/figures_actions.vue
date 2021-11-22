@@ -19,8 +19,8 @@ div(
       q-icon(name="flip" color="grey-2" size="22px").rotate-180
     small(
       :class=`{
-        'text-red': player.figures[1].t-player.figures[0].t > 60,
-        'text-grey-2': player.figures[1].t-player.figures[0].t <= 60
+        'text-red': player.figures[1].t-player.figures[0].t > this.$store.getters.currentUser.settings.quota.nodeMaxDurationSec,
+        'text-grey-2': player.figures[1].t-player.figures[0].t <= this.$store.getters.currentUser.settings.quota.nodeMaxDurationSec
         }`
       :style=`{
         userSelect: 'none',

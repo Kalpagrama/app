@@ -12,14 +12,14 @@ div(:style=`{position: 'relative'}`).row.full-width
     ).b-30
   //- item editor
   q-dialog(
-    v-model="itemEditorShow"
+    v-model="itemEditorShow_data"
     position="standard"
     :maximized="true"
     :no-esc-dismiss="true")
       item-editor(
         :item="itemFound"
-        @composition="($event ? $set_deprecated(node.items, 0, $event) : $delete(node.items, 0)), itemEditorShow=false"
-        @close="itemEditorShow=false"
+        @composition="($event ? $set_deprecated(node.items, 0, $event) : $delete(node.items, 0)), itemEditorShow_data=false"
+        @close="itemEditorShow_data=false"
         )
   item-preview(
     v-if="node.items[0]"
@@ -56,6 +56,7 @@ export default {
     return {
       itemFound: null,
       itemFinderShow_data: this.itemFinderShow,
+      itemEditorShow_data: this.itemEditorShow,
     }
   },
   props: {
@@ -75,7 +76,7 @@ export default {
         let fullItem = await this.$rxdb.get(RxCollectionEnum.OBJ, item.oid, {clientFirst: true})
         this.node.items.push(fullItem.items[0])
       } else if (item.type.in(ObjectTypeEnum.VIDEO, ObjectTypeEnum.BOOK, ObjectTypeEnum.IMAGE)) {
-        this.itemEditorShow = true
+        this.itemEditorShow_data = true
       } else {
         throw new Error('not impl type=' + item.type)
       }
