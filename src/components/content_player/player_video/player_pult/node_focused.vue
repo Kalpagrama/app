@@ -12,7 +12,7 @@ div(
       @click.self="nodeShow = false"
       :style=`{
         height: $q.screen.height+'px',
-        //- background: 'rgba(0,0,0,0.7)',
+        background: 'rgba(20,20,20,0.99)',
       }`
       ).row.full-width.items-start.content-start.justify-center.q-px-sm
       div(
