@@ -81,14 +81,19 @@ export default {
   },
   props: {
     essence: {type: Object, required: true},
-    itemState: { type: Object},
+    itemState: {
+      type: Object,
+      default () {
+        return {}
+      }
+    },
     showAuthorAlways: {type: Boolean, default: false},
     showActions: {type: Boolean, default: true},
   },
   computed: {
     data() {
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-      if (!this.itemState) this.itemState = {}
+      // if (!this.itemState) this.itemState = {} // нельзя модифицировать проперти
       assert(this.itemState)
       let key = this.$options.name
       if (!this.itemState[key]) {
@@ -192,6 +197,9 @@ export default {
       }
       return res
     }
+  },
+  mounted () {
+    this.$log('mounted', this.itemState)
   }
 }
 </script>
