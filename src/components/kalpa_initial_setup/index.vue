@@ -73,6 +73,7 @@ div(:style=`{backgroundColor: $q.screen.xs ? 'rgb(29,29,29)' : ''}`).row.full-wi
                     // height: '60px',
                     // opacity: 0.2,
                     objectFit: 'cover',
+                    border: c.checked ? '3px solid #4caf50' : '',
                     borderRadius: '10px'}`)
                 div(:style=`{background: 'rgba(0,0,0,0.2)'}` @click="c.checked=!c.checked").absolute-full.row.content-end.items-end.justify-center.cursor-pointer
                   div(v-if="c.type !== 'SYMPOSIUM'").row.q-pb-none
