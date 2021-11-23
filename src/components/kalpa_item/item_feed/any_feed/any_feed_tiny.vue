@@ -22,7 +22,7 @@ div(
     //- NAME: dynamic link/ dynamic fontSize
     router-link(
       v-if="showName && item.oid"
-      :to="`/user/${item.type}/${item.oid}`"
+      :to="`/${item.type}/${item.oid}`"
       :style=`{
         minHeight: '60px',
         fontSize: fontSize+'px',
