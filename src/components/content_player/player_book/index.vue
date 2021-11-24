@@ -247,7 +247,7 @@ export default {
   methods: {
     setState (key, val) {
       // this.$log('setState', key, val)
-      this[key] = val
+      this.$set_deprecated(this, key, val)
     },
     onResize (e) {
       this.$log('onResize', e)
