@@ -308,6 +308,7 @@ class ReactiveDocFactory {
    reactiveSubscribe () {
       const f = this.reactiveSubscribe
       if (this.itemUnsubscribeFunc) return
+      // !!! нельзя ставить flush: 'sync' - жуткие тормоза при обновлении массивов
       this.itemUnsubscribeFunc = watch(() => this.vm.reactiveData, async (newVal, oldVal) => {
          // reactiveItem изменилась (обычно из UI)
          // изменить связанный объект во vuex
@@ -350,7 +351,7 @@ class ReactiveDocFactory {
             // logD(f, 'reactiveItem changed without debounce NOW')
             await this.itemSaveFunc(this.getSynchro())
          }
-      }, { deep: true, immediate: false, flush: 'sync' })
+      }, { deep: true, immediate: false, flush: 'pre' })
    }
 
    reactiveUnsubscribe () {
