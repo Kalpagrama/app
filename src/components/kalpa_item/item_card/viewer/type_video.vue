@@ -122,8 +122,11 @@
           //small(:style=`{lineHeight: 1.2}`).text-grey.full-width {{$t('Ознакомительный фрагмент')}}
         q-btn(v-if="true" round flat dense icon="expand_more" color="grey-5" @click="pageId='description'" :style=`{zIndex: '100'}`)
           q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Описание')}}
-      .row.item-center.q-px-sm
+      .row.full-width.content-center.items-center.q-px-sm
         small(size="sm").row.items-center.text-grey-7.text-italic.q-pt-xs {{item.countStat.countViews}} {{$getNoun(item.countStat.countViews,$t('просмотр'),$t('просмотра'),$t('просмотров'))}}
+        .col
+        kalpa-save(:item="item" dense :isActive="true" inactiveColor="white" color="grey-2").q-pl-md
+        kalpa-share(:item="item" :itemState="item" :isActive="true" inactiveColor="white" color="grey-2" :headerText="$t('Share')")
         //.q-pa-sm.text-white {{ item.countStat.countSubscribers }}
         //  q-icon(name="bookmark_outline" color="white" size="20px").q-mx-xs
         //    q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Bookmarks')}}
@@ -142,8 +145,11 @@
           .column.items-start
             span(:style=`{fontSize: '12px'}`).text-grey-5 {{item.author.name}}
             small(v-if="author" :style=`{marginTop: '-4px', fontSize: '10px'}`).text-grey-7.text-italic {{author.countStat.countSubscriptions}} {{$getNoun(author.countStat.countSubscriptions,$t('подписчик'),$t('подписчика'),$t('подписчиков'))}}
-        .col
-        q-btn(v-if="item.author.oid !== $store.getters.currentUser.oid" flat no-caps=false size="sm" color="green-8" :label="$t('подписаться')")
+        q-btn(
+          v-if="item.author.oid !== $store.getters.currentUser.oid"
+          flat :no-caps="following ? true : false" size="sm" :color="!following ? 'green-8' : 'grey-7'" :label="following ? $t('Вы подписаны') : $t('Follow')"
+          @click="followingToggle()"
+        ).q-ml-lg
       .row.full-width.items-center
         span(@click="pageId='nodes'").text-grey-5.q-py-sm.q-pl-sm.cursor-pointer {{$t('Популярные смыслы')}}
         span(@click="pageId='nodes'").text-grey-8.q-pl-xs.cursor-pointer {{ item.countStat.countNodes }}
@@ -252,10 +258,11 @@ import pageNodes from 'src/pages/app/content/layout_video/page_nodes'
 import {RxCollectionEnum} from '../../../../system/rxdb';
 import {assert} from '../../../../system/common/utils';
 import {ObjectApi} from '../../../../api/object';
+import {UserApi} from '../../../../api/user';
 
 export default {
   name: 'typeVideo',
-  props: ['item', 'isActive'],
+  props: ['item', 'isActive', 'itemState'],
   components: {
     contentPlayer,
     pageComments,
@@ -272,6 +279,8 @@ export default {
       bottomHeight: null,
       author: null,
       promoCode: '',
+      followingConfirmed: false,
+      following: null,
       // pages: [
       //   {id: 'description', name: this.$t('Description')},
       //   {id: 'comments', name: this.$t('Comments')},
@@ -304,10 +313,37 @@ export default {
     // this.$log('item!!!!!=', JSON.parse(JSON.stringify(this.item)))
     this.author = await this.$rxdb.get(RxCollectionEnum.OBJ, this.item.author.oid)
   },
+  watch: {
+    author: {
+      immediate: true,
+      async handler (to, from) {
+        this.$log('user TO')
+        if (to) {
+          this.following = await UserApi.isSubscribed(to.oid)
+          this.followingConfirmed = true
+        }
+      }
+    }
+  },
   methods: {
     async sendPromoCode(promoCode) {
       assert(promoCode)
       let result = await ObjectApi.pay(this.item.oid, promoCode)
+    },
+    async followingToggle () {
+      this.$log('followingToggle')
+      let following = await UserApi.isSubscribed(this.item.author.oid)
+      if (following) {
+        this.following = false
+        await UserApi.unSubscribe(this.item.author.oid)
+      }
+      else {
+        this.following = true
+        await UserApi.subscribe(this.item.author.oid)
+      }
+      // TODO: handle await for real data from this query
+      // this.following = await UserApi.isSubscribed(this.user.oid)
+      // this.followingConfirmed = true
     }
   }
 }
