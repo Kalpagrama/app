@@ -64,15 +64,15 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
           div(v-if="pageId === 'preview'").row.full-width.items-start.content-start.justify-center
             div(:style=`{height: $q.screen.width > 320 ? "240px" : "200px",}`).relative-position.row.full-width.items-start.content-start.justify-center.no-scroll
               div(:style=`{height: $q.screen.width > 320 ? "200px" : "160px", width: $q.screen.width > 320 ? "350px" : "300px"}`).relative-position.row.items-start.content-start.justify-center
-                video(v-if="previewUrl"
+                video(v-if="rangeModel || previewUrl"
                   ref="video"
                   autoplay
                   controls
                   :playsinline="true"
-                  :src="previewUrl"
+                  :src="rangeModel ? contentUrl : previewUrl"
                   :style=`{maxHeight: $q.screen.width > 320 ? "200px" : "160px",}`
                 ).full-width.br-20
-                q-btn(v-if="!previewUrl"
+                q-btn(v-if="!rangeModel && !previewUrl"
                   @click="$refs.inputPreview.pickFiles()"
                   flat no-caps color="green" stack
                 :label="$t('Загрузить')"
@@ -94,7 +94,7 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
                     :left-label-value="rangeModel.min + $t('сек')"
                     :right-label-value="rangeModel.max + $t('сек')"
                     label-always
-                    color="green-8").col.q-mx-md
+                    :color="rangeModel.max - rangeModel.min < maxPreviewDur ? 'green-8' : 'red-8'").col.q-mx-md
                   q-btn(flat no-caps color="green-8" :label="$t('Отмена')" @click="rangeModel = null")
                 q-btn(v-if="previewUrl"
                   @click="previewDelete"
@@ -230,6 +230,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import { assert } from 'src/system/common/utils.js';
 import { ObjectApi } from 'src/api/object.js';
 import { ObjectTypeEnum } from '../../../../system/common/enums';
+import { ContentApi } from 'src/api/content'
 
 export default {
   name: 'videoEditor',
@@ -253,12 +254,13 @@ export default {
       pages: [
         { id: 'cover', name: this.$t('Обложка') },
         { id: 'preview', name: this.$t('Превью') }],
-      rangeModel: null
+      rangeModel: null,
+      maxPreviewDur: 20 * 60
     }
   },
   computed: {
     needSave () {
-      return this.content && (this.nameChanged || this.descriptionChanged || this.priceChanged || this.thumbUrlChanged || this.previewUrlChanged)
+      return this.content && (this.rangeModel || this.nameChanged || this.descriptionChanged || this.priceChanged || this.thumbUrlChanged || this.previewUrlChanged)
     },
     nameChanged () {
       return this.contentCopy.name !== this.content.name
@@ -280,6 +282,10 @@ export default {
     },
     type () {
       return objectTypeName(this.content)
+    },
+    contentUrl () {
+      let res = ContentApi.urlSelect(this.contentCopy)
+      return res
     },
     previewUrl () {
       let res = this.contentCopy.previewUrlWithFormats.length ? this.contentCopy.previewUrlWithFormats[0].url : null
@@ -308,16 +314,22 @@ export default {
         await this.$nextTick()
       }
     },
-    rangeModel: {
-      deep: true,
+    'rangeModel.min': {
       async handler (to) {
-        if (to && to.max > to.min + 60 * 20) {
-          this.$nextTick(() => {
-            to.min = to.max - 60 * 20 // максимум - 20 мин
-          })
+        if (this.$refs.video){
+          this.$refs.video.currentTime = to
+          this.$refs.video.pause()
         }
       }
-    }
+    },
+    'rangeModel.max': {
+      async handler (to) {
+        if (this.$refs.video){
+          this.$refs.video.currentTime = to
+          this.$refs.video.pause()
+        }
+      }
+    },
   },
   methods: {
     getCollectionName (collectionId) {
@@ -364,6 +376,10 @@ export default {
     },
     async save () {
       try {
+        if (this.rangeModel && this.rangeModel.max - this.rangeModel.min > this.maxPreviewDur) {
+          this.$notify('error', this.$t('превышена длина превью'))
+          return
+        }
         this.loading = true
         let name, description, price, fileThumb, filePreview
 

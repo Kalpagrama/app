@@ -102,7 +102,7 @@ module.exports = configure(function (ctx) {
       // sourceMap: true,
       devtool: 'eval-source-map',
       preloadChunks: true,
-      gzip: true,
+      // gzip: true,
       distDir: 'dist',
       // отключено для pwa (иначе проблемы при деплое в vercel (не отдается управление в консоль))
       analyze: ctx.mode.pwa || ctx.mode.capacitor ? false : { analyzerPort: ctx.mode.capacitor ? 7777 : ctx.mode.pwa ? 8888 : 9999 },
