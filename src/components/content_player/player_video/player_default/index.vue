@@ -117,7 +117,7 @@ export default {
   },
   methods: {
     setState (key, val) {
-      this.$log('setState', key, val)
+      // this.$log('setState', key, val)
       this.$set_deprecated(this, key, val)
     },
     play () {

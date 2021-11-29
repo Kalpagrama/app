@@ -171,8 +171,8 @@ export default {
       this.figure = null
     },
     setState (key, val) {
-      this.$log('setState', key, val)
-      this[key] = val
+      // this.$log('setState', key, val)
+      this.$set_deprecated(this, key, val)
     },
     play () {},
     pause () {},

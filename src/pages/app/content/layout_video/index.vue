@@ -250,7 +250,7 @@ export default {
       })
       // Get player clusters
       this.clustersRes = await this.$rxdb.find(this.queryClusters)
-      this.$log('clustersRes', this.clustersRes)
+      // this.$log('clustersRes', this.clustersRes)
       this.player.setState('clusters', this.clustersRes.items)
     },
     async nodePlay () {

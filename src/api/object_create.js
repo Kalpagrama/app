@@ -65,7 +65,7 @@ class ObjectCreateApi {
          //   compositionLen += (end - start)
          // }
       }
-      assert(compositionLen <= 60, 'compositionLen <= 60 : ' + compositionLen)
+      assert(compositionLen <= store.getters.currentUser.settings.quota.nodeMaxDurationSec, 'compositionLen <= nodeMaxDurationSec : ' + compositionLen)
       return {
          thumbUrl: composition.thumbUrl,
          layers: composition.layers.map(l => {

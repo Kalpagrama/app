@@ -27,7 +27,7 @@ export default {
       [LogSystemModulesEnum.VUEX_CORE]: LogLevelEnum.TRACE,
       [LogSystemModulesEnum.VUEX_DBG]: LogLevelEnum.TRACE,
       [LogSystemModulesEnum.RXDB]: LogLevelEnum.TRACE,
-      [LogSystemModulesEnum.RXDB_REACTIVE]: LogLevelEnum.DEBUG,
+      [LogSystemModulesEnum.RXDB_REACTIVE]: LogLevelEnum.TRACE,
       [LogSystemModulesEnum.RXDB_WS]: LogLevelEnum.TRACE,
       [LogSystemModulesEnum.RXDB_CACHE]: LogLevelEnum.TRACE,
       [LogSystemModulesEnum.RXDB_OBJ]: LogLevelEnum.TRACE,
