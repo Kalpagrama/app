@@ -51,7 +51,7 @@ q-layout(
             p.text-white Добавляйте контент из YouTube, Twitter, Instagram. Можно загрузить файл с устройства. Книги музыка фильмы - все можно сохранять к себе в мастерскую.
             .row.full-width
               q-btn( flat icon="checklist_rtl" color='white'
-                @click=""
+                @click="showKalpaTutorial('tutorial_content')"
                 :style=`{
                   width: '50px',
                   height: '50px',
@@ -110,7 +110,7 @@ q-layout(
                           }`)
                           span {{$t('Close')}}
               q-btn( flat icon="checklist_rtl" color='white'
-                @click=""
+                @click="showKalpaTutorial('tutorial_node_create')"
                 :style=`{
                   width: '50px',
                   height: '50px',
@@ -273,6 +273,12 @@ export default {
     width () {
       return Math.min(400, this.$store.state.ui.pageWidth - 16, this.$q.screen.width)
     },
+  },
+  methods: {
+    showKalpaTutorial (notice) {
+      this.$log('showKalpaTutorial TODO!')
+      this.$eventBus.$emit('notice-check', {notice: notice, force: true})
   }
+ }
 }
 </script>

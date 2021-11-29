@@ -109,6 +109,7 @@ export default {
     // },
     showKalpaTutorial () {
       this.$log('showKalpaTutorial TODO!')
+      this.$eventBus.$emit('notice-check', {notice: 'tutorial_main', force: true})
     },
     async logout () {
       this.$log('logout')

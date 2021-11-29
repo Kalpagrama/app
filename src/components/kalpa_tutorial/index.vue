@@ -47,7 +47,7 @@ div(
   //- body
   div(
     v-if="showTutorial"
-    :style=`{position: 'relative',borderRadius: '10px', overflow: 'hidden'}`).col.full-width
+    :style=`{position: 'relative',borderRadius: '0px', overflow: 'hidden'}`).col.full-width
       //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       //- v-if="showTutorial"
       q-carousel(
@@ -84,18 +84,13 @@ div(
               userSelect: 'none',
             }`
             ).fit
-  div(
-    v-if="showTutorial"
-    ).row.full-width.justify-center.q-pa-sm
-    q-btn(
-      flat color="white" no-caps
-      :style=`{
-        height: '50px',
-        maxWidth: '300px',
-        minWidth: '300px',
-      }`
-      @click="$emit('close')")
-      span {{$t('Close')}}
+      q-btn(
+        flat color="white" no-caps icon="close" dence
+        :style=`{
+          height: '50px',
+          zIndex: 20
+        }`
+        @click="$emit('close')").absolute-top-right
 </template>
 
 <script>
