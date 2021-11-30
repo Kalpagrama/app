@@ -1,5 +1,5 @@
 /* eslint-disable */
-const swVer = 4
+const swVer = 1
 const useCache = true
 // InjectManifest in Workbox v5
 // https://developers.google.com/web/tools/workbox/guides/migrations/migrate-from-v4
@@ -65,11 +65,13 @@ async function sendMsg (type, msgData) {
 }
 // common init sw
 {
-   logD('common init sw', swVer)
+   logD('common init sw', swVer, process.env.NODE_ENV)
    // precache
    {
       // precacheAndRoute позволяет в фоне предварительно закэшировать весь сайт при первой установке
-      precacheAndRoute(self.__WB_MANIFEST)
+      if (process.env.NODE_ENV !== 'development') {
+         precacheAndRoute(self.__WB_MANIFEST);
+      }
 
       // delayedPrecacheController
       // https://developers.google.com/web/tools/workbox/modules/workbox-precaching
