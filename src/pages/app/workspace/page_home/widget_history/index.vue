@@ -16,7 +16,7 @@
     //- scrolled bookmarks preview max 10...
     .row.full-width.scroll
       //- bookmarks mockup
-      div(v-if="!bookmarksRes").row.full-width.no-wrap.q-pa-sm
+      div(v-if="showItems && !bookmarksRes").row.full-width.no-wrap.q-pa-sm
         div(
           v-for="n in 10" :key="n"
           :style=`{
@@ -25,7 +25,7 @@
         }`
         ).row.b-40.q-mr-sm
       //- bookmarks loaded
-      div(v-if="bookmarksRes").row.full-width.no-wrap.q-pa-sm
+      div(v-if="showItems && bookmarksRes").row.full-width.no-wrap.q-pa-sm
         router-link(
           v-for="b in bookmarksRes.items" :key="b.oid"
           :to="itemLink(b)"
@@ -61,6 +61,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'widgetHistory',
+  props: ['showItems'],
   data () {
     return {
       bookmarksRes: null,

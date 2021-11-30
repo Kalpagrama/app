@@ -2,6 +2,7 @@ import { boot } from 'quasar/wrappers'
 import { isReactive } from 'vue'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import eventBus from 'tiny-emitter/instance'
+
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.BOOT)
 
 import { Screen, date, colors } from 'quasar'
@@ -142,6 +143,7 @@ export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath,
       //   console.log('$goDrop')
       //   goLast = null
       // }
+
       app.config.globalProperties.$ym = function (target, payload) {
          if (!window.ym) return
          window.ym(

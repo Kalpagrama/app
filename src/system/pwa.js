@@ -60,21 +60,21 @@ async function initPWA (store) {
             }
          }
          if (registration.waiting && registration.active) {
-            // The page has been loaded when there's already a waiting and active SW.
-            // This would happen if skipWaiting isn't being called, and there are
-            // still old tabs open.
+            // пришла новая версия, но еще активна текущая версия. (можно обновляться)
+            // This would happen if skipWaiting isn't being called, and there are still old tabs open.
+            logT('PWA update ready!', forceUpdatePWA)
             if (forceUpdatePWA) await updatePWA()
             else {
                // updatePWA() будет вызвано по действию пользователя
                store.commit('core/stateSet', ['newVersionAvailable', true])
                showNotifyNewVer()
             }
-         } else {
+         } else { // installing (приехала свежая версия) Но еще не успела перейти в статус waiting
             // updatefound is also fired for the very first install. ¯\_(ツ)_/¯
             registration.addEventListener('updatefound', () => {
                // If updatefound is fired, it means that there's
                // a new service worker being installed.
-               logD('updatefound...')
+               logT('updatefound...')
                let newSW = registration.installing
                newSW.addEventListener('statechange', (event) => {
                   if (event.target.state === 'installed') {
@@ -82,8 +82,8 @@ async function initPWA (store) {
                         // If there's already an active SW, and skipWaiting() is not
                         // called in the SW, then the user needs to close all their
                         // tabs before they'll get updates.
-                        logW('Please close all tabs to get updates.')
                         // todo show prompt for SW to activate sw immediately and reload page
+                        logT('newSW installed!', forceUpdatePWA)
                         newSW.postMessage({ type: 'skipWaiting' })
                         store.commit('core/stateSet', ['newVersionAvailable', true])
                         if (!forceUpdatePWA) {
@@ -98,7 +98,7 @@ async function initPWA (store) {
                         // Otherwise, this newly installed SW will soon become the
                         // active SW. Rather than explicitly wait for that to happen,
                         // just show the initial "content is cached" message.
-                        logW('Content is cached for the first time! please wait...')
+                        logT('SW installed first time! Content is cached! please wait...')
                      }
                   }
                })

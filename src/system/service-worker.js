@@ -177,7 +177,7 @@ async function sendMsg (type, msgData) {
       // force update sw
       // если необходимо немедленно обновить sw (иначе - зависнет в waiting до закрытия всех страниц) - раскомментировать строки ниже (не рекомендуется)
       // skipWaiting() // небезопасно!!! может смешаться старый и новый код. Сделалано по-правильному см. src/system/pwa.js
-      // clientsClaim()
+      // clientsClaim() // небезопасно!!! может смешаться старый и новый код. Сделалано по-правильному см. src/system/pwa.js
 
       registerRoute(/\/share\/?$/,
          async ({ url, event, params }) => {
