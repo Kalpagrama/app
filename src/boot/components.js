@@ -27,8 +27,13 @@ import itemFeed from 'src/components/kalpa_item/item_feed/index.vue'
 import itemEditor from 'src/components/kalpa_item/item_editor'
 // user
 import userAvatar from 'src/components/user_avatar/index.vue'
+import { LogSystemModulesEnum, getLogFunctions, performance } from 'src/boot/log'
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.BOOT)
 
 export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath, redirect }) => {
+  const f = { nameExtra: 'boot::components' }
+  logD(f, 'start')
+  const t1 = performance.now()
   // kalpa
   app.component('kalpaLayout', kalpaLayout)
   app.component('kalpaTutorial', kalpaTutorial)
@@ -58,4 +63,5 @@ export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath
   app.component('addCollectionBtn', addCollectionBtn)
   app.component('graphView', graphView)
   app.component('collectionList', collectionList)
+  logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 })

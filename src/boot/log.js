@@ -17,9 +17,10 @@ function getLogFunctions(logSystemModulesEnum) {
 }
 
 export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath, redirect }) => {
+  console.log('boot::logger::start')
   const { logD, logT, logI, logW, logE, logC } = await initLogger(store, ssrContext)
   const f = { nameExtra: 'boot::log' }
-  logD(f, 'start')
+  logT(f, 'start')
 
   const t1 = performance.now()
   app.config.globalProperties.$log = app.config.globalProperties.$logD = logD
@@ -44,7 +45,7 @@ export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath
   app.config.warnHandler = function (msg, vm, trace) {
     // logW(`Vue.config.warnHandler: ${msg}\nTrace: ${trace}`)
   }
-  logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+  logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 })
 
 export { LogSystemModulesEnum, LogLevelEnum, getLogFunctions, performance, initLogRocket }

@@ -129,7 +129,7 @@ class Logger {
          msg.splice(0, 1, `[${func.nameExtra || func.name}]`)
       }
       assert(module, '!module')
-      msg.splice(0, 0, `%c[${module}] ${this.store.state.core.logFormat.time ? (new Date()).toLocaleTimeString() : ''}`, `color: ${module.toColor()}; font-style: italic; padding: 2px;`)
+      msg.splice(0, 0, `%c[${module.nameExtra || module}] ${this.store.state.core.logFormat.time ? (new Date()).toLocaleTimeString() : ''}`, `color: ${module.toColor()}; font-style: italic; padding: 2px;`)
    }
 
    showAlert (msg) {

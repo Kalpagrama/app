@@ -232,7 +232,7 @@ class RxDBWrapper {
 
    async create (store) {
       const f = this.create
-      logD(f, 'start')
+      logT(f, 'start')
       const t1 = performance.now()
       assert(!this.created, 'this.created')
       try {

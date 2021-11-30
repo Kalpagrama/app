@@ -257,7 +257,7 @@ export default boot(async ({
       ws: wsApollo
     }
     await rxdb.init() // после инициализации apollo (нужно для event.init())
-    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+    logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   } catch (err) {
     logC(err)
     throw err // без apollo работать не можем!

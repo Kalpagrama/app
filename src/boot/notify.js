@@ -49,7 +49,7 @@ export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath
       }
     }
     app.config.globalProperties.$notify = notify
-    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+    logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   } catch (err) {
     logE(err)
   }
