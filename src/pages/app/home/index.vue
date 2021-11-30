@@ -27,8 +27,9 @@ kalpa-layout
               :isPreload="isPreload"
               :scrolling="scrolling"
               :showContext="false"
+              :layout="'card-tiny'"
               :height="150").q-px-xs
-              template(v-slot:skeleton=`{queryInProgress}`)
+              //template(v-slot:skeleton=`{queryInProgress}`)
                 div(:style=`{width: 150*1.618+'px', height: '150px'}`).relative-position
                   q-skeleton(type='rect' height='100%' :animation="queryInProgress ? 'wave' : 'none'" dark).br-10
                   .row.full-width.absolute-bottom.justify-center
