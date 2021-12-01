@@ -68,7 +68,7 @@ div(ref="graphArea").row.full-width
           q-spinner(size="50px" color="green")
         div(v-else ).full-width
           //item-preview(:item="selectedItemFull" :isVisible="true" :isActive="true" :showHeader="false" :showActions="true")
-          node-extended(:oid="selectedItemFull.oid" :showSimilar="false" :showActions="false" :showComments="false").full-width.q-pb-md
+          node-extended(:oid="selectedItemFull.oid" :showSimilar="false" :showActions="false" :showComments="false" :showAuthor="false").full-width.q-pb-md
   // меню создания связи
   q-dialog(
     v-model="jointCreatorShow"
