@@ -109,7 +109,7 @@ export default {
         this.$emit('draft', this.draft)
       } else {
         if (this.draft.wsItemType === RxCollectionEnum.WS_BLOCK) {
-          await this.$router.push({ path: '/workspace/create', query: { mode: 'block', id: this.draft.id } })
+          await this.$router.push({ path: '/workspace/edit', query: { mode: 'block', id: this.draft.id } })
         }
       }
     }

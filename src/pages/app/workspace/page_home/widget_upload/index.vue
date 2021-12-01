@@ -37,7 +37,7 @@
       q-btn(
         outline color="grey-8" no-caps
         icon="file_upload"
-        :to="'/workspace/create?mode=upload'"
+        :to="'/workspace/edit?mode=upload'"
         ).full-width.full-height
         //component(
         //  is='view-upload'
@@ -53,7 +53,7 @@
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { ContentApi } from 'src/api/content'
 import { UserApi } from 'src/api/user'
-import viewUpload from 'src/pages/app/workspace/page_create/view_upload'
+import viewUpload from 'src/pages/app/workspace/page_edit/view_upload'
 
 export default {
   name: 'widgetUpload',

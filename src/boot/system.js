@@ -12,7 +12,7 @@ let router
 export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath, publicPath, redirect }) => {
   try {
     const f = {nameExtra: 'boot::system'}
-    logT(f, 'start')
+    logD(f, 'start')
     const t1 = performance.now()
     router = VueRouter
     const {initApplication} = await import('src/system/services')

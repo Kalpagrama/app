@@ -7,18 +7,18 @@
 <template lang="pug">
 div(
   :style=`{
-  position: 'relative',
-  // height: $q.screen.height + 'px',
-  ...styles,
+position: 'relative',
+// height: $q.screen.height + 'px',
+...styles,
 }`
 ).row.full-width.items-start.content-start
   div(
     :style=`{
-    position: 'relative',
-    background: 'rgb(40,40,40)',
-    borderRadius: '10px',
-    ...styles,
-  }`).row.full-width.items-start.content-start
+  position: 'relative',
+  background: 'rgb(40,40,40)',
+  borderRadius: '10px',
+  ...styles,
+}`).row.full-width.items-start.content-start
     slot(name="wrapper-inside")
     //graph
     graph-view(:maxHeight="graphHeight" :graphD3="block.graph" detailPosition="standard" :style=`{borderColor: 'rgb(40,40,40)', borderStyle: 'solid', background: 'rgb(35,35,35)'}`)
@@ -34,19 +34,19 @@ div(
         borderless dark
         ref="nameInput"
         type="textarea" autogrow
-        :placeholder="$t('what is this block about')"
+      :placeholder="$t('what is this block about')"
         :autofocus="false"
         :input-style=`{
-        paddingTop: '16px',
-        paddingBottom: '10px',
-        paddingLeft: '20px',
-        paddingRight: '10px',
-        //- textAlign: 'center',
-        fontWeight: 'bold',
-        fontSize: fontSize+'px',
-        lineHeight: 1.3,
-        minHeight: '60px',
-      }`
+      paddingTop: '16px',
+      paddingBottom: '10px',
+      paddingLeft: '20px',
+      paddingRight: '10px',
+      //- textAlign: 'center',
+      fontWeight: 'bold',
+      fontSize: fontSize+'px',
+      lineHeight: 1.3,
+      minHeight: '60px',
+    }`
       ).full-width
     // category and spheres
     div(ref="spheresRef").row.full-width.full-height.q-pt-sm
@@ -56,11 +56,11 @@ div(
           edit-category(
             :node="block"
             :class=`{
-              br: !block.category && categoryError,
-            }`
+            br: !block.category && categoryError,
+          }`
             :style=`{
-              borderRadius: '10px',
-            }`)
+            borderRadius: '10px',
+          }`)
         template(v-slot:right)
           .div(v-if="false").row
             //- Delete from notes
@@ -95,7 +95,7 @@ import editCategory from 'src/pages/app/content/node_editor/edit_category.vue'
 import { ObjectCreateApi } from 'src/api/object_create'
 
 export default {
-  name: 'blockEdit',
+  name: 'composerBlock',
   components: {
     editSpheres,
     editCategory

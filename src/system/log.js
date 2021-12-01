@@ -114,22 +114,13 @@ class Logger {
    }
 
    prepareParams (module, msg) { // #69f542
-      // let func = null
-      // if (msg.length && typeof msg[0] === 'function') {
-      //   func = msg[0]
-      //   if (highlightColor) msg.splice(0, 1, `%c[${func.name || func.nameExtra}]`, `background: ${highlightColor}; color: ${textColor}`, (new Date()).toLocaleTimeString())
-      //   else msg.splice(0, 1, `%c[${func.name || func.nameExtra}]`, 'color: #bada55', (new Date()).toLocaleTimeString())
-      // } else if (highlightColor) {
-      //   msg.splice(0, 0, `%c[${'______'}]`, `background: ${highlightColor}; color: ${textColor}`, (new Date()).toLocaleTimeString())
-      // }
       if (!msg) return
-      let func = null
-      if (this.store.state.core.logFormat.funcName && msg.length && typeof msg[0] === 'function') {
-         func = msg[0]
+      if (this.store.state.core.logFormat.funcName && msg[0] && (typeof msg[0] === 'function' || msg[0].nameExtra)) {
+         let func = msg[0]
          msg.splice(0, 1, `[${func.nameExtra || func.name}]`)
       }
       assert(module, '!module')
-      msg.splice(0, 0, `%c[${module.nameExtra || module}] ${this.store.state.core.logFormat.time ? (new Date()).toLocaleTimeString() : ''}`, `color: ${module.toColor()}; font-style: italic; padding: 2px;`)
+      msg.splice(0, 0, `%c[${module}] ${this.store.state.core.logFormat.time ? (new Date()).toLocaleTimeString() : ''}`, `color: ${module.toColor()}; font-style: italic; padding: 2px;`)
    }
 
    showAlert (msg) {

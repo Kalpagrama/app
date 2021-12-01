@@ -22,7 +22,7 @@ kalpa-layout()
               handler: $throttle(nodeVisibilityCallback, 150)
             }`
           ).row.full-width
-            block-edit(
+            composer-block(
               :block="item"
               :height="height"
               )
@@ -32,7 +32,7 @@ kalpa-layout()
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import navMobile from 'src/pages/app/node/nav_mobile.vue'
-import blockEdit from 'src/components/block/edit/index.vue'
+import composerBlock from 'src/components/kalpa_item/item_editor/composer_block.vue'
 import { assert } from 'src/system/common/utils'
 
 export default {
@@ -43,7 +43,7 @@ export default {
   },
   components: {
     navMobile,
-    blockEdit,
+    composerBlock,
   },
   data () {
     return {
