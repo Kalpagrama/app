@@ -18,8 +18,9 @@ kalpa-layout()
         .row.content-center.items-center.justify-center
           span.text-grey-7 {{$t('Essence core')}}
   template(v-slot:body)
-    div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-      node-extended(:oid="$route.params.oid", @oid="$router.replace({ params: { oid: $event } })")
+    .row.full-width.items-start.content-start.justify-center
+        node-extended(:oid="$route.params.oid", @oid="$router.replace({ params: { oid: $event } })"
+          :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`)
 </template>
 
 <script>
