@@ -250,9 +250,9 @@
 <script>
 import {ContentApi} from 'src/api/content'
 import contentPlayer from 'src/components/content_player'
-import pageComments from '../../../../pages/app/node/page_comments';
+import pageComments from 'src/components/kalpa_item/item_extended/node_extended/page_comments';
 import pageDescription from 'src/components/kalpa_item/item_card/viewer/video/page_description.vue'
-import pageSimilar from '../../../../pages/app/node/page_similar';
+import pageSimilar from 'src/components/kalpa_item/item_extended/node_extended/page_similar';
 import listFeedCustomHorizontalPPV from 'src/components/list_feed/list_feed_horizontal_custom_ppv.vue'
 import pageNodes from 'src/pages/app/content/layout_video/page_nodes'
 import {RxCollectionEnum} from '../../../../system/rxdb';

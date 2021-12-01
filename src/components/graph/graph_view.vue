@@ -55,26 +55,20 @@ div(ref="graphArea").row.full-width
       :style=`{
           // boxShadow: '1px 1px 20px rgba(192,192,192, .5)',
           borderRadius: detailPosition === 'bottom' ? '20px 20px 0 0' : '20px',
-          // border: '2px solid green',
         }`).row.full-width.b-40
-      div(v-if="graphD3.selectedItem").row.full-width.q-ma-sm
+      div(v-if="graphD3.selectedItem").row.full-width
         q-btn(v-if="!$store.getters.isGuest" icon="delete" flat color="grey" @click="removeNode(graphD3.selectedItem)").q-mx-sm
-        //q-btn(
-        //  v-if="selectedItemFull && !graphD3.selectedItem.discovered"
-        //  icon="mediation" flat color="grey"
-        //  v-close-popup
-        //  :label="selectedItemFull.countStat.countJoints || 0"
-        //  @click="discover(graphD3.selectedItem)").q-mx-sm
         q-btn(icon="view_in_ar" flat color="grey" :to="'/cube/' + graphD3.selectedItem.oid").q-mx-sm
         q-btn(v-close-popup icon="add_link" flat color="grey" @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить связь авторизуйтесь'}]) : connectNodes(graphD3.selectedItem, null)").q-mx-sm
         .col
         q-btn(v-close-popup icon="close" flat color="grey").q-mx-sm
-      .row.full-width.items-center.content-center.justify-center.q-pa-sm
+      .row.full-width.items-center.content-center.justify-center
         //spinner
-        div(v-if="!selectedItemFull")
+        div(v-if="!selectedItemFull").full-width
           q-spinner(size="50px" color="green")
-        div(v-else )
-          item-preview(:item="selectedItemFull" :isVisible="true" :isActive="true" :showHeader="false" :showActions="true")
+        div(v-else ).full-width
+          //item-preview(:item="selectedItemFull" :isVisible="true" :isActive="true" :showHeader="false" :showActions="true")
+          node-extended(:oid="selectedItemFull.oid" :showSimilar="false" :showActions="false" :showComments="false").full-width.q-pb-md
   // меню создания связи
   q-dialog(
     v-model="jointCreatorShow"
@@ -132,7 +126,8 @@ div(ref="graphArea").row.full-width
 </template>
 
 <script>
-import itemPreview from 'src/components/kalpa_item/item_preview'
+// import itemPreview from 'src/components/kalpa_item/item_preview'
+import nodeExtended from 'src/components/kalpa_item/item_extended/node_extended'
 import * as d3 from 'd3';
 import { assert } from 'src/system/common/utils'
 import debounce from 'lodash/debounce'
@@ -143,7 +138,8 @@ import { ObjectTypeEnum } from 'src/system/common/enums'
 export default {
   name: 'graphView',
   components: {
-    itemPreview,
+    // itemPreview,
+    nodeExtended,
   },
   props: {
     graphD3: { type: Object, required: true }, // d3 меняет этот объект

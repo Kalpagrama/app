@@ -18,7 +18,7 @@
         div(:style=`{minHeight: '32px'}`).row.full-width.content-start
           essence-spheres(:sphereOwner="node" :itemState="itemState")
     // голосовалка
-    .row.full-width.q-px-xs
+    div(v-if="showActions").row.full-width.q-px-xs
       slot(name="actions-left")
       .col
         essence-actions(
@@ -30,7 +30,7 @@
           :isVisible="true").q-pb-lg
       slot(name="actions-right")
     // author + просмотры
-    .row.full-width.justify-between.q-px-sm
+    div(v-if="showAuthor").row.full-width.justify-between.q-px-sm
       q-btn(:to="'/user/'+node.author.oid" size="sm" round flat no-caps padding="none" :style=`{zIndex: '100'}`).q-pr-sm
         q-avatar(:size="'25px'" :style=`{position:'relative', overflow: 'hidden'}`).q-mr-xs
           //img(:src="node.author.thumbUrl" :to="'/user/'+node.author.oid")
@@ -73,6 +73,8 @@ export default {
     imagesNodes: {type: Object},
     imagesNodesIndx: {type: Number},
     showBadge: {type: Boolean, default: true},
+    showActions: {type: Boolean, default: true},
+    showAuthor: {type: Boolean, default: true},
   },
   data () {
     return {
