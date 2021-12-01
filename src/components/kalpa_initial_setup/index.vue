@@ -177,7 +177,7 @@ export default {
   },
   async beforeUnmount () {
     this.$log('beforeDestroy')
-    this.$eventBus.$emit('notice-check', 'tutorial_main')
+    this.$eventBus.$emit('notice-check', {notice: 'tutorial_main', force: false})
   }
 }
 </script>

@@ -21,7 +21,7 @@ kalpa-layout
                 span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Workspace')}}
             //- tutorial
             q-btn(
-              @click=""
+              @click="showKalpaTutorial('tutorial_content')"
               round flat color="white" icon="help_outline")
       //- guest
       view-guest(v-if="$store.getters.isGuest")
@@ -96,6 +96,12 @@ export default {
     widgetHistory,
     widgetUpload,
     viewGuest,
+  },
+  methods: {
+    showKalpaTutorial (notice) {
+      this.$log('showKalpaTutorial TODO!')
+      this.$eventBus.$emit('notice-check', { notice: notice, force: true })
+    }
   }
 }
 </script>

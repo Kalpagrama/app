@@ -17,7 +17,7 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$eventBus.$emit('notice-check', 'tutorial_workspace')
+    this.$eventBus.$emit('notice-check', {notice: 'tutorial_workspace', force: false})
   },
   beforeUnmount () {
     this.$log('beforeDestroy')

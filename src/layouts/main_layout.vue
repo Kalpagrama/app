@@ -72,12 +72,12 @@ export default {
     }
   },
   methods: {
-    onBusEvent(noticeName) {
-      if (this.$store.getters.currentUser.profile.role !== 'GUEST' && !this.$store.getters.currentUser.profile.notice[noticeName]) {
-        if (noticeName === 'initial_settings') {
+    onBusEvent({notice, force}) {
+      if (force || (this.$store.getters.currentUser.profile.role !== 'GUEST' && !this.$store.getters.currentUser.profile.notice[notice])) {
+        if (notice === 'initial_settings') {
           this.kalpaInitialSetupShow = true
         } else {
-          this.noticeName = noticeName
+          this.noticeName = notice
           this.kalpaTutorialShow = true
         }
       }
@@ -91,9 +91,9 @@ export default {
     this.$ym('APP_MOUNTED')
     this.$eventBus.$on('notice-check', this.onBusEvent)
     if (!this.$store.getters.currentUser.profile.notice.initial_settings) {
-      this.$eventBus.$emit('notice-check', 'initial_settings')
+      this.$eventBus.$emit('notice-check', {notice: 'initial_settings', force: false})
     } else {
-      this.$eventBus.$emit('notice-check', 'tutorial_main')
+      this.$eventBus.$emit('notice-check', {notice: 'tutorial_main', force: false})
     }
   },
   beforeUnmount () {

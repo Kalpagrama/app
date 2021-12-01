@@ -212,7 +212,9 @@ export default {
       }
       res.tutorial = {
         name: 'Справка',
-        cb: () => {},
+        cb: () => {
+          this.showKalpaTutorial('tutorial_content')
+        },
       }
       res.hide = {
         name: 'Скрыть',
@@ -244,6 +246,10 @@ export default {
     }
   },
   methods: {
+    showKalpaTutorial (notice) {
+      this.$log('showKalpaTutorial TODO!')
+      this.$eventBus.$emit('notice-check', { notice: notice, force: true })
+    },
     copyLink () {
       this.$log('copyLink')
       this.shareLink = makeRoutePath(this.player.contentKalpa, true)
