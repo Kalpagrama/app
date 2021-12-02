@@ -100,10 +100,10 @@ div(
       // болванка (должна быть минимальной. их создается очень(очень) много)
       div(v-if="state.isDummy"
         :style=`{
-             border: '2px solid rgb(50,50,50)',
+             // border: '1px solid rgb(50,50,50)',
              borderRadius: '10px',
              height: itemHeightApprox + 'px',
-       }`).row.full-width.q-mb-lg
+       }`).row.full-width.q-mb-lg.b-45
       // item
       div(
         v-else

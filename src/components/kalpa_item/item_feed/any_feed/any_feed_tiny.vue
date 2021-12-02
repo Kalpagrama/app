@@ -8,28 +8,35 @@ div(
     maxHeight: height + 'px',
     minWidth: height + 'px',
     // background: 'linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(40,40,40,0) 100%)',
-  }`).b-0
+  }`)
   //image
-  img(
+  img(v-if="!item.type.in('WORD', 'SENTENCE', 'CHAR')"
     :src="item.thumbUrl"
     :style=`{
       height: height + 'px',
-      // opacity: 0.2,
+      minWidth: height + 'px',
       objectFit: 'cover',
       borderRadius: '10px'}`)
+  div(v-else
+    :style=`{
+      height: height + 'px',
+      width: height + 'px',}`).row.items-center.content-center.justify-center.b-40
+    q-icon(name="blur_on" color="white" size="90px")
   div(:style=`{pointerEvents: 'none', background: 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 50%)', zIndex: 10}`).fit.absolute-center
   div(:style=`{zIndex: 10}`).row.full-width.absolute-bottom.full-height
     //- NAME: dynamic link/ dynamic fontSize
     router-link(
       v-if="showName && item.oid"
-      :to="`/${item.type}/${item.oid}`"
+      :to="objectUrl(item)"
       :style=`{
-        minHeight: '60px',
+        minHeight: height + 'px',
         fontSize: fontSize+'px',
+        fontWeight: fontWeight,
         textAlign: 'center',
       }`
-    ).row.full-width.items-center.content-end.justify-center
-      span.text-grey-5 {{ item.name }}
+    ).row.full-width.items-end.content-end.justify-center.no-wrap.q-px-sm
+      q-icon(v-if="!item.type.in('WORD', 'SENTENCE', 'CHAR')" :name="namePrefix" color="grey-5").q-pb-sm
+      span.text-grey-5.q-pl-xs.q-pb-xs.ellipsis {{ item.type.in('WORD', 'SENTENCE', 'CHAR') ? '✦' : '' }} {{ item.name }}
 </template>
 
 <script>
@@ -38,11 +45,17 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import { assert } from 'src/system/common/utils'
 import cloneDeep from 'lodash/cloneDeep'
 import { reactive } from 'vue'
+import { objectUrl } from 'src/system/common/object_info'
 
 // этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
 export default {
   name: 'anyFeedTiny',
   components: {
+  },
+  methods: {
+    objectUrl(item) {
+      return objectUrl(item)
+    }
   },
   props: {
     item: { type: Object },
@@ -77,7 +90,10 @@ export default {
     height: { type: Number, required: true }
   },
   computed: {
-    data() {
+    // pathToItem() {
+    //   return `/${item.type}/${item.oid}`
+    // },
+    data () {
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
       assert(this.itemState)
       let key = this.$options.name
@@ -90,10 +106,34 @@ export default {
     },
     fontSize () {
       let l = this.item.name.length
-      if (l < 20) return 22
-      else if (l < 30) return 20
-      else if (l < 40) return 16
+      let w = 100
+      if (l < 20 && w > 300) return 22
+      else if (l < 30 && w > 300) return 20
+      else if (l < 40 && w > 300) return 16
+      else if (l <= 20 && w < 300) return 12
+      else if (l > 20 && w < 300) return 12
       else return 14
+    },
+    fontWeight () {
+      return 800
+    },
+    namePrefix () {
+      switch (this.item.type) {
+        case 'NODE':
+          return 'adjust'
+        case 'JOINT':
+          return 'fas fa-link'
+        case 'USER':
+          return 'person'
+        case 'BLOCK':
+          return 'dashboard_customize'
+        case 'VIDEO':
+        case 'BOOK':
+        case 'IMAGE':
+          return 'select_all'
+        default:
+          return 'adjust'
+      }
     }
   }
 }

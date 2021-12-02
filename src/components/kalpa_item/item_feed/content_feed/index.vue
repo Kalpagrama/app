@@ -1,36 +1,35 @@
 <template lang="pug">
-.row.full-width
-  div(
+div(
+  :style=`{
+  position: 'relative',
+  overflow: 'hidden',
+  borderRadius: '10px',
+  minHeight: height + 'px',
+  maxHeight: height + 'px',
+  minWidth: height + 'px',
+  // background: 'linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(40,40,40,0) 100%)',
+  }`).b-0
+  //image
+  img(
+    :src="item.thumbUrl"
     :style=`{
-      position: 'relative',
-      background: 'rgb(35,35,35)',
-      borderRadius: '10px',
-    }`
-    ).row.full-width
-    //- header
-    div(
+    height: height + 'px',
+    minWidth: height + 'px',
+    // opacity: 0.2,
+    objectFit: 'cover',
+    borderRadius: '10px'}`)
+  div(:style=`{pointerEvents: 'none', background: 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 50%)', zIndex: 10}`).fit.absolute-center
+  div(:style=`{zIndex: 10}`).row.full-width.absolute-bottom.full-height
+    //- NAME: dynamic link/ dynamic fontSize
+    router-link(
+      :to="`/${item.type}/${item.oid}`"
       :style=`{
-      }`
-      ).row.full-width.items-center.content-center.q-pa-xs
-      q-btn(
-        :to="'/user/'+joint.author.oid"
-        round flat color="white" no-caps
-        :style=`{
-        }`).row.q-px-sm
-        user-avatar(:url="joint.author.thumbUrl" :width="24" :height="24").q-ml-sm
-        .col
-          .row.items-center.content-center.q-px-sm
-            span.text-grey-4 {{ joint.author.name }}
-            .row.full-width
-              //- small(:style=`{lineHeight: 0.8}`).text-grey-8 {{ node.author.username }}
-      .col
-      .row.items-center.content-center.justify-end.q-pt-sm
-        small.text-grey-8 {{ $date(joint.createdAt, 'DD.MM.YYYY') }}
-        .row.full-width.items-center.content-center.justify-end
-          small(:style=`{lineHeight: 0.8}`).text-grey-8.q-mr-xs {{ joint.countStat.countViews }}
-          q-icon(name="visibility" color="grey-9")
-      kalpa-menu-actions(:actions="actions" icon="more_vert")
-    //- items wrapper
+      minHeight: height + 'px',
+      textAlign: 'center',
+      fontWeight: fontWeight,
+    }`
+    ).row.full-width.items-center.content-end.justify-center
+      span.text-grey-5.q-px-sm.q-pb-xs.ellipsis {{ item.name }}
 </template>
 
 <script>
@@ -41,14 +40,14 @@ import { reactive } from 'vue'
 // этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
 export default {
   name: 'contentFeed',
-  props: ['item', 'itemState', 'isActive', 'isVisible'],
+  props: ['item', 'itemState', 'isActive', 'isVisible', 'height'],
   components: {
   },
   computed: {
     actions () {
       return {}
     },
-    data() {
+    data () {
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
       assert(this.itemState)
       let key = this.$options.name
@@ -58,6 +57,19 @@ export default {
         }))
       }
       return this.itemState[key]
+    },
+    fontSize () {
+      let l = this.item.name.length
+      let w = 100
+      if (l < 20 && w > 300) return 22
+      else if (l < 30 && w > 300) return 20
+      else if (l < 40 && w > 300) return 16
+      else if (l <= 20 && w < 300) return 12
+      else if (l > 20 && w < 300) return 12
+      else return 14
+    },
+    fontWeight () {
+      return 800
     }
   }
 }

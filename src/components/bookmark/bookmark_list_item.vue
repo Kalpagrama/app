@@ -25,7 +25,7 @@ div(
       ).row.full-width.items-start.content-start.cursor-pointer
       //- preview, but not for sphere...
       img(
-        v-if="item.type !== 'SPHERE' && !thumbUrlErrored"
+        v-if="!item.type.in('WORD', 'SENTENCE', 'CHAR') && !thumbUrlErrored"
         @error="thumbUrlErrorHandle"
         draggable="false"
         :src="item.thumbUrl"
