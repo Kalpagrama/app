@@ -31,7 +31,7 @@ div(:style=`{width: $q.screen.width + 'px'}`)
       q-icon(color="grey-9" name="logout" size="sm").rotate-270
       q-icon(v-if="item.type !== 'JOINT'" color="grey-9" name="select_all" size="sm")
       q-skeleton(type='circle' size="35px" animation="none" dark)
-      q-icon(v-if="item.type !== 'JOINT'" color="grey-9" name="hub" size="sm")
+      q-icon(v-if="item.type !== 'JOINT'" color="grey-9" name="o_hub" size="sm")
       q-icon(color="grey-9" name="bookmark_outline" size="sm")
 </template>
 
