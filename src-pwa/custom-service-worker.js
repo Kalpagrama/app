@@ -201,7 +201,7 @@ async function sendMsg (type, msgData) {
       // self.addEventListener('fetch', async event => {})
       self.addEventListener('updatefound', event => {
          logD('ready to update!', swVer)
-         self.registration.showNotification('new version available')
+         self.registration.showNotification('new version available!!!')
       })
       self.addEventListener('error', function (e) {
          logC('SW: on error!!!', e)
