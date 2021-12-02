@@ -19,6 +19,7 @@ if (!('toJSON' in Error.prototype)) {
    })
 }
 const performance = window.performance
+
 const LogLevelEnum = Object.freeze({
    DEBUG_RAW: 0,
    DEBUG: 1, // (с учетом logDbgModulesFilter)

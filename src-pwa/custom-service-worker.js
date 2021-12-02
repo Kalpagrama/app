@@ -8,7 +8,7 @@ const swVer = 2
 const useCache = true
 self.__WB_DISABLE_DEV_LOGS = true // отключаем дебаговый вывод workbox
 
-import { setCacheNameDetails } from 'workbox-core'
+// import { setCacheNameDetails } from 'workbox-core'
 import { registerRoute, setCatchHandler } from 'workbox-routing'
 import { getCacheKeyForURL, matchPrecache, precacheAndRoute } from 'workbox-precaching'
 import { CacheFirst } from 'workbox-strategies/CacheFirst'
@@ -130,9 +130,10 @@ async function sendMsg (type, msgData) {
    initWebPush()
    // workbox init
    {
-      setCacheNameDetails({
-         prefix: 'kalpa'
-      })
+      // setCacheNameDetails({
+      //    prefix: 'kalpa'
+      // })
+
       // force update sw
       // если необходимо немедленно обновить sw (иначе - зависнет в waiting до закрытия всех страниц) - раскомментировать строки ниже (не рекомендуется)
       // skipWaiting() // небезопасно!!! может смешаться старый и новый код. Сделалано по-правильному см. src/system/pwa.js
@@ -186,23 +187,24 @@ async function sendMsg (type, msgData) {
       })
       self.addEventListener('activate', event => {
          logD('activated!', swVer)
-         const sendToken = async () => {
-            await self.clients.claim() // перевести всех клиентов на себя
-            let token = await messaging.getToken()
-            await sendMsg('webPushToken', token) // послать всем новый токен
-            await sendMsg('swVer', swVer)
-         }
-         event.waitUntil(sendToken()) // пришел новый сервис-воркер - отправить всем новый webPushToken
+         // // TODO проблемы при обновлении приложения (все зависает) Возможно дело в этом...
+         // const sendToken = async () => {
+         //    await self.clients.claim() // перевести всех клиентов на себя
+         //    let token = await messaging.getToken()
+         //    await sendMsg('webPushToken', token) // послать всем новый токен
+         //    await sendMsg('swVer', swVer)
+         // }
+         // // пришел новый сервис-воркер - отправить всем новый webPushToken
+         // // TODO проблемы при обновлении приложения (все зависает) Возможно дело в этом...
+         // event.waitUntil(sendToken())
       })
-      self.addEventListener('fetch', async event => {
-         // logD('ready to handle fetches! request=', event.request)
-      })
+      // self.addEventListener('fetch', async event => {})
       self.addEventListener('updatefound', event => {
          logD('ready to update!', swVer)
          self.registration.showNotification('new version available')
       })
       self.addEventListener('error', function (e) {
-         logC(e)
+         logC('SW: on error!!!', e)
       })
       self.addEventListener('message', function handler (event) {
          logD('message!', event.data)

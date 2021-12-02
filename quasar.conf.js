@@ -54,6 +54,7 @@ module.exports = configure(function (ctx) {
          // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
          'roboto-font',
          'material-icons',
+         'material-icons-outlined',
          'fontawesome-v5'
       ],
 
