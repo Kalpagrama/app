@@ -11,7 +11,7 @@ import { assert } from 'src/system/common/utils'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.PWA)
 
 let registration = null // ServiceWorkerRegistration
-const forceUpdatePWA = true // обновлять приложение без разрешения прользователя
+const forceUpdatePWA = false // обновлять приложение без разрешения прользователя
 
 async function initPWA (store) {
    const f = initPWA
@@ -77,6 +77,7 @@ async function initPWA (store) {
                logT('updatefound...')
                let newSW = registration.installing
                newSW.addEventListener('statechange', (event) => {
+                  // alert('sw statechange: ' + event.target.state)
                   if (event.target.state === 'installed') {
                      if (registration.active) {
                         // If there's already an active SW, and skipWaiting() is not

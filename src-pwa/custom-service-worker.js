@@ -4,7 +4,7 @@
  * quasar.conf > pwa > workboxPluginMode is set to "InjectManifest"
  */
 
-const swVer = 2
+const swVer = 1
 const useCache = true
 self.__WB_DISABLE_DEV_LOGS = true // отключаем дебаговый вывод workbox
 
@@ -178,13 +178,7 @@ async function sendMsg (type, msgData) {
    }
    // listeners
    {
-      self.addEventListener('install', event => {
-         logD('installed!', swVer)
-         // event.registerForeignFetch({
-         //   scopes: ['/'],
-         //   origins: ['*'] // or ['https://example.com']
-         // })
-      })
+      self.addEventListener('install', event => { logD('installed!', swVer) })
       self.addEventListener('activate', event => {
          logD('activated!', swVer)
          // // TODO проблемы при обновлении приложения (все зависает) Возможно дело в этом...
@@ -198,10 +192,9 @@ async function sendMsg (type, msgData) {
          // // TODO проблемы при обновлении приложения (все зависает) Возможно дело в этом...
          // event.waitUntil(sendToken())
       })
-      // self.addEventListener('fetch', async event => {})
       self.addEventListener('updatefound', event => {
          logD('ready to update!', swVer)
-         self.registration.showNotification('new version available!!!')
+         // self.registration.showNotification('new version available!') // сообщение в области уведомлений телефона
       })
       self.addEventListener('error', function (e) {
          logC('SW: on error!!!', e)
