@@ -59,7 +59,7 @@
           .row.fit.items-center.content-center.justify-end
             small.text-grey-9 {{ essence.countStat.countJoints || '' }}
         .row.items-center.content-center
-          q-btn(round flat color="grey-9" icon="hub")
+          q-btn(round flat color="grey-9" icon="o_hub")
             q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Graph')}}
             //q-icon(name="fas fa-link" size="20px")
     //- bookmarks

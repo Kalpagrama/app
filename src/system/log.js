@@ -19,13 +19,15 @@ if (!('toJSON' in Error.prototype)) {
    })
 }
 const performance = window.performance
+
 const LogLevelEnum = Object.freeze({
-   DEBUG: 0,
-   TRACE: 1, // профилирование | замеры производительности
-   INFO: 2,
-   WARNING: 3,
-   ERROR: 4,
-   CRITICAL: 5
+   DEBUG_RAW: 0,
+   DEBUG: 1, // (с учетом logDbgModulesFilter)
+   TRACE: 2, // профилирование | замеры производительности (с учетом logDbgModulesFilter)
+   INFO: 3,
+   WARNING: 4,
+   ERROR: 5,
+   CRITICAL: 6
 })
 Object.freeze(LogLevelEnum)
 const LogSystemModulesEnum = Object.freeze({
@@ -136,7 +138,9 @@ class Logger {
       assert(['gui', 'any', 'sys'].includes(this.store.state.core.logDbgFilter))
       if (this.store.state.core.logDbgFilter === 'gui' && logSystemModulesValueSet.has(module)) return
       if (this.store.state.core.logDbgFilter === 'sys' && !logSystemModulesValueSet.has(module)) return
-      if (this.store.state.core.logModulesFilter[module] !== undefined && this.store.state.core.logModulesFilter[module] > LogLevelEnum.DEBUG) return
+      if (this.store.state.core.logLevel !== LogLevelEnum.DEBUG_RAW &&
+         this.store.state.core.logDbgModulesFilter[module] !== undefined &&
+         this.store.state.core.logDbgModulesFilter[module] > LogLevelEnum.DEBUG) return
       if (LogLevelEnum.DEBUG >= this.store.state.core.logLevel) {
          this.prepareParams(module, msg)
          console.log(...msg)
@@ -151,7 +155,7 @@ class Logger {
       assert(['gui', 'any', 'sys'].includes(this.store.state.core.logDbgFilter))
       if (this.store.state.core.logDbgFilter === 'gui' && logSystemModulesValueSet.has(module)) return
       if (this.store.state.core.logDbgFilter === 'sys' && !logSystemModulesValueSet.has(module)) return
-      if (this.store.state.core.logModulesFilter[module] !== undefined && this.store.state.core.logModulesFilter[module] > LogLevelEnum.TRACE) return
+      if (this.store.state.core.logDbgModulesFilter[module] !== undefined && this.store.state.core.logDbgModulesFilter[module] > LogLevelEnum.TRACE) return
       if (LogLevelEnum.TRACE >= this.store.state.core.logLevel) {
          this.prepareParams(module, msg)
          console.log(...msg)
@@ -321,7 +325,7 @@ async function initLogger (store) {
    return { logD, logT, logI, logW, logE, logC }
 }
 
-async function initLogRocket(oidUser, username, userEmail, issueDescription, store) {
+async function initLogRocket (oidUser, username, userEmail, issueDescription, store) {
    // const LogRocket = require('logrocket')
    // LogRocket.init('qdibsv/kalpa-main')
    // // await wait(500)
@@ -347,5 +351,5 @@ export {
    getLogFunc,
    LogLevelEnum,
    performance,
-   LogSystemModulesEnum,
+   LogSystemModulesEnum
 }
