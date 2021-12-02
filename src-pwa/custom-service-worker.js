@@ -4,7 +4,7 @@
  * quasar.conf > pwa > workboxPluginMode is set to "InjectManifest"
  */
 
-const swVer = 1
+const swVer = 7
 const useCache = true
 self.__WB_DISABLE_DEV_LOGS = true // отключаем дебаговый вывод workbox
 

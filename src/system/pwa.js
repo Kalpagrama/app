@@ -66,8 +66,7 @@ async function initPWA (store) {
             if (forceUpdatePWA) await updatePWA()
             else {
                // updatePWA() будет вызвано по действию пользователя
-               store.commit('core/stateSet', ['newVersionAvailable', true])
-               showNotifyNewVer()
+               showNotifyNewVer(store)
             }
          } else { // installing (приехала свежая версия) Но еще не успела перейти в статус waiting
             // updatefound is also fired for the very first install. ¯\_(ツ)_/¯
@@ -85,15 +84,13 @@ async function initPWA (store) {
                         // tabs before they'll get updates.
                         // todo show prompt for SW to activate sw immediately and reload page
                         logT('newSW installed!', forceUpdatePWA)
-                        newSW.postMessage({ type: 'skipWaiting' })
-                        store.commit('core/stateSet', ['newVersionAvailable', true])
-                        if (!forceUpdatePWA) {
-                           showNotifyNewVer()
-                        } else {
+                        if (forceUpdatePWA) {
                            notify('info', 'new version will installed!')
                            updatePWA().then(() => {
                               notify('info', 'version updated!')
                            })
+                        } else {
+                           showNotifyNewVer(store)
                         }
                      } else {
                         // Otherwise, this newly installed SW will soon become the
@@ -171,10 +168,18 @@ async function pwaShareWith (title, text, url) {
 
 async function pwaReset () {
    const f = pwaReset
-   logD(f, 'start')
+   logD(f, 'start', registration, registration.waiting)
    const t1 = performance.now()
    if (registration && registration.waiting) { // если есть новый ожидающий SW - активируем его
-      registration.waiting.postMessage({ type: 'skipWaiting' })
+      await new Promise((resolve, reject) => {
+         registration.waiting.addEventListener('statechange', (event) => {
+            // alert('registration.waiting statechange: ' + event.target.state)
+            if (event.target.state === 'activated') {
+               return resolve()
+            }
+         })
+         registration.waiting.postMessage({ type: 'skipWaiting' })
+      })
    }
    if (registration) {
       logD(f, 'try registration.unregister...')
@@ -202,7 +207,8 @@ async function pwaReset () {
    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 }
 
-function showNotifyNewVer () {
+function showNotifyNewVer (store) {
+   store.commit('core/stateSet', ['newVersionAvailable', true])
    Notify.create(
       {
          position: 'top',
@@ -359,4 +365,4 @@ async function showNotification (title, body, dbEvent) {
    )
 }
 
-export { askForPwaWebPushPerm, initPWA, pwaReset, pwaShareWith }
+export { askForPwaWebPushPerm, initPWA, pwaReset, updatePWA, pwaShareWith }

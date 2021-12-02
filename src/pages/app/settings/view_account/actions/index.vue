@@ -13,6 +13,15 @@
     //  }`
     //  ).full-width.b-40.q-mb-sm
     //  span {{$t('Feedback')}}
+    // upgradeVersion
+    q-btn( v-if="$store.state.core.newVersionAvailable"
+      @click="upgradeVersion"
+      flat color="grey-6" no-caps
+      :style=`{
+        height: '50px',
+      }`
+    ).full-width.b-40.q-mb-sm
+      span {{$t('Обновить приложение')}}
     //- show main tutorial
     q-btn(
       @click="showKalpaTutorial()"
@@ -83,6 +92,7 @@ import { rxdb } from 'src/system/rxdb'
 import { ObjectApi } from 'src/api/object'
 import { ObjectCreateApi } from 'src/api/object_create'
 import {UserRoleEnum} from '../../../../../api/user';
+import { updatePWA } from 'src/system/pwa'
 
 export default {
   name: 'accountActions',
@@ -107,6 +117,9 @@ export default {
     //   el.style.display = 'block'
     //   window.Chatra('openChat', true)
     // },
+    async upgradeVersion () {
+      await updatePWA()
+    },
     showKalpaTutorial () {
       this.$log('showKalpaTutorial TODO!')
       this.$eventBus.$emit('notice-check', {notice: 'tutorial_main', force: true})
