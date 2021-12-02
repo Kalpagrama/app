@@ -134,9 +134,9 @@ export default {
         if (description && confirm('Теперь продемонстрируйте ошибку.\nМы запишем ваши действия и сможем понять в чем проблема\nПо окончанию - нажмите на кнопку "закончить запись ошибки"')) {
           this.$store.commit('core/stateSet', ['logRocket', true])
           this.$store.commit('core/stateSet', ['logDbgFilter', 'any'])
-          this.$store.commit('core/stateSet', ['logModulesFilter', {}])
+          // this.$store.commit('core/stateSet', ['logDbgModulesFilter', {}])
           this.$store.commit('core/stateSet', ['logFormat', {time: true, moduleName: true, funcName: true}])
-          this.$store.commit('core/stateSet', ['logLevel', LogLevelEnum.DEBUG])
+          this.$store.commit('core/stateSet', ['logLevel', LogLevelEnum.DEBUG_RAW])
           await initLogRocket(this.$rxdb.getCurrentUser().oid, this.$rxdb.getCurrentUser().username, this.$rxdb.getCurrentUser().profile.email, description, this.$store)
         }
       } else {

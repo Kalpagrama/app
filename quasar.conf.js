@@ -226,8 +226,8 @@ module.exports = configure(function (ctx) {
             ? {
                // swDest: 'firebase-messaging-sw.js', // не работает. Приходится делать messaging.useServiceWorker('firebase-messaging-sw.js')
                // importWorkboxFrom: 'local'
-               swSrc: 'src/system/service-worker.js',
-               swDest: 'service-worker.js',
+               // swSrc: 'src/system/service-worker.js',
+               // swDest: 'service-worker.js',
                maximumFileSizeToCacheInBytes: 1024 * 1024 * 20
             }
             : {

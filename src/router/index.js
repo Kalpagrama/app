@@ -55,8 +55,8 @@ export default route(function ({ app, store, ssrContext, urlPath, publicPath, re
       logD('router::need more privileges')
       // alert('router::need more privileges')
       store.commit('ui/stateSet', ['authGuard', { message: t('Для перехода на эту страницу нужно войти...') }])
-      return next(false)
-      // return next()
+      // return next(false)
+      return next()
     } else {
       return next()
     }

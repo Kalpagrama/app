@@ -47,7 +47,7 @@ async function initPWA (store) {
          // sw уже зарегистрирован. ф-ей register можно пользоваться для получения текущей регистрации
          logT('try register sw')
          registration = await navigator.serviceWorker.register('/service-worker.js')
-         logT('navigator.serviceWorker.register service-worker.js OK!')
+         logT('navigator.serviceWorker.register sw OK!')
          for (let sw of [registration.installing, registration.waiting, registration.active]) {
             if (sw) {
                // установить фильтр логирования
