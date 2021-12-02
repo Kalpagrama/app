@@ -25,7 +25,7 @@ kalpa-layout
           :pages="pages"
           :pageId="pageId"
           :query="query"
-          :itemHeightApprox="pageId === 'contents' ? 30 : (Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 222)"
+          :itemHeightApprox="pageId === 'contents' ? 30 : (Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 170)"
           :itemActivePersist="true"
           @searchString="searchString = $event"
           @pageId="pageId = $event"

@@ -24,6 +24,7 @@ import nodeFeed from 'src/components/kalpa_item/item_feed/node_feed'
 import nodeFeedTiny from 'src/components/kalpa_item/item_feed/node_feed/node_feed_tiny'
 import anyFeedTiny from 'src/components/kalpa_item/item_feed/any_feed/any_feed_tiny'
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
+// import contentFeed from 'src/components/kalpa_item/item_feed/content_feed'
 import joinFeed from 'src/components/kalpa_item/item_feed/joint_feed'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import cloneDeep from 'lodash/cloneDeep'
@@ -81,6 +82,7 @@ export default {
     joinFeed,
     anyFeedTiny,
     bookmarkListItem,
+    // contentFeed,
     skeletonLine,
     skeletonCardTiny,
     skeletonCard
@@ -113,7 +115,7 @@ export default {
         case ObjectTypeEnum.VIDEO:
         case ObjectTypeEnum.IMAGE:
         case ObjectTypeEnum.BOOK:
-          return 'bookmark-list-item'
+          return this.layout === 'line' ? 'bookmark-list-item' : 'any-feed-tiny'
         default:
           assert(this.height, 'not impl')
           return this.height < 300 ? 'any-feed-tiny' : ''

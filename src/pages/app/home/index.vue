@@ -29,13 +29,6 @@ kalpa-layout
               :showContext="false"
               :layout="'card-tiny'"
               :height="150").q-px-xs
-              //template(v-slot:skeleton=`{queryInProgress}`)
-                div(:style=`{width: 150*1.618+'px', height: '150px'}`).relative-position
-                  q-skeleton(type='rect' height='100%' :animation="queryInProgress ? 'wave' : 'none'" dark).br-10
-                  .row.full-width.absolute-bottom.justify-center
-                    span.text-grey-5.text-h6 {{item.name}}
-                  //.row.full-width.justify-center.q-pt-sm
-                    q-skeleton(type='text' width='50%' :animation="queryInProgress ? 'wave' : 'none'" dark)
         span.text-grey-5.text-h5.q-py-md.q-pl-sm {{$t('Новое по подпискам')}}
         tab-list-feed(
           ref="listFeed"
@@ -54,6 +47,7 @@ kalpa-layout
               :isActive="isActive"
               :isVisible="isVisible"
               :isPreload="isPreload"
+              :layout="item.type.in('NODE', 'JOINT', 'BLOCK') ? 'card' : 'line'"
               :scrolling="scrolling").q-pb-xl
 </template>
 

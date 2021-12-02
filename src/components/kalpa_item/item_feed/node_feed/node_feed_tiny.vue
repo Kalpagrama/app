@@ -38,13 +38,14 @@ div(
       v-if="showName && node.oid"
       :to="nodeEssenceLink"
       :style=`{
-      minHeight: '60px',
+      minHeight: height + 'px',
       fontSize: fontSize+'px',
       fontWeight: fontWeight,
       textAlign: 'center',
     }`
-    ).row.full-width.items-end.content-end.justify-center
-      span.text-grey-5.ellipsis.q-px-sm.q-pb-xs {{ nodeName }}
+    ).row.full-width.items-end.content-end.justify-center.no-wrap.q-px-sm
+      q-icon(:name="namePrefix" color="grey-5").q-pb-sm
+      span.text-grey-5.ellipsis.q-pl-xs.q-pb-xs {{ nodeName }}
 </template>
 
 <script>
@@ -100,13 +101,13 @@ export default {
     height: { type: Number, required: true }
   },
   computed: {
-    data() {
+    data () {
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
       assert(this.itemState)
       let key = this.$options.name
       if (!this.itemState[key]) {
         this.$set_deprecated(this.itemState, key, reactive({
-         // key: value
+          // key: value
           nodeWidth: 100
         }))
       }
@@ -145,6 +146,24 @@ export default {
     },
     fontWeight () {
       return 800
+    },
+    namePrefix () {
+      switch (this.node.type) {
+        case 'NODE':
+          return 'adjust'
+        case 'JOINT':
+          return 'fas fa-link'
+        case 'USER':
+          return 'person'
+        case 'BLOCK':
+          return 'dashboard_customize'
+        case 'VIDEO':
+        case 'BOOK':
+        case 'IMAGE':
+          return 'select_all'
+        default:
+          return 'adjust'
+      }
     }
   }
 }
