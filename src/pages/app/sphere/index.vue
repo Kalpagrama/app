@@ -42,6 +42,7 @@ kalpa-layout
               :isVisible="isVisible"
               :isPreload="isPreload"
               :scrolling="scrolling"
+              :layout="item.type.in('NODE', 'JOINT', 'BLOCK') ? 'card' : 'line'"
               :height="pageId === 'contents' ? 30 : undefined")
             .row.full-width
               div(v-if="pageId === 'contents'").q-pb-md
