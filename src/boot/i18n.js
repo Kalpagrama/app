@@ -9,6 +9,9 @@ let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnu
 let setLocale, t
 
 export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath, redirect }) => {
+   const f = { nameExtra: 'boot::i18n' }
+   logD(f, 'start')
+   const t1 = performance.now()
    // https://vue-i18n.intlify.dev/guide/
    // https://github.com/intlify/vue-i18n-next
    i18n = createI18n({
@@ -29,6 +32,7 @@ export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath
    t = i18n.global.t
    // Set i18n instance on app
    app.use(i18n)
+   logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 })
 
 export { setLocale, t }

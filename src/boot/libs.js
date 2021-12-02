@@ -2,6 +2,7 @@ import { boot } from 'quasar/wrappers'
 import { isReactive } from 'vue'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import eventBus from 'tiny-emitter/instance'
+
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.BOOT)
 
 import { Screen, date, colors } from 'quasar'
@@ -47,7 +48,7 @@ const time = (sec, addSeconds = true) => {
 
 export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath, publicPath, redirect }) => {
    try {
-      const f = { nameExtra: 'boot::main' }
+      const f = { nameExtra: 'boot::libs' }
       logD(f, 'start')
       const t1 = performance.now()
       eventBus.$on = eventBus.on
@@ -142,6 +143,7 @@ export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath,
       //   console.log('$goDrop')
       //   goLast = null
       // }
+
       app.config.globalProperties.$ym = function (target, payload) {
          if (!window.ym) return
          window.ym(
@@ -160,6 +162,7 @@ export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath,
             }
          )
       }
+      logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    } catch (err) {
       logC(err)
       throw err

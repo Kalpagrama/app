@@ -373,9 +373,9 @@ const routes = [
                   component: () => import('src/pages/app/list/index.vue')
                },
                {
-                  name: 'workspace.create',
-                  path: 'create',
-                  component: () => import('src/pages/app/workspace/page_create/index.vue')
+                  name: 'workspace.edit',
+                  path: 'edit',
+                  component: () => import('src/pages/app/workspace/page_edit/index.vue')
                }
             ]
          }

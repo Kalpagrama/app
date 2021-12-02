@@ -16,7 +16,7 @@
     //- scrolled bookmarks preview max 10...
     .row.full-width.scroll
       //- bookmarks mockup
-      div(v-if="!bookmarksRes").row.full-width.no-wrap.q-pa-sm
+      div(v-if="showItems && !bookmarksRes").row.full-width.no-wrap.q-pa-sm
         div(
           v-for="n in 10" :key="n"
           :style=`{
@@ -25,7 +25,7 @@
           }`
           ).row.b-40.q-mr-sm
       //- bookmarks loaded
-      div(v-if="bookmarksRes").row.full-width.no-wrap.q-pa-sm
+      div(v-if="showItems && bookmarksRes").row.full-width.no-wrap.q-pa-sm
         //span(v-for="d in bookmarksRes.items" :key="d.id") {{// d.items}}
         router-link(
           v-for="b in bookmarksRes.items" :key="b.oid"
@@ -62,6 +62,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'widgetDrafts',
+  props: ['showItems'],
   data () {
     return {
       bookmarksRes: null,
@@ -93,7 +94,7 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.bookmarksRes = await this.$rxdb.find(this.query)
+    if (this.showItems) this.bookmarksRes = await this.$rxdb.find(this.query)
   },
   beforeUnmount () {
     this.$log('beforeDestroy')

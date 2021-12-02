@@ -7,6 +7,7 @@ import { clear, get, Store } from 'public/scripts/idb-keyval/idb-keyval.mjs'
 import { router } from 'src/boot/system'
 import { makeRoutePath } from 'public/scripts/common_func'
 import { shareIn } from 'src/system/services'
+import { assert } from 'src/system/common/utils'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.PWA)
 
 let registration = null // ServiceWorkerRegistration
@@ -14,7 +15,7 @@ const forceUpdatePWA = true // обновлять приложение без р
 
 async function initPWA (store) {
    const f = initPWA
-   logD(f, 'initPWA start')
+   logT(f, 'initPWA start')
    const t1 = performance.now()
    window.addEventListener('beforeinstallprompt', (e) => {
       // Prevent the mini-info bar from appearing.
@@ -34,9 +35,19 @@ async function initPWA (store) {
          logD('try navigator.serviceWorker.register service-worker.js. controller=', navigator.serviceWorker.controller)
          if (navigator.serviceWorker.controller) window.KALPA_LOAD_SW_STATUS = 'active'
          else window.KALPA_LOAD_SW_STATUS = 'not_installed'
+
+         // let currRegistration = await navigator.serviceWorker.getRegistration('/')
+         // assert(currRegistration)
+         // if (!currRegistration.installing && !currRegistration.waiting && !currRegistration.active){
+         //    logE('BAD Registration! try unregister sw!!!!', navigator.serviceWorker, currRegistration)
+         //    await currRegistration.unregister()
+         //    logD(' unregister sw OK!')
+         // }
+
          // sw уже зарегистрирован. ф-ей register можно пользоваться для получения текущей регистрации
+         logT('try register sw')
          registration = await navigator.serviceWorker.register('/service-worker.js')
-         logD('navigator.serviceWorker.register service-worker.js OK!')
+         logT('navigator.serviceWorker.register service-worker.js OK!')
          for (let sw of [registration.installing, registration.waiting, registration.active]) {
             if (sw) {
                // установить фильтр логирования
@@ -49,21 +60,21 @@ async function initPWA (store) {
             }
          }
          if (registration.waiting && registration.active) {
-            // The page has been loaded when there's already a waiting and active SW.
-            // This would happen if skipWaiting isn't being called, and there are
-            // still old tabs open.
+            // пришла новая версия, но еще активна текущая версия. (можно обновляться)
+            // This would happen if skipWaiting isn't being called, and there are still old tabs open.
+            logT('PWA update ready!', forceUpdatePWA)
             if (forceUpdatePWA) await updatePWA()
             else {
                // updatePWA() будет вызвано по действию пользователя
                store.commit('core/stateSet', ['newVersionAvailable', true])
                showNotifyNewVer()
             }
-         } else {
+         } else { // installing (приехала свежая версия) Но еще не успела перейти в статус waiting
             // updatefound is also fired for the very first install. ¯\_(ツ)_/¯
             registration.addEventListener('updatefound', () => {
                // If updatefound is fired, it means that there's
                // a new service worker being installed.
-               logD('updatefound...')
+               logT('updatefound...')
                let newSW = registration.installing
                newSW.addEventListener('statechange', (event) => {
                   if (event.target.state === 'installed') {
@@ -71,8 +82,8 @@ async function initPWA (store) {
                         // If there's already an active SW, and skipWaiting() is not
                         // called in the SW, then the user needs to close all their
                         // tabs before they'll get updates.
-                        logW('Please close all tabs to get updates.')
                         // todo show prompt for SW to activate sw immediately and reload page
+                        logT('newSW installed!', forceUpdatePWA)
                         newSW.postMessage({ type: 'skipWaiting' })
                         store.commit('core/stateSet', ['newVersionAvailable', true])
                         if (!forceUpdatePWA) {
@@ -87,7 +98,7 @@ async function initPWA (store) {
                         // Otherwise, this newly installed SW will soon become the
                         // active SW. Rather than explicitly wait for that to happen,
                         // just show the initial "content is cached" message.
-                        logW('Content is cached for the first time! please wait...')
+                        logT('SW installed first time! Content is cached! please wait...')
                      }
                   }
                })
@@ -146,7 +157,7 @@ async function initPWA (store) {
       } else next()
    })
 
-   logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+   logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 }
 
 async function pwaShareWith (title, text, url) {

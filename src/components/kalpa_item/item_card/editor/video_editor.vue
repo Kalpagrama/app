@@ -1,16 +1,16 @@
 <template lang="pug">
 div(
   :style=`{
-  position: 'fixed',
-  borderRadius: '10px',
-  paddingTop: $q.screen.xs ? '0px' : '10px',
-  paddingBottom: $q.screen.xs ? '0px' : '0px'
-  // paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)'
+position: 'fixed',
+borderRadius: '10px',
+paddingTop: $q.screen.xs ? '0px' : '10px',
+paddingBottom: $q.screen.xs ? '0px' : '0px'
+// paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)'
 }`
 ).relative-position.row.full-width.b-40
   // header
   div(:style=`{}`
-      ).row.full-width.justify-center.content-end.items-end.q-pb-xs
+  ).row.full-width.justify-center.content-end.items-end.q-pb-xs
     .text-white.text-subtitle2 {{$t('Сведения о контенте')}}
     //q-btn(round flat color="white" icon="clear" v-close-popup)
   div(v-if="!contentCopy" :style=`{minHeight: '400px'}`).row.fit.items-center.justify-center.content-center
@@ -18,15 +18,15 @@ div(
   // body
   div(v-if="contentCopy"
     :style=`{
-      maxHeight: !$q.screen.xs ? ($q.screen.height*70/100)+'px' : $q.screen.height+'px',
-      overflow: "auto"
-  }`).row.full-width
+    maxHeight: !$q.screen.xs ? ($q.screen.height*70/100)+'px' : $q.screen.height+'px',
+    overflow: "auto"
+}`).row.full-width
     //- tabs
     .row.full-width
       q-tabs(
         v-model="pageId"
-       :breakpoint="500" switch-indicator
-        no-caps dense size="xs"
+        :breakpoint="500" switch-indicator
+      no-caps dense size="xs"
         active-color="green"
       ).full-width.text-grey-8
         q-tab(
@@ -48,11 +48,11 @@ div(
                     :src="contentCopy.thumbUrl"
                     draggable="false"
                     :style=`{
-                    maxHeight: '100%',
-                    maxWidth: '100%',
-                    objectFit: 'contain',
-                    borderRadius: '20px',
-                  }`)
+                  maxHeight: '100%',
+                  maxWidth: '100%',
+                  objectFit: 'contain',
+                  borderRadius: '20px',
+                }`)
                 div(flat dense no-caps color="white" :style=`{position: "absolute"}` @click="$refs.inputThumb.pickFiles()").fit.br-20
               .row.full-width.items-start.content-start.justify-center
                 q-btn(
@@ -64,23 +64,38 @@ div(
           div(v-if="pageId === 'preview'").row.full-width.items-start.content-start.justify-center
             div(:style=`{height: $q.screen.width > 320 ? "240px" : "200px",}`).relative-position.row.full-width.items-start.content-start.justify-center.no-scroll
               div(:style=`{height: $q.screen.width > 320 ? "200px" : "160px", width: $q.screen.width > 320 ? "350px" : "300px"}`).relative-position.row.items-start.content-start.justify-center
-                video(v-if="previewUrl"
+                video(v-if="rangeModel || previewUrl"
                   ref="video"
                   autoplay
                   controls
                   :playsinline="true"
-                  :src="previewUrl"
+                  :src="rangeModel ? contentUrl : previewUrl"
                   :style=`{maxHeight: $q.screen.width > 320 ? "200px" : "160px",}`
                 ).full-width.br-20
-                q-btn(v-if="!previewUrl"
+                q-btn(v-if="!rangeModel && !previewUrl"
                   @click="$refs.inputPreview.pickFiles()"
                   flat no-caps color="green" stack
-                  :label="$t('Загрузить')"
+                :label="$t('Загрузить')"
                   icon="add"
                   :style=`{
-                      border: '2px solid rgb(60,60,60)'
-                  }`).fit.br-20
+                    border: '2px solid rgb(60,60,60)'
+                }`).fit.br-20
               .row.full-width.items-start.content-start.justify-center
+                q-btn(v-if="content && !previewUrl && !rangeModel"
+                  flat no-caps color="green-8"
+                  :label="$t('Выделить диапазон')"
+                  @click="rangeModel = {min: 0, max: Math.min(60 * 5, content.duration / 2)}")
+                div(v-if="rangeModel").row.full-width
+                  q-range(
+                    v-model="rangeModel"
+                    :min="0"
+                    :max="content.duration"
+                    :step="1"
+                    :left-label-value="rangeModel.min + $t('сек')"
+                    :right-label-value="rangeModel.max + $t('сек')"
+                    label-always
+                    :color="rangeModel.max - rangeModel.min < maxPreviewDur ? 'green-8' : 'red-8'").col.q-mx-md
+                  q-btn(flat no-caps color="green-8" :label="$t('Отмена')" @click="rangeModel = null")
                 q-btn(v-if="previewUrl"
                   @click="previewDelete"
                   flat no-caps color="red"
@@ -91,9 +106,9 @@ div(
     q-file(ref="inputPreview" accept="video/*" @update:model-value="previewChanged" :style=`{display: 'none',}`)
     //- form
     div(:style=`{
-          paddingLeft: $q.screen.xs ? '0px' : '10px',
-          paddingRight: $q.screen.xs ? '0px' : '10px'
-    }`).row.full-width
+        paddingLeft: $q.screen.xs ? '0px' : '10px',
+        paddingRight: $q.screen.xs ? '0px' : '10px'
+  }`).row.full-width
       .row.full-width.q-pl-lg
         small.text-grey-6 {{$t('Название')}}
       q-input(
@@ -102,17 +117,17 @@ div(
         color="green"
         borderless dark dense
         type="text" autogrow
-        counter maxlength="108"
+      counter maxlength="108"
         :style=`{minHeight: '60px'}`
         :placeholder="$t('Введите название контента')"
         :input-style=`{
-        background: 'rgb(45,45,45)',
-        borderRadius: '10px',
-        padding: '10px',
-        marginBottom: '-5px',
-        minHeight: '40px',
-        textAlign: 'left',
-        }`).row.full-width.q-px-sm
+      background: 'rgb(45,45,45)',
+      borderRadius: '10px',
+      padding: '10px',
+      marginBottom: '-5px',
+      minHeight: '40px',
+      textAlign: 'left',
+      }`).row.full-width.q-px-sm
       .row.full-width.q-pl-lg
         small.text-grey-6 {{$t('Описание')}}
       q-input(
@@ -120,17 +135,17 @@ div(
         borderless dark
         ref="descriptionInput"
         type="textarea" autogrow
-        counter maxlength="5000"
+      counter maxlength="5000"
         :placeholder="$t('Введите описание')"
         :autofocus="false"
         :input-style=`{
-        background: 'rgb(45,45,45)',
-        padding: '10px',
-        marginBottom: '-5px',
-        borderRadius: '10px',
-        lineHeight: 1.3,
-        minHeight: '100px',
-      }`
+      background: 'rgb(45,45,45)',
+      padding: '10px',
+      marginBottom: '-5px',
+      borderRadius: '10px',
+      lineHeight: 1.3,
+      minHeight: '100px',
+    }`
       ).full-width.q-px-sm
       .row.full-width.justify-start.q-pl-sm
         .row.full-width.justify-start.content-center.items-center.q-mb-sm
@@ -143,13 +158,13 @@ div(
           .col
           q-btn(v-if="contentCopy.payInfo.price > 0"
             flat color="white" no-caps dense
-            @click="paidUsersListShow = true"
+          @click="paidUsersListShow = true"
             :ripple="false"
             :style=`{borderRadius: '10px', marginTop: '3px'}`)
             span(:style=`{fontSize: $q.screen.width > 320 ? '14px' : '11px'}`).text-body1 {{$t('Список оплативших')}}
             q-dialog(
-                v-model="paidUsersListShow"
-                :maximized="true")
+              v-model="paidUsersListShow"
+              :maximized="true")
               paid-users(:content="content" @close="paidUsersListShow=false")
           .col
         div(v-if="false" :style=`{minHeight: '45px'}`).row.full-width
@@ -165,12 +180,12 @@ div(
               :style=`{borderRadius: '10px', height: '40px'}`
               :placeholder="$t('Введите стоимость')"
               :input-style=`{
-              // background: 'rgb(45,45,45)',
-              // borderRadius: '10px',
-              maxWidth: '150px',
-              minHeight: '30px',
-              textAlign: 'center',
-              }`).row.b-50.q-mr-sm
+            // background: 'rgb(45,45,45)',
+            // borderRadius: '10px',
+            maxWidth: '150px',
+            minHeight: '30px',
+            textAlign: 'center',
+            }`).row.b-50.q-mr-sm
               template(v-slot="append")
                 .row.content-center.items-center
                   q-icon(name="fas fa-ruble-sign" color="grey-5")
@@ -179,7 +194,7 @@ div(
     .row
       q-btn(v-if="$store.getters.currentUser.profile.role.in('MODERATOR', 'ADMIN')"
         no-caps :ripple="false" color="grey" round
-        flat icon="delete"
+      flat icon="delete"
         :loading="contentDeleting"
         @click="contentDelete")
         q-tooltip(dense dark) {{$t('Удалить контент')}}
@@ -189,46 +204,47 @@ div(
     slot(v-if="showBottomMenu" name="bottomMenu")
       div(v-if="showBottomMenu").row.full-width
         div(:style=`{
-            content: '',
-            width: '100%',
-            height: '1px',
-            background: 'rgb(73,66,61)',}`).q-my-xs
+          content: '',
+          width: '100%',
+          height: '1px',
+          background: 'rgb(73,66,61)',}`).q-my-xs
         //- delete
         q-btn(
           no-caps :ripple="false" color="grey"
           flat  icon="delete"
           :loading="contentDeleting"
           :style=`{
-            height: '50px', position: 'absolute', marginTop: '12px'
-          }`
+          height: '50px', position: 'absolute', marginTop: '12px'
+        }`
           @click="contentDelete"
         )
           q-tooltip(dense dark) {{$t('Delete content')}}
 </template>
 
 <script>
-import {RxCollectionEnum} from 'src/system/rxdb'
-import {objectTypeName, objectUrl} from 'src/system/common/object_info.js';
+import { RxCollectionEnum } from 'src/system/rxdb'
+import { objectTypeName, objectUrl } from 'src/system/common/object_info.js';
 import differenceWith from 'lodash/differenceWith'
 import paidUsers from 'src/components/kalpa_lists/paid_users.vue'
 import cloneDeep from 'lodash/cloneDeep'
-import {assert} from 'src/system/common/utils.js';
-import {ObjectApi} from 'src/api/object.js';
-import {ObjectTypeEnum} from '../../../../system/common/enums';
+import { assert } from 'src/system/common/utils.js';
+import { ObjectApi } from 'src/api/object.js';
+import { ObjectTypeEnum } from '../../../../system/common/enums';
+import { ContentApi } from 'src/api/content'
 
 export default {
   name: 'videoEditor',
   props: {
-    contentOid: {type: String, required: true},
-    showBottomMenu: {type: Boolean, default: true},
+    contentOid: { type: String, required: true },
+    showBottomMenu: { type: Boolean, default: true }
   },
   components: {
     paidUsers
   },
-  data() {
+  data () {
     return {
       isPaid: false,
-      collectionsModel: {collectionId: null, collections: [], selectedCollectionIds: []},
+      collectionsModel: { collectionId: null, collections: [], selectedCollectionIds: [] },
       contentDeleting: false,
       content: null,
       contentCopy: null,
@@ -236,75 +252,97 @@ export default {
       paidUsersListShow: false,
       pageId: 'cover',
       pages: [
-        {id: 'cover', name: this.$t('Обложка')},
-        {id: 'preview', name: this.$t('Превью')}]
+        { id: 'cover', name: this.$t('Обложка') },
+        { id: 'preview', name: this.$t('Превью') }],
+      rangeModel: null,
+      maxPreviewDur: 20 * 60
     }
   },
   computed: {
-    needSave() {
-      return this.content && (this.nameChanged || this.descriptionChanged || this.priceChanged || this.thumbUrlChanged || this.previewUrlChanged)
+    needSave () {
+      return this.content && (this.rangeModel || this.nameChanged || this.descriptionChanged || this.priceChanged || this.thumbUrlChanged || this.previewUrlChanged)
     },
-    nameChanged() {
+    nameChanged () {
       return this.contentCopy.name !== this.content.name
     },
-    descriptionChanged() {
+    descriptionChanged () {
       return this.contentCopy.description !== this.content.description
     },
-    priceChanged() {
+    priceChanged () {
       return this.contentCopy.payInfo.price !== this.content.payInfo.price
     },
-    thumbUrlChanged() {
+    thumbUrlChanged () {
       return this.contentCopy.thumbUrl !== this.content.thumbUrl
     },
-    previewUrlChanged() {
+    previewUrlChanged () {
       return this.previewUrlOrig !== this.previewUrl
     },
-    link() {
+    link () {
       return objectUrl(this.content)
     },
-    type() {
+    type () {
       return objectTypeName(this.content)
     },
-    previewUrl() {
+    contentUrl () {
+      let res = ContentApi.urlSelect(this.contentCopy)
+      return res
+    },
+    previewUrl () {
       let res = this.contentCopy.previewUrlWithFormats.length ? this.contentCopy.previewUrlWithFormats[0].url : null
       return res
     },
-    previewUrlOrig() {
+    previewUrlOrig () {
       let res = this.content.previewUrlWithFormats.length ? this.content.previewUrlWithFormats[0].url : null
       return res
     }
   },
   watch: {
-    'collectionsModel.selectedCollectionIds'(to){
+    'collectionsModel.selectedCollectionIds' (to) {
       this.synchronizeSelectedCollectionIds(to)
     },
-    isPaid(to) {
+    isPaid (to) {
       if (to) this.contentCopy.payInfo.price = 100
       else this.contentCopy.payInfo.price = 0
     },
     content: {
       deep: true,
-      async handler(to) {
+      async handler (to) {
         this.$log('content changed!', cloneDeep(this.content))
         this.contentCopy = cloneDeep(this.content)
         this.bookmark.name = this.content.name
         this.bookmark.thumbUrl = this.content.thumbUrl
         await this.$nextTick()
       }
-    }
+    },
+    'rangeModel.min': {
+      async handler (to) {
+        if (this.$refs.video){
+          this.$refs.video.currentTime = to
+          this.$refs.video.pause()
+        }
+      }
+    },
+    'rangeModel.max': {
+      async handler (to) {
+        if (this.$refs.video){
+          this.$refs.video.currentTime = to
+          this.$refs.video.pause()
+        }
+      }
+    },
   },
   methods: {
-    getCollectionName(collectionId) {
+    getCollectionName (collectionId) {
       let collection = this.collectionsModel.collections.find(el => el.id === collectionId)
       return collection ? collection.name : null
     },
-    async synchronizeSelectedCollectionIds(selectedCollectionIds) {
+    async synchronizeSelectedCollectionIds (selectedCollectionIds) {
       assert(selectedCollectionIds)
       if (!this.bookmark.collections) this.bookmark.collections = []
       let addedCollections = differenceWith(selectedCollectionIds, this.bookmark.collections)
       let removedCollections = differenceWith(this.bookmark.collections, selectedCollectionIds)
       this.bookmark.collections.splice(0, this.bookmark.collections.length, ...selectedCollectionIds)
-      for (let collectionId of removedCollections){
+      for (let collectionId of removedCollections) {
         let collection = this.collectionsModel.collections.find(el => el.id === collectionId)
         if (collection) {
           let indxB = collection.bookmarks.findIndex(bid => bid === this.bookmark.id)
@@ -323,7 +361,7 @@ export default {
         }
       }
     },
-    async contentDelete() {
+    async contentDelete () {
       this.$log('contentDelete start')
       this.contentDeleting = true
       // await this.$wait(1000)
@@ -336,8 +374,12 @@ export default {
       this.$emit('deleted')
       this.$emit('close')
     },
-    async save(){
+    async save () {
       try {
+        if (this.rangeModel && this.rangeModel.max - this.rangeModel.min > this.maxPreviewDur) {
+          this.$notify('error', this.$t('превышена длина превью'))
+          return
+        }
         this.loading = true
         let name, description, price, fileThumb, filePreview
 
@@ -352,6 +394,14 @@ export default {
         if (price !== undefined) await ObjectApi.update(this.content.oid, 'payInfo.price', price)
         if (fileThumb !== undefined) await ObjectApi.update(this.content.oid, 'thumb', fileThumb)
         if (filePreview !== undefined) await ObjectApi.update(this.content.oid, 'preview', filePreview)
+        else if (this.rangeModel) {
+          await ObjectApi.update(this.content.oid, 'preview', {
+            figuresAbsolute: [{
+              t: this.rangeModel.min,
+              points: []
+            }, { t: this.rangeModel.max, points: [] }]
+          })
+        }
         this.$emit('close')
       } finally {
         this.loading = false
@@ -365,19 +415,22 @@ export default {
     async previewChanged (file) {
       this.$log('previewChanged', file)
       assert(file)
-      this.$set_deprecated(this.contentCopy, 'previewUrlWithFormats', [{format: 'default', url: URL.createObjectURL(file)}])
+      this.$set_deprecated(this.contentCopy, 'previewUrlWithFormats', [{
+        format: 'default',
+        url: URL.createObjectURL(file)
+      }])
       this.filePreview = file
     },
     async previewDelete () {
       this.$set_deprecated(this.contentCopy, 'previewUrlWithFormats', [])
     }
   },
-  async mounted() {
+  async mounted () {
     this.$log('mounted', this.contentOid)
     let { items: [bookmark] } = await this.$rxdb.find({
       selector: {
         rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
-        oid: this.contentOid,
+        oid: this.contentOid
       }
     })
     this.$log('mounted1', bookmark)

@@ -116,7 +116,13 @@ export default {
     draftSelectHandle (draft) {
       this.$log('draftSelectHandle', draft)
       if (this.mode === 'select') {
-        this.$go('/content/' + draft.items[0].layers[0].contentOid + '?draftId=' + draft.id)
+        if (this.pageId === 'blocks') {
+          this.$router.push({ path: '/workspace/edit', query: { mode: 'block', id: draft.id } })
+        } else if (this.pageId === 'nodes') {
+          this.$go('/content/' + draft.items[0].layers[0].contentOid + '?draftId=' + draft.id)
+        } else {
+          this.$notify('warn', this.$t('not implemented'))
+        }
       } else {
         this.draftSelected = draft
       }
@@ -124,7 +130,7 @@ export default {
     createItem () {
       // eslint-disable-next-line no-constant-condition
       if (this.pageId === 'blocks') {
-        this.$router.push('/workspace/create?mode=block')
+        this.$router.push('/workspace/edit?mode=block')
       } else if (this.pageId === 'nodes') {
         this.$router.push('/workspace/contents')
       } else {

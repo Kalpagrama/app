@@ -7,11 +7,11 @@ let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnu
 export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath, redirect }) => {
    try {
       const f = { nameExtra: 'boot::rxdb' }
-      logD(f, 'start')
+      logT(f, 'start')
       const t1 = performance.now()
       await rxdb.create(store)
       app.config.globalProperties.$rxdb = rxdb
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    } catch (err) {
       console.error('cant create rxdb!', err)
       logE('cant create rxdb!', err)

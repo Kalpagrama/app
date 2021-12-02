@@ -1,5 +1,5 @@
 /* eslint-disable */
-const swVer = 4
+const swVer = 1
 const useCache = true
 // InjectManifest in Workbox v5
 // https://developers.google.com/web/tools/workbox/guides/migrations/migrate-from-v4
@@ -65,11 +65,13 @@ async function sendMsg (type, msgData) {
 }
 // common init sw
 {
-   logD('common init sw', swVer)
+   logD('common init sw', swVer, process.env.NODE_ENV)
    // precache
    {
       // precacheAndRoute позволяет в фоне предварительно закэшировать весь сайт при первой установке
-      precacheAndRoute(self.__WB_MANIFEST)
+      if (process.env.NODE_ENV !== 'development') {
+         precacheAndRoute(self.__WB_MANIFEST);
+      }
 
       // delayedPrecacheController
       // https://developers.google.com/web/tools/workbox/modules/workbox-precaching
@@ -175,7 +177,7 @@ async function sendMsg (type, msgData) {
       // force update sw
       // если необходимо немедленно обновить sw (иначе - зависнет в waiting до закрытия всех страниц) - раскомментировать строки ниже (не рекомендуется)
       // skipWaiting() // небезопасно!!! может смешаться старый и новый код. Сделалано по-правильному см. src/system/pwa.js
-      // clientsClaim()
+      // clientsClaim() // небезопасно!!! может смешаться старый и новый код. Сделалано по-правильному см. src/system/pwa.js
 
       registerRoute(/\/share\/?$/,
          async ({ url, event, params }) => {
@@ -359,166 +361,30 @@ async function sendMsg (type, msgData) {
 }
 
 if (useCache) {
-   // custom resolver for graphql & video requests
-   {
-      cacheVideo = async function (event) {
-         // let requestCopy = event.request.clone()
-         // logD('video cacheVideo', requestCopy.url, requestCopy)
-         return await cacheFirst(event, videoStore)
-      }
-      const cacheOnly = async (event, store) => {
-         return await getCache(event.request, store)
-      }
-      const networkOnly = async (event) => {
-         return await fetch(event.request.clone(), {
-            credentials: 'same-origin', // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
-            mode: 'cors' // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
-         })
-      }
-      const StaleWhileRevalidate = async (event, store) => {
-         logD('gql StaleWhileRevalidate')
-         let cachedResponse = await cacheOnly(event, store)
-         let fetchPromise = fetch(event.request.clone())
-            .then(async (response) => {
-               if (response && response.ok) await setCache(event.request, response, store)
-               return response
-            })
-            .catch((err) => {
-               logC('cant fetch gql query with StaleWhileRevalidate', err)
-            })
-         return cachedResponse ? cachedResponse : await fetchPromise
-      }
-      // Если по истечении timeout ответ не получен - ответить из кэша
-      const networkFirst = async (event, store, timeout) => {
-         logD('gql networkFirst')
-         let cachedResponse = await cacheOnly(event, store)
-         return await new Promise((resolve, reject) => {
-            let timeoutId
-            if (cachedResponse && timeout) {
-               timeoutId = setTimeout(() => {
-                  logD('gql networkFirst. time expired. resolve from cache ok!')
-                  resolve(cachedResponse)
-               }, timeout)
-            }
-            networkOnly(event).then(async (networkResponse) => {
-               logD('gql networkFirst. resolve from network ok!', networkResponse)
-               if (timeoutId) clearTimeout(timeoutId)
-               if (networkResponse && networkResponse.ok) {
-                  logD('gql networkFirst. save to cache...')
-                  await setCache(event.request, networkResponse, store)
-               }
-               resolve(networkResponse)
-            }).catch(err => {
-               if (cachedResponse) {
-                  logD('gql networkFirst. fails. resolve from cache ok!', err)
-                  resolve(cachedResponse)
-               }
-               logD('gql networkFirst. fails.', err)
-               reject(err)
-            })
-         })
-      }
-      const cacheFirst = async (event, store) => {
-         logD('gql cacheFirst')
-         let cachedResponse = await cacheOnly(event, store)
-         if (cachedResponse) {
-            logD('gql cacheFirst. resolve from cache ok!', cachedResponse)
-            return cachedResponse
-         }
-         return await networkFirst(event, store)
-      }
-
-      // сделает из response данные для хранения в кэше
-      const prepareResponse = async (response, request) => {
-         let requestCopy = request.clone()
-         let responseCopy = response.clone()
-         let serializedHeaders = {}
-         for (let entry of responseCopy.headers.entries()) {
-            serializedHeaders[entry[0]] = entry[1]
-         }
-         let res = {
-            request: await prepareRequest(requestCopy),
-            headers: serializedHeaders,
-            status: responseCopy.status,
-            statusText: responseCopy.statusText,
-            body: await responseCopy.arrayBuffer()// await response.json()
-         }
-         return res
-      }
-      // сделает из request данные для ключа в кэше
-      const prepareRequest = async (request) => {
-         let requestCopy = request.clone()
-         let serializedHeaders = {}
-         for (let entry of requestCopy.headers.entries()) {
-            if (!['range'].includes(entry[0].toLowerCase())) continue // остальные заголовки считаем несущественными для ключа
-            serializedHeaders[entry[0]] = entry[1]
-         }
-         let res = {
-            url: requestCopy.url,
-            headers: serializedHeaders
-         }
-         if (requestCopy.method === 'POST') {
-            res.body = await requestCopy.json()
-         }
-         return res
-      }
-      const setCache = async (request, response, store) => {
-         logD('save to cache...')
-         if (!store) {
-            logC('bad store!!!')
-            throw new Error('bad store!!!')
-         }
-         let reqPrepared = await prepareRequest(request)
-         let entry = {
-            request: reqPrepared,
-            response: await prepareResponse(response, request),
-            timestamp: Date.now()
-         }
-         let id = MD5(JSON.stringify(reqPrepared)).toString()
-
-         await idbKeyval.set(id, entry, store)
-         logD('save to cache ok!')
-      }
-      const getCache = async (request, store) => {
-         if (!store) {
-            logC('bad store!!!')
-            throw new Error('bad store!!!')
-         }
-         let reqPrepared = await prepareRequest(request)
-         try {
-            let entry
-            let id = MD5(JSON.stringify(reqPrepared)).toString()
-            entry = await idbKeyval.get(id, store)
-            if (!entry) {
-               logD('Load response not found in cache.')
-               return null
-            }
-            // // Check cache max age.
-            // let cacheControl = requestCopy.headers.get('Cache-Control')
-            // let maxAge = cacheControl ? parseInt(cacheControl.split('=')[1]) : 3600
-            // if (Date.now() - data.timestamp > maxAge * 1000) {
-            //   logD('Cache expired. Load from API endpoint.')
-            //   return null
-            // }
-            logD('Load response from cache.', entry)
-            return new Response(entry.response.body, entry.response)
-         } catch (err) {
-            logC('cant getCache', err)
-            return null
-         }
-      }
-   }
 // routing
    {
       registerRoute(/^http.*(?:googleapis|gstatic)\.com\/.*/, new StaleWhileRevalidate({ cacheName: 'google' }))
       registerRoute(/\/(icons|other|scripts)\/.*$/, new CacheFirst({ cacheName: 'static' }))
+      // картинки с категориями и пр
+      registerRoute(/^http.*kalpa\.store\/static\/category_thumbs\/.+\.jpg$/,
+         new CacheFirst({
+            cacheName: 'static',
+            fetchOptions: {
+               credentials: 'same-origin', // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
+               mode: 'cors', // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
+               headers: {
+                  'Cache-Control': 'no-cache' // нужно тк иначе браузер кэширует картинки и они так оказваются без cors-заголовков (при получении такой картинки - происходит ошибка)
+                  // 'x-my-custom-header': 'The Most Amazing Header Ever'
+               }
+            }
+         }))
       // content images
-      registerRoute(/^http.*(kalpa\.store|akamaized\.net).+\.jpg$/,
+      registerRoute(/^http.*(kalpa\.store|akamaized\.net).+\.jpg/,
          new CacheFirst({
             cacheName: 'content_img',
             plugins: [
                new ExpirationPlugin({
-                  maxEntries: 2000
+                  maxEntries: 1000
                })
             ],
             fetchOptions: {
@@ -532,9 +398,9 @@ if (useCache) {
          })
       )
       registerRoute(/.+(\.jpg|\.ico|\.png)$/, new CacheFirst({ cacheName: 'origin images' }))
-      registerRoute(/^http.*(kalpa\.store|akamaized\.net).+\.mp4$/, async ({ url, event, params }) => {
-         return fetch(event.request)
-      })
+      // registerRoute(/^http.*(kalpa\.store|akamaized\.net).+\.mp4$/, async ({ url, event, params }) => {
+      //    return fetch(event.request)
+      // })
       // // почему-то закэшитрованное видео не играет...
       // registerRoute( // content video
       //   /^http.*(kalpa\.store).+\.mp4$/,

@@ -1,13 +1,16 @@
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { assert } from 'src/system/common/utils'
 import { router } from 'src/boot/system'
-import { HapticsImpactStyle, Plugins, StatusBarStyle } from '@capacitor/core'
-// import { Screenshot } from 'com.darktalker.cordova.screenshot'
+import { StatusBar, Style } from '@capacitor/status-bar'
+import { Haptics, ImpactStyle } from '@capacitor/haptics'
+import { PushNotifications } from '@capacitor/push-notifications'
+import { Browser } from '@capacitor/browser'
+import { App } from '@capacitor/app'
+import { Share } from '@capacitor/share'
 import { AuthApi } from 'src/api/auth'
 import { makeRoutePath } from 'public/scripts/common_func'
 import { shareIn } from 'src/system/services'
 
-const { PushNotifications, Share, App, StatusBar, Haptics, Browser } = Plugins
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.CP)
 
 // let PushNotifications, Share
@@ -65,22 +68,22 @@ async function statusBarSetVisible (visible) {
 
 async function statusBarSetStyle (style) {
    assert(style.in('dark', 'light'), 'bad style')
-   if (style === 'dark') style = StatusBarStyle.Dark
-   else style = StatusBarStyle.Light
+   if (style === 'dark') style = Style.Dark
+   else style = Style.Light
    await StatusBar.setStyle({ style })
 }
 
 async function vibrate () {
    // assert(pattern && Array.isArray(pattern), 'pattern && Array.isArray(pattern)')
-   Haptics.vibrate()
+   await Haptics.vibrate()
 }
 
 async function hapticsImpact (style) {
    assert(style.in('medium', 'heavy', 'light'), '!style.in(medium, heavy, light)')
-   if (style === 'medium') style = HapticsImpactStyle.Medium
-   else if (style === 'heavy') style = HapticsImpactStyle.Heavy
-   else if (style === 'light') style = HapticsImpactStyle.Light
-   Haptics.impact({ style });
+   if (style === 'medium') style = ImpactStyle.Medium
+   else if (style === 'heavy') style = ImpactStyle.Heavy
+   else if (style === 'light') style = ImpactStyle.Light
+   await Haptics.impact({ style });
 }
 
 async function initPushPlugin (store) {
@@ -88,10 +91,10 @@ async function initPushPlugin (store) {
    // Request permission to use push notifications
    // iOS will prompt user and return if they granted permission or not
    // Android will just grant without prompting
-   let result = await PushNotifications.requestPermission()
+   let result = await PushNotifications.requestPermissions()
    if (result.granted) {
       // Register with Apple / Google to receive push via APNS/FCM
-      PushNotifications.register()
+      await PushNotifications.register()
    } else {
       alert('Push registration ERROR:')
       logE('Push registration ERROR:', result)

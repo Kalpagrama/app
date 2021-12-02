@@ -18,7 +18,7 @@ export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath,
     const {initApplication} = await import('src/system/services')
     app.config.globalProperties.$systemUtils = await initApplication()
     await systemInit()
-    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+    logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   } catch (err) {
     logC(err)
     throw err // без initApplication работать не можем!

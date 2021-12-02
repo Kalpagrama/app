@@ -134,7 +134,7 @@
               outline color="grey-8"
               align="center"
               size="xl"
-              :to="'/workspace/create?mode=block'"
+              :to="'/workspace/edit?mode=block'"
               :label="$t('Essence block')"
               icon='dashboard_customize'
               round flat no-caps

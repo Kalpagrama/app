@@ -80,11 +80,11 @@ div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`)
 </template>
 
 <script>
-import pageComments from 'src/pages/app/node/page_comments'
+import pageComments from 'src/components/kalpa_item/item_extended/node_extended/page_comments'
 import itemDescription from 'src/components/kalpa_item/item_card/viewer/item_description.vue'
 // import pageNodes from 'src/pages/app/sphere/page_nodes/index.vue'
 // import pageJoints from 'src/pages/app/sphere/page_joints/index.vue'
-import pageSimilar from 'src/pages/app/node/page_similar'
+import pageSimilar from 'src/components/kalpa_item/item_extended/node_extended/page_similar'
 import {ContentApi} from 'src/api/content';
 
 export default {
