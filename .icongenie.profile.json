@@ -1,6 +1,6 @@
 {
   "params": {
-    "quality": 12,
+    "quality": 8,
     "include":  ["all"],
     "skipTrim": false,
     "padding": [

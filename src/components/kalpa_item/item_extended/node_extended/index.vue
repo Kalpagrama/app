@@ -54,7 +54,7 @@
             q-icon(
               dense name="add" color="green-9" size="sm"
               @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить смысл авторизуйтесь'}]) : itemEditorShow=true"
-              ).cursor-pointer.q-pr-xs
+            ).cursor-pointer.q-pr-xs
             //small(v-if="state.node.items[0].layers[0].contentName").text-grey-7.text-weight-bolder.text-italic.q-pl-xs.q-mt-xs {{state.node.items[0].layers[0].contentName.substring(0, 22)}}{{state.node.items[0].layers[0].contentName.length > 22 ? '...': ''}}
           div(v-else @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить смысл авторизуйтесь'}]) : itemEditorShow=true").row.full-width.cursor-pointer.items-center
             small.text-grey-7.text-weight-thin.q-pl-xs  {{$t('Добавить смысл на этот образ')}}
@@ -66,10 +66,10 @@
       div(
         v-if="pageId"
         :style=`{
-          position: 'relative',
-          borderRadius: '20px 20px 0 0',
-          height: bottomHeight + 'px',
-        }`).row.full-width.b-30
+        position: 'relative',
+        borderRadius: '20px 20px 0 0',
+        height: bottomHeight + 'px',
+      }`).row.full-width.b-30
         component(:is="'page-' + pageId"
           :node="state.node"
           :item="state.node"
@@ -99,7 +99,7 @@
           @comments-show="pageId='comments'"
           @set-node="setNode($event.oid, true)").b-30
         q-tab-panels(v-else
-          v-model="state.essencesNodesIndx"
+        v-model="state.essencesNodesIndx"
           :swipeable="true || $q.platform.is.mobile"
           :animated="true || $q.platform.is.mobile"
           dark).full-width
@@ -168,15 +168,15 @@ export default {
   props: {
     oid: {
       type: String,
-      required: true,
+      required: true
     },
-    showActions: {default: true},
-    showAuthor: {default: true},
-    showComments: {default: true},
-    showImages: {default: true},
-    showSimilar: {default: true},
+    showActions: { default: true },
+    showAuthor: { default: true },
+    showComments: { default: true },
+    showImages: { default: true },
+    showSimilar: { default: true }
   },
-  emits: ['oid'],
+  emits: ['oid', 'pageId'],
   components: {
     pageSimilar,
     pageComments,
@@ -206,7 +206,7 @@ export default {
       itemEditorShow: false,
       pageId: null, // description|comments|essences
       bottomHeight: 0, // сколько места под образом
-      imageMaxHeight: 0, // максимальная высота образа
+      imageMaxHeight: 0 // максимальная высота образа
     }
   },
   computed: {
@@ -250,29 +250,29 @@ export default {
   },
   watch: {
     'state.essencesNodesIndx': {
-      handler(to, from) {
+      handler (to, from) {
         // this.$log('state.essencesNodesIndx TO', to)
-        if (to >= 0){
+        if (to >= 0) {
           assert(this.state.essencesNodes[to])
           this.setNode(this.state.essencesNodes[to].oid, true)
         }
       }
     },
     'state.essencesNodesIndxPage': {
-      handler(to, from) {
-        if (to >= 1){
+      handler (to, from) {
+        if (to >= 1) {
           assert(this.state.essencesNodes[to - 1])
           this.setNode(this.state.essencesNodes[to - 1].oid, true)
         }
       }
     },
-    essencesNodesIndx(to, from){
+    essencesNodesIndx (to, from) {
       this.state.essencesNodesIndx = to
       this.state.essencesNodesIndxPage = to + 1
     },
     'state.imagesNodesRes.items': {
       deep: true,
-      handler(to, from){
+      handler (to, from) {
         if (to) {
           // this.$log('imagesNodesRes changed', this.state?.node?.oid, cloneDeep(itemsRes.items))
           let res = [...to]
@@ -287,7 +287,7 @@ export default {
     },
     'state.essencesNodesRes.items': {
       deep: true,
-      handler(to, from){
+      handler (to, from) {
         if (to) {
           // this.$log('essenceNodesRes changed', this.state?.node?.oid, cloneDeep(itemsRes.items))
           let res = [...to]
@@ -354,6 +354,9 @@ export default {
         await this.setNode(to, true)
       }
     },
+    pageId (to) {
+      this.$emit('pageId', to)
+    }
   },
   methods: {
     async setNode (oid, canChangeMainEssence = true) {

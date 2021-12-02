@@ -107,7 +107,7 @@ module.exports = configure(function (ctx) {
          // gzip: true,
          distDir: 'dist',
          // отключено для deploy (иначе проблемы при деплое   (не отдается управление в консоль))
-         analyze: process.env.DOCKER_MACHINE_NAME ? false : { analyzerPort: ctx.mode.capacitor ? 7777 : ctx.mode.pwa ? 8888 : 9999 },
+         analyze: process.env.DOCKER_MACHINE_NAME || ctx.mode.capacitor ? false : { analyzerPort: ctx.mode.pwa ? 8888 : 9999 },
 
          // Options below are automatically set depending on the env, set them if you want to override
          // extractCSS: false,
