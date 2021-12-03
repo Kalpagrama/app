@@ -27,17 +27,18 @@
       @pageId="pageId = $event"
     ).row.full-width
       template(v-slot:stickyHeaderTop)
-        q-tabs(
-          v-model="collectionsModel.collectionId"
-          switch-indicator="false" no-caps dense
-          active-color="green"
-          :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`
-        ).full-width.text-grey-8
+        div(:style=`{
+          maxWidth: $store.state.ui.pageWidth+'px',
+          maxHeight: '145px',
+          }`).row.full-width.text-grey-8.wrap.justify-start.scroll.q-px-sm
           // add collection btn
           add-collection-btn(v-model="collectionsModel")
-          q-tab(
+          q-chip(
             v-for="(c,ci) in collectionsModel.collections" :key="c.id"
-            :name="c.id" :label="getCollectionNameWithCnt(c)")
+            clickable outline
+            :name="c.id" :label="getCollectionNameWithCnt(c)"
+            :color="collectionsModel.collectionId==c.id ? 'green' : 'grey-8'"
+            @click="collectionsModel.collectionId=c.id")
       template(v-slot:item=`{item:bookmark,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
         bookmark-list-item(
           :item="bookmark"

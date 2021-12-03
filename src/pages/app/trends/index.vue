@@ -51,13 +51,6 @@ kalpa-layout
                 :layout="'card-tiny'"
                 :showContext="false"
                 :height="150").q-px-xs
-                //template(v-slot:skeleton=`{queryInProgress}`)
-                  div(:style=`{width: 150*1.618+'px', height: '150px'}`).relative-position
-                    q-skeleton(type='rect' height='100%' :animation="queryInProgress ? 'wave' : 'none'" dark).br-10
-                    .row.full-width.absolute-bottom.justify-center
-                      span.text-grey-5.text-h6 {{item.name}}
-                    //.row.full-width.justify-center.q-pt-sm
-                      q-skeleton(type='text' width='50%' :animation="queryInProgress ? 'wave' : 'none'" dark)
           span.text-grey-5.text-h6.q-py-sm.q-pl-sm {{$t('Категории')}}
           .row.full-width
             div(v-for="(c, ix) in $store.getters.nodeCategories").col-6.q-pa-xs

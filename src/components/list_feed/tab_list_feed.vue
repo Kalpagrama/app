@@ -139,6 +139,12 @@ export default {
     }
   },
   methods: {
+    scrollToStart() {
+      return this.$refs.listFeed.scrollToStart()
+    },
+    scrollToEnd() {
+      return this.$refs.listFeed.scrollToEnd()
+    },
     scrollTo (pos) {
       // assert(pos.in('start', 'end'))
       if (pos === 'start') this.$refs.listFeed.scrollToStart()

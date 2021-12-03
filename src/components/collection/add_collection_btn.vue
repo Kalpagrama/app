@@ -5,7 +5,7 @@ q-btn-dropdown(flat icon="add", :content-style=`{borderRadius: '10px', backgroun
   ).row.full-width
     q-input(v-model="newCollectionName", borderless dark :placeholder="$t('New collection')" @keyup.enter="createCollection").col.full-width
     q-btn(round flat v-close-popup :color="newCollectionName ? 'green' : null", icon="add", :disable="!newCollectionName" @click="createCollection")
-  div(:style=`{height: Math.min(modelValue.collections.length*40, 300)+'px'}`).scroll
+  div(:style=`{height: Math.min(modelValue.collections.length*40, 300)+'px', minWidth: '150px'}`).scroll
     div(v-for="(c,ci) in modelValue.collections" :key="c.id").row.full-width
       q-btn(
         round flat no-caps v-close-popup align="left"
