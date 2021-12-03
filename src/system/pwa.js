@@ -5,7 +5,7 @@ import { Notify, Platform } from 'quasar'
 import { t } from 'src/boot/i18n'
 import { clear, get, Store } from 'public/scripts/idb-keyval/idb-keyval.mjs'
 import { router } from 'src/boot/system'
-import { makeRoutePath } from 'public/scripts/common_func'
+import { makeRoutePath, wait } from 'public/scripts/common_func'
 import { shareIn } from 'src/system/services'
 import { assert } from 'src/system/common/utils'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.PWA)
@@ -236,6 +236,7 @@ async function checkUpdate () {
 async function updatePWA () {
    await pwaReset()
    logW('before reload!')
+   await wait(2000)
    await window.location.reload()
 }
 

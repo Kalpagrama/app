@@ -316,12 +316,11 @@ async function sendMsg (type, msgData) {
 if (useCache) {
 // routing
    {
-      registerRoute(/^http.*(?:googleapis|gstatic)\.com\/.*/, new StaleWhileRevalidate({ cacheName: 'google' }))
-      registerRoute(/\/(icons|other|scripts)\/.*$/, new CacheFirst({ cacheName: 'static' }))
+      // registerRoute(/^http.*(?:googleapis|gstatic)\.com\/.*/, new StaleWhileRevalidate({ cacheName: 'google' }))
       // картинки с категориями и пр
       registerRoute(/^http.*kalpa\.store\/static\/category_thumbs\/.+\.jpg$/,
          new CacheFirst({
-            cacheName: 'static',
+            cacheName: 'static_back',
             fetchOptions: {
                credentials: 'same-origin', // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
                mode: 'cors', // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
@@ -337,7 +336,9 @@ if (useCache) {
             cacheName: 'content_img',
             plugins: [
                new ExpirationPlugin({
-                  maxEntries: 1000
+                  maxEntries: 1000,
+                  // Automatically cleanup if quota is exceeded.
+                  purgeOnQuotaError: true,
                })
             ],
             fetchOptions: {
@@ -350,7 +351,8 @@ if (useCache) {
             }
          })
       )
-      registerRoute(/.+(\.jpg|\.ico|\.png)$/, new CacheFirst({ cacheName: 'origin images' }))
+      registerRoute(/\/(icons|other|scripts)\/.*$/, new CacheFirst({ cacheName: 'static_front' }))
+      registerRoute(/.+(\.jpg|\.ico|\.png)$/, new CacheFirst({ cacheName: 'static_front' })) // в конце
       // registerRoute(/^http.*(kalpa\.store|akamaized\.net).+\.mp4$/, async ({ url, event, params }) => {
       //    return fetch(event.request)
       // })

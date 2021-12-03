@@ -333,7 +333,7 @@ export default {
               rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
               objectTypeEnum: { $in: ['NODE'] },
               oidSphere: to,
-              name: this.state.node.name, // не берем ядра, у которых другая главная суть (например, эта суть в сферах)
+              name: this.state.node.name, // не  берем ядра, у которых другая главная суть (например, эта суть в сферах)
               sortStrategy: 'ESSENTIALLY' // 'ACTIVITY', // AGE
             },
             populateObjects: false
