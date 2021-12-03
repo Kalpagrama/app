@@ -306,6 +306,7 @@ export default {
         // this.state.essencesNodesRes = null
         if (to) {
           // this.state.essencesNodes = [this.state.node] -- не надо. иначе суть дергается при смене образа
+          assert(this.state.node)
           this.state.essencesNodesInProgress = true
           this.state.essencesNodesRes = await this.$rxdb.find({
             selector: {
@@ -332,6 +333,7 @@ export default {
               rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
               objectTypeEnum: { $in: ['NODE'] },
               oidSphere: to,
+              name: this.state.node.name, // не берем ядра, у которых другая главная суть (например, эта суть в сферах)
               sortStrategy: 'ESSENTIALLY' // 'ACTIVITY', // AGE
             },
             populateObjects: false

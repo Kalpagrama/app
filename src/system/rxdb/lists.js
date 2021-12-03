@@ -350,6 +350,7 @@ class Lists {
          assert(rxDoc.props.mangoQuery, '!mangoQuery')
          assert(object.type, '!event.object.type')
          if (rxDoc.props.mangoQuery.selector.objectTypeEnum && !checkMangoCond(rxDoc.props.mangoQuery.selector.objectTypeEnum, object.type)) return false
+         if (rxDoc.props.mangoQuery.selector.name && !checkMangoCond(rxDoc.props.mangoQuery.selector.name, object.name)) return false
          return true
       })
       if (type === 'OBJECT_DELETED') { // удаленный объект может быть на домашней странице
