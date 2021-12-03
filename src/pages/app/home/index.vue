@@ -8,7 +8,7 @@ kalpa-layout
         // подписки
         span.text-grey-5.text-h5.q-py-sm.q-pl-sm {{$t('Мои подписки')}}
         list-feed-custom-horizontalPPV(
-          ref="listFeed"
+          ref="listFeedHorizontal"
           :scrollAreaWidth="$store.state.ui.pageWidth"
           :scrollAreaHeight="150"
           :query="querySubscriptions"
@@ -68,6 +68,7 @@ export default {
   methods: {
     onBusEvent(ev) {
       this.$refs.listFeed.scrollToStart()
+      this.$refs.listFeedHorizontal.scrollToStart()
     }
   },
   computed: {
