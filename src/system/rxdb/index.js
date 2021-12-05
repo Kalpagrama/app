@@ -4,8 +4,8 @@ import { LstCollectionEnum, RxCollectionEnum, rxdbOperationProxyExec, WsCollecti
 import { Cache } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
-import { addPouchPlugin, getRxStoragePouch, addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
-import { getRxStorageLoki } from 'rxdb/plugins/lokijs';
+import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
+import { getRxStorageLoki } from 'rxdb/plugins/lokijs'
 import { Event } from 'src/system/rxdb/event'
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
 // import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
@@ -24,6 +24,9 @@ import { setSyncEventStorageValue } from 'src/system/services'
 import { ObjectApi } from 'src/api/object'
 import { store } from 'src/store'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB)
+
+// in the browser, we want to persist data in IndexedDB, so we use the indexeddb adapter.
+const LokiIncrementalIndexedDBAdapter = require('lokijs/src/incremental-indexeddb-adapter');
 
 const purgePeriod = 1000 * 60 * 60 * 24 // раз в сутки очищать бд от мертвых строк
 const defaultCacheSize = 10 * 1024 * 1024 // кэш реактивных объектов
@@ -53,7 +56,7 @@ function makeId (rxCollectionEnum, rawId, params = null) {
    return rxCollectionEnum + '::' + rawId + '::' + JSON.stringify(params)
 }
 
-// кээширование объектов перед rxDb (rxDb  очень медленная)
+// кээширование объектов перед rxDb (rxDb  очень медленная) (PS уже неактуально (используется LokiJS)) - можно перейти на rxdb
 class ReactiveDocDbMemCache {
    constructor () {
       this.cacheLru = new LruCache({
@@ -84,9 +87,6 @@ class ReactiveDocDbMemCache {
    }
 }
 
-let adapter = 'idb'
-// let adapter = 'indexeddb'  // глючит
-
 class RxDBWrapper {
    constructor () {
       this.created = false
@@ -95,8 +95,7 @@ class RxDBWrapper {
       this.removeMutex = new MutexLocal('rxdb-remove')
       this.store = null // vuex
       this.reactiveDocDbMemCache = new ReactiveDocDbMemCache()
-      addPouchPlugin(require('pouchdb-adapter-idb'))
-      // addRxPlugin(require('pouchdb-adapter-' + adapter)) // глючит // IndexedDB (new) https://github.com/pouchdb/pouchdb/tree/master/packages/node_modules/pouchdb-adapter-indexeddb#differences-between-couchdb-and-pouchdbs-find-implementations-under-indexeddb
+      // addPouchPlugin(require('pouchdb-adapter-idb'))
 
       addRxPlugin(RxDBQueryBuilderPlugin)
       addRxPlugin(RxDBAjvValidatePlugin)
@@ -239,9 +238,15 @@ class RxDBWrapper {
       try {
          await mutexGlobal.lock('rxdb::create')
          this.store = store
+         // this.rxStorage = getRxStoragePouch(adapter)
+         this.rxStorage = getRxStorageLoki({
+            adapter: new LokiIncrementalIndexedDBAdapter(),
+            // * Do not set lokiJS persistence options like autoload and autosave,
+            // * RxDB will pick proper defaults based on the given adapter
+         })
          this.db = await createRxDatabase({
             name: 'kalpadb',
-            storage: getRxStoragePouch(adapter),
+            storage: this.rxStorage,
             multiInstance: true, // <- multiInstance (optional, default: true)
             // eventReduce: false // если поставить true - будут теряться события об обновлении (по всей видимости - это баг)<- eventReduce (optional, default: true)
             // pouchSettings: { revs_limit: 1 }
@@ -263,7 +268,7 @@ class RxDBWrapper {
          // alert('!!!!!!')
          logE(f, 'ошибка при создания RxDatabase! очищаем и пересоздаем!', err)
          if (this.db) await this.db.remove() // предпочтительно, тк removeRxDatabase иногда глючит
-         else await removeRxDatabase('kalpadb', adapter)
+         else if (this.rxStorage) await removeRxDatabase('kalpadb', this.rxStorage)
          throw err
       } finally {
          await mutexGlobal.release('rxdb::create')
@@ -416,7 +421,7 @@ class RxDBWrapper {
       } catch (err) {
          logE(f, 'err on deInitGlobal! remove db!', err)
          if (this.db) await this.db.remove() // предпочтительно, тк removeRxDatabase иногда глючит
-         else await removeRxDatabase('kalpadb', adapter)
+         else if (this.rxStorage) await removeRxDatabase('kalpadb', this.rxStorage)
          throw err
       } finally {
          await mutexGlobal.release('rxdb::deinitGlobal')

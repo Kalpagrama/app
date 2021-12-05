@@ -85,7 +85,6 @@ export default {
   },
   computed: {
     pages() {
-      this.$logE(this?.pageFilter?.whiteList)
       return [
         { id: 'all', name: this.$t('All') },
         { id: 'nodes', name: this.$t('Nodes') },

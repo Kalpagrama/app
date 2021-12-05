@@ -231,6 +231,7 @@ class Cache {
    }
 
    // если вставлять через atomicUpsert, то на большом числе документов случаются тормоза (один апсерт длится до 5 секунд и они сериализуются)
+   // (PS уже неактуально (используется LokiJS)) - можно перейти на обычный апсерт
    async upsertRxDocDebounce (plainDoc) {
       if (!this.debouncedBatchUpdate) {
          this.debouncedBatchUpdate = debounce(async () => {
