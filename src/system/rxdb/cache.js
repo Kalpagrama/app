@@ -9,7 +9,7 @@ import { getRxCollectionEnumFromId, rxdb } from 'src/system/rxdb'
 import { rxdbOperationProxyExec } from 'src/system/rxdb/common'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_CACHE)
 
-const debounceIntervalDumpLru = 1000 * 30 // сохраняем весь LRU в idb с дебаунсом 30 сек
+const debounceIntervalDumpLru = 1000 * 10 // сохраняем весь LRU в idb с дебаунсом 10 сек
 const defaultActualAge = 1000 * 60 * 60 // время жизни объекта в кэше (по умолчанию час)
 const defaultCacheSize = 50 * 1024 * 1024 // кэш в rxdb
 if (defaultCacheSize < 50 * 1024 * 1024) logW('TODO увеличить кэш до 50 МБ после тестирования')
@@ -132,7 +132,7 @@ class Cache {
          if (!this.cacheLru.get(rxDoc.id)) {
             this.cacheLru.set(rxDoc.id, {
                actualUntil: Date.now() + debounceIntervalDumpLru,
-               actualAge: 1000 * 60
+               actualAge: defaultActualAge
             })
          }
       }
@@ -363,6 +363,7 @@ class Cache {
             }
          }
          if (force || !this.isActual(id, cachedInfo)) { // данные отсутствуют в кэше, либо устарели
+            logD(f, 'rxdb cache miss! goto backend...', force, this.isActual(id, cachedInfo), cachedInfo, Date.now())
             await fetch()
          }
          let rxDoc = this.fastCache.get(id) || await rxdbOperationProxyExec(this.db.cache, 'findOne', id) // выполняем строго после fetchFunc!!! (findOne может выполняться очень долго(ломается логика QueryAccumulator))

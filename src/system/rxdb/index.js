@@ -569,6 +569,7 @@ class RxDBWrapper {
          let cachedReactiveList = this.reactiveDocDbMemCache.get(listId)
          if (cachedReactiveList) findResult = cachedReactiveList
          if (!findResult) {
+            logD(f, 'reactive cache miss! goto rxdb...', mangoQuery)
             let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
             assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
             let defaultPageSize = mangoQuery.selector.rxCollectionEnum === RxCollectionEnum.LST_FEED ? 25 : 1000 * 1000
