@@ -140,6 +140,7 @@ class RxDBWrapper {
    }
 
    // rxdb не удаляет элементы, а помечает удаленными! purgeDb - очистит помеченные удаленными
+   // TODO Возможно это не надо! (lokiJs)
    async purgeDb () {
       const f = this.purgeDb
       logD(f, 'start')
@@ -161,73 +162,6 @@ class RxDBWrapper {
          localStorage.setItem('k_rxdb_last_purge_date', mutexGlobal.getInstanceId())
       }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-   }
-
-   async createTestDb () {
-      const dbTest = this.db
-      await dbTest.addCollections({ cache_test: { schema: cacheSchema } })
-      await dbTest.cache_test.remove();
-      await dbTest.addCollections({ cache_test: { schema: cacheSchema } })
-
-      // let collection = dbTest.cache_test
-      let collection = dbTest.cache
-
-      let allObjects = await ObjectApi.objectListAllTest()
-      logD('allObjects', allObjects.length)
-      let f = this.createTestDb
-      let tmpObj
-      const findCycle = async () => {
-         for (let obj of allObjects) {
-            let t = performance.now()
-            let id = RxCollectionEnum.OBJ + '::' + obj.oid + '::' + JSON.stringify({})
-            let finded1 = await collection.find({ selector: { 'cached.data.name': obj.name } }).exec()
-            let finded2 = await collection.findOne(id).exec()
-            logD(f, `find complete: ${Math.floor(performance.now() - t)} msec`, finded1.length, finded2 ? 1 : 0)
-            // await wait(5)
-         }
-      }
-      const insert = async (prefix, from, to) => {
-         tmpObj = allObjects[from]
-
-         let inserted = []
-         for (let dbItem of allObjects.slice(from, to)) {
-            let id = RxCollectionEnum.OBJ + '::' + prefix + dbItem.oid + '::' + JSON.stringify({})
-            let plainDoc = {
-               id,
-               props: {
-                  notEvict: false,
-                  oid: 'kjnlkjhqwoiufhsakljdfhalskdjfhsalkdfjhaslkdfjhaslkdfjhaslkdfhjaskldjfhalksjhflaksdfhiowuqrhfklsajdfh',
-                  rxCollectionEnum: RxCollectionEnum.OBJ,
-                  mangoQuery: { selector: { oid: 'asdalkhfalskjdfhalskdjfhaklsjghsklfjghkldsjghkdsfjghklasjhflkjhsadfkljhsadfksajdhflksadjfhasdfklsjdhf' } }
-               },
-               cached: { data: dbItem }
-            }
-            inserted.push(plainDoc)
-         }
-         let oids = inserted.map(item => item.id)
-         let updatedRxDocs = await collection.find({ selector: { id: { $in: oids } } }).exec()
-         for (let updated of updatedRxDocs) {
-            let itemForUpdate = inserted.find(item => item.id === updated.id)
-            assert(itemForUpdate, '!inserted')
-            await collection.atomicUpsert(itemForUpdate)
-            inserted = inserted.filter(it => it.id !== updated.id)
-         }
-         let { success, error } = collection.bulkInsert(inserted) // оставшиеся вставляем
-      }
-      // findCycle()
-      for (let prefix = 0; prefix < 1; prefix++) {
-         let curr = 0
-         while (curr <= allObjects.length) {
-            let t = performance.now()
-            let next = Math.max(0, curr) + 100
-            await insert(prefix, curr, curr + 100)
-            curr = next
-            // await wait(100)
-            logD(f, `${prefix}:${curr} cycle complete: ${Math.floor(performance.now() - t)} msec`)
-         }
-      }
-
-      logD(f, 'complete')
    }
 
    async create (store) {
