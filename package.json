@@ -1,6 +1,6 @@
 {
   "name": "kalpagrama",
-  "version": "4.0.48",
+  "version": "4.0.49",
   "description": "Kalpagrama application",
   "productName": "Kalpagrama",
   "cordovaId": "app.kalpa",
@@ -63,6 +63,7 @@
     "epubjs": "^0.3.90",
     "graphql-tag": "^2.10.1",
     "gsap": "^3.7.1",
+    "idb-keyval": "^6.0.3",
     "lodash": "^4.17.21",
     "lru-cache": "^6.0.0",
     "mediaelement": "^4.2.14",
