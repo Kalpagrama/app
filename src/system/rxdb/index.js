@@ -5,6 +5,7 @@ import { Cache } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { addPouchPlugin, getRxStoragePouch, addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
+import { getRxStorageLoki } from 'rxdb/plugins/lokijs';
 import { Event } from 'src/system/rxdb/event'
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
 // import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
