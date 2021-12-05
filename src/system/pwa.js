@@ -3,9 +3,9 @@ import { AuthApi } from 'src/api/auth'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { Notify, Platform } from 'quasar'
 import { t } from 'src/boot/i18n'
-import { clear, get, Store } from 'public/scripts/idb-keyval/idb-keyval.mjs'
+import { clear, get, createStore } from 'idb-keyval'
 import { router } from 'src/boot/system'
-import { makeRoutePath, wait } from 'public/scripts/common_func'
+import { makeRoutePath, wait } from 'src/system/common/common_func'
 import { shareIn } from 'src/system/services'
 import { assert } from 'src/system/common/utils'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.PWA)
@@ -145,7 +145,7 @@ async function initPWA (store) {
          //   reader.onerror = error => reject(error)
          // })
          logD('mounted')
-         const swShareStore = new Store('sw-share', 'request-formData')
+         const swShareStore = createStore('sw-share', 'request-formData')
          let shareData = await get('shareData', swShareStore)
          if (shareData) {
             // alert('share to Kalpagrama! shareData (see store.core.state.shareData)=\n' + JSON.stringify(shareData))
@@ -200,8 +200,8 @@ async function pwaReset () {
       // })
    }
    logD(f, 'try clear sw Idb')
-   const swShareStore = new Store('sw-share', 'request-formData')
-   const videoStore = new Store('sw-cache-video', 'video-responses')
+   const swShareStore = createStore('sw-share', 'request-formData')
+   const videoStore = createStore('sw-cache-video', 'video-responses')
    await clear(swShareStore)
    await clear(videoStore)
    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)

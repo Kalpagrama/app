@@ -14,8 +14,9 @@ import { getCacheKeyForURL, matchPrecache, precacheAndRoute } from 'workbox-prec
 import { CacheFirst } from 'workbox-strategies/CacheFirst'
 import { StaleWhileRevalidate } from 'workbox-strategies/StaleWhileRevalidate'
 import { ExpirationPlugin } from 'workbox-expiration/ExpirationPlugin'
+import { clear, get, set, createStore } from 'idb-keyval'
 
-import { makeRoutePath, vueRoutesRegexp, wait } from 'src/../public/scripts/common_func'
+import { makeRoutePath, vueRoutesRegexp } from 'src/system/common/common_func'
 
 let logD, logW, logE, logC, logDbgFilter, logLevel, logLevelSentry, videoStore, swShareStore,
    cacheGraphQl,
@@ -65,15 +66,12 @@ async function sendMsg (type, msgData) {
       // precacheAndRoute позволяет в фоне предварительно закэшировать весь сайт при первой установке
       precacheAndRoute(self.__WB_MANIFEST)
    }
-   /* global idbKeyval, MD5 */
-   importScripts('/scripts/idb-keyval/idb-keyval-iife.min.js')
-   importScripts('/scripts/md5.js')
    importScripts('https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js')
    importScripts('https://www.gstatic.com/firebasejs/8.0.1/firebase-messaging.js')
    logD('swVer=', swVer)
    logD('init idb')
-   swShareStore = new idbKeyval.Store('sw-share', 'request-formData')
-   videoStore = new idbKeyval.Store('sw-cache-video', 'video-responses')
+   swShareStore = createStore('sw-share', 'request-formData')
+   videoStore = createStore('sw-cache-video', 'video-responses')
    logD('init idb ok')
 
    function initWebPush () {
@@ -160,7 +158,7 @@ async function sendMsg (type, msgData) {
                   let images = formData.getAll('image')
                   let videos = formData.getAll('video')
                   logD(' formData fields  = ', { title, text, url, images, videos })
-                  await idbKeyval.set('shareData', { title, text, url, contentUrl, images, videos }, swShareStore)
+                  await set('shareData', { title, text, url, contentUrl, images, videos }, swShareStore)
                } catch (err) {
                   logC('share_target err', err)
                }

@@ -2,7 +2,7 @@ import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log
 import { AuthApi } from 'src/api/auth'
 import { systemInit } from 'src/system/services'
 import { assert } from 'src/system/common/utils'
-import { vueRoutesRegexp } from 'public/scripts/common_func'
+import { vueRoutesRegexp } from 'src/system/common/common_func'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.ROUTER)
 

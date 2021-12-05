@@ -169,7 +169,7 @@ div(
 import { openURL } from 'quasar'
 import { ContentApi } from 'src/api/content'
 import {assert} from 'src/system/common/utils'
-import {makeRoutePath} from 'public/scripts/common_func.js';
+import {makeRoutePath} from 'src/system/common/common_func'
 import {RxCollectionEnum} from '../../../../system/rxdb';
 import { UserApi } from 'src/api/user'
 

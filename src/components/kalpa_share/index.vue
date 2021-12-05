@@ -67,7 +67,7 @@ q-btn(
 // этот элемент показывается в virtual scroll и не может иметь состояния!!! data - запрещено! И во вложенных - тоже!!!
 <script>
 import { Platform, openURL } from 'quasar'
-import { makeRoutePath } from 'public/scripts/common_func'
+import { makeRoutePath } from 'src/system/common/common_func'
 import { assert } from 'src/system/common/utils'
 import { reactive } from 'vue'
 

@@ -30,7 +30,7 @@ axios.post(`${process.env.SERVICES_URL_DEBUG}`, {
          }
       });
 
-      fs.writeFile('public/scripts/possibleTypes.json', JSON.stringify(possibleTypes), err => {
+      fs.writeFile('src/api/possibleTypes.json', JSON.stringify(possibleTypes), err => {
          if (err) {
             console.error('Error writing possibleTypes.json', err);
          } else {

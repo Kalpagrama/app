@@ -8,7 +8,7 @@ import { Browser } from '@capacitor/browser'
 import { App } from '@capacitor/app'
 import { Share } from '@capacitor/share'
 import { AuthApi } from 'src/api/auth'
-import { makeRoutePath } from 'public/scripts/common_func'
+import { makeRoutePath } from 'src/system/common/common_func'
 import { shareIn } from 'src/system/services'
 
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.CP)

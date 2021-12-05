@@ -5,7 +5,7 @@ import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log
 import { assert } from 'src/system/common/utils'
 import { rxdb, RxCollectionEnum } from 'src/system/rxdb'
 import { watch } from 'vue'
-import { wait } from 'public/scripts/common_func'
+import { wait } from 'src/system/common/common_func'
 import { ObjectApi } from 'src/api/object'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.TESTS)
 

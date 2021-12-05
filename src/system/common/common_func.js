@@ -1,10 +1,10 @@
 import 'src/system/common/utils' // string.in func
 function assert(cond, strError){
-   if(!cond) throw new Error('dummy assert: ' + strError)
+   if (!cond) throw new Error('dummy assert: ' + strError)
 }
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
-const vueRoutesRegexp = /.+\/(\:catchAll\(\.\*\)\*|auth|help|share|ui|about|links|\*|home|welcome|settings|user|user-render|node|block|block-render|graph|node-render|cube|joint|joint-render|sphere|sphere-threads|sphere-render|trends|category|content|cover|content-render|content_book|notifications|messages|workspace.*)(\/|\?|$).*/
+const vueRoutesRegexp = /.+\/(:catchAll\(\.\*\)\*|auth|help|share|ui|about|links|\*|home|welcome|settings|user|user-render|node|block|block-render|graph|node-render|cube|joint|joint-render|sphere|sphere-threads|sphere-render|trends|category|content|cover|content-render|content_book|notifications|messages|workspace.*)(\/|\?|$).*/
 
 function makeRoutePath(object, full = false){
    let res = '/'

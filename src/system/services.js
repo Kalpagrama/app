@@ -10,7 +10,7 @@ import { AuthApi } from 'src/api/auth'
 import { router } from 'src/boot/system'
 import { store } from 'src/store/index'
 import { ContentApi } from 'src/api/content'
-import { makeRoutePath } from 'public/scripts/common_func'
+import { makeRoutePath } from 'src/system/common/common_func'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.SYSTEM)
 let { logD: logMD, logT: logMT, logI: logMI, logW: logMW, logE: logME, logC: logMC } = getLogFunctions(LogSystemModulesEnum.MUTEX)
 let initialized = false

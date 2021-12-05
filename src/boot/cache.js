@@ -6,8 +6,8 @@ import {
   get as idbGet,
   keys as idbKeys,
   set as idbSet,
-  Store
-} from 'public/scripts/idb-keyval/idb-keyval.mjs'
+  createStore
+} from 'idb-keyval'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.VUEX_CACHE)
 
@@ -16,7 +16,7 @@ alert('DEPRECATED!!!!!')
 // долговременное(между запусками) хранилище объектов
 class CachePersist {
   constructor (props) {
-    this.persistStore = new Store('vuexPersistStore', 'cache')
+    this.persistStore = createStore('vuexPersistStore', 'cache')
   }
 
   async clear () {

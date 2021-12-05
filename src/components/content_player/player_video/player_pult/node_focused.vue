@@ -74,7 +74,7 @@ div(
 </template>
 
 <script>
-import { makeRoutePath } from 'public/scripts/common_func'
+import { makeRoutePath } from 'src/system/common/common_func'
 
 export default {
   name: 'nodeFocused',
