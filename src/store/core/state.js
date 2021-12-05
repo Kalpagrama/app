@@ -15,8 +15,8 @@ export default {
    logRocketSessionUrl: null,
    logDbgFilter: 'any', // gui | system | any
    logDbgModulesFilter: {
-      [LogSystemModulesEnum.SYSTEM]: LogLevelEnum.TRACE,
       [LogSystemModulesEnum.TESTS]: LogLevelEnum.DEBUG,
+      [LogSystemModulesEnum.SYSTEM]: LogLevelEnum.TRACE,
       [LogSystemModulesEnum.SW]: LogLevelEnum.TRACE,
       [LogSystemModulesEnum.PWA]: LogLevelEnum.TRACE,
       [LogSystemModulesEnum.AUTH]: LogLevelEnum.TRACE,
