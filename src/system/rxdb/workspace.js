@@ -219,12 +219,12 @@ class Workspace {
    // работает в фоне и запускается по мере необходимости см ( switchOnSynchro )
    async synchronize () {
       const f = this.synchronize
-      // logD(f, 'start')
+      logD(f, 'start')
       const t1 = performance.now()
       // запросит при необходимости данные и сольет с локальными изменениями
       const synchronizeWsWhole = async (forceMerge = false) => {
          const f = synchronizeWsWhole
-         // logD(f, 'start')
+         logD(f, 'start')
          const t1 = performance.now()
          assert(this.reactiveUser && this.reactiveUser.wsRevision >= 0, '!wsRevision')
          let wsFetchDate = await rxdb.get(RxCollectionEnum.META, 'wsFetchDate')
@@ -234,34 +234,30 @@ class Workspace {
          //  reactiveUser.wsVersion - версия мастерской (меняется сервером после пересоздания мастерской)
          if (forceMerge || wsRevisionLocal !== this.reactiveUser.wsRevision || !wsFetchDate || wsVersionLocal !== this.reactiveUser.wsVersion) {
             let wsServer = await WorkspaceApi.getWs()
-            logD(f, 'try merge local ws with server...', wsServer)
-            // console.time('tm merge ws')
             let itemsServer = []
             for (let wsItemTypeEnum in WsItemTypeEnum) {
                if (wsServer[wsItemTypeEnum]) itemsServer.push(...wsServer[wsItemTypeEnum])
             }
             for (let itemServer of itemsServer) itemServer.hasChanges = false
             let itemsLocal = await rxdbOperationProxyExec(this.db.ws_items, 'find')
+            let localMap = Object.fromEntries(itemsLocal.map(item => [item.id, item]))
+            let serverMap = Object.fromEntries(itemsServer.map(item => [item.id, item]))
             let newItems = []
             let outdatedItems = []
             let extraItems = []
             if (wsVersionLocal === wsServer.ver) {
+               logT(f, 'try merge local ws with server...')
                let unsavedIds = new Set((await rxdbOperationProxyExec(this.db.ws_changes, 'find')).map(item => item.id))
-
                // есть на сервере, но нет у нас (эти надо вставить!)
-               newItems = differenceWith(itemsServer, itemsLocal, (serverItem, localItem) => {
-                  return serverItem.id === localItem.id
-               })
+               newItems = itemsServer.filter(item => !localMap[item.id])
                // есть и на сервере и у нас, но у нас - устаревшая копия
-               outdatedItems = intersectionWith(itemsServer, itemsLocal, (serverItem, localItem) => {
-                  return serverItem.id === localItem.id && (serverItem.rev !== localItem.rev || serverItem.updatedAt > localItem.updatedAt)
-               })
+               outdatedItems = itemsServer.filter(item => localMap[item.id] && (item.rev !== localMap[item.id].rev || item.updatedAt > localMap[item.id].updatedAt))
                // есть у нас, но нет на сервере. (надо удалить у нас)
-               extraItems = differenceWith(itemsLocal, itemsServer, (localItem, serverItem) => {
-                  return serverItem.id === localItem.id
-               }).filter(item => !unsavedIds.has(item.id)) // только те, что НЕ были изменены c момента последнего сохранения
-               // logD(f, 'merge ws.(newItems, outdatedItems, extraItems):', newItems, outdatedItems, extraItems)
+               extraItems = itemsLocal.filter(item => !serverMap[item.id])
+                  .filter(item => !unsavedIds.has(item.id)) // только те, что НЕ были изменены c момента последнего сохранения
+               if (newItems.length || outdatedItems.length || extraItems.length) logT(f, 'merge ws.(newItems, outdatedItems, extraItems):', newItems.length, outdatedItems.length, extraItems.length)
             } else { // на сервере совсем другая мастерская. Берем только ее (свои изменения убиваем)
+               logT(f, 'remove local ws. pick server ws!')
                extraItems = itemsLocal // удаялем все локальные! на сервере - другая мастерская
                newItems = itemsServer
             }
@@ -276,7 +272,7 @@ class Workspace {
             await rxdb.set(RxCollectionEnum.META, { id: 'wsVersion', valueString: wsServer.ver.toString() })
             this.reactiveUser.wsRevision = wsServer.rev // ревизия по мнению сервера
             this.reactiveUser.wsVersion = wsServer.ver // версия мастерской по мнению сервера
-            logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, newItems, outdatedItems, extraItems)
+            logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
          }
          await rxdb.set(RxCollectionEnum.META, { id: 'wsSynchroDate', valueString: (new Date()).toISOString() })
       }

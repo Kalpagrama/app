@@ -144,6 +144,10 @@ module.exports = configure(function (ctx) {
                   new webpack.IgnorePlugin({ resourceRegExp: /@capacitor\/core/ })
                )
             }
+            cfg.resolve.fallback = {
+               ...cfg.resolve.fallback,
+               fs: false
+            }
             cfg.resolve.alias = {
                ...cfg.resolve.alias,
                schema: path.resolve(__dirname, './src/api'),
