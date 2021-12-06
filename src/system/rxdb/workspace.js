@@ -428,7 +428,7 @@ class Workspace {
       delete mangoQuery.selector.rxCollectionEnum
       if (!mangoQuery.selector.deletedAt) mangoQuery.selector.deletedAt = { $eq: 0 } // не выводить удаленные
 
-      mangoQuery.selector._deleted = { $exists: false } // не выводить реально удаленные ( да! rxdb по умолчанию выводит! )
+      // не актуально для lokiJS! mangoQuery.selector._deleted = { $exists: false } // не выводить реально удаленные ( да! rxdb по умолчанию выводит! )
       if (rxCollectionEnum !== WsCollectionEnum.WS_ANY) mangoQuery.selector.wsItemType = rxCollectionEnum
       let rxQuery = rxdbOperationProxy(this.db.ws_items, 'find', mangoQuery)
       return rxQuery

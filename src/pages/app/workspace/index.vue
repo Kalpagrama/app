@@ -9,18 +9,18 @@ export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: 'pageWorkspace',
   data () {
-    return {
-    }
+    return {}
   },
   created () {
     this.$log('created')
   },
   mounted () {
     this.$log('mounted')
-    this.$eventBus.$emit('notice-check', {notice: 'tutorial_workspace', force: false})
+    this.$eventBus.$emit('notice-check', { notice: 'tutorial_workspace', force: false })
   },
-  beforeUnmount () {
-    this.$log('beforeDestroy')
+    beforeUnmount()
+    {
+      this.$log('beforeDestroy')
+    }
   }
-}
 </script>
