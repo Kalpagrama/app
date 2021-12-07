@@ -115,7 +115,7 @@
             :label="$t('Смотреть')"
             @click="$router.push('/content/' + item.oid)"
           ).full-width
-      div(@click="pageId='description'").row.full-width.items-center.content-center.wrap.q-pt-xs.q-pl-sm
+      div(@click="pageId='description'").row.full-width.items-center.content-center.wrap.q-pt-xs.q-pl-sm.cursor-pointer
         //q-icon(name="select_all" color="white" size="36px").q-mr-sm
         .row.col
           span(:style=`{lineHeight: 1.2, fontSize: '15px'}`).text-white.text-bold.full-width {{ item.name }}
