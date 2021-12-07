@@ -9,10 +9,9 @@ export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath
       const f = { nameExtra: 'boot::rxdb' }
       logT(f, 'start')
       const t1 = performance.now()
-      if (!localStorage.getItem('TMP_NEW_VERSION_LOKI')) {
-         await systemHardReset(false)
-         localStorage.setItem('TMP_NEW_VERSION_LOKI', 'INSTALLED')
-         window.location.reload()
+      if (localStorage.getItem('k_rxdb_create_date')) {
+         alert('версия БД несовместима.')
+         await systemHardReset()
          return
       }
       await rxdb.create(store)
