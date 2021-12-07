@@ -61,7 +61,7 @@
             :style=`{
               borderRadius: '30px',
             }`)
-            span {{ following ? $t('Unfollow') : $t('Follow') }}
+            span {{ following ? $t('Вы подписаны') : $t('Follow') }}
       //- about user
       .row.full-width.q-px-sm
         div(
