@@ -11,6 +11,7 @@ div(
     minHeight: '50px',
     background: 'rgb(35,35,35)',
     borderRadius: '10px',
+    maxWidth: Math.min($store.state.ui.pageWidth, $q.screen.width)+'px'
   }`
   ).row.full-width.items-start.content-start.bookmark-item
   //- left
@@ -49,7 +50,7 @@ div(
       .col
         div(:style=`{minHeight: '50px',}`).row.full-width.items-start.content-start.q-pt-sm.q-px-sm
           //- item name
-          div(:style=`{minHeight:'32px',}`).row.full-width
+          div(:style=`{minHeight:'32px', overflow: 'hidden'}`).row.full-width
             span(:style=`{lineHeight: 1.1,}`).text-white {{ item.name }}
           .row.full-width.q-py-xs
             small.text-grey-8 {{ type }}

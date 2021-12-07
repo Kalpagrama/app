@@ -44,51 +44,51 @@ q-menu(
           }`
           ).text-grey-5 {{ p.name }}
     //- Create new
-    div(
-      v-if="!$store.getters.isGuest && $q.screen.height > 570"
-      @click="addItemMenuShow = true"
-      v-close-popup
-      :style=`{
-        paddingLeft: '14px',
-        paddingRight: '14px',
-      }`
-    ).row.full-width.items-start.content-start.q-pb-sm
-      q-dialog(
-        v-model="addItemMenuShow"
-        position="standard"
-        :maximized="false"
-        )
-        div(:style=`{background: 'rgb(35,35,35)',borderRadius: '10px'}`).row.full-width.q-pa-md.justify-center
-          q-btn(
-            outline color="grey-8"
-            size="xl"
-            align="center"
-            :to="''"
-            :label="$t('Essence core')"
-            icon='adjust'
-            round flat no-caps
-            ).row.full-width.create-item.q-pa-sm
-          q-btn(
-            outline color="grey-8"
-            align="center"
-            size="xl"
-            :to="'/workspace/edit?mode=block'"
-            :label="$t('Essence block')"
-            icon='dashboard_customize'
-            round flat no-caps
-            ).row.full-width.create-item.q-pa-sm
-      div(:style=`{
-          height: '50px',
-          background: 'rgb(33,33,33)',
-          borderRadius: '10px',
-        }`
-      ).row.full-width.items-center.content-center.q-pa-sm.cursor-pointer
-        q-icon(name='add_circle_outline' size="24px" color="grey-5" :style=`{marginRight: '18px'}`).q-ml-xs
-        span(
-          :style=`{
-            textDecotation: 'none',
-          }`
-        ).text-grey-5 {{$t('Create')}}
+    //div(
+    //  v-if="!$store.getters.isGuest && $q.screen.height > 570"
+    //  @click="addItemMenuShow = true"
+    //  v-close-popup
+    //  :style=`{
+    //    paddingLeft: '14px',
+    //    paddingRight: '14px',
+    //  }`
+    //).row.full-width.items-start.content-start.q-pb-sm
+    //  q-dialog(
+    //    v-model="addItemMenuShow"
+    //    position="standard"
+    //    :maximized="false"
+    //    )
+    //    div(:style=`{background: 'rgb(35,35,35)',borderRadius: '10px'}`).row.full-width.q-pa-md.justify-center
+    //      q-btn(
+    //        outline color="grey-8"
+    //        size="xl"
+    //        align="center"
+    //        :to="''"
+    //        :label="$t('Essence core')"
+    //        icon='adjust'
+    //        round flat no-caps
+    //        ).row.full-width.create-item.q-pa-sm
+    //      q-btn(
+    //        outline color="grey-8"
+    //        align="center"
+    //        size="xl"
+    //        :to="'/workspace/edit?mode=block'"
+    //        :label="$t('Essence block')"
+    //        icon='dashboard_customize'
+    //        round flat no-caps
+    //        ).row.full-width.create-item.q-pa-sm
+    //  div(:style=`{
+    //      height: '50px',
+    //      background: 'rgb(33,33,33)',
+    //      borderRadius: '10px',
+    //    }`
+    //  ).row.full-width.items-center.content-center.q-pa-sm.cursor-pointer
+    //    q-icon(name='add_circle_outline' size="24px" color="grey-5" :style=`{marginRight: '18px'}`).q-ml-xs
+    //    span(
+    //      :style=`{
+    //        textDecotation: 'none',
+    //      }`
+    //    ).text-grey-5 {{$t('Create')}}
     div(
       :style=`{
         paddingLeft: '14px',

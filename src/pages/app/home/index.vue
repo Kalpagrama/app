@@ -4,7 +4,23 @@ kalpa-layout
     kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
   template(v-slot:body)
     .row.full-width.items-start.content-start.justify-center
-      div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+      div(v-if="$store.getters.isGuest" :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+        .row.full-width.justify-center.b-30.q-mb-sm
+          .row.full-width
+            div(
+              :style=`{
+                height: '60px',
+                borderRadius: '10px',
+              }`
+            ).row.full-width.items-center.content-center.q-pa-sm.b-40.justify-between
+              q-btn(round flat color="white" icon="home")
+              span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Home')}}
+              //- tutorial
+              q-btn(
+                round flat color="white" icon="more_vert")
+        //- guest
+        view-guest
+      div(v-if="!$store.getters.isGuest" :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         // подписки
         span.text-grey-5.text-h5.q-py-sm.q-pl-sm {{$t('Мои подписки')}}
         list-feed-custom-horizontalPPV(
@@ -54,12 +70,14 @@ kalpa-layout
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import listFeedCustomHorizontalPPV from 'src/components/list_feed/list_feed_horizontal_custom_ppv.vue'
+import viewGuest from 'src/pages/app/home/view_guest.vue';
 
 export default {
   name: 'feeds_feed',
   props: ['feed'],
   components: {
-    listFeedCustomHorizontalPPV
+    listFeedCustomHorizontalPPV,
+    viewGuest
   },
   data () {
     return {

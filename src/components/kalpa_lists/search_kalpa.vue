@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start
+div(:style=`{maxWidth: $store.state.ui.pageWidth+'px', overflow: 'hidden'}`).row.full-width.items-start.content-start
   tab-list-feed(
     v-if="pageId"
     :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
@@ -21,6 +21,8 @@ div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-st
         :style=`{
                   background: 'rgb(35,35,35)',
                   borderRadius: '10px',
+                  maxWidth: Math.min($store.state.ui.pageWidth, $q.screen.width)+'px',
+                  overflow: 'hidden'
                 }`
       ).row.full-width.items-start.content-start.q-mb-sm
         img(
@@ -41,7 +43,7 @@ div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-st
           q-icon(name="blur_on" size="60px" color="white")
         .col.full-height
           .row.fit.items-between.content-between.q-pa-sm
-            .row.full-width
+            div(:style=`{overflow: 'hidden'}`).row.full-width
               span.text-white.q-pt-sm {{ item.name }}
             .row.full-width
               small.text-grey-8 {{ itemType(item) }}
