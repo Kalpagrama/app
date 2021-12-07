@@ -7,6 +7,7 @@ import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import debounce from 'lodash/debounce'
 import { getRxCollectionEnumFromId, rxdb } from 'src/system/rxdb'
 import { rxdbOperationProxyExec } from 'src/system/rxdb/common'
+
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_CACHE)
 
 const debounceIntervalDumpLru = 1000 * 10 // сохраняем весь LRU в idb с дебаунсом 10 сек
@@ -18,29 +19,36 @@ const DEBUG_IGNORE_CACHE = false // если === true - брать из сети
 
 // класс для кэширования gql запросов
 class Cache {
-   constructor (db) {
-      assert(db, '!rxdb')
-      this.db = db
+   constructor () {
+      this.mutex = new MutexLocal('rxdb::cache')
    }
 
-   async updateCollections (operation) {
-      assert(operation.in('create', 'delete', 'recreate'))
-      const f = this.updateCollections
-      logD(f, 'start')
-      const t1 = performance.now()
-      if (operation.in('delete', 'recreate')) {
-         if (this.db.cache) await rxdbOperationProxyExec(this.db.cache, 'remove')
+   async destroy () {
+      if (this.created && this.db) { // пересоздание
          try {
-            this.lruResetInProgress = true
-            if (this.cacheLru) this.cacheLru.reset()
+            await this.lock('destroy')
+            if (this.db.cache) await rxdbOperationProxyExec(this.db.cache, 'destroy')
+            this.db = null
+            this.fastCache = null
+            if (this.cacheLru) this.cacheLru.reset() // после this.db.cache = null
+            this.cacheLru = null
+            this.created = false
          } finally {
-            this.lruResetInProgress = true
+            this.release()
          }
       }
-      if (operation.in('create', 'delete', 'recreate')) {
-         if (this.db.cache) await rxdbOperationProxyExec(this.db.cache, 'destroy')
-      }
-      if (operation.in('create', 'recreate')) {
+   }
+
+   async create (db) {
+      const f = this.create
+      logD(f, 'start')
+      const t1 = performance.now()
+      assert(db, '!rxdb')
+      try {
+         await this.lock('recreate')
+         this.db = db
+         assert(!this.created, 'this.created')
+
          await this.db.addCollections({ cache: { schema: cacheSchema } })
          assert(this.db.cache, '!this.db.cache')
          this.db.cache.postInsert(async (plainData) => {
@@ -53,91 +61,95 @@ class Cache {
             await this.debouncedDumpLru()
             rxdb.onRxDocDelete(plainData.id)
          }, false)
-      }
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-   }
 
-   async create () {
-      const f = this.create
-      logD(f, 'start')
-      const t1 = performance.now()
-      assert(!this.created, 'this.created')
-      this.mutex = new MutexLocal('rxdb::cache')
-      // кэш только что вставленных элементов (нужен тк после вставки тут же будут запрошены эти элементы и это обычно долго)
-      this.fastCache = {}
-      this.fastCache.insert = (rxDoc) => {
-         if (!this.fastCache[rxDoc.id]) {
-            this.fastCache[rxDoc.id] = rxDoc
-            this.fastCache.list = this.fastCache.list || []
-            let deleted = this.fastCache.list.splice(88, this.fastCache.list.length) // удалим старые
-            for (let deletedId of deleted) delete this.fastCache[deletedId]
-         }
-      }
-      this.fastCache.get = (id) => this.cacheLru.get(id) ? this.fastCache[id] : null
-
-      // используется для контроля места (при переполнении - объект удалится из rxdb)
-      this.cacheLru = new LruCache({
-         max: defaultCacheSize,
-         length: function (n, id) {
-            return JSON.stringify(n).length + id.length
-         },
-         maxAge: 0, // не удаляем объекты по возрасту (для того чтобы при неудачной попытке взять с сервера - вернуть из кэша)
-         noDisposeOnSet: true,
-         dispose: async (id, { actualUntil, actualAge }) => {
-            const f = this.dispose
-            if (this.lruResetInProgress) return
-            assert(actualUntil && actualAge >= 0, `actualUntil && actualAge >= 0 ${actualUntil} ${actualAge}`)
-            let rxDoc = this.fastCache.get(id) || await rxdbOperationProxyExec(this.db.cache, 'findOne', id)
-            if (rxDoc) {
-               if (rxDoc.props.notEvict) { // кладем обратно в LRU! (некоторые данные должны жить вечно!)
-                  setTimeout(() => {
-                     this.cacheLru.set(id, { actualUntil, actualAge })
-                  }, 0)
-               } else { // удалим из rxdb (освобождаем от старых данных)
-                  logD(f, 'элемент вытеснен из кэша', id)
-                  await rxDoc.remove()
-               }
+         // кэш только что вставленных элементов (нужен тк после вставки тут же будут запрошены эти элементы и это обычно долго)
+         this.fastCache = {}
+         this.fastCache.insert = (rxDoc) => {
+            if (!this.fastCache[rxDoc.id]) {
+               this.fastCache[rxDoc.id] = rxDoc
+               this.fastCache.list = this.fastCache.list || []
+               let deleted = this.fastCache.list.splice(88, this.fastCache.list.length) // удалим старые
+               for (let deletedId of deleted) delete this.fastCache[deletedId]
             }
          }
-      })
+         this.fastCache.get = (id) => this.cacheLru.get(id) ? this.fastCache[id] : null
 
-      // заполняем cacheLru из idb
-      // let lruDump = await rxdb.get(RxCollectionEnum.META, 'lruDump') // так не делаем чтобы reactiveItem не дергался каждый раз при измнении
-      let lruDumpDoc = await rxdbOperationProxyExec(rxdb.db.meta, 'findOne', 'lruDump')
-      if (lruDumpDoc) {
-         logD(f, 'восстанавливаем Lru')
-         let lruDump = JSON.parse(lruDumpDoc.valueString)
-         this.cacheLru.load(lruDump)
-      }
-      this.debouncedDumpLru = debounce(async () => {
-         const f = this.debouncedDumpLru
-         f.nameExtra = 'debouncedDumpLru'
-         if (!mutexGlobal.isLeader()) return // вкладок много (все не могут хранить свои состояния) Храним состояние лидера
-         logD(f, 'start', 'debouncedDumpLru')
-         // logW('todo skip debouncedDumpLru')
-         // return
-         // eslint-disable-next-line no-unreachable
-         const t1 = performance.now()
-         let lruDump = this.cacheLru.dump()
-         let lruDumpStr = JSON.stringify(lruDump)
-         await rxdbOperationProxyExec(this.db.meta, 'atomicUpsert', {
-            id: 'lruDump',
-            valueString: lruDumpStr
+         // используется для контроля места (при переполнении - объект удалится из rxdb)
+         this.cacheLru = new LruCache({
+            max: defaultCacheSize,
+            length: function (n, id) {
+               return JSON.stringify(n).length + id.length
+            },
+            maxAge: 0, // не удаляем объекты по возрасту (для того чтобы при неудачной попытке взять с сервера - вернуть из кэша)
+            noDisposeOnSet: true,
+            dispose: async (id, { actualUntil, actualAge }) => {
+               const f = this.dispose
+               if (this.db.cache) {
+                  assert(actualUntil && actualAge >= 0, `actualUntil && actualAge >= 0 ${actualUntil} ${actualAge}`)
+                  let rxDoc = this.fastCache.get(id) || await rxdbOperationProxyExec(this.db.cache, 'findOne', id)
+                  if (rxDoc) {
+                     if (rxDoc.props.notEvict) { // кладем обратно в LRU! (некоторые данные должны жить вечно!)
+                        setTimeout(() => {
+                           this.cacheLru.set(id, { actualUntil, actualAge })
+                        }, 0)
+                     } else { // удалим из rxdb (освобождаем от старых данных)
+                        logD(f, 'элемент вытеснен из кэша', id)
+                        await rxDoc.remove()
+                     }
+                  }
+               }
+            }
          })
-         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      }, debounceIntervalDumpLru, { maxWait: 60 * 1000 })
 
-      // из-за debounce сохранения - на старте может оказаться, что в rxdb запись есть, а в lru - нет!
-      for (let rxDoc of await rxdbOperationProxyExec(this.db.cache, 'find')) {
-         if (!this.cacheLru.get(rxDoc.id)) {
-            this.cacheLru.set(rxDoc.id, {
-               actualUntil: Date.now() + debounceIntervalDumpLru,
-               actualAge: defaultActualAge
-            })
+         // заполняем cacheLru из idb
+         // let lruDump = await rxdb.get(RxCollectionEnum.META, 'lruDump') так не делаем чтобы reactiveItem не дергался каждый раз при измнении
+         let lruDumpDoc = await rxdbOperationProxyExec(rxdb.db.meta, 'findOne', 'lruDump')
+         if (lruDumpDoc) {
+            logD(f, 'восстанавливаем Lru')
+            let lruDump = JSON.parse(lruDumpDoc.valueString)
+            this.cacheLru.load(lruDump)
          }
+         this.debouncedDumpLru = debounce(async () => {
+            const f = this.debouncedDumpLru
+            f.nameExtra = 'debouncedDumpLru'
+            if (!mutexGlobal.isLeader()) return // вкладок много (все не могут хранить свои состояния) Храним состояние лидера
+            logD(f, 'start', 'debouncedDumpLru')
+            // logW('todo skip debouncedDumpLru')
+            // return
+            // eslint-disable-next-line no-unreachable
+            const t1 = performance.now()
+            let lruDump = this.cacheLru.dump()
+            let lruDumpStr = JSON.stringify(lruDump)
+            await rxdbOperationProxyExec(this.db.meta, 'atomicUpsert', {
+               id: 'lruDump',
+               valueString: lruDumpStr
+            })
+            logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+         }, debounceIntervalDumpLru, { maxWait: 60 * 1000 })
+
+         // из-за debounce сохранения - на старте может оказаться, что в rxdb запись есть, а в lru - нет!
+         for (let rxDoc of await rxdbOperationProxyExec(this.db.cache, 'find')) {
+            if (!this.cacheLru.get(rxDoc.id)) {
+               this.cacheLru.set(rxDoc.id, {
+                  actualUntil: Date.now() + debounceIntervalDumpLru,
+                  actualAge: defaultActualAge
+               })
+            }
+         }
+         this.created = true
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      } finally {
+         this.release()
       }
-      this.created = true
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, this.created)
+   }
+
+   async recreate (db) {
+      const f = this.recreate
+      logD(f, 'start')
+      const t1 = performance.now()
+      assert(db, '!rxdb')
+      await this.destroy()
+      await this.create(db)
    }
 
    async lock (lockOwner) {

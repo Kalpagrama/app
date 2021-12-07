@@ -12,6 +12,7 @@ import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { AuthApi } from 'src/api/auth'
 import { systemReset } from 'src/system/services'
+import { EventApi } from 'src/api/event'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.BOOT)
 
 let apollo
@@ -203,6 +204,7 @@ export default boot(async ({
       lazy: true,
       connectionParams: () => {
         let token = localStorage.getItem('k_token')
+        assert(token, '!token!!! сокеты включаем только когда уже открыта сессия!')
         return {
           Authorization: token,
           'X-Kalpagrama-debug': kDebug ? 'k_debug' : ''
@@ -256,7 +258,7 @@ export default boot(async ({
       upload: uploadApollo,
       ws: wsApollo
     }
-    await rxdb.init() // после инициализации apollo (нужно для event.init())
+    await EventApi.init()
     logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   } catch (err) {
     logC(err)

@@ -4,7 +4,9 @@ import { AppVisibility, Platform } from 'quasar'
 import { reactive, watch } from 'vue'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.MUTEX)
 
-const actualLockUpdateInterval = 500 // интервал обновления статуса активной блокировки
+const actualLockUpdateInterval = 300 // интервал обновления статуса активной блокировки
+const maxMutexWaitTime = 1000 * 20 // интервал обновления статуса активной блокировки
+const warnMutexWaitTime = 1000 * 5 // интервал обновления статуса активной блокировки
 
 // глобальный (несколько вкладок) мьютекс
 // синглтон (один экземпляр на приложение)
@@ -100,7 +102,11 @@ class MutexGlobal {
       while (current && current.locked && this.instanceId !== current.instanceId) { // мьютекс захвачен не нами. ждем пока освободится
          // если вкладка, создавшая мьютекс не обновляет его (вкладки уже нет, либо она неактивна)
          if (Date.now() - current.dtActual > actualLockUpdateInterval * 8) {
-            logW(' Мьютекс никто не обновляет слишком долго. Захватываем его принудительно!')
+            logW(' Мьютекс никто не обновляет слишком долго. Захватываем его принудительно!', Date.now() - current.dtActual)
+            break
+         }
+         if (Date.now() - current.dt > maxMutexWaitTime) {
+            logW('истекло максимальное время ожидания мьютекса. Захватываем его принудительно!', Date.now() - current.dt > maxMutexWaitTime)
             break
          }
          await wait(actualLockUpdateInterval / 2) // ждем пока мьютекс освободится
@@ -123,6 +129,7 @@ class MutexGlobal {
                // alert('другая вкладка стала лидером принудительно и захватила управление(1). \n Reload required!')
                window.location.reload() // не мжем дальше выполняться. Нас прервала другая вкладка!
             } else { // обновляем актуальность блокировки
+               if (Date.now() - current.dt > warnMutexWaitTime && Date.now() - current.dtActual > 1000) logE('MutexGlobal::long operation!', current.lockOwner)
                current.dtActual = Date.now()
                localStorage.setItem('k_global_lock', JSON.stringify(current))
             }

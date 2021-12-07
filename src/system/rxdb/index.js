@@ -23,6 +23,8 @@ import { GqlQueries } from 'src/system/rxdb/gql_query'
 import { setSyncEventStorageValue } from 'src/system/services'
 import { ObjectApi } from 'src/api/object'
 import { store } from 'src/store'
+import { wait } from 'src/system/common/common_func'
+
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB)
 
 // in the browser, we want to persist data in IndexedDB, so we use the indexeddb adapter.
@@ -40,6 +42,7 @@ function getRxCollectionEnumFromId (id) {
    assert(rxCollection in RxCollectionEnum, 'bad rxCollection' + rxCollection)
    return rxCollection
 }
+
 function getRawIdFromId (id) {
    assert(id, '!id')
    let parts = id.split('::')
@@ -48,6 +51,7 @@ function getRawIdFromId (id) {
    assert(rawId, 'bad id' + id)
    return rawId
 }
+
 function makeId (rxCollectionEnum, rawId, params = null) {
    assert(rawId, '!rawId')
    assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum' + rxCollectionEnum)
@@ -95,15 +99,20 @@ class RxDBWrapper {
       this.removeMutex = new MutexLocal('rxdb-remove')
       this.store = null // vuex
       this.reactiveDocDbMemCache = new ReactiveDocDbMemCache()
-      // addPouchPlugin(require('pouchdb-adapter-idb'))
 
       addRxPlugin(RxDBQueryBuilderPlugin)
       addRxPlugin(RxDBAjvValidatePlugin)
       addRxPlugin(RxDBJsonDumpPlugin)
       addRxPlugin(RxDBMigrationPlugin)
       // if (process.env.NODE_ENV === 'development') addRxPlugin(RxDBDevModePlugin)
+      this.workspace = new Workspace()
+      this.cache = new Cache()
+      this.objects = new Objects()
+      this.lists = new Lists()
+      this.event = new Event()
+      this.gqlQueries = new GqlQueries()
       this.processStoreEvent = async (eventKey) => {
-         // одна из вкладок создала rxdb либо выполнила rxdb.deInitGlobal(пересрздала rxdb). Надо обновить коллекции
+         // одна из вкладок пересоздала rxdb либо выполнила rxdb.setAuthUser. Надо обновить
          if (this.created) {
             const f = this.processStoreEvent
             f.nameExtra = 'processStoreEvent'
@@ -111,15 +120,11 @@ class RxDBWrapper {
             const t1 = performance.now()
             try {
                switch (eventKey) {
-                  case 'k_rxdb_create_date':
-                     await this.updateCollections('create')
+                  case 'k_rxdb_recreate_date':
+                     await this.recreate(this.store)
                      break
-                  case 'k_rxdb_init_global_date':
-                     await this.init()
-                     break
-                  case 'k_rxdb_deinit_global_date':
-                     await this.updateCollections('create')
-                     await this.deInit()
+                  case 'k_rxdb_set_auth_user':
+                     await this.setCurrentUser_internal()
                      break
                   default:
                      throw new Error('bad event' + eventKey)
@@ -139,137 +144,115 @@ class RxDBWrapper {
       this.reactiveDocDbMemCache.del(id)
    }
 
-   // rxdb не удаляет элементы, а помечает удаленными! purgeDb - очистит помеченные удаленными
-   // TODO Возможно это не надо! (lokiJs)
-   async purgeDb () {
-      const f = this.purgeDb
-      logD(f, 'start')
-      const t1 = performance.now()
-      assert(this.db, '!this.db')
-
-      let purgeLastDate = parseInt(localStorage.getItem('k_rxdb_last_purge_date') || '0')
-      if (Date.now() - purgeLastDate < purgePeriod) {
-         logD(f, 'skip.')
-         return
+   // clearStorage - реально стереть данные в indexedDb
+   async destroy (clearStorage) {
+      if (this.created && this.db) { // пересоздание
+         try {
+            await mutexGlobal.lock('rxdb::destroy')
+            await this.lock('destroy')
+            await this.workspace.switchOffSynchro()
+            await this.gqlQueries.destroy()
+            await this.event.destroy()
+            await this.lists.destroy()
+            await this.objects.destroy()
+            await this.cache.destroy()
+            await this.workspace.destroy()
+            this.reactiveDocDbMemCache.reset()
+            if (this.db.meta) await rxdbOperationProxyExec(this.db.meta, 'destroy')
+            if (clearStorage) await this.db.remove()
+            else await this.db.destroy()
+            this.db = null
+            this.created = false
+            store.commit('stateSet', ['rxdbInitialized', false])
+         } finally {
+            this.release()
+            await mutexGlobal.release('rxdb::destroy')
+         }
       }
-      try {
-         let dumpJson = await this.db.exportJSON()
-         await this.db.importJSON(dumpJson)
-      } catch (err) {
-         logE('cant purgeDb', err)
-         throw err
-      } finally {
-         localStorage.setItem('k_rxdb_last_purge_date', mutexGlobal.getInstanceId())
-      }
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
    async create (store) {
       const f = this.create
       logT(f, 'start')
+      assert(!this.db)
       const t1 = performance.now()
-      assert(!this.created, 'this.created')
+      this.store = store
       try {
          await mutexGlobal.lock('rxdb::create')
-         this.store = store
-         // this.rxStorage = getRxStoragePouch(adapter)
+         await this.lock('create')
          this.rxStorage = getRxStorageLoki({
-            adapter: new LokiIncrementalIndexedDBAdapter(),
+            adapter: new LokiIncrementalIndexedDBAdapter()
             // * Do not set lokiJS persistence options like autoload and autosave,
             // * RxDB will pick proper defaults based on the given adapter
          })
          this.db = await createRxDatabase({
             name: 'kalpadb',
             storage: this.rxStorage,
-            multiInstance: true, // <- multiInstance (optional, default: true)
+            multiInstance: true // <- multiInstance (optional, default: true)
             // eventReduce: false // если поставить true - будут теряться события об обновлении (по всей видимости - это баг)<- eventReduce (optional, default: true)
             // pouchSettings: { revs_limit: 1 }
-         }) // 400 msec
-         await this.purgeDb() // очистит бд от старых данных
+         })
+         await this.db.addCollections({ meta: { schema: schemaKeyValue } })
+
          this.reactiveDocDbMemCache.reset()
-         this.workspace = new Workspace(this.db, store)
-         this.cache = new Cache(this.db)
-         this.objects = new Objects(this.cache)
-         this.lists = new Lists(this.cache)
-         this.event = new Event(this.workspace, this.objects, this.lists, this.cache)
-         this.gqlQueries = new GqlQueries(this.cache)
-         await this.updateCollections('create') // 600 msec
-         await this.workspace.create()
-         await this.cache.create()
-         this.created = true
+         await this.workspace.create(this.db, store)
+         await this.cache.create(this.db)
+         await this.objects.create(this.cache)
+         await this.lists.create(this.cache)
+         await this.event.create(this.workspace, this.objects, this.lists, this.cache)
+         await this.gqlQueries.create(this.cache)
+         if (!(await this.get(RxCollectionEnum.META, 'rxdbCreateDate', { beforeCreate: true }))) { // эта вкладка первой инициализироваля rxdb
+            await this.set(RxCollectionEnum.META, {
+               id: 'rxdbCreateDate',
+               valueString: Date.now().toString()
+            }, { beforeCreate: true })
+         }
+         this.created = true // до setCurrentUser_internal
+         await this.setCurrentUser_internal()
          logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } catch (err) {
-         // alert('!!!!!!')
-         logE(f, 'ошибка при создания RxDatabase! очищаем и пересоздаем!', err)
+         logE(f, 'rxdb::create error! очищаем и пересоздаем!', err)
          if (this.db) await this.db.remove() // предпочтительно, тк removeRxDatabase иногда глючит
          else if (this.rxStorage) await removeRxDatabase('kalpadb', this.rxStorage)
          throw err
       } finally {
+         this.release()
          await mutexGlobal.release('rxdb::create')
       }
    }
 
-   async updateCollections (operation, collections = ['workspace', 'cache']) {
-      assert(operation.in('create', 'delete', 'recreate'))
-      const f = this.updateCollections
+   async recreate (store, clearStorage = false) {
+      const f = this.recreate
+      logT(f, 'start')
       const t1 = performance.now()
-      logD(f, 'start')
-      if (operation.in('delete', 'recreate')) {
-         if (this.db.meta) await rxdbOperationProxyExec(this.db.meta, 'remove')
-      }
-      if (operation.in('create', 'delete', 'recreate')) {
-         if (this.db.meta) await rxdbOperationProxyExec(this.db.meta, 'destroy')
-      }
-      if (operation.in('create', 'recreate')) {
-         await this.db.addCollections({ meta: { schema: schemaKeyValue } })
-      }
-      for (let collection of collections) {
-         if (this[collection]) await this[collection].updateCollections(operation)
-      }
-      if (!(await this.get(RxCollectionEnum.META, 'rxdbCreateDate', { beforeCreate: true }))) { // эта вкладка первой инициализироваля rxdb
-         await this.set(RxCollectionEnum.META, {
-            id: 'rxdbCreateDate',
-            valueString: Date.now().toString()
-         }, { beforeCreate: true })
-         setSyncEventStorageValue('k_rxdb_create_date', Date.now().toString()) // сообщаем другим вкладкам
-      }
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      this.store = store
+      await this.destroy(clearStorage)
+      await this.create(store)
+      if (clearStorage) setSyncEventStorageValue('k_rxdb_recreate_date', Date.now().toString()) // сообщаем другим вкладкам
    }
 
-   // получит юзера, запустит обработку эвентов и синхронмзацию мастерской) dummyUser - для входа без регистрации
-   async init () {
-      assert(this.created, '!created')
-      assert(!this.initialized, 'this.initialized уже!')
-      const f = this.init
-      const t1 = performance.now()
+   // получить юзера, запустить обработку эвентов и синхронмзацию мастерской (dummyUser - для входа без регистрации)
+   async setCurrentUser_internal () {
+      const f = this.setCurrentUser_internal
       logD(f, 'start')
-      store.commit('stateSet', ['rxdbInitialized', false])
-      if (!(await this.isInitializedGlobal())) {
-         logD(f, 'ждем пока сработает initGlobal (она нас вызовет повторно)')
-         return
-      }
-      try {
-         await this.lock('rxdb::init')
-         await this.event.init()
-         let authUser = JSON.parse(await this.get(RxCollectionEnum.META, 'authUser') || 'null') // данные запоминаются после первого успешного init на одной из вкладок
-         assert(authUser, 'authUser')
+      const t1 = performance.now()
+      let authUser = await this.getAuthUser()
+      if (authUser) {
          let { userOid, dummyUser } = authUser
          assert(userOid || dummyUser, '!userOid || dummyUser')
          // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возьмется из кэша
-         // let currentUser
-         let currentUserDb, currentUserDummy, currentUserDbFetched
+         let currentUserDb, currentUserDummy
          if (userOid) {
             currentUserDb = await this.get(RxCollectionEnum.OBJ, userOid, {
                notEvict: true,
                force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
                clientFirst: true, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
                onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
-                  currentUserDbFetched = true
-                  this.workspace.switchOnSynchro() // запускаем синхронизацию только после получения актуального юзера с сервера (см clientFirst)
+                  // если данных в кэше не было, то onFetchFunc выпольнится раньше, чем this.getCurrentUser = ...
+                  wait(5000).then(() => this.workspace.switchOnSynchro(this.getCurrentUser()))
                },
                mirroredVuexObjectKey: 'currentUser' // vuexKey - создаст или обновит связанный объект в vuex по этому ключу
             })
-            this.workspace.setUser(currentUserDb) // для синхронизации мастерской с сервером
          } else {
             assert(dummyUser, '!dummyUser')
             dummyUser.profile.tutorial = {
@@ -284,88 +267,45 @@ class RxDBWrapper {
             currentUserDummy = getReactive(dummyUser, 'currentUser')
          }
          assert(currentUserDb || currentUserDummy, 'currentUserDb || currentUserDummy') // должен быть в rxdb после init
-
-         let settingsDb = await this.get(RxCollectionEnum.GQL_QUERY, 'settings', {
-            mirroredVuexObjectKey: 'currentSettings' // создаст или обновит связанный объект в vuex по этому ключу
-         })
-         assert(settingsDb, '!settingsDb')
          this.getCurrentUser = () => {
             assert(this.store && this.store.state.mirrorObjects['currentUser'], '!this.store && this.store.state.mirrorObjects[currentUser]')
             return this.store.state.mirrorObjects['currentUser']
          }
-         this.initialized = true
+         let settingsDb = await this.get(RxCollectionEnum.GQL_QUERY, 'settings', {
+            mirroredVuexObjectKey: 'currentSettings' // создаст или обновит связанный объект в vuex по этому ключу
+         })
+         assert(settingsDb, '!settingsDb')
          store.commit('stateSet', ['rxdbInitialized', true])
-         if (currentUserDbFetched) this.workspace.switchOnSynchro() // на тот случай, когда onFetchFunc сработает до "this.initialized = true". надо аовторно сбросить таймер ожидания
-         logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      } catch (err) {
-         logE('cant init rxdb. err = ', err)
-      } finally {
-         this.release()
+         this.hasCurrentUser = true
       }
+      logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
-   async deInit (fromDeinitGlobal = false) {
-      const f = this.deInit
-      const t1 = performance.now()
-      try {
-         await this.lock('rxdb::deInit')
-         logD(f, 'start', fromDeinitGlobal)
-         assert(this.created, '!created')
-         if (fromDeinitGlobal) await this.event.deInit() // подписку отменяем только 1 раз
-         this.workspace.switchOffSynchro()
-         this.reactiveDocDbMemCache.reset()
-         if (fromDeinitGlobal) await this.updateCollections('recreate', ['workspace', 'cache']) // fromDeinitGlobal - кейс только для  deInitGlobal
-         this.initialized = false
-         store.commit('stateSet', ['rxdbInitialized', false])
-         logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      } finally {
-         this.release()
-      }
+   async getAuthUser () {
+      assert(this.created, '!created')
+      let authUser = JSON.parse(await this.get(RxCollectionEnum.META, 'authUser') || 'null') // данные запоминаются после первого успешного init на одной из вкладок
+      return authUser
    }
 
-   // запускается единожды после регистрации
-   async initGlobal ({ userOid, dummyUser }) {
-      const f = this.initGlobal
+   // запускается единожды после регистрации (НЕ запускается при простой перезагрузке страницы)
+   async setAuthUser ({ userOid, dummyUser }) {
+      const f = this.setAuthUser
       logD(f, 'start')
       const t1 = performance.now()
       assert(this.created, '!created') // нужна коллекция META
-      assert(!(await this.isInitializedGlobal()), '!!this.isInitializedGlobal()')
+      assert(!(await this.getAuthUser()), '!!this.getAuthUser()')
       assert(userOid || dummyUser, '!userOid || dummyUser')
       try {
-         await mutexGlobal.lock('rxdb::initGlobal')
+         await mutexGlobal.lock('rxdb::setAuthUser')
+         await this.lock('setAuthUser')
          await this.set(RxCollectionEnum.META, { id: 'authUser', valueString: JSON.stringify({ userOid, dummyUser }) })
-         await this.init() // инициализируем текущую вкладку
-         setSyncEventStorageValue('k_rxdb_init_global_date', Date.now().toString()) // сообщаем другим вкладкам
+         await this.setCurrentUser_internal()
+         setSyncEventStorageValue('k_rxdb_set_auth_user', Date.now().toString()) // сообщаем другим вкладкам
          logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } finally {
-         await mutexGlobal.release('rxdb::initGlobal')
+         await mutexGlobal.release('rxdb::setAuthUser')
+         this.release()
       }
-   }
-
-   // удалит данные в rxdb (сообщит об этом другим вкладкам)
-   async deInitGlobal () {
-      const f = this.deInitGlobal
-      logD(f, 'start')
-      const t1 = performance.now()
-      try {
-         await mutexGlobal.lock('rxdb::deinitGlobal')
-         if (this.created) await this.deInit(true) // деинициализируем текущую вкладку
-         setSyncEventStorageValue('k_rxdb_deinit_global_date', Date.now().toString()) // сообщаем другим вкладкам
-         logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      } catch (err) {
-         logE(f, 'err on deInitGlobal! remove db!', err)
-         if (this.db) await this.db.remove() // предпочтительно, тк removeRxDatabase иногда глючит
-         else if (this.rxStorage) await removeRxDatabase('kalpadb', this.rxStorage)
-         throw err
-      } finally {
-         await mutexGlobal.release('rxdb::deinitGlobal')
-      }
-   }
-
-   async isInitializedGlobal () {
-      assert(this.created, '!created')
-      let authUser = await this.get(RxCollectionEnum.META, 'authUser') // данные запоминаются после первого успешного init на одной из вкладок
-      return !!authUser && localStorage.getItem('k_token') // k_token нужен для gql-запросов
    }
 
    async lock (lockOwner) {
@@ -385,8 +325,8 @@ class RxDBWrapper {
          logD(f, 'try to process event...')
          try {
             await mutexGlobal.lock('rxdb::processEvent')
-            await this.lock('rxdb::processEvent')// (чтобы дождалась пока отработает rxdb.deInitGlobal, synchronize ws и др)
-            assert(this.initialized, '! this.initialized1 !')
+            await this.lock('rxdb::processEvent')// (чтобы дождалась пока отработает rxdb.create, synchronize ws и др)
+            assert(this.hasCurrentUser, '! this.hasCurrentUser !')
             assert(event.id, '!event.id')
             assert(this.store, '!this.store')
             await this.event.processEvent(event, this.store)
@@ -491,7 +431,7 @@ class RxDBWrapper {
       assert(!mangoQuery.pageToken, 'mangoQuery.pageToken')
       try {
          await this.findMutex.lock('rxdb::findInternal') // нужно тк иногда запросы за одной и той же сущностью прилетают друг за другом и начинают выполняться "параллельно" (при этом не срабатывает reactiveDocDbMemCache)
-         assert(this.initialized, '! this.initialized2 !' + JSON.stringify(mangoQuery))
+         assert(this.hasCurrentUser, '! this.hasCurrentUser !' + JSON.stringify(mangoQuery))
          let populateObjects = mangoQuery.populateObjects
          delete mangoQuery.populateObjects // populateObjects мешает нормальному кэшированию в rxdb (нужно только тут)
          let listId = `mangoQuery:${JSON.stringify(mangoQuery)} populateObjects:${populateObjects} screenSize: ${screenSize} autoNextSize: ${autoNextSize}` // (запросы с и без populate -это разные списки) (то-же и для screenSize)

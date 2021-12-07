@@ -267,9 +267,21 @@ function getOidFromId (id) {
 
 // класс для запроса списков и отдельных объектов
 class Objects {
-   constructor (cache) {
+   async destroy () {
+      if (this.created) {
+         this.created = false
+      }
+   }
+
+   async create (cache) {
       this.cache = cache
       this.queryAccumulator = new QueryAccumulator()
+      this.created = true
+   }
+
+   async recreate (cache) {
+      await this.destroy()
+      await this.create(cache)
    }
 
    // Вернет объект из кэша, либо запросит его. и вернет промис, который ВОЗМОЖНО когда-то выполнится(когда дойдет очередь);

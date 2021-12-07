@@ -16,6 +16,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import differenceWith from 'lodash/differenceWith'
 import intersectionWith from 'lodash/intersectionWith'
 import { getRxCollectionEnumFromId, rxdb } from 'src/system/rxdb'
+
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_WS)
 
 const synchroTimeDefault = 1000 * 60 * 1 // раз в 1 минут шлем изменения на сервер
@@ -52,168 +53,177 @@ const WsOperationEnum = Object.freeze({ UPSERT: 'UPSERT', DELETE: 'DELETE' })
 // Workspace вызывается 1: из UI(upsertItem/deleteItem); 2: из сети(processEvent); 3: synchroLoop.
 // Эти ф-ии сериализованы(вызываются строго друг за другом) (см MutexLocal)
 class Workspace {
-   constructor (db, store) {
-      assert(db, '!rxdb')
-      this.db = db
-      this.store = store
+   constructor () {
       this.mutex = new MutexLocal('rxdb::ws')
-      this.synchroLoopWaitObj = new WaitBreakable(synchroTimeDefault)
       this.reactiveUser = null
       this.synchro = false
+      this.synchroLoopWaitObj = new WaitBreakable(synchroTimeDefault)
    }
 
-   async updateCollections (operation) {
-      assert(operation.in('create', 'delete', 'recreate'))
-      const f = this.updateCollections
-      logD(f, 'start', operation)
-      const t1 = performance.now()
-      try {
-         await this.lock('ws::updateCollections')
-         if (operation.in('delete', 'recreate')) {
-            if (this.db.ws_items) await rxdbOperationProxyExec(this.db.ws_items, 'remove')
-            if (this.db.ws_changes) await rxdbOperationProxyExec(this.db.ws_changes, 'remove')
-         }
-         if (operation.in('create', 'delete', 'recreate')) {
+   async destroy () {
+      if (this.created && this.db) { // пересоздание
+         await this.switchOffSynchro() // до await this.lock
+         try {
+            await this.lock('ws::destroy')
             if (this.db.ws_items) await rxdbOperationProxyExec(this.db.ws_items, 'destroy')
             if (this.db.ws_changes) await rxdbOperationProxyExec(this.db.ws_changes, 'destroy')
+            this.db = null
+            this.created = false
+         } finally {
+            this.release()
          }
-         if (operation.in('create', 'recreate')) {
-            await this.db.addCollections({ ws_items: {
-                  schema: wsSchemaItem,
-                  migrationStrategies: {
-                     // ..., - см wsSchemaItem.version (из schema.js)
-                     1: oldDoc => oldDoc,
-                     2: oldDoc => oldDoc,
-                     3: oldDoc => oldDoc
-                  }
-               } })
-            await this.db.addCollections({ ws_changes: { schema: wsSchemaLocalChanges } })
-            assert(this.db.ws_items && this.db.ws_changes, '!this.db.ws_items && this.db.ws_changes')
-            // обработка события измения мастерской пользователем (запоминает измененные элементы)
-            let onWsChangedByUser = async (id, operation, plainData) => {
-               assert(id && operation && operation in WsOperationEnum, 'bad params' + id + operation)
-               assert('hasChanges' in plainData, '! hasChanges in plainData')
-               if (plainData.hasChanges || operation === WsOperationEnum.DELETE) {
-                  let deletedDocs = await rxdbOperationProxyExec(this.db.ws_changes, 'find', {
-                     selector: {
-                        id,
-                        operation: WsOperationEnum.DELETE
-                     }
-                  })
-                  if (deletedDocs.length === 0) { // только если не удален
-                     await rxdbOperationProxyExec(this.db.ws_changes, 'atomicUpsert', {
-                        id,
-                        operation,
-                        rev: plainData.rev
-                     })
-                  }
-               }
-            }
-            const initWsItem = (plainData) => {
-               assert(plainData.wsItemType, '!plainData.wsItemType')
-               plainData.rev = plainData.rev || 0
-               switch (plainData.wsItemType) {
-                  case WsItemTypeEnum.WS_COLLECTION:
-                     plainData.bookmarks = plainData.bookmarks || []
-                     break
-                  case WsItemTypeEnum.WS_BOOKMARK:
-                     plainData.collections = plainData.collections || []
-                     break
-               }
-            }
-            this.db.ws_items.preSave(async (plainData, rxDoc) => {
-               initWsItem(plainData)
-               let plainDataCopy = cloneDeep(plainData) // newVal
-               let rxDocCopy = cloneDeep(rxDoc.toJSON()) // oldVal
-               delete plainDataCopy._rev // внутреннее св-во rxdb (мешает при сравненении)
-               delete plainDataCopy.rev // rev - присваивается сервером (не реагируем на изменения rev (это происходит в processEvent))
-               delete rxDocCopy.rev
-               delete plainDataCopy.hasChanges
-               delete rxDocCopy.hasChanges
-               if (isEqual(plainDataCopy, rxDocCopy)) {
-                  // реальных изменений нет! изменена ТОЛЬКО ревизия. На сервер ничего слать не надо (иначе будет бесконечный цикл)
-                  plainData.hasChanges = false // будет проверено в this.db.ws_items.postSave
-               }
-            }, false)
-            this.db.ws_items.preInsert(async (plainData) => {
-               initWsItem(plainData)
-            }, false)
-            this.db.ws_items.postSave(async (plainData, rxDoc) => {
-               // сработает НЕ на всех вкладках (только на той, что изменила итем)
-               await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData)
-            }, false)
-            this.db.ws_items.postInsert(async (plainData) => {
-               // сработает НЕ на всех вкладках (только на той, что изменила итем)
-               await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData)
-            }, false)
-            this.db.ws_items.postRemove(async (plainData) => {
-               // сработает НЕ на всех вкладках (только на той, что изменила итем)
-               // если нет rev - то элемент еще не создавался на сервере (удалять с сервера не надо его)
-               logD('postRemove')
-               if (plainData.rev) await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE, plainData)
-               rxdb.onRxDocDelete(plainData.id) // удалить из lru(иначе он будет находиться через rxdb.get())
-               // plainData.deletedAt = Date.now()
-            }, false)
-         }
-      } finally {
-         this.release()
-         this.store.commit('core/stateSet', ['wsReady', false])
       }
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
-   async create () {
+   async create (db, store) {
       const f = this.create
       const t1 = performance.now()
-      assert(!this.created, 'this.created')
-      // синхроним изменения в цикле
-      this.synchroLoop = async () => {
-         const f = this.synchroLoop
-         f.nameExtra = 'synchroLoop'
-         // logD(f, 'start')
-         this.synchroStarted = true // защита от двойного запуска
-         while (true) {
-            if (this.reactiveUser && this.synchro && rxdb.initialized && mutexGlobal.isLeader()) {
-               try {
-                  await mutexGlobal.lock('ws::synchroLoop')
-                  await this.lock('ws::synchroLoop')
-                  const tLoop = performance.now()
-                  // logD(f, 'next loop start...', this.synchroLoopWaitObj.getTimeOut())
-                  await this.synchronize()
-                  // logD(f, `next loop complete: ${Math.floor(performance.now() - tLoop)} msec`)
-               } catch (err) {
-                  logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
-                  this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
-               } finally {
-                  this.release()
-                  await mutexGlobal.release('ws::synchroLoop')
+      assert(db && store)
+      try {
+         await this.lock('ws::recreate')
+         this.db = db
+         this.store = store
+         await this.db.addCollections({
+            ws_items: {
+               schema: wsSchemaItem,
+               migrationStrategies: {
+                  // ..., - см wsSchemaItem.version (из schema.js)
+                  1: oldDoc => oldDoc,
+                  2: oldDoc => oldDoc,
+                  3: oldDoc => oldDoc
                }
             }
-            await this.synchroLoopWaitObj.wait()
+         })
+         await this.db.addCollections({ ws_changes: { schema: wsSchemaLocalChanges } })
+         assert(this.db.ws_items && this.db.ws_changes, '!this.db.ws_items && this.db.ws_changes')
+         // обработка события измения мастерской пользователем (запоминает измененные элементы)
+         let onWsChangedByUser = async (id, operation, plainData) => {
+            assert(id && operation && operation in WsOperationEnum, 'bad params' + id + operation)
+            assert('hasChanges' in plainData, '! hasChanges in plainData')
+            if (plainData.hasChanges || operation === WsOperationEnum.DELETE) {
+               let deletedDocs = await rxdbOperationProxyExec(this.db.ws_changes, 'find', {
+                  selector: {
+                     id,
+                     operation: WsOperationEnum.DELETE
+                  }
+               })
+               if (deletedDocs.length === 0) { // только если не удален
+                  await rxdbOperationProxyExec(this.db.ws_changes, 'atomicUpsert', {
+                     id,
+                     operation,
+                     rev: plainData.rev
+                  })
+               }
+            }
          }
+         const initWsItem = (plainData) => {
+            assert(plainData.wsItemType, '!plainData.wsItemType')
+            plainData.rev = plainData.rev || 0
+            switch (plainData.wsItemType) {
+               case WsItemTypeEnum.WS_COLLECTION:
+                  plainData.bookmarks = plainData.bookmarks || []
+                  break
+               case WsItemTypeEnum.WS_BOOKMARK:
+                  plainData.collections = plainData.collections || []
+                  break
+            }
+         }
+         this.db.ws_items.preSave(async (plainData, rxDoc) => {
+            initWsItem(plainData)
+            let plainDataCopy = cloneDeep(plainData) // newVal
+            let rxDocCopy = cloneDeep(rxDoc.toJSON()) // oldVal
+            delete plainDataCopy._rev // внутреннее св-во rxdb (мешает при сравненении)
+            delete plainDataCopy.rev // rev - присваивается сервером (не реагируем на изменения rev (это происходит в processEvent))
+            delete rxDocCopy.rev
+            delete plainDataCopy.hasChanges
+            delete rxDocCopy.hasChanges
+            if (isEqual(plainDataCopy, rxDocCopy)) {
+               // реальных изменений нет! изменена ТОЛЬКО ревизия. На сервер ничего слать не надо (иначе будет бесконечный цикл)
+               plainData.hasChanges = false // будет проверено в this.db.ws_items.postSave
+            }
+         }, false)
+         this.db.ws_items.preInsert(async (plainData) => {
+            initWsItem(plainData)
+         }, false)
+         this.db.ws_items.postSave(async (plainData, rxDoc) => {
+            // сработает НЕ на всех вкладках (только на той, что изменила итем)
+            await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData)
+         }, false)
+         this.db.ws_items.postInsert(async (plainData) => {
+            // сработает НЕ на всех вкладках (только на той, что изменила итем)
+            await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData)
+         }, false)
+         this.db.ws_items.postRemove(async (plainData) => {
+            // сработает НЕ на всех вкладках (только на той, что изменила итем)
+            // если нет rev - то элемент еще не создавался на сервере (удалять с сервера не надо его)
+            logD('postRemove')
+            if (plainData.rev) await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE, plainData)
+            rxdb.onRxDocDelete(plainData.id) // удалить из lru(иначе он будет находиться через rxdb.get())
+            // plainData.deletedAt = Date.now()
+         }, false)
+
+         if (!this.synchroLoop) {
+            let thiz = this
+            // синхроним изменения в цикле (не лямбда! тк recreate может вызываться неск-ко раз!)
+            this.synchroLoop = async function () {
+               const f = thiz.synchroLoop
+               f.nameExtra = 'synchroLoop'
+               logD(f, 'start')
+               while (true) {
+                  if (thiz.reactiveUser && thiz.synchro && rxdb.initialized && mutexGlobal.isLeader()) {
+                     try {
+                        await mutexGlobal.lock('ws::synchroLoop')
+                        await thiz.lock('ws::synchroLoop')
+                        // logD(f, 'next loop start...', this.synchroLoopWaitObj.getTimeOut())
+                        await thiz.synchronize()
+                        // logD(f, `next loop complete: ${Math.floor(performance.now() - tLoop)} msec`)
+                     } catch (err) {
+                        logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
+                        thiz.synchroLoopWaitObj.setTimeout(Math.min(thiz.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
+                     } finally {
+                        thiz.release()
+                        await mutexGlobal.release('ws::synchroLoop')
+                     }
+                  }
+                  await thiz.synchroLoopWaitObj.wait()
+               }
+            }
+            thiz.synchroLoop().catch(err => logE(f, 'не удалось запустить цикл синхронизации', err))
+         }
+         this.created = true
+         this.store.commit('core/stateSet', ['wsReady', false])
+         logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, this.created)
+      } finally {
+         this.release()
       }
-      if (!this.synchroStarted) this.synchroLoop().catch(err => logE(f, 'не удалось запустить цикл синхронизации', err))
-      this.created = true
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, this.created)
    }
 
-   setUser (reactiveUser) { // для гостей мастерская НЕ синхронится с сервером!
+   async recreate (db, store) {
+      const f = this.recreate
+      const t1 = performance.now()
+      assert(db && store)
+      await this.destroy()
+      await this.create(db, store)
+   }
+
+   switchOnSynchro (reactiveUser) { // для гостей мастерская НЕ синхронится с сервером!
       const f = this.switchOnSynchro
       assert(reactiveUser, '!reactiveUser')
+      assert(reactiveUser.oid, '!reactiveUser.oid')
       // reactiveUser.wsRevision - версия мастерской по мнению сервера
       assert(reactiveUser.wsRevision >= 0, '!reactiveUser.wsRevision')
       assert(reactiveUser.wsVersion, '!reactiveUser.wsVersion')
       this.reactiveUser = reactiveUser
-   }
 
-   switchOnSynchro () { // для гостей мастерская НЕ синхронится с сервером!
-      const f = this.switchOnSynchro
       this.synchro = true
       this.synchroLoopWaitObj.break()// форсировать синхронизацию (см synchroLoop)
    }
 
-   switchOffSynchro () {
+   async switchOffSynchro () {
       this.synchro = false
+      this.reactiveUser = null
+      await this.lock('ws::switchOffSynchro') // ждем пока завершится synchroLoop (если он запущен)
+      this.release()
    }
 
    // работает в фоне и запускается по мере необходимости см ( switchOnSynchro )
