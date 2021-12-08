@@ -4,7 +4,7 @@ import { LstCollectionEnum, RxCollectionEnum, rxdbOperationProxyExec, WsCollecti
 import { Cache } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
-import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
+import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb/plugins/core'
 import { getRxStorageLoki } from 'rxdb/plugins/lokijs'
 import { Event } from 'src/system/rxdb/event'
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
