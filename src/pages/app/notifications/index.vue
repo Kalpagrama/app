@@ -45,7 +45,7 @@ kalpa-layout
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import notificationItem from './notification_item.vue'
-import viewGuest from '../notifications/view_guest';
+import viewGuest from 'src/layouts/view_guest.vue';
 
 export default {
   name: 'pageApp__notifications',

@@ -24,7 +24,7 @@ kalpa-layout
               @click="showKalpaTutorial('tutorial_content')"
               round flat color="white" icon="help_outline")
       //- guest
-      view-guest(v-if="$store.getters.isGuest")
+      view-guest(v-if="$store.getters.isGuest").q-mt-sm
       q-spinner(v-else-if="!$store.state.core.wsReady" size="50px" color="green").absolute-center
       //- user
       div(
@@ -77,7 +77,7 @@ import widgetContents from './widget_contents/index.vue'
 import widgetWatchLater from './widget_watch_later/index.vue'
 import widgetHistory from './widget_history/index.vue'
 import widgetUpload from './widget_upload/index.vue'
-import viewGuest from './view_guest/index.vue'
+import viewGuest from 'src/layouts/view_guest.vue'
 
 export default {
   name: 'pageHome',
