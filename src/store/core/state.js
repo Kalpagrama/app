@@ -13,7 +13,7 @@ export default {
    logFormat: {time: false, moduleName: true, funcName: true},
    logRocket: false,
    logRocketSessionUrl: null,
-   logDbgFilter: 'any', // gui | system | any
+   logDbgFilter: 'sys', // gui | system | any
    logDbgModulesFilter: {
       [LogSystemModulesEnum.TESTS]: LogLevelEnum.DEBUG,
       [LogSystemModulesEnum.SYSTEM]: LogLevelEnum.DEBUG,

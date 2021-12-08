@@ -159,7 +159,21 @@ class RxDBWrapper {
             await this.workspace.destroy()
             this.reactiveDocDbMemCache.reset()
             if (this.db.meta) await rxdbOperationProxyExec(this.db.meta, 'destroy')
-            if (clearStorage) await this.db.remove()
+            if (clearStorage) {
+               await this.db.remove()
+               let dbOpenRequest = window.indexedDB.deleteDatabase('kalpadb.db')
+               await new Promise((resolve, reject) => {
+                  dbOpenRequest.onerror = function(event) {
+                     reject(event)
+                  }
+                  dbOpenRequest.onsuccess = function(event) {
+                     resolve()
+                  }
+                  dbOpenRequest.onblocked = function () {
+                     logW('Couldnt delete database due to the operation being blocked')
+                  };
+               })
+            }
             else await this.db.destroy()
             this.db = null
             this.created = false
