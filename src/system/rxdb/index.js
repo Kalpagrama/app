@@ -241,15 +241,15 @@ class RxDBWrapper {
          let { userOid, dummyUser } = authUser
          assert(userOid || dummyUser, '!userOid || dummyUser')
          // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возьмется из кэша
-         let currentUserDb, currentUserDummy
+         let currentUserDb, currentUserDummy, currentUserDbFetched
          if (userOid) {
             currentUserDb = await this.get(RxCollectionEnum.OBJ, userOid, {
                notEvict: true,
                force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
                clientFirst: true, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
                onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
-                  // если данных в кэше не было, то onFetchFunc выпольнится раньше, чем this.getCurrentUser = ...
-                  wait(5000).then(() => this.workspace.switchOnSynchro(this.getCurrentUser()))
+                  if (currentUserDb && this.getCurrentUser) this.workspace.switchOnSynchro(this.getCurrentUser()) // в кэше есть данные (onFetchFunc сработает после this.getCurrentUser = ...)
+                  else currentUserDbFetched = true // если данных в кэше не было, то onFetchFunc выпольнится раньше, чем this.getCurrentUser = ...
                },
                mirroredVuexObjectKey: 'currentUser' // vuexKey - создаст или обновит связанный объект в vuex по этому ключу
             })
@@ -271,6 +271,7 @@ class RxDBWrapper {
             assert(this.store && this.store.state.mirrorObjects['currentUser'], '!this.store && this.store.state.mirrorObjects[currentUser]')
             return this.store.state.mirrorObjects['currentUser']
          }
+         if (currentUserDbFetched) this.workspace.switchOnSynchro(this.getCurrentUser()) // onFetchFunc сработало до этого момента(в кэше не было данных(см clientFirst))
          let settingsDb = await this.get(RxCollectionEnum.GQL_QUERY, 'settings', {
             mirroredVuexObjectKey: 'currentSettings' // создаст или обновит связанный объект в vuex по этому ключу
          })
