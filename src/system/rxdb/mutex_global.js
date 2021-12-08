@@ -2,7 +2,7 @@ import { assert, wait } from 'src/system/common/utils'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { AppVisibility, Platform } from 'quasar'
 import { reactive, watch } from 'vue'
-let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.MUTEX)
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.MUTEX_GLOBAL)
 
 const actualLockUpdateInterval = 300 // интервал обновления статуса активной блокировки
 const maxMutexWaitTime = 1000 * 20 // интервал обновления статуса активной блокировки
@@ -36,7 +36,7 @@ class MutexGlobal {
          let unwatchFunc = watch(() => this.vm.appVisibility, (to, from) => {
             assert(to, '!to!')
             // logD(`appVisibility changed! from:${from ? from.appVisible : false} to: ${to.appVisible}`)
-            if (to && to.appVisible) thiz.setLeader()
+            if (to && to.appVisible) thiz.setLeaderToMe()
          }, {deep: true, immediate: true})
       }
       // подписываемся на изменение localStorage (Событие НЕ работает на вкладке, которая вносит изменения)
@@ -66,21 +66,21 @@ class MutexGlobal {
       })
    }
 
-   setLeader () {
-      logD('change leader to ', this.instanceId)
+   setLeaderToMe () {
       // logW('document.title=', document.title)
       if (document.title && typeof document.title === 'string') {
          document.title = document.title.replace('✨', '')
          document.title = document.title + '✨'
       }
       localStorage.setItem('k_leader_instance_id', this.instanceId)
+      logT('I\'m a leader now!', this.instanceId)
    }
 
    isLeader () {
       if (Platform.is.capacitor) return true
       let currentLeaderInstanceId = localStorage.getItem('k_leader_instance_id')
       if (!currentLeaderInstanceId) {
-         this.setLeader()
+         this.setLeaderToMe()
          currentLeaderInstanceId = this.instanceId
       }
       return currentLeaderInstanceId === this.instanceId

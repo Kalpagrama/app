@@ -51,6 +51,7 @@ const LogSystemModulesEnum = Object.freeze({
    RXDB_LST: 'rxdb_lst',
    RXDB_EVENT: 'rxdb_ev',
    MUTEX: 'mutex',
+   MUTEX_GLOBAL: 'mutex_g',
    BOOT: 'boot',
    CP: 'capacitor'
 })

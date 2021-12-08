@@ -27,6 +27,7 @@ class Cache {
       if (this.created && this.db) { // пересоздание
          try {
             await this.lock('destroy')
+            await this.debouncedDumpLru.flush()
             if (this.db.cache) await rxdbOperationProxyExec(this.db.cache, 'destroy')
             this.db = null
             this.fastCache = null
