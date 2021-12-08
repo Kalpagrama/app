@@ -124,7 +124,7 @@ class RxDBWrapper {
                      await this.recreate(this.store)
                      break
                   case 'k_rxdb_set_auth_user':
-                     await this.setCurrentUser_internal()
+                     await this.recreate(this.store)
                      break
                   default:
                      throw new Error('bad event' + eventKey)
