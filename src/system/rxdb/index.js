@@ -1,17 +1,19 @@
-import { assert } from 'src/system/common/utils'
-import { Workspace } from 'src/system/rxdb/workspace'
-import { LstCollectionEnum, RxCollectionEnum, rxdbOperationProxyExec, WsCollectionEnum } from 'src/system/rxdb/common'
-import { Cache } from 'src/system/rxdb/cache'
-import { Objects } from 'src/system/rxdb/objects'
-import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb/plugins/core'
 import { getRxStorageLoki } from 'rxdb/plugins/lokijs'
-import { Event } from 'src/system/rxdb/event'
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
 // import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
 import { RxDBAjvValidatePlugin } from 'rxdb/plugins/ajv-validate'
 import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump'
 import { RxDBMigrationPlugin } from 'rxdb/plugins/migration'
+import { RxDBUpdatePlugin } from 'rxdb/plugins/update';
+
+import { assert } from 'src/system/common/utils'
+import { Workspace } from 'src/system/rxdb/workspace'
+import { LstCollectionEnum, RxCollectionEnum, rxdbOperationProxyExec, WsCollectionEnum } from 'src/system/rxdb/common'
+import { Cache } from 'src/system/rxdb/cache'
+import { Objects } from 'src/system/rxdb/objects'
+import { Event } from 'src/system/rxdb/event'
+import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { Lists, makeListCacheId } from 'src/system/rxdb/lists'
 import { getReactive, ReactiveListWithPaginationFactory } from 'src/system/rxdb/reactive'
 import { mutexGlobal } from 'src/system/rxdb/mutex_global'
@@ -104,6 +106,7 @@ class RxDBWrapper {
       addRxPlugin(RxDBAjvValidatePlugin)
       addRxPlugin(RxDBJsonDumpPlugin)
       addRxPlugin(RxDBMigrationPlugin)
+      addRxPlugin(RxDBUpdatePlugin);
       // if (process.env.NODE_ENV === 'development') addRxPlugin(RxDBDevModePlugin)
       this.workspace = new Workspace()
       this.cache = new Cache()
