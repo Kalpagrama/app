@@ -69,6 +69,7 @@ class Workspace {
             if (this.db.ws_changes) await rxdbOperationProxyExec(this.db.ws_changes, 'destroy')
             this.db = null
             this.created = false
+            this.store.commit('core/stateSet', ['wsReady', false])
          } finally {
             this.release()
          }
@@ -170,7 +171,7 @@ class Workspace {
                f.nameExtra = 'synchroLoop'
                logD(f, 'start')
                while (true) {
-                  if (thiz.reactiveUser && thiz.synchro && rxdb.initialized && mutexGlobal.isLeader()) {
+                  if (thiz.reactiveUser && thiz.synchro && rxdb.hasCurrentUser && mutexGlobal.isLeader()) {
                      try {
                         await mutexGlobal.lock('ws::synchroLoop')
                         await thiz.lock('ws::synchroLoop')
@@ -191,7 +192,6 @@ class Workspace {
             thiz.synchroLoop().catch(err => logE(f, 'не удалось запустить цикл синхронизации', err))
          }
          this.created = true
-         this.store.commit('core/stateSet', ['wsReady', false])
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, this.created)
       } finally {
          this.release()

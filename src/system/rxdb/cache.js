@@ -84,7 +84,7 @@ class Cache {
             noDisposeOnSet: true,
             dispose: async (id, { actualUntil, actualAge }) => {
                const f = this.dispose
-               if (this.db.cache) {
+               if (this.db && this.db.cache) {
                   assert(actualUntil && actualAge >= 0, `actualUntil && actualAge >= 0 ${actualUntil} ${actualAge}`)
                   let rxDoc = this.fastCache.get(id) || await rxdbOperationProxyExec(this.db.cache, 'findOne', id)
                   if (rxDoc) {
