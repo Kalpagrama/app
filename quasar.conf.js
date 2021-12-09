@@ -85,9 +85,9 @@ module.exports = configure(function (ctx) {
          env: {
             USE_CUSTOM_SW: useCustomSW, // использовать кастомный сервисворкер(push, etc)
             DOCKER_MACHINE_NAME: process.env.DOCKER_MACHINE_NAME || 'local', // имя контенйнера, в котором собран фронт (для того чтобы различать production от dev) (api-dev,api-yc,vercel,local)
-            ORIGIN_URL: process.env.ORIGIN_URL,
+            ORIGIN_URL: process.env.DOCKER_MACHINE_NAME === 'vercel' ? process.env.ORIGIN_URL_VERCEL : process.env.ORIGIN_URL,
             ORIGIN_URL_DEBUG: ctx.mode.pwa && ctx.dev ? process.env.ORIGIN_URL_DEBUG_MAC : process.env.ORIGIN_URL_DEBUG,
-            SERVICES_URL: process.env.SERVICES_URL,
+            SERVICES_URL: process.env.DOCKER_MACHINE_NAME === 'vercel' ? process.env.SERVICES_URL_VERCEL : process.env.SERVICES_URL,
             SERVICES_URL_DEBUG: process.env.SERVICES_URL_DEBUG,
             BUILD_DATE: (new Date().toISOString()).split('T')[0],
             BUILD_VERSION: require('./package.json').version

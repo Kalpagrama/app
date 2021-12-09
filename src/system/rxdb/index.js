@@ -5,7 +5,8 @@ import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
 import { RxDBAjvValidatePlugin } from 'rxdb/plugins/ajv-validate'
 import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump'
 import { RxDBMigrationPlugin } from 'rxdb/plugins/migration'
-import { RxDBUpdatePlugin } from 'rxdb/plugins/update';
+import { RxDBUpdatePlugin } from 'rxdb/plugins/update'
+import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode'
 
 import { assert } from 'src/system/common/utils'
 import { Workspace } from 'src/system/rxdb/workspace'
@@ -105,7 +106,10 @@ class RxDBWrapper {
       addRxPlugin(RxDBJsonDumpPlugin)
       addRxPlugin(RxDBMigrationPlugin)
       addRxPlugin(RxDBUpdatePlugin);
-      // if (process.env.NODE_ENV === 'development') addRxPlugin(RxDBDevModePlugin)
+      if (process.env.NODE_ENV === 'development') {
+         logW('disable RxDBDevModePlugin!')
+         addRxPlugin(RxDBDevModePlugin)
+      }
       this.workspace = new Workspace()
       this.cache = new Cache()
       this.objects = new Objects()
@@ -162,21 +166,21 @@ class RxDBWrapper {
             this.reactiveDocDbMemCache.reset()
             if (this.db.meta) await rxdbOperationProxyExec(this.db.meta, 'destroy')
             if (clearStorage) {
+               alert('before clear rxdb storage')
                await this.db.remove()
-               let dbOpenRequest = window.indexedDB.deleteDatabase('kalpadb.db')
-               await new Promise((resolve, reject) => {
-                  dbOpenRequest.onerror = function(event) {
-                     reject(event)
-                  }
-                  dbOpenRequest.onsuccess = function(event) {
-                     resolve()
-                  }
-                  dbOpenRequest.onblocked = function () {
-                     logW('Couldnt delete database due to the operation being blocked')
-                  };
-               })
+               // let dbOpenRequest = window.indexedDB.deleteDatabase('kalpadb.db')
+               // await new Promise((resolve, reject) => {
+               //    dbOpenRequest.onerror = function(event) {
+               //       reject(event)
+               //    }
+               //    dbOpenRequest.onsuccess = function(event) {
+               //       resolve()
+               //    }
+               //    dbOpenRequest.onblocked = function () {
+               //       logW('Couldnt delete database due to the operation being blocked')
+               //    };
+               // })
             }
-            else await this.db.destroy()
             this.db = null
             this.created = false
          } finally {
