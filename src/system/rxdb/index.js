@@ -112,9 +112,7 @@ class RxDBWrapper {
       this.lists = new Lists()
       this.event = new Event()
       this.gqlQueries = new GqlQueries()
-
-      this.currentUser = reactive({})
-      this.currentSettings = reactive({})
+      this.currentState = reactive({currentUser: null, currentState: null})
       this.processStoreEvent = async (eventKey) => {
          // одна из вкладок пересоздала rxdb либо выполнила rxdb.setAuthUser. Надо обновить
          if (this.created) {
@@ -283,14 +281,17 @@ class RxDBWrapper {
             currentUserDummy = getReactive(dummyUser, 'currentUser')
          }
          assert(currentUserDb || currentUserDummy, 'currentUserDb || currentUserDummy') // должен быть в rxdb после init
-         ReactiveDocFactory.mergeReactive(this.currentUser, currentUserDb || currentUserDummy)
-         this.getCurrentUser = () => this.currentUser
+         // ReactiveDocFactory.mergeReactive(this.currentUser, currentUserDb || currentUserDummy)
+         // this.getCurrentUser = () => this.currentUser
+         this.currentState.currentUser = currentUserDb || currentUserDummy
+         this.getCurrentUser = () => this.currentState.currentUser
          if (currentUserDbFetched) this.workspace.switchOnSynchro(this.getCurrentUser()) // onFetchFunc сработало до этого момента(в кэше не было данных(см clientFirst))
 
          let settings = await this.get(RxCollectionEnum.GQL_QUERY, 'settings')
          assert(settings, '!settings') // были получены ранее в boot.apollo
-         ReactiveDocFactory.mergeReactive(this.currentSettings, settings)
-         this.getCurrentSettings = () => this.currentSettings
+         // ReactiveDocFactory.mergeReactive(this.currentSettings, settings)
+         this.currentState.currentSettings = settings
+         this.getCurrentSettings = () => this.currentState.currentSettings
 
          this.hasCurrentUser = true
       }
