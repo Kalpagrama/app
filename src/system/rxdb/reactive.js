@@ -15,8 +15,8 @@ import { reactive, watch } from 'vue'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_REACTIVE)
 
 // dummyObject - не создавать реактивный объект с нуля, а использовать dummyObject (нужно когда dummyObject уже ушел в UI и нужно сохранить реактивность)
-function getReactive (rxDocOrObject, mirroredVuexObjectKey = null) {
-   let reactiveDocFactory = isRxDocument(rxDocOrObject) ? new ReactiveDocFactory(rxDocOrObject, mirroredVuexObjectKey) : new ReactiveObjFactory(rxDocOrObject, mirroredVuexObjectKey)
+function getReactive (rxDocOrObject) {
+   let reactiveDocFactory = isRxDocument(rxDocOrObject) ? new ReactiveDocFactory(rxDocOrObject) : new ReactiveObjFactory(rxDocOrObject)
    return reactiveDocFactory.getReactive()
 }
 
@@ -67,7 +67,7 @@ async function updateRxDocPayload (rxDocOrId, path, valueOrFunc, debouncedSave =
 const debounceIntervalItem = 2000 // дебаунс сохранения реактивных элементов в rxdb
 
 class ReactiveObjFactory {
-   constructor (object, mirroredVuexObjectKey = null) {
+   constructor (object) {
       assert(typeof object === 'object')
       this.vm = reactive({ reactiveData: {}, rev: 1 })
       this.getReactive = () => {
@@ -79,11 +79,6 @@ class ReactiveObjFactory {
          const reactiveDoc = plainData
          // Vue.set(this.vm.reactiveData, 'doc', reactiveDoc)
          this.vm.reactiveData.doc = reactiveDoc
-         if (mirroredVuexObjectKey) {
-            this.vuexKey = mirroredVuexObjectKey
-            assert(store && store.state && store.state.mirrorObjects, 'store && store.state && store.state.mirrorObjects')
-            store.commit('setMirrorObject', [this.vuexKey, this.getReactive()])
-         }
       }
       this.setReactiveDoc(object)
    }
@@ -102,7 +97,7 @@ function TMP_CHECK (rxDoc, sss) {
 
 // класс-обертка над rxDoc для реактивности
 class ReactiveDocFactory {
-   constructor (rxDoc, mirroredVuexObjectKey = null) {
+   constructor (rxDoc) {
       assert(isRxDocument(rxDoc), '!isRxDocument(rxDoc)')
       assert(rxDoc.id, '!rxDoc.id')
       // TMP_CHECK(rxDoc, '1')
@@ -111,7 +106,7 @@ class ReactiveDocFactory {
       else if (rxDoc.cached) this.itemType = 'object'
       else if (rxDoc.valueString) this.itemType = 'meta'
       else throw new Error('bad itemType')
-      if (rxDoc.reactiveItemHolderMaster && !mirroredVuexObjectKey) {
+      if (rxDoc.reactiveItemHolderMaster) {
          this.getReactive = rxDoc.reactiveItemHolderMaster.getReactive
          this.getDebouncedSave = rxDoc.reactiveItemHolderMaster.getDebouncedSave
          this.setDebouncedSave = rxDoc.reactiveItemHolderMaster.setDebouncedSave
@@ -230,11 +225,6 @@ class ReactiveDocFactory {
                   rxdb.workspace.populateReactiveWsItem(payload)
                }
             }
-            if (mirroredVuexObjectKey) {
-               this.vuexKey = mirroredVuexObjectKey
-               assert(store && store.state && store.state.mirrorObjects, 'store && store.state && store.state.mirrorObjects')
-               store.commit('setMirrorObject', [this.vuexKey, this.getReactive().getPayload()])
-            }
          }
          this.getDebouncedSave = () => {
             return this.debouncedSave
@@ -311,10 +301,6 @@ class ReactiveDocFactory {
       // !!! нельзя ставить flush: 'sync' - жуткие тормоза при обновлении массивов
       this.itemUnsubscribeFunc = watch(() => this.vm.reactiveData, async (newVal, oldVal) => {
          // reactiveItem изменилась (обычно из UI)
-         // изменить связанный объект во vuex
-         if (this.vuexKey) {
-            store.commit('mergeMirrorObject', [this.vuexKey, this.getReactive().getPayload()])
-         }
          if (!this.debouncedItemSaveFunc) {
             // itemSaveFunc - сохраняет текущий reactiveItem в rxdb
             this.itemSaveFunc = async (synchro = true) => {

@@ -15,7 +15,7 @@ import { Objects } from 'src/system/rxdb/objects'
 import { Event } from 'src/system/rxdb/event'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { Lists, makeListCacheId } from 'src/system/rxdb/lists'
-import { getReactive, ReactiveListWithPaginationFactory } from 'src/system/rxdb/reactive'
+import { getReactive, ReactiveDocFactory, ReactiveListWithPaginationFactory } from 'src/system/rxdb/reactive'
 import { mutexGlobal } from 'src/system/rxdb/mutex_global'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import { cacheSchema, schemaKeyValue } from 'src/system/rxdb/schemas'
@@ -23,9 +23,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import LruCache from 'lru-cache'
 import { GqlQueries } from 'src/system/rxdb/gql_query'
 import { setSyncEventStorageValue } from 'src/system/services'
-import { ObjectApi } from 'src/api/object'
-import { store } from 'src/store'
-import { wait } from 'src/system/common/common_func'
+import { reactive } from 'vue'
 
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB)
 
@@ -114,6 +112,9 @@ class RxDBWrapper {
       this.lists = new Lists()
       this.event = new Event()
       this.gqlQueries = new GqlQueries()
+
+      this.currentUser = reactive({})
+      this.currentSettings = reactive({})
       this.processStoreEvent = async (eventKey) => {
          // одна из вкладок пересоздала rxdb либо выполнила rxdb.setAuthUser. Надо обновить
          if (this.created) {
@@ -180,7 +181,6 @@ class RxDBWrapper {
             else await this.db.destroy()
             this.db = null
             this.created = false
-            store.commit('stateSet', ['rxdbInitialized', false])
          } finally {
             this.release()
             await mutexGlobal.release('rxdb::destroy')
@@ -267,8 +267,7 @@ class RxDBWrapper {
                onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
                   if (currentUserDb && this.getCurrentUser) this.workspace.switchOnSynchro(this.getCurrentUser()) // в кэше есть данные (onFetchFunc сработает после this.getCurrentUser = ...)
                   else currentUserDbFetched = true // если данных в кэше не было, то onFetchFunc выпольнится раньше, чем this.getCurrentUser = ...
-               },
-               mirroredVuexObjectKey: 'currentUser' // vuexKey - создаст или обновит связанный объект в vuex по этому ключу
+               }
             })
          } else {
             assert(dummyUser, '!dummyUser')
@@ -284,16 +283,15 @@ class RxDBWrapper {
             currentUserDummy = getReactive(dummyUser, 'currentUser')
          }
          assert(currentUserDb || currentUserDummy, 'currentUserDb || currentUserDummy') // должен быть в rxdb после init
-         this.getCurrentUser = () => {
-            assert(this.store && this.store.state.mirrorObjects['currentUser'], '!this.store && this.store.state.mirrorObjects[currentUser]')
-            return this.store.state.mirrorObjects['currentUser']
-         }
+         ReactiveDocFactory.mergeReactive(this.currentUser, currentUserDb || currentUserDummy)
+         this.getCurrentUser = () => this.currentUser
          if (currentUserDbFetched) this.workspace.switchOnSynchro(this.getCurrentUser()) // onFetchFunc сработало до этого момента(в кэше не было данных(см clientFirst))
-         let settingsDb = await this.get(RxCollectionEnum.GQL_QUERY, 'settings', {
-            mirroredVuexObjectKey: 'currentSettings' // создаст или обновит связанный объект в vuex по этому ключу
-         })
-         assert(settingsDb, '!settingsDb')
-         store.commit('stateSet', ['rxdbInitialized', true])
+
+         let settings = await this.get(RxCollectionEnum.GQL_QUERY, 'settings')
+         assert(settings, '!settings') // были получены ранее в boot.apollo
+         ReactiveDocFactory.mergeReactive(this.currentSettings, settings)
+         this.getCurrentSettings = () => this.currentSettings
+
          this.hasCurrentUser = true
       }
       logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
@@ -620,7 +618,6 @@ class RxDBWrapper {
       onFetchFunc = null,
       params = null,
       beforeCreate = false,
-      mirroredVuexObjectKey = null, // создаст или обновит связанный объект в vuex по этому ключу
       queryId = Date.now(), // id запроса чтобы потом можно было отменить
       cancel = false // отменить запрос на сервер если это возможно (используется при прокрутке ленты)
    } = {}) {
@@ -648,7 +645,7 @@ class RxDBWrapper {
             } else reactiveDoc = cachedReactiveItem // остальные элементы не устаревают
          }
       }
-      if (!reactiveDoc || mirroredVuexObjectKey || cancel) {
+      if (!reactiveDoc || cancel) {
          let rxDoc = await this.getRxDoc(id, {
             fetchFunc,
             notEvict,
@@ -662,7 +659,7 @@ class RxDBWrapper {
             cancel
          })
          if (!rxDoc) return null
-         reactiveDoc = getReactive(rxDoc, mirroredVuexObjectKey)
+         reactiveDoc = getReactive(rxDoc)
          this.reactiveDocDbMemCache.set(id, reactiveDoc)
       }
       this.store.commit('debug/addReactiveItem', { id, reactiveItem: reactiveDoc.getPayload() })
