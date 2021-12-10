@@ -221,15 +221,14 @@ class RxDBWrapper {
          if (!this.db) {
             this.rxStorage = getRxStorageLoki({
                adapter: new LokiIncrementalIndexedDBAdapter(),
-               ignoreDuplicate: true,
-               // multiInstance: false,
                // * Do not set lokiJS persistence options like autoload and autosave,
                // * RxDB will pick proper defaults based on the given adapter
             })
+            logW('TODO multiInstance: false. Вернуть true, когда в rxdb исчезнет баг с несколькими вкладками')
             this.db = await createRxDatabase({
                name: 'kalpadb',
                storage: this.rxStorage,
-               multiInstance: true // <- multiInstance (optional, default: true)
+               multiInstance: false // <- multiInstance (optional, default: true)
                // eventReduce: false // если поставить true - будут теряться события об обновлении (по всей видимости - это баг)<- eventReduce (optional, default: true)
                // pouchSettings: { revs_limit: 1 }
             })
