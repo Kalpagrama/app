@@ -29,7 +29,7 @@
   ).row
   div(v-else).row.full-width.q-px-sm.q-pb-sm
     q-btn(
-      @click="itemFinderShow = true"
+      @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить связь авторизуйтесь'}]) : itemFinderShow = true"
       flat color="white" no-caps icon="add" size="lg" stack
     :style=`{minHeight: '200px'}`
     ).full-width.b-40
@@ -38,7 +38,7 @@
     :label="$t('Create joint')"
     :loading="jointPublishing"
     :style=`{height: '50px', borderRadius: '0px'}`
-    @click="jointPublish").row.full-width.text-green.text-bold
+    @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить связь авторизуйтесь'}]) : jointPublish").row.full-width.text-green.text-bold
 </template>
 
 <script>
