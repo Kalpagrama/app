@@ -1,7 +1,6 @@
 import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb/plugins/core'
 import { getRxStorageLoki } from 'rxdb/plugins/lokijs'
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
-// import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
 import { RxDBAjvValidatePlugin } from 'rxdb/plugins/ajv-validate'
 import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump'
 import { RxDBMigrationPlugin } from 'rxdb/plugins/migration'
@@ -166,7 +165,7 @@ class RxDBWrapper {
             this.reactiveDocDbMemCache.reset()
             if (this.db.meta) await rxdbOperationProxyExec(this.db.meta, 'destroy')
             if (clearStorage) {
-               alert('before clear rxdb storage')
+               // alert('before clear rxdb storage')
                await this.db.remove()
                // let dbOpenRequest = window.indexedDB.deleteDatabase('kalpadb.db')
                // await new Promise((resolve, reject) => {
@@ -180,7 +179,7 @@ class RxDBWrapper {
                //       logW('Couldnt delete database due to the operation being blocked')
                //    };
                // })
-            }
+            } // else await this.db.destroy()
             this.db = null
             this.created = false
          } finally {
