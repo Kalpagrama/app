@@ -60,19 +60,31 @@ class Workspace {
       this.synchroLoopWaitObj = new WaitBreakable(synchroTimeDefault)
    }
 
-   async destroy () {
-      if (this.created && this.db) { // пересоздание
-         await this.switchOffSynchro() // до await this.lock
-         try {
-            await this.lock('ws::destroy')
-            if (this.db.ws_items) await rxdbOperationProxyExec(this.db.ws_items, 'destroy')
-            if (this.db.ws_changes) await rxdbOperationProxyExec(this.db.ws_changes, 'destroy')
-            this.db = null
-            this.created = false
-            this.store.commit('core/stateSet', ['wsReady', false])
-         } finally {
-            this.release()
+   async destroy (clearStorageMethod) {
+      await this.switchOffSynchro() // до await this.lock
+      try {
+         await this.lock('ws::destroy')
+         this.created = false
+         if (clearStorageMethod === 'destroy') {
+            if (this.db && this.db.ws_items) await rxdbOperationProxyExec(this.db.ws_items, 'destroy')
+            if (this.db && this.db.ws_changes) await rxdbOperationProxyExec(this.db.ws_changes, 'destroy')
+         } else if (clearStorageMethod === 'remove_collections') {
+            if (this.db && this.db.ws_items) await rxdbOperationProxyExec(this.db.ws_items, 'remove')
+            if (this.db && this.db.ws_changes) await rxdbOperationProxyExec(this.db.ws_changes, 'remove')
+         } else if (clearStorageMethod === 'remove_rows') {
+            if (this.db && this.db.ws_items) {
+               let query = rxdbOperationProxy(this.db.ws_items, 'find')
+               await query.remove();
+            }
+            if (this.db && this.db.ws_changes) {
+               let query = rxdbOperationProxy(this.db.ws_changes, 'find')
+               await query.remove();
+            }
          }
+         this.db = null
+         this.store.commit('core/stateSet', ['wsReady', false])
+      } finally {
+         this.release()
       }
    }
 
@@ -81,21 +93,23 @@ class Workspace {
       const t1 = performance.now()
       assert(db && store)
       try {
-         await this.lock('ws::recreate')
+         await this.lock('create')
          this.db = db
          this.store = store
-         await this.db.addCollections({
-            ws_items: {
-               schema: wsSchemaItem,
-               migrationStrategies: {
-                  // ..., - см wsSchemaItem.version (из schema.js)
-                  1: oldDoc => oldDoc,
-                  2: oldDoc => oldDoc,
-                  3: oldDoc => oldDoc
+         if (!this.db.ws_items) {
+            await this.db.addCollections({
+               ws_items: {
+                  schema: wsSchemaItem,
+                  migrationStrategies: {
+                     // ..., - см wsSchemaItem.version (из schema.js)
+                     1: oldDoc => oldDoc,
+                     2: oldDoc => oldDoc,
+                     3: oldDoc => oldDoc
+                  }
                }
-            }
-         })
-         await this.db.addCollections({ ws_changes: { schema: wsSchemaLocalChanges } })
+            })
+         }
+         if (!this.db.ws_changes) await this.db.addCollections({ ws_changes: { schema: wsSchemaLocalChanges } })
          assert(this.db.ws_items && this.db.ws_changes, '!this.db.ws_items && this.db.ws_changes')
          // обработка события измения мастерской пользователем (запоминает измененные элементы)
          let onWsChangedByUser = async (id, operation, plainData) => {
@@ -155,6 +169,7 @@ class Workspace {
             await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData)
          }, false)
          this.db.ws_items.postRemove(async (plainData) => {
+            if (!this.created) return // см. destroy ('remove_rows')
             // сработает НЕ на всех вкладках (только на той, что изменила итем)
             // если нет rev - то элемент еще не создавался на сервере (удалять с сервера не надо его)
             logD('postRemove')
@@ -165,13 +180,13 @@ class Workspace {
 
          if (!this.synchroLoop) {
             let thiz = this
-            // синхроним изменения в цикле (не лямбда! тк recreate может вызываться неск-ко раз!)
+            // синхроним изменения в цикле (не лямбда! тк create может вызываться неск-ко раз
             this.synchroLoop = async function () {
                const f = thiz.synchroLoop
                f.nameExtra = 'synchroLoop'
                logD(f, 'start')
                while (true) {
-                  if (thiz.reactiveUser && thiz.synchro && rxdb.hasCurrentUser && mutexGlobal.isLeader()) {
+                  if (thiz.created && thiz.db && thiz.reactiveUser && thiz.synchro && rxdb.hasCurrentUser && mutexGlobal.isLeader()) {
                      try {
                         await mutexGlobal.lock('ws::synchroLoop')
                         await thiz.lock('ws::synchroLoop')
@@ -196,14 +211,6 @@ class Workspace {
       } finally {
          this.release()
       }
-   }
-
-   async recreate (db, store) {
-      const f = this.recreate
-      const t1 = performance.now()
-      assert(db && store)
-      await this.destroy()
-      await this.create(db, store)
    }
 
    switchOnSynchro (reactiveUser) { // для гостей мастерская НЕ синхронится с сервером!

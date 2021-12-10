@@ -62,7 +62,7 @@ class Lists {
    // список последних созданных/удаленных сущностей и сферы на которые они попали
    // (объект возвращается раньше, чем изментся сфера (меняются только после голосования))
 
-   async destroy () {
+   async destroy (clearStorage) {
       if (this.created) {
          this.created = false
       }
@@ -72,11 +72,6 @@ class Lists {
       this.cache = cache
       Lists.cache = cache
       this.created = true
-   }
-
-   async recreate (cache) {
-      await this.destroy()
-      await this.create(cache)
    }
 
    // вернет  список (из кэша или с сервера)

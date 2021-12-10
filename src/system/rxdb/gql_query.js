@@ -64,7 +64,7 @@ class GqlQueries {
       return fetchFunc
    }
 
-   async destroy () {
+   async destroy (clearStorage) {
       if (this.created) {
          this.created = false
       }
@@ -73,11 +73,6 @@ class GqlQueries {
    async create (cache) {
       this.cache = cache
       this.created = true
-   }
-
-   async recreate (cache) {
-      await this.destroy()
-      await this.create(cache)
    }
 
    // Вернет объект из кэша, либо запросит его. и вернет промис, который ВОЗМОЖНО когда-то выполнится(когда дойдет очередь);

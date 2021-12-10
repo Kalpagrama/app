@@ -91,7 +91,7 @@ async function initApplication () {
    window.addEventListener('storage', async function (event) {
       try {
          await storageEventMutex.lock('onStorageEvent')// события валятся параллельно (второе приходит не дожидаясь выполнения первого)
-         if (!event.key || !event.key.in('k_login_date', 'k_logout_date', 'k_rxdb_recreate_date', 'k_rxdb_set_auth_user')) return
+         if (!event.key || !event.key.in('k_login_date', 'k_logout_date', 'k_rxdb_reset_date', 'k_rxdb_set_auth_user')) return
          if (event.newValue) {
             logD('storage sync event:', event)
             const getSyncEventStorageValue = (strValue) => { // В сафари событие срабатывает и на вкладке, которая инициировала изменения
@@ -108,7 +108,7 @@ async function initApplication () {
                   logD(`localStorage auth event: ${event.key}`, event)
                   if (getSyncEventStorageValue(event.newValue)) await router.replace('/auth')
                   break
-               case 'k_rxdb_recreate_date':
+               case 'k_rxdb_reset_date':
                case 'k_rxdb_set_auth_user':
                   if (getSyncEventStorageValue(event.newValue)) await rxdb.processStoreEvent(event.key)
                   break
@@ -127,7 +127,7 @@ async function initApplication () {
 function setSyncEventStorageValue (key, value) {
    const f = setSyncEventStorageValue
    logD(f, key, value, mutexGlobal.getInstanceId())
-   assert(key.in('k_login_date', 'k_logout_date', 'k_rxdb_recreate_date', 'k_rxdb_set_auth_user'), 'bad key: ' + key)
+   assert(key.in('k_login_date', 'k_logout_date', 'k_rxdb_reset_date', 'k_rxdb_set_auth_user'), 'bad key: ' + key)
    assert(key && value && mutexGlobal.getInstanceId(), '!key && value' + key + value)
    localStorage.setItem(key, JSON.stringify({ value, instanceId: mutexGlobal.getInstanceId() })) // сообщаем другим вкладкам
 }
@@ -248,7 +248,7 @@ async function systemReset (clearAuthData = false, clearRxdb = true, reload = tr
          await systemHardReset()
          return
       }
-      if (clearRxdb) await rxdb.recreate(store, true) // сначала очистим базу, потом resetLocalStorage (ей может понадобиться k_token)
+      if (clearRxdb) await rxdb.reset(store) // сначала очистим базу, потом resetLocalStorage (ей может понадобиться k_token)
       if (clearAuthData) await resetLocalStorage()
       if (pwaResetFlag && process.env.MODE === 'pwa') await pwaReset()
       if (clearAuthData) {

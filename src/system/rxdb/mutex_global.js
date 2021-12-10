@@ -1,7 +1,7 @@
 import { assert, wait } from 'src/system/common/utils'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { AppVisibility, Platform } from 'quasar'
-import { reactive, watch } from 'vue'
+import { watch } from 'vue'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.MUTEX_GLOBAL)
 
 const actualLockUpdateInterval = 300 // интервал обновления статуса активной блокировки
@@ -20,7 +20,7 @@ class MutexGlobal {
       window.addEventListener('beforeunload', () => {
          logD('on page unload')
          this.unloadingInProgress = true
-         sessionStorage.setItem('k_instance_id', this.instanceId) // запоминаем instanceId (хранится в сторадж только тогда когда вкладка закрыта (иначе при дублировании вкладки - дублируется и instanceId))
+         sessionStorage.setItem('k_instance_id', this.instanceId) // запоминаем instanceId (хранится в сторадж только тогда когда вкладка закрыта (иначе при дублировании вкладки в хроме - дублируется и instanceId))
          let currentLock = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({
             dt: 0,
             instanceId: ''
@@ -32,12 +32,12 @@ class MutexGlobal {
       { // leader detection
          // отслеживание открыта ли вкладка
          const thiz = this
-         this.vm = reactive({ appVisibility: AppVisibility })
-         let unwatchFunc = watch(() => this.vm.appVisibility, (to, from) => {
-            assert(to, '!to!')
-            // logD(`appVisibility changed! from:${from ? from.appVisible : false} to: ${to.appVisible}`)
-            if (to && to.appVisible) thiz.setLeaderToMe()
-         }, {deep: true, immediate: true})
+         watch(() => AppVisibility.appVisible, state => {
+            // alert('appVisibility' + !!state)
+            if (state) {
+               thiz.setLeaderToMe()
+            }
+         }, {immediate: true})
       }
       // подписываемся на изменение localStorage (Событие НЕ работает на вкладке, которая вносит изменения)
       // upd В сафари событие срабатывает и на вкладке, которая инициировала изменения

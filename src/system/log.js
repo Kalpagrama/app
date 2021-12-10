@@ -83,7 +83,7 @@ class Logger {
             }))
          }
          if (!sessionStorage.getItem('k_log_level')) {
-            if (process.env.NODE_ENV === 'development') sessionStorage.setItem('k_log_level', LogLevelEnum.DEBUG)
+            if (process.env.DEV) sessionStorage.setItem('k_log_level', LogLevelEnum.DEBUG)
             else sessionStorage.setItem('k_log_level', LogLevelEnum.WARNING)
          }
          if (!sessionStorage.getItem('k_log_filter')) sessionStorage.setItem('k_log_filter', this.store.state.core.logDbgFilter)

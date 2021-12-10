@@ -83,10 +83,10 @@ module.exports = {
     'prefer-promise-reject-errors': 'off',
 
     // allow console.log during development only
-    // 'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    // 'no-console': process.env.PROD ? 'error' : 'off',
     'no-console': 'off',
     // allow debugger during development only
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    'no-debugger': process.env.PROD ? 'error' : 'off',
 
     // custom
     'no-return-await': 0,

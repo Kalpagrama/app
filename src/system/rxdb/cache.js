@@ -6,7 +6,7 @@ import { mutexGlobal } from 'src/system/rxdb/mutex_global'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
 import debounce from 'lodash/debounce'
 import { getRxCollectionEnumFromId, rxdb } from 'src/system/rxdb'
-import { rxdbOperationProxyExec } from 'src/system/rxdb/common'
+import { rxdbOperationProxy, rxdbOperationProxyExec } from 'src/system/rxdb/common'
 
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_CACHE)
 
@@ -23,20 +23,31 @@ class Cache {
       this.mutex = new MutexLocal('rxdb::cache')
    }
 
-   async destroy () {
-      if (this.created && this.db) { // пересоздание
-         try {
-            await this.lock('destroy')
-            await this.debouncedDumpLru.flush()
-            if (this.db.cache) await rxdbOperationProxyExec(this.db.cache, 'destroy')
-            this.db = null
-            this.fastCache = null
-            if (this.cacheLru) this.cacheLru.reset() // после this.db.cache = null
-            this.cacheLru = null
-            this.created = false
-         } finally {
-            this.release()
+   async destroy (clearStorageMethod) {
+      try {
+         await this.lock('destroy')
+
+         this.created = false
+         this.debouncedDumpLru.cancel()
+         // if (clearStorageMethod.in('destroy', 'none')) this.debouncedDumpLru.cancel()
+         // else await this.debouncedDumpLru.flush()
+
+         if (clearStorageMethod === 'destroy') {
+            if (this.db && this.db.cache) await rxdbOperationProxyExec(this.db.cache, 'destroy')
+         } else if (clearStorageMethod === 'remove_collections') {
+            if (this.db && this.db.cache) await rxdbOperationProxyExec(this.db.cache, 'remove')
+         } else if (clearStorageMethod === 'remove_rows') {
+            if (this.db && this.db.cache) {
+               let query = rxdbOperationProxy(this.db.cache, 'find')
+               await query.remove();
+            }
          }
+         this.db = null
+         this.fastCache = null
+         if (this.cacheLru) this.cacheLru.reset() // после this.db = null
+         this.cacheLru = null
+      } finally {
+         this.release()
       }
    }
 
@@ -46,11 +57,11 @@ class Cache {
       const t1 = performance.now()
       assert(db, '!rxdb')
       try {
-         await this.lock('recreate')
+         await this.lock('create')
          this.db = db
          assert(!this.created, 'this.created')
 
-         await this.db.addCollections({ cache: { schema: cacheSchema } })
+         if (!this.db.cache) await this.db.addCollections({ cache: { schema: cacheSchema } })
          assert(this.db.cache, '!this.db.cache')
          this.db.cache.postInsert(async (plainData) => {
             await this.debouncedDumpLru()
@@ -104,7 +115,8 @@ class Cache {
 
          // заполняем cacheLru из idb
          // let lruDump = await rxdb.get(RxCollectionEnum.META, 'lruDump') так не делаем чтобы reactiveItem не дергался каждый раз при измнении
-         let lruDumpDoc = await rxdbOperationProxyExec(rxdb.db.meta, 'findOne', 'lruDump')
+         assert(this.db.meta)
+         let lruDumpDoc = await rxdbOperationProxyExec(this.db.meta, 'findOne', 'lruDump')
          if (lruDumpDoc) {
             logD(f, 'восстанавливаем Lru')
             let lruDump = JSON.parse(lruDumpDoc.valueString)
@@ -142,15 +154,6 @@ class Cache {
       } finally {
          this.release()
       }
-   }
-
-   async recreate (db) {
-      const f = this.recreate
-      logD(f, 'start')
-      const t1 = performance.now()
-      assert(db, '!rxdb')
-      await this.destroy()
-      await this.create(db)
    }
 
    async lock (lockOwner) {

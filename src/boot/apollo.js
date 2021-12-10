@@ -29,9 +29,6 @@ export default boot(async ({
   try {
     const f = { nameExtra: 'boot::apollo' }
     logD(f, 'start')
-    // logW(f, 'SERVICES_URL_DEBUG=', process.env.SERVICES_URL_DEBUG)
-    // logW(f, 'SERVICES_URL=', process.env.SERVICES_URL)
-    // logW(f, 'DOCKER_MACHINE_NAME=', process.env.DOCKER_MACHINE_NAME)
     const t1 = performance.now()
     let fetchFunc
     fetchFunc = fetch
@@ -39,8 +36,7 @@ export default boot(async ({
     let kDebug = sessionStorage.getItem('k_debug')// запросы переренаправляются на машину разработчика
     kDebug = kDebug === '1'
     // Vue.use(VueApollo)
-    let SERVICES_URL = (process.env.NODE_ENV === 'development' ? process.env.SERVICES_URL_DEBUG : process.env.SERVICES_URL)
-    logD('SERVICES_URL=' + SERVICES_URL)
+    logD('SERVICES_URL=' + process.env.SERVICES_URL)
     const errLink = onError(({
       operation,
       response,
@@ -115,7 +111,7 @@ export default boot(async ({
     }
     const settingsApollo = new ApolloClient({
       link: createHttpLink({
-        uri: SERVICES_URL,
+        uri: process.env.SERVICES_URL,
         fetch (uri, options) {
           if (kDebug) options.headers['X-Kalpagrama-debug'] = 'k_debug'
           return fetchFunc(uri, options)

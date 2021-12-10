@@ -11,7 +11,7 @@ import { eventBus } from 'src/boot/libs'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_EVENT)
 
 class Event {
-   async destroy () {
+   async destroy (clearStorage) {
       if (this.created) {
          this.created = false
       }
@@ -23,11 +23,6 @@ class Event {
       this.lists = lists
       this.cache = cache
       this.created = true
-   }
-
-   async recreate (workspace, objects, lists, cache) {
-      await this.destroy()
-      await this.create(workspace, objects, lists, cache)
    }
 
    // от сервера прилетел эвент (поправим данные в кэше)

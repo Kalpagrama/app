@@ -6,7 +6,6 @@ import ui from './ui'
 import debug from './debug'
 import { assert } from 'src/system/common/utils'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
-import { ReactiveDocFactory } from 'src/system/rxdb/reactive'
 import { rxdb } from 'src/system/rxdb'
 
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.VUEX)
@@ -24,25 +23,7 @@ export default store(function (/* { ssrContext } */) {
       // for dev mode and --debug builds only
       strict: process.env.DEBUGGING,
       state: {},
-      mutations: {
-         // setMirrorObject (state, [vuexKey, val]) {
-         //    assert(vuexKey && val, '!vuexKey && val')
-         //    let copy = JSON.parse(JSON.stringify(val))
-         //    copy.vuexKey = vuexKey
-         //    // Vue.set(state.mirrorObjects, vuexKey, copy)
-         //    state.mirrorObjects[vuexKey] = copy
-         // },
-         // mergeMirrorObject (state, [vuexKey, val]) {
-         //    assert(vuexKey && val, '!vuexKey && val')
-         //    let existing = state.mirrorObjects[vuexKey]
-         //    assert(existing)
-         //    ReactiveDocFactory.mergeReactive(existing, val)
-         // },
-         stateSet (state, [key, val]) {
-            assert(Object.prototype.hasOwnProperty.call(state, key))
-            state[key] = val
-         }
-      },
+      mutations: {},
       getters: {
          currentUser: (state, getters, rootState, rootGetters) => {
             assert(rxdb.getCurrentUser())

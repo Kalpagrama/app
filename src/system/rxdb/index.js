@@ -9,7 +9,13 @@ import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode'
 
 import { assert } from 'src/system/common/utils'
 import { Workspace } from 'src/system/rxdb/workspace'
-import { LstCollectionEnum, RxCollectionEnum, rxdbOperationProxyExec, WsCollectionEnum } from 'src/system/rxdb/common'
+import {
+   LstCollectionEnum,
+   RxCollectionEnum,
+   rxdbOperationProxy,
+   rxdbOperationProxyExec,
+   WsCollectionEnum
+} from 'src/system/rxdb/common'
 import { Cache } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
 import { Event } from 'src/system/rxdb/event'
@@ -105,7 +111,7 @@ class RxDBWrapper {
       addRxPlugin(RxDBJsonDumpPlugin)
       addRxPlugin(RxDBMigrationPlugin)
       addRxPlugin(RxDBUpdatePlugin);
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.DEV) {
          logW('disable RxDBDevModePlugin!')
          addRxPlugin(RxDBDevModePlugin)
       }
@@ -115,7 +121,7 @@ class RxDBWrapper {
       this.lists = new Lists()
       this.event = new Event()
       this.gqlQueries = new GqlQueries()
-      this.currentState = reactive({currentUser: null, currentState: null})
+      this.currentState = reactive({ currentUser: null, currentState: null })
       this.processStoreEvent = async (eventKey) => {
          // одна из вкладок пересоздала rxdb либо выполнила rxdb.setAuthUser. Надо обновить
          if (this.created) {
@@ -125,11 +131,17 @@ class RxDBWrapper {
             const t1 = performance.now()
             try {
                switch (eventKey) {
-                  case 'k_rxdb_recreate_date':
-                     await this.recreate(this.store)
+                  case 'k_rxdb_reset_date':
+                     // TODO у rxdb проблемы при работе на неск-ких вкладках после очистки БД
+                     // на другой вкладке произошла очистка данных
+                     // await this.destroy('destroy') // уничтожить текущий экземпляр (данные не удалять)
+                     // await this.create(this.store)
                      break
                   case 'k_rxdb_set_auth_user':
-                     await this.recreate(this.store)
+                     // TODO у rxdb проблемы при работе на неск-ких вкладках после очистки БД
+                     // на другой вкладке произошла авторизация
+                     // await this.destroy('destroy') // уничтожить текущий экземпляр (данные не удалять)
+                     // await this.create(this.store)
                      break
                   default:
                      throw new Error('bad event' + eventKey)
@@ -150,67 +162,79 @@ class RxDBWrapper {
    }
 
    // clearStorage - реально стереть данные в indexedDb
-   async destroy (clearStorage) {
-      if (this.created && this.db) { // пересоздание
-         try {
-            await mutexGlobal.lock('rxdb::destroy')
-            await this.lock('destroy')
-            await this.workspace.switchOffSynchro()
-            await this.gqlQueries.destroy()
-            await this.event.destroy()
-            await this.lists.destroy()
-            await this.objects.destroy()
-            await this.cache.destroy()
-            await this.workspace.destroy()
-            this.reactiveDocDbMemCache.reset()
-            if (this.db.meta) await rxdbOperationProxyExec(this.db.meta, 'destroy')
-            if (clearStorage) {
-               // alert('before clear rxdb storage')
-               await this.db.remove()
-               // let dbOpenRequest = window.indexedDB.deleteDatabase('kalpadb.db')
-               // await new Promise((resolve, reject) => {
-               //    dbOpenRequest.onerror = function(event) {
-               //       reject(event)
-               //    }
-               //    dbOpenRequest.onsuccess = function(event) {
-               //       resolve()
-               //    }
-               //    dbOpenRequest.onblocked = function () {
-               //       logW('Couldnt delete database due to the operation being blocked')
-               //    };
-               // })
-            } // else await this.db.destroy()
+   async destroy (clearStorageMethod = 'none') {
+      assert(clearStorageMethod.in('none', 'destroy', 'remove_db', 'remove_collections', 'remove_rows'))
+      try {
+         await mutexGlobal.lock('rxdb::destroy')
+         // alert('rxdb destroy. clearStorageMethod=' + clearStorageMethod)
+         await this.lock('destroy')
+         this.created = false
+         await this.workspace.switchOffSynchro()
+         await this.gqlQueries.destroy(clearStorageMethod)
+         await this.event.destroy(clearStorageMethod)
+         await this.lists.destroy(clearStorageMethod)
+         await this.objects.destroy(clearStorageMethod)
+         await this.cache.destroy(clearStorageMethod)
+         await this.workspace.destroy(clearStorageMethod)
+         this.reactiveDocDbMemCache.reset()
+         if (clearStorageMethod === 'destroy') { // просто уничтожить текущий экземпляр (данные не удалять)
+            if (this.db && this.db.meta) await rxdbOperationProxyExec(this.db.meta, 'destroy')
+            if (this.db) await this.db.destroy()
             this.db = null
-            this.created = false
-         } finally {
-            this.release()
-            await mutexGlobal.release('rxdb::destroy')
+         } else if (clearStorageMethod === 'remove_db'){
+            await this.db.remove()
+            // let dbOpenRequest = window.indexedDB.deleteDatabase('kalpadb.db')
+            // await new Promise((resolve, reject) => {
+            //    dbOpenRequest.onerror = function(event) {
+            //       reject(event)
+            //    }
+            //    dbOpenRequest.onsuccess = function(event) {
+            //       resolve()
+            //    }
+            //    dbOpenRequest.onblocked = function () {
+            //       logW('Couldnt delete database due to the operation being blocked')
+            //    }
+            // })
+            this.db = null
+         } else if (clearStorageMethod === 'remove_collections') {
+            if (this.db && this.db.meta) await rxdbOperationProxyExec(this.db.meta, 'remove')
+         } else if (clearStorageMethod === 'remove_rows') {
+            if (this.db && this.db.meta) {
+               let query = rxdbOperationProxy(this.db.meta, 'find')
+               await query.remove();
+            }
          }
+      } finally {
+         this.release()
+         await mutexGlobal.release('rxdb::destroy')
       }
    }
 
    async create (store) {
       const f = this.create
       logT(f, 'start')
-      assert(!this.db)
       const t1 = performance.now()
       this.store = store
       try {
          await mutexGlobal.lock('rxdb::create')
          await this.lock('create')
-         this.rxStorage = getRxStorageLoki({
-            adapter: new LokiIncrementalIndexedDBAdapter()
-            // * Do not set lokiJS persistence options like autoload and autosave,
-            // * RxDB will pick proper defaults based on the given adapter
-         })
-         this.db = await createRxDatabase({
-            name: 'kalpadb',
-            storage: this.rxStorage,
-            multiInstance: true // <- multiInstance (optional, default: true)
-            // eventReduce: false // если поставить true - будут теряться события об обновлении (по всей видимости - это баг)<- eventReduce (optional, default: true)
-            // pouchSettings: { revs_limit: 1 }
-         })
-         await this.db.addCollections({ meta: { schema: schemaKeyValue } })
+         if (!this.db) {
+            this.rxStorage = getRxStorageLoki({
+               adapter: new LokiIncrementalIndexedDBAdapter(),
+               ignoreDuplicate: true,
+               // multiInstance: false,
+               // * Do not set lokiJS persistence options like autoload and autosave,
+               // * RxDB will pick proper defaults based on the given adapter
+            })
+            this.db = await createRxDatabase({
+               name: 'kalpadb',
+               storage: this.rxStorage,
+               multiInstance: true // <- multiInstance (optional, default: true)
+               // eventReduce: false // если поставить true - будут теряться события об обновлении (по всей видимости - это баг)<- eventReduce (optional, default: true)
+               // pouchSettings: { revs_limit: 1 }
+            })
+         }
+         if (!this.db.meta) await this.db.addCollections({ meta: { schema: schemaKeyValue } })
 
          this.reactiveDocDbMemCache.reset()
          await this.workspace.create(this.db, store)
@@ -232,6 +256,7 @@ class RxDBWrapper {
          logE(f, 'rxdb::create error! очищаем и пересоздаем!', err)
          if (this.db) await this.db.remove() // предпочтительно, тк removeRxDatabase иногда глючит
          else if (this.rxStorage) await removeRxDatabase('kalpadb', this.rxStorage)
+         this.db = null
          throw err
       } finally {
          this.release()
@@ -239,14 +264,15 @@ class RxDBWrapper {
       }
    }
 
-   async recreate (store, clearStorage = false) {
-      const f = this.recreate
-      logT(f, 'start')
+   // очистить все данные и пересоздать
+   async reset (store) {
+      const f = this.reset
+      logT(f, 'reset')
       const t1 = performance.now()
       this.store = store
-      await this.destroy(clearStorage)
+      await this.destroy('remove_db')
       await this.create(store)
-      if (clearStorage) setSyncEventStorageValue('k_rxdb_recreate_date', Date.now().toString()) // сообщаем другим вкладкам
+      setSyncEventStorageValue('k_rxdb_reset_date', Date.now().toString()) // сообщаем другим вкладкам
    }
 
    // получить юзера, запустить обработку эвентов и синхронмзацию мастерской (dummyUser - для входа без регистрации)
@@ -255,7 +281,8 @@ class RxDBWrapper {
       logD(f, 'start')
       const t1 = performance.now()
       let authUser = await this.getAuthUser()
-      if (authUser) {
+      let settings = await this.get(RxCollectionEnum.GQL_QUERY, 'settings') // были получены в boot.apollo после инициализации rxdb
+      if (authUser && settings) {
          let { userOid, dummyUser } = authUser
          assert(userOid || dummyUser, '!userOid || dummyUser')
          // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возьмется из кэша
@@ -290,8 +317,8 @@ class RxDBWrapper {
          this.getCurrentUser = () => this.currentState.currentUser
          if (currentUserDbFetched) this.workspace.switchOnSynchro(this.getCurrentUser()) // onFetchFunc сработало до этого момента(в кэше не было данных(см clientFirst))
 
-         let settings = await this.get(RxCollectionEnum.GQL_QUERY, 'settings')
-         assert(settings, '!settings') // были получены ранее в boot.apollo
+         // let settings = await this.get(RxCollectionEnum.GQL_QUERY, 'settings')
+         // assert(settings, '!settings') // были получены ранее в boot.apollo
          // ReactiveDocFactory.mergeReactive(this.currentSettings, settings)
          this.currentState.currentSettings = settings
          this.getCurrentSettings = () => this.currentState.currentSettings

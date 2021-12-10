@@ -140,7 +140,7 @@ export default {
       immediate: false,
       async handler (to, from) {
         // this.$log('hasItemFull to', to)
-        // if (process.env.NODE_ENV === 'development') {
+        // if (process.env.DEV) {
         //   // проверяем что во вложенных компонентах нет состояния (должны опираться только на props и itemState)
         //   if (to) {
         //     // this.$log(`hasItemFull=${to} #${this.itemIndex}`)
