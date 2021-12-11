@@ -347,11 +347,11 @@ async function systemHardReset (reload = true) {
    alert('before systemHardReset')
    try {
       // await wait(1000)
+      localStorage.clear()
+      sessionStorage.clear()
       if (window.indexedDB) {
          if (window.indexedDB.databases) {
             let dbs = await window.indexedDB.databases()
-            // alert('systemHardReset 1. dbs = ' + JSON.stringify(dbs))
-            // alert('systemHardReset 1. localStorage = ' + JSON.stringify(localStorage))
             for (let db of dbs) {
                // alert('indexedDB.deleteDatabase(databaseName): ' + db.name)
                logD('indexedDB.deleteDatabase(databaseName): ' + db.name)
@@ -365,8 +365,6 @@ async function systemHardReset (reload = true) {
          }
       } else window.alert('Ваш браузер не поддерживат стабильную версию IndexedDB.')
       if (process.env.MODE === 'pwa') await pwaReset()
-      localStorage.clear()
-      sessionStorage.clear()
       logW('systemHardReset complete. reload after systemHardReset...')
       // await wait(1000)
       // alert('reload after systemHardReset...')
