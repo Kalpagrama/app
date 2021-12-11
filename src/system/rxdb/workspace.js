@@ -179,32 +179,29 @@ class Workspace {
          }, false)
 
          if (!this.synchroLoop) {
-            let thiz = this
-            // синхроним изменения в цикле (не лямбда! тк create может вызываться неск-ко раз
-            this.synchroLoop = async function () {
-               const f = thiz.synchroLoop
+            // синхроним изменения в цикле
+            this.synchroLoop = async () => {
+               const f = this.synchroLoop
                f.nameExtra = 'synchroLoop'
                logD(f, 'start')
                while (true) {
-                  if (thiz.created && thiz.db && thiz.reactiveUser && thiz.synchro && rxdb.hasCurrentUser && mutexGlobal.isLeader()) {
+                  if (this.created && this.db && this.reactiveUser && this.synchro && rxdb.hasCurrentUser && mutexGlobal.isLeader()) {
                      try {
                         await mutexGlobal.lock('ws::synchroLoop')
-                        await thiz.lock('ws::synchroLoop')
-                        // logD(f, 'next loop start...', this.synchroLoopWaitObj.getTimeOut())
-                        await thiz.synchronize()
-                        // logD(f, `next loop complete: ${Math.floor(performance.now() - tLoop)} msec`)
+                        await this.lock('ws::synchroLoop')
+                        await this.synchronize()
                      } catch (err) {
                         logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
-                        thiz.synchroLoopWaitObj.setTimeout(Math.min(thiz.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
+                        this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
                      } finally {
-                        thiz.release()
+                        this.release()
                         await mutexGlobal.release('ws::synchroLoop')
                      }
                   }
-                  await thiz.synchroLoopWaitObj.wait()
+                  await this.synchroLoopWaitObj.wait()
                }
             }
-            thiz.synchroLoop().catch(err => logE(f, 'не удалось запустить цикл синхронизации', err))
+            this.synchroLoop().catch(err => logE(f, 'не удалось запустить цикл синхронизации', err))
          }
          this.created = true
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, this.created)
@@ -379,7 +376,7 @@ class Workspace {
          }
       }
       this.store.commit('core/stateSet', ['wsReady', true])
-      logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`, unsavedItems)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, unsavedItems)
    }
 
    // от сервера прилетел эвент об изменении в мастерской (скорей всего - ответ на наши действия)
