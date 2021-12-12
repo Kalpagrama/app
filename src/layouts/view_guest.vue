@@ -14,7 +14,7 @@ div(
       div(
         :style=`{textAlign: 'center'}`
       ).row.full-width.justify-center
-        span.text-white {{$t('Login to see your home feed')}}
+        span.text-white  {{messageName}}
       .row.full-width.justify-center.q-pt-md
         q-btn(
           outline color="white" no-caps
@@ -25,6 +25,10 @@ div(
           @click="$store.commit('ui/stateSet', ['authGuard', {message: null}])"
         )
           h1.text-white {{$t('Login')}}
+      div(:style=`{minHeight: '80px'}`).row.full-width.justify-center.q-pt-md
+        kalpa-docs(
+          :style=`{maxWidth: '300px'}`
+          :alignClass="'justify-center'")
 //div(
 //  :style=`{
 //    height: '80vh',
@@ -48,6 +52,18 @@ div(
 
 <script>
 export default {
-  name: 'pageAppHomeFeedsViewGuest'
+  name: 'pageViewGuest',
+  props: ['message'],
+  computed: {
+    messageName() {
+      switch (this.$route.name.split('.')[0]) {
+        case 'notifications': return this.$t('Login to see your notifications')
+        case 'workspace': return this.$t('You will be able to add YouTube videos by URL, add bookmarks, and upload files!')
+        case 'home': return this.$t('Login to see your home feed')
+        case 'settings': return this.$t('Login to edit your profile')
+        default: return this.message
+      }
+    }
+  },
 }
 </script>

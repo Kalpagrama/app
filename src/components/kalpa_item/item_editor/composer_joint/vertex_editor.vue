@@ -23,7 +23,7 @@ div(
       :style=`{
       position: 'absolute', zIndex: 10000,
       transform: 'translate3d(0,0,1000px)',
-      left: '8px', maxWidth: 'calc(100% - 16px)',
+      left: '8px', maxWidth: 'calc(100% - 16px)', minWidth: '200px',
       borderRadius: '30px',
     }`
     ).row.full-width.items-start.cotent-start.q-pa-sm.b-60

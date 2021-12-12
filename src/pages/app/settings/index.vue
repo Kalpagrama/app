@@ -3,7 +3,7 @@ kalpa-layout()
   template(v-slot:footer)
     kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
   template(v-slot:header)
-    .row.full-width.justify-center.b-30.q-pt-sm.q-px-sm
+    .row.full-width.justify-center.b-30
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         div(:style=`{height: '60px', borderRadius: '10px',}`
           ).row.full-width.items-center.content-center.justify-between.q-pa-sm.b-40
@@ -13,13 +13,13 @@ kalpa-layout()
   template(v-slot:body)
     .row.full-width.items-start.content-start.justify-center
       view-guest(
-        v-if="$store.getters.isGuest")
+        v-if="$store.getters.isGuest").q-mt-sm
       router-view(
         v-else)
 </template>
 
 <script>
-import viewGuest from './view_guest/index.vue'
+import viewGuest from 'src/layouts/view_guest.vue'
 
 export default {
   name: 'pageApp_settings',

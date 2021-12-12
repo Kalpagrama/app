@@ -19,26 +19,28 @@
     :showActions="false"
   ).row
   vertex-editor(:joint="joint").row
-  item-preview(
-    v-if="joint.items[1]"
-    :item="joint.items[1]"
-    :isActive="true"
-    :showHeader="false"
-    :showSpheres="false"
-    :showActions="false"
-  ).row
-  div(v-else).row.full-width.q-px-sm.q-pb-sm
-    q-btn(
-      @click="itemFinderShow = true"
-      flat color="white" no-caps icon="add" size="lg" stack
-    :style=`{minHeight: '200px'}`
-    ).full-width.b-40
-      span(:style=`{fontSize: '18px'}`) {{$t('Pick element for join')}}
+  div(:style=`{minHeight: '200px'}`).row.full-width.relative-position
+    item-preview(
+      v-if="joint.items[1]"
+      :item="joint.items[1]"
+      :isActive="true"
+      :showHeader="false"
+      :showSpheres="false"
+      :showActions="false"
+    ).row
+    div(v-else).row.full-width.q-px-sm.q-pb-sm
+      q-btn(
+        @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить связь авторизуйтесь'}]) : itemFinderShow = true"
+        flat color="white" no-caps icon="add" size="lg" stack
+      :style=`{minHeight: '200px'}`
+      ).full-width.b-40
+        span(:style=`{fontSize: '18px'}`) {{$t('Pick element for join')}}
+    q-btn(v-if="joint.items[1]" flat round icon="close" color="red" :style=`{zIndex: 100}` @click="itemDelete").absolute-top-right
   q-btn(
     :label="$t('Create joint')"
     :loading="jointPublishing"
     :style=`{height: '50px', borderRadius: '0px'}`
-    @click="jointPublish").row.full-width.text-green.text-bold
+    @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить связь авторизуйтесь'}]) : jointPublish").row.full-width.text-green.text-bold
 </template>
 
 <script>
@@ -83,6 +85,9 @@ export default {
       assert(item.type.in('NODE', 'VIDEO', 'BOOK'), 'bad joint second item:' + item.type)
       this.joint.items[1] = JSON.parse(JSON.stringify(item))
       this.itemFinderShow = false
+    },
+    itemDelete () {
+      this.joint.items[1] = null
     },
     async jointPublish () {
       assert(this.joint.vertices.length === 2)

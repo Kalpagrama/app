@@ -11,16 +11,10 @@
 
 <template lang="pug">
 .row.full-width
-  div(v-for="(d,di) in docs" :key="d.id").row.full-width
+  div(v-for="(d,di) in docs" :key="d.id" :class=`[alignClass]`).row.full-width
     router-link(
-      flat no-caps align="left"
+      flat no-caps
       :to="'/help/'+d.id"
-      :class=`{
-      }`
-      :style=`{
-        textAlign: 'left',
-        // borderRadius: '10px',
-      }`
       @click="docClick(d,di)"
       )
       small(:class=`[docColor]`) {{ d.name }}
@@ -38,6 +32,10 @@ export default {
     docColor: {
       type: String,
       default: 'doc-item'
+    },
+    alignClass: {
+      type: String,
+      default: ''
     },
   },
   data () {

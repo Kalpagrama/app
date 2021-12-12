@@ -22,7 +22,7 @@ kalpa-layout
         view-guest
       div(v-if="!$store.getters.isGuest" :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         // подписки
-        span.text-grey-5.text-h5.q-py-sm.q-pl-sm {{$t('Мои подписки')}}
+        span.text-grey-5.text-h6.q-py-sm.q-pl-sm {{$t('Мои подписки')}}
         list-feed-custom-horizontalPPV(
           ref="listFeedHorizontal"
           :scrollAreaWidth="$store.state.ui.pageWidth"
@@ -45,7 +45,7 @@ kalpa-layout
               :showContext="false"
               :layout="'card-tiny'"
               :height="150").q-px-xs
-        span.text-grey-5.text-h5.q-py-md.q-pl-sm {{$t('Новое по подпискам')}}
+        span.text-grey-5.text-h6.q-py-md.q-pl-sm {{$t('Новое по подпискам')}}
         tab-list-feed(
           ref="listFeed"
           :type="'customPPV'"
@@ -70,7 +70,7 @@ kalpa-layout
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import listFeedCustomHorizontalPPV from 'src/components/list_feed/list_feed_horizontal_custom_ppv.vue'
-import viewGuest from 'src/pages/app/home/view_guest.vue';
+import viewGuest from 'src/layouts/view_guest.vue';
 
 export default {
   name: 'feeds_feed',
