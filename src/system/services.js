@@ -237,7 +237,7 @@ async function resetLocalStorage () {
 async function systemReset (clearAuthData = false, clearRxdb = true, reload = true, pwaResetFlag = true) {
    const f = systemReset
    const t1 = performance.now()
-   logD(f, 'start')
+   logT(f, 'start')
    let resetDates = JSON.parse(sessionStorage.getItem('k_system_reset_dates') || '[]')
    resetDates = resetDates.filter(dt => Date.now() - dt < 1000 * 60) // удаляем все что старше минуты
    try {
@@ -274,11 +274,11 @@ async function systemReset (clearAuthData = false, clearRxdb = true, reload = tr
 // если не войдено - попытается войти
 async function systemInit () {
    const f = systemInit
-   logD(f, 'start')
+   logT(f, 'start')
    const t1 = performance.now()
    try {
       if (await rxdb.getAuthUser() && localStorage.getItem('k_token')) { // уже войдено!
-         logD(f, 'skip systemInit')
+         logT(f, 'skip systemInit')
          // alert('skip systemInit')
          window.KALPA_LOAD_COMPLETE = true
       } else { // войти
@@ -290,7 +290,16 @@ async function systemInit () {
                await rxdb.setAuthUser({ userOid })
             } else { // пытаемся войти без регистрации
                // alert(' systemInit 2 ')
-               if (!localStorage.getItem('k_token')) {
+               if (localStorage.getItem('k_token') && await rxdb.getAuthUser()) {
+                  // есть k_token, но нет userOid
+                  try { // если токен уже подтвержден, то userAuthenticate сработает нормально
+                     await AuthApi.userAuthenticate(null)
+                  } catch (err) {
+                     logW('не удалось войти по токену', localStorage.getItem('k_token'))
+                     localStorage.removeItem('k_token')
+                  }
+               }
+               if (!localStorage.getItem('k_token') || !(await rxdb.getAuthUser())) {
                   // alert(' systemInit 3 ')
                   const {
                      userExist,
@@ -300,16 +309,9 @@ async function systemInit () {
                      dummyUser,
                      loginType
                   } = await AuthApi.userIdentify(null)
-                  logD('userIdentify = ', { userExist, userId, needInvite, needConfirm, dummyUser, loginType })
+                  logT('userIdentify = ', { userExist, userId, needInvite, needConfirm, dummyUser, loginType })
                   if (needConfirm === false && dummyUser) {
                      await rxdb.setAuthUser({ dummyUser })
-                  }
-               } else {
-                  // есть k_token, но нет userOid
-                  try { // если токен уже подтвержден, то userAuthenticate сработает нормально
-                     await AuthApi.userAuthenticate(null)
-                  } catch (err) {
-                     logW('не удалось войти по токену', localStorage.getItem('k_token'))
                   }
                }
             }
