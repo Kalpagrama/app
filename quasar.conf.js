@@ -18,6 +18,8 @@ const ESLintPlugin = require('eslint-webpack-plugin')
 const { configure } = require('quasar/wrappers')
 
 module.exports = configure(function (ctx) {
+   console.log('ctx = ', ctx)
+   console.log('process.env = ', process.env)
    return {
       // https://quasar.dev/quasar-cli/supporting-ts
       supportTS: false,
@@ -94,7 +96,7 @@ module.exports = configure(function (ctx) {
                }
             })(),
             SERVICES_URL: (() => {
-               if (ctx.mode.capacitor && process.env.PROD) return process.env.SERVICES_URL
+               if (ctx.mode.capacitor && ctx.prod) return process.env.SERVICES_URL
                switch (process.env.DOCKER_MACHINE_NAME || '') {
                   case 'vercel': return process.env.SERVICES_URL_VERCEL
                   case 'api-dev': return process.env.SERVICES_URL_DEBUG
