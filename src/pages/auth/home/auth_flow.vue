@@ -83,7 +83,7 @@ div(
         q-input(v-if="needConfirm"
           v-model="password"
           borderless dark
-          :placeholder="$t('Введите пароль')"
+          :placeholder="$t('Введите код')"
           type="text"
           inputmode="numeric"
           autocomplete="new-password" name="password"
