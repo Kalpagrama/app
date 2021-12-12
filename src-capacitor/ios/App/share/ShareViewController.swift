@@ -32,7 +32,7 @@ extension URL {
 }
 
 class ShareViewController: SLComposeServiceViewController {
-    
+
     //  Function must be named exactly like this so a selector can be found by the compiler!
     //  Anyway - it's another selector in another instance that would be "performed" instead.
     @objc func openURL(_ url: URL) -> Bool {
@@ -45,14 +45,14 @@ class ShareViewController: SLComposeServiceViewController {
         }
         return false
     }
-    
+
     override func isContentValid() -> Bool {
         // Do validation of contentText and/or NSExtensionContext attachments here
         return true
     }
 
     //пример для других типов данных (картинки/видео) https://github.com/4321ip/cordova-plugin-openwith/blob/master/src/ios/ShareExtension/ShareViewController.m
-    
+
     func openApp(urlData: String){
         // let xxx = contentText
         var url = URL(string: "app.kalpa://share")!
@@ -62,9 +62,9 @@ class ShareViewController: SLComposeServiceViewController {
         // Запуск Containing App через url-scheme
 //        print(" self.extensionContext?.open(url, completionHandler: nil): " + url.absoluteString)
         openURL(url)
-        
+
         // Inform the host that we're done, so it un-blocks its UI. Note: Alternatively you could call super's -didSelectPost, which will similarly complete the extension context.
-        
+
         self.extensionContext!.completeRequest(returningItems: [], completionHandler: nil)
     }
     override func didSelectPost() {
@@ -96,18 +96,17 @@ class ShareViewController: SLComposeServiceViewController {
                     })
                 } else {
                     itemProvider.loadItem(forTypeIdentifier: "public.item", options: nil, completionHandler: { (item, error) -> Void in
-                        // Inform the host that we're done, so it un-blocks its UI. Note: Alternatively you could call super's -didSelectPost, which will similarly complete the extension context.
-                        self.extensionContext!.completeRequest(returningItems: [], completionHandler: nil)
+        // Inform the host that we're done, so it un-blocks its UI. Note: Alternatively you could call super's -didSelectPost, which will similarly complete the extension context.
+        self.extensionContext!.completeRequest(returningItems: [], completionHandler: nil)
                     })
                 }
             }
         }
-        }
-    
+    }
+
     override func configurationItems() -> [Any]! {
         // To add configuration options via table cells at the bottom of the sheet, return an array of SLComposeSheetConfigurationItem here.
         return []
     }
 
 }
-    

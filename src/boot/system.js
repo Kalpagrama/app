@@ -1,6 +1,8 @@
 import { boot } from 'quasar/wrappers'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { systemInit } from 'src/system/services'
+import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
+import { assert } from 'src/system/common/utils'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.BOOT)
 
 function t (str) {

@@ -51,6 +51,7 @@ const LogSystemModulesEnum = Object.freeze({
    RXDB_LST: 'rxdb_lst',
    RXDB_EVENT: 'rxdb_ev',
    MUTEX: 'mutex',
+   MUTEX_GLOBAL: 'mutex_g',
    BOOT: 'boot',
    CP: 'capacitor'
 })
@@ -81,10 +82,7 @@ class Logger {
                funcName: true
             }))
          }
-         if (!sessionStorage.getItem('k_log_level')) {
-            if (process.env.NODE_ENV === 'development') sessionStorage.setItem('k_log_level', LogLevelEnum.DEBUG)
-            else sessionStorage.setItem('k_log_level', LogLevelEnum.WARNING)
-         }
+         if (!sessionStorage.getItem('k_log_level')) sessionStorage.setItem('k_log_level', this.store.state.core.logLevel)
          if (!sessionStorage.getItem('k_log_filter')) sessionStorage.setItem('k_log_filter', this.store.state.core.logDbgFilter)
       }
       let logLevel = sessionStorage.getItem('k_log_level')

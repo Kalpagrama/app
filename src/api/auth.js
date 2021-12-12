@@ -211,6 +211,7 @@ class AuthApi {
          }
          localStorage.setItem('k_token', token)
          localStorage.setItem('k_token_expires', expires)
+         await EventApi.init()
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
          return {
             userId,
@@ -249,6 +250,7 @@ class AuthApi {
          userExist = route.query.userExist === 'true'
          localStorage.setItem('k_token', token)
          localStorage.setItem('k_token_expires', expires)
+         await EventApi.init()
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
          return { userId, loginType, userExist, needInvite, needConfirm, token, expires }
       }
@@ -297,7 +299,6 @@ class AuthApi {
       }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, res)
       // переподключаемся (предыдущее подключение было вне авторизованной зоны.)
-      await EventApi.deInit()
       await EventApi.init()
       return res
    }

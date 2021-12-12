@@ -1,10 +1,12 @@
 import { assert, wait } from 'src/system/common/utils'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { AppVisibility, Platform } from 'quasar'
-import { reactive, watch } from 'vue'
-let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.MUTEX)
+import { watch } from 'vue'
+let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.MUTEX_GLOBAL)
 
-const actualLockUpdateInterval = 500 // интервал обновления статуса активной блокировки
+const actualLockUpdateInterval = 300 // интервал обновления статуса активной блокировки
+const maxMutexWaitTime = 1000 * 20 // интервал обновления статуса активной блокировки
+const warnMutexWaitTime = 1000 * 5 // интервал обновления статуса активной блокировки
 
 // глобальный (несколько вкладок) мьютекс
 // синглтон (один экземпляр на приложение)
@@ -18,7 +20,7 @@ class MutexGlobal {
       window.addEventListener('beforeunload', () => {
          logD('on page unload')
          this.unloadingInProgress = true
-         sessionStorage.setItem('k_instance_id', this.instanceId) // запоминаем instanceId (хранится в сторадж только тогда когда вкладка закрыта (иначе при дублировании вкладки - дублируется и instanceId))
+         sessionStorage.setItem('k_instance_id', this.instanceId) // запоминаем instanceId (хранится в сторадж только тогда когда вкладка закрыта (иначе при дублировании вкладки в хроме - дублируется и instanceId))
          let currentLock = JSON.parse(localStorage.getItem('k_global_lock') || JSON.stringify({
             dt: 0,
             instanceId: ''
@@ -30,12 +32,12 @@ class MutexGlobal {
       { // leader detection
          // отслеживание открыта ли вкладка
          const thiz = this
-         this.vm = reactive({ appVisibility: AppVisibility })
-         let unwatchFunc = watch(() => this.vm.appVisibility, (to, from) => {
-            assert(to, '!to!')
-            // logD(`appVisibility changed! from:${from ? from.appVisible : false} to: ${to.appVisible}`)
-            if (to && to.appVisible) thiz.setLeader()
-         }, {deep: true, immediate: true})
+         watch(() => AppVisibility.appVisible, state => {
+            // alert('appVisibility' + !!state)
+            if (state) {
+               thiz.setLeaderToMe()
+            }
+         }, {immediate: true})
       }
       // подписываемся на изменение localStorage (Событие НЕ работает на вкладке, которая вносит изменения)
       // upd В сафари событие срабатывает и на вкладке, которая инициировала изменения
@@ -64,21 +66,21 @@ class MutexGlobal {
       })
    }
 
-   setLeader () {
-      logD('change leader to ', this.instanceId)
+   setLeaderToMe () {
       // logW('document.title=', document.title)
       if (document.title && typeof document.title === 'string') {
          document.title = document.title.replace('✨', '')
          document.title = document.title + '✨'
       }
       localStorage.setItem('k_leader_instance_id', this.instanceId)
+      logT('I\'m a leader now!', this.instanceId)
    }
 
    isLeader () {
       if (Platform.is.capacitor) return true
       let currentLeaderInstanceId = localStorage.getItem('k_leader_instance_id')
       if (!currentLeaderInstanceId) {
-         this.setLeader()
+         this.setLeaderToMe()
          currentLeaderInstanceId = this.instanceId
       }
       return currentLeaderInstanceId === this.instanceId
@@ -100,7 +102,11 @@ class MutexGlobal {
       while (current && current.locked && this.instanceId !== current.instanceId) { // мьютекс захвачен не нами. ждем пока освободится
          // если вкладка, создавшая мьютекс не обновляет его (вкладки уже нет, либо она неактивна)
          if (Date.now() - current.dtActual > actualLockUpdateInterval * 8) {
-            logW(' Мьютекс никто не обновляет слишком долго. Захватываем его принудительно!')
+            logW(' Мьютекс никто не обновляет слишком долго. Захватываем его принудительно!', Date.now() - current.dtActual)
+            break
+         }
+         if (Date.now() - current.dt > maxMutexWaitTime) {
+            logW('истекло максимальное время ожидания мьютекса. Захватываем его принудительно!', Date.now() - current.dt > maxMutexWaitTime)
             break
          }
          await wait(actualLockUpdateInterval / 2) // ждем пока мьютекс освободится
@@ -123,6 +129,7 @@ class MutexGlobal {
                // alert('другая вкладка стала лидером принудительно и захватила управление(1). \n Reload required!')
                window.location.reload() // не мжем дальше выполняться. Нас прервала другая вкладка!
             } else { // обновляем актуальность блокировки
+               if (Date.now() - current.dt > warnMutexWaitTime && Date.now() - current.dtActual > 1000) logE('MutexGlobal::long operation!', current.lockOwner)
                current.dtActual = Date.now()
                localStorage.setItem('k_global_lock', JSON.stringify(current))
             }

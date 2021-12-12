@@ -106,13 +106,21 @@ class EventApi {
    }
 
    static async init () {
-      if (EventApi.initialized) return true
       const f = EventApi.init
       logD(f, 'start')
       const t1 = performance.now()
+      const kToken = localStorage.getItem('k_token')
+      if (!kToken) {
+         logT(f, 'session is not initialized! cancel EventApi::init!')
+         return false
+      }
+      if (EventApi.kToken === kToken) return true // уже все норм! ничего больше не надо
+      else if (EventApi.kToken) {
+         logT(f, 'уже инициализировано с другим токеном! deinit old connection!', EventApi.kToken, kToken)
+         await EventApi.deInit()
+      }
       const cb = async () => {
          assert(apollo.clients.ws, '!apollo.clients.ws1')
-         assert(localStorage.getItem('k_token'), '!localStorage.getItem(k_token)')
          apollo.clients.ws.openConnection()
          const observerEvent = apollo.clients.ws.subscribe({
             client: 'wsApollo',
@@ -143,13 +151,19 @@ class EventApi {
          })
          return true
       }
-      let res = await apiCall(f, cb)
-      EventApi.initialized = true
+      let res
+      // приложение может работать и без сокетов!
+      try {
+         res = await apiCall(f, cb, false)
+      } catch (err) {
+         logE('error on EventApi::deinit', err)
+      }
+      EventApi.kToken = kToken
       return res
    }
 
    static async deInit () {
-      if (!EventApi.initialized) return true
+      if (!EventApi.kToken) return true
       const f = EventApi.deInit
       logD(f, 'start')
       const t1 = performance.now()
@@ -161,8 +175,14 @@ class EventApi {
          apollo.clients.ws.closeConnection()
          return true
       }
-      let res = await apiCall(f, cb)
-      EventApi.initialized = false
+      let res
+      // приложение может работать и без сокетов!
+      try {
+         res = await apiCall(f, cb, false)
+      } catch (err) {
+         logE('error on EventApi::deinit', err)
+      }
+      EventApi.kToken = null
       return res
    }
 }

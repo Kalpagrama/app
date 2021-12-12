@@ -12,6 +12,7 @@ import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { AuthApi } from 'src/api/auth'
 import { systemReset } from 'src/system/services'
+import { EventApi } from 'src/api/event'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.BOOT)
 
 let apollo
@@ -28,9 +29,6 @@ export default boot(async ({
   try {
     const f = { nameExtra: 'boot::apollo' }
     logD(f, 'start')
-    // logW(f, 'SERVICES_URL_DEBUG=', process.env.SERVICES_URL_DEBUG)
-    // logW(f, 'SERVICES_URL=', process.env.SERVICES_URL)
-    // logW(f, 'DOCKER_MACHINE_NAME=', process.env.DOCKER_MACHINE_NAME)
     const t1 = performance.now()
     let fetchFunc
     fetchFunc = fetch
@@ -38,8 +36,7 @@ export default boot(async ({
     let kDebug = sessionStorage.getItem('k_debug')// запросы переренаправляются на машину разработчика
     kDebug = kDebug === '1'
     // Vue.use(VueApollo)
-    let SERVICES_URL = (process.env.NODE_ENV === 'development' || process.env.DOCKER_MACHINE_NAME === 'vercel' ? process.env.SERVICES_URL_DEBUG : process.env.SERVICES_URL)
-    logD('SERVICES_URL=' + SERVICES_URL)
+    logD('SERVICES_URL=' + process.env.SERVICES_URL)
     const errLink = onError(({
       operation,
       response,
@@ -114,7 +111,7 @@ export default boot(async ({
     }
     const settingsApollo = new ApolloClient({
       link: createHttpLink({
-        uri: SERVICES_URL,
+        uri: process.env.SERVICES_URL,
         fetch (uri, options) {
           if (kDebug) options.headers['X-Kalpagrama-debug'] = 'k_debug'
           return fetchFunc(uri, options)
@@ -148,7 +145,6 @@ export default boot(async ({
         force: true,
         onFetchFunc
       })
-
     logD('settings=', settings)
     assert(settings && settings.services, '!services!!!')
     let linkAuth = settings.services.authUrl
@@ -203,6 +199,7 @@ export default boot(async ({
       lazy: true,
       connectionParams: () => {
         let token = localStorage.getItem('k_token')
+        assert(token, '!token!!! сокеты включаем только когда уже открыта сессия!')
         return {
           Authorization: token,
           'X-Kalpagrama-debug': kDebug ? 'k_debug' : ''
@@ -256,7 +253,7 @@ export default boot(async ({
       upload: uploadApollo,
       ws: wsApollo
     }
-    await rxdb.init() // после инициализации apollo (нужно для event.init())
+    await EventApi.init()
     logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   } catch (err) {
     logC(err)

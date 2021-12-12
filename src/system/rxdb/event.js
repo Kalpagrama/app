@@ -7,22 +7,22 @@ import { rxdb } from 'src/system/rxdb'
 import { RxCollectionEnum } from 'src/system/rxdb/common'
 import { getReactive } from 'src/system/rxdb/reactive'
 import { eventBus } from 'src/boot/libs'
+
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_EVENT)
 
 class Event {
-   constructor (workspace, objects, lists, cache) {
+   async destroy (clearStorage) {
+      if (this.created) {
+         this.created = false
+      }
+   }
+
+   async create (workspace, objects, lists, cache) {
       this.workspace = workspace
       this.objects = objects
       this.lists = lists
       this.cache = cache
-   }
-
-   async init () {
-      await EventApi.init()
-   }
-
-   async deInit () {
-      await EventApi.deInit()
+      this.created = true
    }
 
    // от сервера прилетел эвент (поправим данные в кэше)

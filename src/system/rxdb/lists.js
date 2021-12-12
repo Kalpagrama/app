@@ -1,4 +1,4 @@
-import {assert} from 'src/system/common/utils'
+import { assert } from 'src/system/common/utils'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { rxdb } from 'src/system/rxdb'
 import {
@@ -12,6 +12,7 @@ import { ListsApi as ListApi, ListsApi } from 'src/api/lists'
 import { getReactive, ReactiveListWithPaginationFactory, updateRxDocPayload } from 'src/system/rxdb/reactive'
 import { EpubCFI } from 'epubjs'
 import { makeId } from 'src/system/rxdb/index'
+
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_LST)
 
 export function makeListCacheId (mangoQuery) {
@@ -32,11 +33,6 @@ function getMangoQueryFromId (id) {
 
 // класс для запроса списков
 class Lists {
-   constructor (cache) {
-      this.cache = cache
-      Lists.cache = cache
-   }
-
    static async getBlackLists () {
       let blackLists = await rxdb.get(RxCollectionEnum.META, 'blackLists')
       if (blackLists) blackLists = JSON.parse(blackLists)
@@ -45,8 +41,6 @@ class Lists {
       return blackLists
    }
 
-   // список последних созданных/удаленных сущностей и сферы на которые они попали
-   // (объект возвращается раньше, чем изментся сфера (меняются только после голосования))
    // то мы можем запросить сферу до того как объект будет на нее помещен
    static async getObjectsWithRelatedSpheres () {
       let objectsWithRelatedSpheres = await rxdb.get(RxCollectionEnum.META, 'objectsWithRelatedSpheres')
@@ -63,6 +57,21 @@ class Lists {
       if (el.author && blackLists.blackListAuthorOids.includes(el.author.oid)) return true
       if (el.authorOid && blackLists.blackListAuthorOids.includes(el.authorOid)) return true
       return false
+   }
+
+   // список последних созданных/удаленных сущностей и сферы на которые они попали
+   // (объект возвращается раньше, чем изментся сфера (меняются только после голосования))
+
+   async destroy (clearStorage) {
+      if (this.created) {
+         this.created = false
+      }
+   }
+
+   async create (cache) {
+      this.cache = cache
+      Lists.cache = cache
+      this.created = true
    }
 
    // вернет  список (из кэша или с сервера)

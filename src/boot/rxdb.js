@@ -1,7 +1,7 @@
 import { boot } from 'quasar/wrappers'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { rxdb } from 'src/system/rxdb'
-import { systemReset } from 'src/system/services'
+import { systemHardReset, systemReset } from 'src/system/services'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.BOOT)
 
 export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath, redirect }) => {
@@ -9,6 +9,11 @@ export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath
       const f = { nameExtra: 'boot::rxdb' }
       logT(f, 'start')
       const t1 = performance.now()
+      if (localStorage.getItem('k_rxdb_create_date')) {
+         alert('версия БД несовместима.')
+         await systemHardReset()
+         return
+      }
       await rxdb.create(store)
       app.config.globalProperties.$rxdb = rxdb
       logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
