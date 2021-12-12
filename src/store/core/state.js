@@ -8,12 +8,12 @@ export default {
    online: true, // если сеть недоступна - присваивается false
    newVersionAvailable: false,
    installPrompt: null, // ф-я вызова диалога "установить приложение"
-   logLevel: LogLevelEnum.DEBUG,
+   logLevel: process.env.DEV || process.env.DOCKER_MACHINE_NAME === 'vercel' ? LogLevelEnum.TRACE : LogLevelEnum.WARNING,
+   logDbgFilter: 'any', // gui | system | any
    logLevelSentry: LogLevelEnum.CRITICAL,
    logFormat: {time: false, moduleName: true, funcName: true},
    logRocket: false,
    logRocketSessionUrl: null,
-   logDbgFilter: 'sys', // gui | system | any
    logDbgModulesFilter: {
       [LogSystemModulesEnum.TESTS]: LogLevelEnum.DEBUG,
       [LogSystemModulesEnum.SYSTEM]: LogLevelEnum.TRACE,
