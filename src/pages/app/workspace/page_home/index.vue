@@ -21,7 +21,7 @@ kalpa-layout
                 span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Workspace')}}
             //- tutorial
             q-btn(
-              @click="showKalpaTutorial('tutorial_content')"
+              @click="showKalpaTutorial('tutorial_workspace')"
               round flat color="white" icon="help_outline")
       //- guest
       view-guest(v-if="$store.getters.isGuest").q-mt-sm
