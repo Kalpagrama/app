@@ -94,6 +94,7 @@ module.exports = configure(function (ctx) {
                }
             })(),
             SERVICES_URL: (() => {
+               if (ctx.mode.capacitor && process.env.PROD) return process.env.SERVICES_URL
                switch (process.env.DOCKER_MACHINE_NAME || '') {
                   case 'vercel': return process.env.SERVICES_URL_VERCEL
                   case 'api-dev': return process.env.SERVICES_URL_DEBUG
