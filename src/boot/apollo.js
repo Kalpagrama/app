@@ -145,8 +145,6 @@ export default boot(async ({
         force: true,
         onFetchFunc
       })
-    rxdb.setCurrentSettings(settings)
-
     logD('settings=', settings)
     assert(settings && settings.services, '!services!!!')
     let linkAuth = settings.services.authUrl

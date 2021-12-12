@@ -28,7 +28,7 @@ import { cacheSchema, schemaKeyValue } from 'src/system/rxdb/schemas'
 import cloneDeep from 'lodash/cloneDeep'
 import LruCache from 'lru-cache'
 import { GqlQueries } from 'src/system/rxdb/gql_query'
-import { setSyncEventStorageValue } from 'src/system/services'
+import { setSyncEventStorageValue, systemInit } from 'src/system/services'
 import { reactive } from 'vue'
 
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB)
@@ -134,14 +134,12 @@ class RxDBWrapper {
                   case 'k_rxdb_reset_date':
                      // TODO у rxdb проблемы при работе на неск-ких вкладках после очистки БД
                      // на другой вкладке произошла очистка данных
-                     // await this.destroy('destroy') // уничтожить текущий экземпляр (данные не удалять)
-                     // await this.create(this.store)
+                     // await systemInit()
                      break
                   case 'k_rxdb_set_auth_user':
                      // TODO у rxdb проблемы при работе на неск-ких вкладках после очистки БД
                      // на другой вкладке произошла авторизация
-                     // await this.destroy('destroy') // уничтожить текущий экземпляр (данные не удалять)
-                     // await this.create(this.store)
+                     // await systemInit()
                      break
                   default:
                      throw new Error('bad event' + eventKey)
@@ -249,8 +247,6 @@ class RxDBWrapper {
             }, { beforeCreate: true })
          }
          this.created = true // до setCurrentUser_internal
-         let authUser = await this.getAuthUser() // при первом запуске юзер появится позже (при вызове systemInit)
-         if (authUser) await this.setCurrentUser(authUser)
          logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } catch (err) {
          logE(f, 'rxdb::create error! очищаем и пересоздаем!', err)
@@ -276,10 +272,11 @@ class RxDBWrapper {
    }
 
    // получить юзера, запустить обработку эвентов и синхронмзацию мастерской (dummyUser - для входа без регистрации). вызывается при каждой загрузке приложения
-   async setCurrentUser (authUser) {
-      const f = this.setCurrentUser
+   async setup (authUser, settings) {
+      const f = this.setup
       logD(f, 'start')
       const t1 = performance.now()
+      this.reactiveDocDbMemCache.reset() // setup вызывается в systemInit. нужно очистить кэш в памяти
       assert(authUser)
       let { userOid, dummyUser } = authUser
       assert(userOid || dummyUser, '!userOid || dummyUser')
@@ -315,18 +312,13 @@ class RxDBWrapper {
       this.getCurrentUser = () => this.currentState.currentUser
       if (currentUserDbFetched) this.workspace.switchOnSynchro(this.getCurrentUser()) // onFetchFunc сработало до этого момента(в кэше не было данных(см clientFirst))
       this.hasCurrentUser = true
-      logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-   }
 
-   setCurrentSettings (settings) {
-      const f = this.setCurrentSettings
-      logD(f, 'start')
-      const t1 = performance.now()
       assert(settings)
       this.currentState.currentSettings = settings
       this.getCurrentSettings = () => this.currentState.currentSettings
       this.hasCurrentSettings = true
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+
+      logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
    async getAuthUser () {
@@ -344,16 +336,11 @@ class RxDBWrapper {
       assert(!(await this.getAuthUser()), '!!this.getAuthUser()')
       assert(userOid || dummyUser, '!userOid || dummyUser')
       try {
-         await mutexGlobal.lock('rxdb::setAuthUser')
          await this.lock('setAuthUser')
          await this.set(RxCollectionEnum.META, { id: 'authUser', valueString: JSON.stringify({ userOid, dummyUser }) })
-         let authUser = await this.getAuthUser()
-         assert(authUser)
-         await this.setCurrentUser(authUser)
          setSyncEventStorageValue('k_rxdb_set_auth_user', Date.now().toString()) // сообщаем другим вкладкам
          logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } finally {
-         await mutexGlobal.release('rxdb::setAuthUser')
          this.release()
       }
    }

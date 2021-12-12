@@ -276,69 +276,62 @@ async function systemInit () {
    const f = systemInit
    logD(f, 'start')
    const t1 = performance.now()
-   if (await rxdb.getAuthUser() && localStorage.getItem('k_token')) {
-      logD(f, 'skip systemInit')
-      // alert('skip systemInit')
-      window.KALPA_LOAD_COMPLETE = true
-      return
-   } // уже войдено!
    try {
-      await mutexGlobal.lock('system::systemInit')
-      let userOid = localStorage.getItem('k_user_oid')
-      if (userOid) { // пользователь зарегистрирован
-         // alert(' systemInit 1 ')
-         await rxdb.setAuthUser({ userOid })
-      } else { // пытаемся войти без регистрации
-         // alert(' systemInit 2 ')
-         if (!localStorage.getItem('k_token')) {
-            // alert(' systemInit 3 ')
-            const {
-               userExist,
-               userId,
-               needInvite,
-               needConfirm,
-               dummyUser,
-               loginType
-            } = await AuthApi.userIdentify(null)
-            logD('userIdentify = ', { userExist, userId, needInvite, needConfirm, dummyUser, loginType })
-            if (needConfirm === false && dummyUser) {
-               await rxdb.setAuthUser({ dummyUser })
+      if (await rxdb.getAuthUser() && localStorage.getItem('k_token')) { // уже войдено!
+         logD(f, 'skip systemInit')
+         // alert('skip systemInit')
+         window.KALPA_LOAD_COMPLETE = true
+      } else { // войти
+         try {
+            await mutexGlobal.lock('system::systemInit')
+            let userOid = localStorage.getItem('k_user_oid')
+            if (userOid) { // пользователь зарегистрирован
+               // alert(' systemInit 1 ')
+               await rxdb.setAuthUser({ userOid })
+            } else { // пытаемся войти без регистрации
+               // alert(' systemInit 2 ')
+               if (!localStorage.getItem('k_token')) {
+                  // alert(' systemInit 3 ')
+                  const {
+                     userExist,
+                     userId,
+                     needInvite,
+                     needConfirm,
+                     dummyUser,
+                     loginType
+                  } = await AuthApi.userIdentify(null)
+                  logD('userIdentify = ', { userExist, userId, needInvite, needConfirm, dummyUser, loginType })
+                  if (needConfirm === false && dummyUser) {
+                     await rxdb.setAuthUser({ dummyUser })
+                  }
+               } else {
+                  // есть k_token, но нет userOid
+                  try { // если токен уже подтвержден, то userAuthenticate сработает нормально
+                     await AuthApi.userAuthenticate(null)
+                  } catch (err) {
+                     logW('не удалось войти по токену', localStorage.getItem('k_token'))
+                  }
+               }
             }
-         } else {
-            // есть k_token, но нет userOid
-            try { // если токен уже подтвержден, то userAuthenticate сработает нормально
-               await AuthApi.userAuthenticate(null)
-            } catch (err) {
-               logW('не удалось войти по токену', localStorage.getItem('k_token'))
-            }
+            setSyncEventStorageValue('k_login_date', Date.now().toString()) // сообщаем другим вкладкам
+            // alert(' systemInit 7 ')
+         } finally {
+            await mutexGlobal.release('system::systemInit')
          }
       }
-      // alert(' systemInit 4 ')
-      if (await rxdb.getAuthUser() && localStorage.getItem('k_token')) {
-         await setLocale(rxdb.getCurrentUser().profile.lang)
-         // if (sessionStorage.getItem('k_originalUrl')) { // если зашли по ссылке поделиться(бэкенд редиректит в корень с query =  originalUrl)
-         //    logD(f, 'redirect to originalUrl: ' + sessionStorage.getItem('k_originalUrl'))
-         //    alert('redirect to originalUrl: ' + sessionStorage.getItem('k_originalUrl'))
-         //    await router.replace(sessionStorage.getItem('k_originalUrl'))
-         //    sessionStorage.removeItem('k_originalUrl')
-         // }
-         setSyncEventStorageValue('k_login_date', Date.now().toString()) // сообщаем другим вкладкам
-      } else { // не удалось залогиниться
-         // alert(' systemInit 6 ')
-         logD(f, 'GO LOGIN')
-         await resetLocalStorage()
-         await router.replace('/auth')
-         setSyncEventStorageValue('k_logout_date', Date.now().toString()) // сообщаем другим вкладкам
-      }
-      // alert(' systemInit 7 ')
+      let settings = await rxdb.get(RxCollectionEnum.GQL_QUERY, 'settings')
+      let authUser = await rxdb.getAuthUser()
+      assert(settings) // заполняется в boot::apollo
+      assert(authUser) // заполняется при первом запуске
+      await rxdb.setup(authUser, settings)
+      assert(rxdb.getCurrentUser())
+      await setLocale(rxdb.getCurrentUser().profile.lang)
       window.KALPA_LOAD_COMPLETE = true
       logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    } catch (err) {
       logE('error on systemInit!', err)
-      await systemReset(true, true, true, true)
-      throw err
-   } finally {
-      await mutexGlobal.release('system::systemInit')
+      await systemReset(true, true, false, true)
+      window.location.reload()
    }
 }
 
