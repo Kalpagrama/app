@@ -241,36 +241,25 @@ async function systemReset (clearAuthData = false, clearRxdb = true, reload = tr
    let resetDates = JSON.parse(sessionStorage.getItem('k_system_reset_dates') || '[]')
    resetDates = resetDates.filter(dt => Date.now() - dt < 1000 * 60) // удаляем все что старше минуты
    try {
-      alert('step 1')
       await mutexGlobal.lock('system::systemReset')
-      alert('step 2')
       if (resetDates.length > 5) { // за последнюю минуту произошло слишком много systemReset
          logW('too often systemReset!')
          alert('Приложение не может запуститься по неизвестной причине(resetDates.length > 5).\n Очистка данных и перезагрузка.')
          await systemHardReset()
          return
       }
-      alert('step 3')
       if (clearRxdb) await rxdb.reset(store) // сначала очистим базу, потом resetLocalStorage (ей может понадобиться k_token)
-      alert('step 4')
       if (clearAuthData) await resetLocalStorage()
-      alert('step 5')
       if (pwaResetFlag && process.env.MODE === 'pwa') await pwaReset()
-      alert('step 6')
       if (clearAuthData) {
-         alert('step 7')
          // сообщаем другим вкладкам
          setSyncEventStorageValue('k_logout_date', Date.now().toString())
       }
-      alert('step 8')
       resetDates.push(Date.now())
       sessionStorage.setItem('k_system_reset_dates', JSON.stringify(resetDates))
-      alert('step 9')
       await mutexGlobal.release('system::systemReset')
-      alert('step 10')
       logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       if (reload) {
-         alert('step 11')
          logW('systemReset::before reload')
          window.location.reload()
       }
