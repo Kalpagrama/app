@@ -271,54 +271,59 @@ class RxDBWrapper {
       setSyncEventStorageValue('k_rxdb_reset_date', Date.now().toString()) // сообщаем другим вкладкам
    }
 
-   // получить юзера, запустить обработку эвентов и синхронмзацию мастерской (dummyUser - для входа без регистрации). вызывается при каждой загрузке приложения
+   // получить юзера, запустить обработку эвентов и синхронизацию мастерской (dummyUser - для входа без регистрации). вызывается при каждой загрузке приложения
    async setup (authUser, settings) {
       const f = this.setup
       logD(f, 'start')
       const t1 = performance.now()
-      this.reactiveDocDbMemCache.reset() // setup вызывается в systemInit. нужно очистить кэш в памяти
-      assert(authUser)
-      let { userOid, dummyUser } = authUser
-      assert(userOid || dummyUser, '!userOid || dummyUser')
-      // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возьмется из кэша
-      let currentUserDb, currentUserDummy, currentUserDbFetched
-      if (userOid) {
-         currentUserDb = await this.get(RxCollectionEnum.OBJ, userOid, {
-            notEvict: true,
-            force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
-            clientFirst: true, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
-            onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
-               if (currentUserDb && this.getCurrentUser) this.workspace.switchOnSynchro(this.getCurrentUser()) // в кэше есть данные (onFetchFunc сработает после this.getCurrentUser = ...)
-               else currentUserDbFetched = true // если данных в кэше не было, то onFetchFunc выпольнится раньше, чем this.getCurrentUser = ...
+      try {
+         await this.lock('setup')
+         this.reactiveDocDbMemCache.reset() // setup вызывается в systemInit. нужно очистить кэш в памяти
+         assert(authUser)
+         let { userOid, dummyUser } = authUser
+         assert(userOid || dummyUser, '!userOid || dummyUser')
+         // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возьмется из кэша
+         let currentUserDb, currentUserDummy, currentUserDbFetched
+         if (userOid) {
+            currentUserDb = await this.get(RxCollectionEnum.OBJ, userOid, {
+               notEvict: true,
+               force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
+               clientFirst: true, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
+               onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
+                  if (currentUserDb && this.getCurrentUser) this.workspace.switchOnSynchro(this.getCurrentUser()) // в кэше есть данные (onFetchFunc сработает после this.getCurrentUser = ...)
+                  else currentUserDbFetched = true // если данных в кэше не было, то onFetchFunc выпольнится раньше, чем this.getCurrentUser = ...
+               }
+            })
+         } else {
+            assert(dummyUser, '!dummyUser')
+            dummyUser.profile.tutorial = {
+               main: true,
+               content_first: true,
+               node_first: true,
+               joint_first: true,
+               workspace_first: true,
+               workspace_upload: true,
+               workspace_article: true
             }
-         })
-      } else {
-         assert(dummyUser, '!dummyUser')
-         dummyUser.profile.tutorial = {
-            main: true,
-            content_first: true,
-            node_first: true,
-            joint_first: true,
-            workspace_first: true,
-            workspace_upload: true,
-            workspace_article: true
+            currentUserDummy = getReactive(dummyUser, 'currentUser')
          }
-         currentUserDummy = getReactive(dummyUser, 'currentUser')
+         assert(currentUserDb || currentUserDummy, 'currentUserDb || currentUserDummy') // должен быть в rxdb после init
+         // ReactiveDocFactory.mergeReactive(this.currentUser, currentUserDb || currentUserDummy)
+         // this.getCurrentUser = () => this.currentUser
+         this.currentState.currentUser = currentUserDb || currentUserDummy
+         this.getCurrentUser = () => this.currentState.currentUser
+         if (currentUserDbFetched) this.workspace.switchOnSynchro(this.getCurrentUser()) // onFetchFunc сработало до этого момента(в кэше не было данных(см clientFirst))
+         this.hasCurrentUser = true
+
+         assert(settings)
+         this.currentState.currentSettings = settings
+         this.getCurrentSettings = () => this.currentState.currentSettings
+         this.hasCurrentSettings = true
+
+         logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      } finally {
+         this.release()
       }
-      assert(currentUserDb || currentUserDummy, 'currentUserDb || currentUserDummy') // должен быть в rxdb после init
-      // ReactiveDocFactory.mergeReactive(this.currentUser, currentUserDb || currentUserDummy)
-      // this.getCurrentUser = () => this.currentUser
-      this.currentState.currentUser = currentUserDb || currentUserDummy
-      this.getCurrentUser = () => this.currentState.currentUser
-      if (currentUserDbFetched) this.workspace.switchOnSynchro(this.getCurrentUser()) // onFetchFunc сработало до этого момента(в кэше не было данных(см clientFirst))
-      this.hasCurrentUser = true
-
-      assert(settings)
-      this.currentState.currentSettings = settings
-      this.getCurrentSettings = () => this.currentState.currentSettings
-      this.hasCurrentSettings = true
-
-      logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
    async getAuthUser () {
@@ -376,83 +381,6 @@ class RxDBWrapper {
          logD(f, 'event ignored', event)
       }
    }
-
-   // вернет список из objectFull
-   // async find___ (mangoQuery) {
-   //    const f = this.find
-   //    const t1 = performance.now()
-   //    logD(f, 'start', mangoQuery)
-   //    mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
-   //
-   //    let result = { items: [], count: 0, totalCount: 0, nextPageToken: null, prevPageToken: mangoQuery.pageToken }
-   //    let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
-   //    let pageToken = mangoQuery.pageToken || { indx: 0, id: null }
-   //    let populateObjects = mangoQuery.populateObjects
-   //    let limit = parseInt(mangoQuery.limit)
-   //    delete mangoQuery.pageToken // мешает нормальному кэшированию запросов в findInternal
-   //    delete mangoQuery.populateObjects // мешает нормальному кэшированию запросов в findInternal
-   //    delete mangoQuery.limit // мешает нормальному кэшированию запросов в findInternal
-   //
-   //    if (!limit) limit = populateObjects ? 88 : 8888
-   //    let startIndx = pageToken.indx
-   //    let nextIndx = startIndx + limit
-   //
-   //    if (rxCollectionEnum in WsCollectionEnum) {
-   //       if (pageToken && pageToken.id) mangoQuery.startkey = pageToken.id
-   //       else if (pageToken && pageToken.indx) mangoQuery.skip = pageToken.indx
-   //       result.items = (await this.findInternal(mangoQuery)).items
-   //       result.count = result.items.length
-   //       result.totalCount = 100500
-   //       result.nextPageToken = result.count ? {
-   //          indx: nextIndx,
-   //          id: result.items[result.items.length - 1].id
-   //       } : null
-   //
-   //       const result = await (new ReactiveListWithPaginationFactory()).create(rxQuery)
-   //
-   //    } else if (rxCollectionEnum in LstCollectionEnum) {
-   //       let objectShortList = await this.findInternal(mangoQuery)
-   //       let objectShortItemsLimit = objectShortList.items.slice(startIndx, nextIndx)
-   //       let objectShortItemsPrefetch = objectShortList.items.slice(nextIndx, nextIndx + 3) // упреждающее чтение
-   //       if (populateObjects) {
-   //          if (rxCollectionEnum === RxCollectionEnum.LST_FEED) {
-   //             // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
-   //             const itemsFull = await Promise.all(
-   //                objectShortItemsLimit.reduce((accumulator, { object, subject }) => {
-   //                   accumulator.push(this.get(RxCollectionEnum.OBJ, object.oid, { clientFirst: true }))
-   //                   // accumulator.push(this.get(RxCollectionEnum.OBJ, subject.oid, { clientFirst: true }))
-   //                   return accumulator
-   //                }, [])
-   //             )
-   //             result.items = cloneDeep(objectShortItemsLimit)
-   //             for (let item of result.items) {
-   //                item.object = await this.get(RxCollectionEnum.OBJ, item.object.oid, { clientFirst: true }) || item.object
-   //             }
-   //             logD('asdasdas', result.items)
-   //          } else {
-   //             // запрашиваем разом (см. objects.js) все полные сущности (после этого они будут в кэше)
-   //             result.items = await Promise.all(objectShortItemsLimit.map(objShort => {
-   //                logD('objShort=', objShort)
-   //                return this.get(RxCollectionEnum.OBJ, objShort.oid, { clientFirst: true })
-   //             }))
-   //             objectShortItemsPrefetch.map(objShort => this.get(RxCollectionEnum.OBJ, objShort.oid, {
-   //                clientFirst: true,
-   //                priority: 1
-   //             })) // в фоне делаем упреждающее чтение
-   //             result.items = result.items.filter(obj => !!obj)
-   //          }
-   //       } else result.items = objectShortItemsLimit
-   //       result.count = result.items.length
-   //       result.totalCount = objectShortList.items.length
-   //       result.nextPageToken = objectShortList.items[nextIndx] ? {
-   //          indx: nextIndx,
-   //          id: objectShortList.items[nextIndx].oid
-   //       } : null
-   //    }
-   //    // logD(f, `findInternal complete: ${Math.floor(performance.now() - tx)} msec`)
-   //    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, result)
-   //    return result
-   // }
 
    // для LstCollectionEnum вернет список из objectShort. для WsCollectionEnum - полные сущности
    // поищет в rxdb (если надо - запросит с сервера) Вернет {items, count, totalCount, nextPageToken }
