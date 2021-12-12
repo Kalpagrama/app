@@ -26,16 +26,16 @@ export default store(function (/* { ssrContext } */) {
       mutations: {},
       getters: {
          currentUser: (state, getters, rootState, rootGetters) => {
-            assert(rxdb.getCurrentUser())
+            assert(rxdb.getCurrentUser && rxdb.getCurrentUser())
             return rxdb.getCurrentUser()
          },
          isGuest: (state, getters, rootState, rootGetters) => {
-            assert(rxdb.getCurrentUser())
+            assert(rxdb.getCurrentUser && rxdb.getCurrentUser())
             return rxdb.getCurrentUser() ? rxdb.getCurrentUser().profile.role === 'GUEST' : true
          },
          nodeCategories: (state, getters, rootState, rootGetters) => {
-            assert(rxdb.getCurrentUser())
-            assert(rxdb.getCurrentSettings())
+            assert(rxdb.getCurrentUser && rxdb.getCurrentUser())
+            assert(rxdb.getCurrentSettings && rxdb.getCurrentSettings())
             // if (!currentUser || !currentSettings) return []
             return rxdb.getCurrentSettings().nodeCategories.filter(c => c.lang === rxdb.getCurrentUser().profile.lang)
          }

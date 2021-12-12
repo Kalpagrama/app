@@ -121,7 +121,7 @@ class RxDBWrapper {
       this.lists = new Lists()
       this.event = new Event()
       this.gqlQueries = new GqlQueries()
-      this.currentState = reactive({ currentUser: null, currentState: null })
+      this.currentState = reactive({ currentUser: null, currentSettings: null })
       this.processStoreEvent = async (eventKey) => {
          // одна из вкладок пересоздала rxdb либо выполнила rxdb.setAuthUser. Надо обновить
          if (this.created) {
@@ -249,7 +249,8 @@ class RxDBWrapper {
             }, { beforeCreate: true })
          }
          this.created = true // до setCurrentUser_internal
-         await this.setCurrentUser_internal()
+         let authUser = await this.getAuthUser() // при первом запуске юзер появится позже (при вызове systemInit)
+         if (authUser) await this.setCurrentUser(authUser)
          logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } catch (err) {
          logE(f, 'rxdb::create error! очищаем и пересоздаем!', err)
@@ -274,62 +275,63 @@ class RxDBWrapper {
       setSyncEventStorageValue('k_rxdb_reset_date', Date.now().toString()) // сообщаем другим вкладкам
    }
 
-   // получить юзера, запустить обработку эвентов и синхронмзацию мастерской (dummyUser - для входа без регистрации)
-   async setCurrentUser_internal () {
-      const f = this.setCurrentUser_internal
+   // получить юзера, запустить обработку эвентов и синхронмзацию мастерской (dummyUser - для входа без регистрации). вызывается при каждой загрузке приложения
+   async setCurrentUser (authUser) {
+      const f = this.setCurrentUser
       logD(f, 'start')
       const t1 = performance.now()
-      let authUser = await this.getAuthUser()
-      let settings = await this.get(RxCollectionEnum.GQL_QUERY, 'settings') // были получены в boot.apollo после инициализации rxdb
-      if (authUser && settings) {
-         let { userOid, dummyUser } = authUser
-         assert(userOid || dummyUser, '!userOid || dummyUser')
-         // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возьмется из кэша
-         let currentUserDb, currentUserDummy, currentUserDbFetched
-         if (userOid) {
-            currentUserDb = await this.get(RxCollectionEnum.OBJ, userOid, {
-               notEvict: true,
-               force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
-               clientFirst: true, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
-               onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
-                  if (currentUserDb && this.getCurrentUser) this.workspace.switchOnSynchro(this.getCurrentUser()) // в кэше есть данные (onFetchFunc сработает после this.getCurrentUser = ...)
-                  else currentUserDbFetched = true // если данных в кэше не было, то onFetchFunc выпольнится раньше, чем this.getCurrentUser = ...
-               }
-            })
-         } else {
-            assert(dummyUser, '!dummyUser')
-            dummyUser.profile.tutorial = {
-               main: true,
-               content_first: true,
-               node_first: true,
-               joint_first: true,
-               workspace_first: true,
-               workspace_upload: true,
-               workspace_article: true
+      assert(authUser)
+      let { userOid, dummyUser } = authUser
+      assert(userOid || dummyUser, '!userOid || dummyUser')
+      // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возьмется из кэша
+      let currentUserDb, currentUserDummy, currentUserDbFetched
+      if (userOid) {
+         currentUserDb = await this.get(RxCollectionEnum.OBJ, userOid, {
+            notEvict: true,
+            force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
+            clientFirst: true, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
+            onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
+               if (currentUserDb && this.getCurrentUser) this.workspace.switchOnSynchro(this.getCurrentUser()) // в кэше есть данные (onFetchFunc сработает после this.getCurrentUser = ...)
+               else currentUserDbFetched = true // если данных в кэше не было, то onFetchFunc выпольнится раньше, чем this.getCurrentUser = ...
             }
-            currentUserDummy = getReactive(dummyUser, 'currentUser')
+         })
+      } else {
+         assert(dummyUser, '!dummyUser')
+         dummyUser.profile.tutorial = {
+            main: true,
+            content_first: true,
+            node_first: true,
+            joint_first: true,
+            workspace_first: true,
+            workspace_upload: true,
+            workspace_article: true
          }
-         assert(currentUserDb || currentUserDummy, 'currentUserDb || currentUserDummy') // должен быть в rxdb после init
-         // ReactiveDocFactory.mergeReactive(this.currentUser, currentUserDb || currentUserDummy)
-         // this.getCurrentUser = () => this.currentUser
-         this.currentState.currentUser = currentUserDb || currentUserDummy
-         this.getCurrentUser = () => this.currentState.currentUser
-         if (currentUserDbFetched) this.workspace.switchOnSynchro(this.getCurrentUser()) // onFetchFunc сработало до этого момента(в кэше не было данных(см clientFirst))
-
-         // let settings = await this.get(RxCollectionEnum.GQL_QUERY, 'settings')
-         // assert(settings, '!settings') // были получены ранее в boot.apollo
-         // ReactiveDocFactory.mergeReactive(this.currentSettings, settings)
-         this.currentState.currentSettings = settings
-         this.getCurrentSettings = () => this.currentState.currentSettings
-
-         this.hasCurrentUser = true
+         currentUserDummy = getReactive(dummyUser, 'currentUser')
       }
+      assert(currentUserDb || currentUserDummy, 'currentUserDb || currentUserDummy') // должен быть в rxdb после init
+      // ReactiveDocFactory.mergeReactive(this.currentUser, currentUserDb || currentUserDummy)
+      // this.getCurrentUser = () => this.currentUser
+      this.currentState.currentUser = currentUserDb || currentUserDummy
+      this.getCurrentUser = () => this.currentState.currentUser
+      if (currentUserDbFetched) this.workspace.switchOnSynchro(this.getCurrentUser()) // onFetchFunc сработало до этого момента(в кэше не было данных(см clientFirst))
+      this.hasCurrentUser = true
       logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+   }
+
+   setCurrentSettings (settings) {
+      const f = this.setCurrentSettings
+      logD(f, 'start')
+      const t1 = performance.now()
+      assert(settings)
+      this.currentState.currentSettings = settings
+      this.getCurrentSettings = () => this.currentState.currentSettings
+      this.hasCurrentSettings = true
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
    async getAuthUser () {
       assert(this.created, '!created')
-      let authUser = JSON.parse(await this.get(RxCollectionEnum.META, 'authUser') || 'null') // данные запоминаются после первого успешного init на одной из вкладок
+      let authUser = JSON.parse(await this.get(RxCollectionEnum.META, 'authUser') || 'null') // данные запоминаются после первого успешного setAuthUser на одной из вкладок
       return authUser
    }
 
@@ -345,7 +347,9 @@ class RxDBWrapper {
          await mutexGlobal.lock('rxdb::setAuthUser')
          await this.lock('setAuthUser')
          await this.set(RxCollectionEnum.META, { id: 'authUser', valueString: JSON.stringify({ userOid, dummyUser }) })
-         await this.setCurrentUser_internal()
+         let authUser = await this.getAuthUser()
+         assert(authUser)
+         await this.setCurrentUser(authUser)
          setSyncEventStorageValue('k_rxdb_set_auth_user', Date.now().toString()) // сообщаем другим вкладкам
          logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } finally {
