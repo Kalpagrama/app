@@ -13,31 +13,32 @@
 		504EC30D1FED79650016851F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30B1FED79650016851F /* Main.storyboard */; };
 		504EC30F1FED79650016851F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30E1FED79650016851F /* Assets.xcassets */; };
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
+		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
 		A084ECDBA7D38E1E42DFC39D /* Pods_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF277DCFFFF123FFC6DF26C7 /* Pods_App.framework */; };
-		CE5F3ED025338E5F001C12C7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CE5F3ECF25338E5F001C12C7 /* GoogleService-Info.plist */; };
-		CE5F3ED8253423EF001C12C7 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5F3ED7253423EF001C12C7 /* ShareViewController.swift */; };
-		CE5F3EDB253423EF001C12C7 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CE5F3ED9253423EF001C12C7 /* MainInterface.storyboard */; };
-		CE5F3EDF253423EF001C12C7 /* share.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CE5F3ED5253423EF001C12C7 /* share.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CE444A7C2765D945007793A7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CE444A7B2765D945007793A7 /* GoogleService-Info.plist */; };
+		CECCBEED2765DDE10023235F /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CECCBEEC2765DDE10023235F /* ShareViewController.swift */; };
+		CECCBEF02765DDE10023235F /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CECCBEEE2765DDE10023235F /* MainInterface.storyboard */; };
+		CECCBEF42765DDE10023235F /* share.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CECCBEEA2765DDE10023235F /* share.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		CE5F3EDD253423EF001C12C7 /* PBXContainerItemProxy */ = {
+		CECCBEF22765DDE10023235F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CE5F3ED4253423EF001C12C7;
+			remoteGlobalIDString = CECCBEE92765DDE10023235F;
 			remoteInfo = share;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		CE5F3EE3253423EF001C12C7 /* Embed App Extensions */ = {
+		CECCBEF82765DDE20023235F /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				CE5F3EDF253423EF001C12C7 /* share.appex in Embed App Extensions */,
+				CECCBEF42765DDE10023235F /* share.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -53,14 +54,15 @@
 		504EC30E1FED79650016851F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		504EC3111FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
 		AF277DCFFFF123FFC6DF26C7 /* Pods_App.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_App.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF51FD2D460BCFE21FA515B2 /* Pods-App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.release.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.release.xcconfig"; sourceTree = "<group>"; };
-		CE145706253B2899005295B3 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
-		CE5F3ECF25338E5F001C12C7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		CE5F3ED5253423EF001C12C7 /* share.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = share.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		CE5F3ED7253423EF001C12C7 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
-		CE5F3EDA253423EF001C12C7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
-		CE5F3EDC253423EF001C12C7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CE444A7B2765D945007793A7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		CECCBEEA2765DDE10023235F /* share.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = share.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		CECCBEEC2765DDE10023235F /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		CECCBEEF2765DDE10023235F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
+		CECCBEF12765DDE10023235F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CECCBEFD2765DFD20023235F /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
 		FC68EB0AF532CFC21C3344DD /* Pods-App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.debug.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -73,7 +75,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CE5F3ED2253423EF001C12C7 /* Frameworks */ = {
+		CECCBEE72765DDE10023235F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -95,7 +97,7 @@
 			isa = PBXGroup;
 			children = (
 				504EC3061FED79650016851F /* App */,
-				CE5F3ED6253423EF001C12C7 /* share */,
+				CECCBEEB2765DDE10023235F /* share */,
 				504EC3051FED79650016851F /* Products */,
 				7F8756D8B27F46E3366F6CEA /* Pods */,
 				27E2DDA53C4D2A4D1A88CE4A /* Frameworks */,
@@ -106,7 +108,7 @@
 			isa = PBXGroup;
 			children = (
 				504EC3041FED79650016851F /* App.app */,
-				CE5F3ED5253423EF001C12C7 /* share.appex */,
+				CECCBEEA2765DDE10023235F /* share.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -114,8 +116,8 @@
 		504EC3061FED79650016851F /* App */ = {
 			isa = PBXGroup;
 			children = (
-				CE145706253B2899005295B3 /* App.entitlements */,
-				CE5F3ECF25338E5F001C12C7 /* GoogleService-Info.plist */,
+				CECCBEFD2765DFD20023235F /* App.entitlements */,
+				CE444A7B2765D945007793A7 /* GoogleService-Info.plist */,
 				50379B222058CBB4000EE86E /* capacitor.config.json */,
 				504EC3071FED79650016851F /* AppDelegate.swift */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
@@ -123,6 +125,7 @@
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
 				504EC3131FED79650016851F /* Info.plist */,
 				2FAD9762203C412B000D30F8 /* config.xml */,
+				50B271D01FEDC1A000F3C39B /* public */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -136,12 +139,12 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
-		CE5F3ED6253423EF001C12C7 /* share */ = {
+		CECCBEEB2765DDE10023235F /* share */ = {
 			isa = PBXGroup;
 			children = (
-				CE5F3ED7253423EF001C12C7 /* ShareViewController.swift */,
-				CE5F3ED9253423EF001C12C7 /* MainInterface.storyboard */,
-				CE5F3EDC253423EF001C12C7 /* Info.plist */,
+				CECCBEEC2765DDE10023235F /* ShareViewController.swift */,
+				CECCBEEE2765DDE10023235F /* MainInterface.storyboard */,
+				CECCBEF12765DDE10023235F /* Info.plist */,
 			);
 			path = share;
 			sourceTree = "<group>";
@@ -158,25 +161,25 @@
 				504EC3011FED79650016851F /* Frameworks */,
 				504EC3021FED79650016851F /* Resources */,
 				9592DBEFFC6D2A0C8D5DEB22 /* [CP] Embed Pods Frameworks */,
-				CE5F3EE3253423EF001C12C7 /* Embed App Extensions */,
+				CECCBEF82765DDE20023235F /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				CE5F3EDE253423EF001C12C7 /* PBXTargetDependency */,
+				CECCBEF32765DDE10023235F /* PBXTargetDependency */,
 			);
 			name = App;
 			productName = App;
 			productReference = 504EC3041FED79650016851F /* App.app */;
 			productType = "com.apple.product-type.application";
 		};
-		CE5F3ED4253423EF001C12C7 /* share */ = {
+		CECCBEE92765DDE10023235F /* share */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = CE5F3EE0253423EF001C12C7 /* Build configuration list for PBXNativeTarget "share" */;
+			buildConfigurationList = CECCBEF52765DDE20023235F /* Build configuration list for PBXNativeTarget "share" */;
 			buildPhases = (
-				CE5F3ED1253423EF001C12C7 /* Sources */,
-				CE5F3ED2253423EF001C12C7 /* Frameworks */,
-				CE5F3ED3253423EF001C12C7 /* Resources */,
+				CECCBEE62765DDE10023235F /* Sources */,
+				CECCBEE72765DDE10023235F /* Frameworks */,
+				CECCBEE82765DDE10023235F /* Resources */,
 			);
 			buildRules = (
 			);
@@ -184,7 +187,7 @@
 			);
 			name = share;
 			productName = share;
-			productReference = CE5F3ED5253423EF001C12C7 /* share.appex */;
+			productReference = CECCBEEA2765DDE10023235F /* share.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -193,7 +196,7 @@
 		504EC2FC1FED79650016851F /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1170;
+				LastSwiftUpdateCheck = 1220;
 				LastUpgradeCheck = 0920;
 				TargetAttributes = {
 					504EC3031FED79650016851F = {
@@ -201,8 +204,8 @@
 						LastSwiftMigration = 1100;
 						ProvisioningStyle = Manual;
 					};
-					CE5F3ED4253423EF001C12C7 = {
-						CreatedOnToolsVersion = 11.7;
+					CECCBEE92765DDE10023235F = {
+						CreatedOnToolsVersion = 12.2;
 						ProvisioningStyle = Manual;
 					};
 				};
@@ -221,7 +224,7 @@
 			projectRoot = "";
 			targets = (
 				504EC3031FED79650016851F /* App */,
-				CE5F3ED4253423EF001C12C7 /* share */,
+				CECCBEE92765DDE10023235F /* share */,
 			);
 		};
 /* End PBXProject section */
@@ -232,19 +235,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */,
+				50B271D11FEDC1A000F3C39B /* public in Resources */,
 				504EC30F1FED79650016851F /* Assets.xcassets in Resources */,
 				50379B232058CBB4000EE86E /* capacitor.config.json in Resources */,
 				504EC30D1FED79650016851F /* Main.storyboard in Resources */,
 				2FAD9763203C412B000D30F8 /* config.xml in Resources */,
-				CE5F3ED025338E5F001C12C7 /* GoogleService-Info.plist in Resources */,
+				CE444A7C2765D945007793A7 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CE5F3ED3253423EF001C12C7 /* Resources */ = {
+		CECCBEE82765DDE10023235F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CE5F3EDB253423EF001C12C7 /* MainInterface.storyboard in Resources */,
+				CECCBEF02765DDE10023235F /* MainInterface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,21 +299,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CE5F3ED1253423EF001C12C7 /* Sources */ = {
+		CECCBEE62765DDE10023235F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CE5F3ED8253423EF001C12C7 /* ShareViewController.swift in Sources */,
+				CECCBEED2765DDE10023235F /* ShareViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		CE5F3EDE253423EF001C12C7 /* PBXTargetDependency */ = {
+		CECCBEF32765DDE10023235F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = CE5F3ED4253423EF001C12C7 /* share */;
-			targetProxy = CE5F3EDD253423EF001C12C7 /* PBXContainerItemProxy */;
+			target = CECCBEE92765DDE10023235F /* share */;
+			targetProxy = CECCBEF22765DDE10023235F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -330,10 +334,10 @@
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
-		CE5F3ED9253423EF001C12C7 /* MainInterface.storyboard */ = {
+		CECCBEEE2765DDE10023235F /* MainInterface.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				CE5F3EDA253423EF001C12C7 /* Base */,
+				CECCBEEF2765DDE10023235F /* Base */,
 			);
 			name = MainInterface.storyboard;
 			sourceTree = "<group>";
@@ -372,7 +376,6 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 132;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -396,7 +399,6 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
 		};
@@ -431,7 +433,6 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 132;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -448,7 +449,6 @@
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				VALIDATE_PRODUCT = YES;
-				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
 		};
@@ -465,50 +465,6 @@
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-ObjC",
-					"-l\"sqlite3\"",
-					"-l\"z\"",
-					"-framework",
-					"\"Capacitor\"",
-					"-framework",
-					"\"Cordova\"",
-					"-framework",
-					"\"CoreTelephony\"",
-					"-framework",
-					"\"FBLPromises\"",
-					"-framework",
-					"\"FirebaseCore\"",
-					"-framework",
-					"\"FirebaseCoreDiagnostics\"",
-					"-framework",
-					"\"FirebaseInstallations\"",
-					"-framework",
-					"\"FirebaseInstanceID\"",
-					"-framework",
-					"\"FirebaseMessaging\"",
-					"-framework",
-					"\"Foundation\"",
-					"-framework",
-					"\"GoogleDataTransport\"",
-					"-framework",
-					"\"GoogleUtilities\"",
-					"-framework",
-					"\"Protobuf\"",
-					"-framework",
-					"\"Security\"",
-					"-framework",
-					"\"SystemConfiguration\"",
-					"-framework",
-					"\"UIKit\"",
-					"-framework",
-					"\"WebKit\"",
-					"-framework",
-					"\"nanopb\"",
-					"-weak_framework",
-					"\"UserNotifications\"",
-				);
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" \"-DDEBUG\"";
 				PRODUCT_BUNDLE_IDENTIFIER = app.kalpa;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -532,50 +488,6 @@
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-ObjC",
-					"-l\"sqlite3\"",
-					"-l\"z\"",
-					"-framework",
-					"\"Capacitor\"",
-					"-framework",
-					"\"Cordova\"",
-					"-framework",
-					"\"CoreTelephony\"",
-					"-framework",
-					"\"FBLPromises\"",
-					"-framework",
-					"\"FirebaseCore\"",
-					"-framework",
-					"\"FirebaseCoreDiagnostics\"",
-					"-framework",
-					"\"FirebaseInstallations\"",
-					"-framework",
-					"\"FirebaseInstanceID\"",
-					"-framework",
-					"\"FirebaseMessaging\"",
-					"-framework",
-					"\"Foundation\"",
-					"-framework",
-					"\"GoogleDataTransport\"",
-					"-framework",
-					"\"GoogleUtilities\"",
-					"-framework",
-					"\"Protobuf\"",
-					"-framework",
-					"\"Security\"",
-					"-framework",
-					"\"SystemConfiguration\"",
-					"-framework",
-					"\"UIKit\"",
-					"-framework",
-					"\"WebKit\"",
-					"-framework",
-					"\"nanopb\"",
-					"-weak_framework",
-					"\"UserNotifications\"",
-				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.kalpa;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = kalpa_app_profile;
@@ -585,21 +497,23 @@
 			};
 			name = Release;
 		};
-		CE5F3EE1253423EF001C12C7 /* Debug */ = {
+		CECCBEF62765DDE20023235F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 133;
 				DEVELOPMENT_TEAM = RWC96M839A;
 				INFOPLIST_FILE = share/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MARKETING_VERSION = 3.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = app.kalpa.share;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = kalpa_ext_profile;
@@ -609,20 +523,22 @@
 			};
 			name = Debug;
 		};
-		CE5F3EE2253423EF001C12C7 /* Release */ = {
+		CECCBEF72765DDE20023235F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 133;
 				DEVELOPMENT_TEAM = RWC96M839A;
 				INFOPLIST_FILE = share/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MARKETING_VERSION = 3.2;
 				MTL_FAST_MATH = YES;
-				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = app.kalpa.share;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = kalpa_ext_profile;
@@ -653,11 +569,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		CE5F3EE0253423EF001C12C7 /* Build configuration list for PBXNativeTarget "share" */ = {
+		CECCBEF52765DDE20023235F /* Build configuration list for PBXNativeTarget "share" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				CE5F3EE1253423EF001C12C7 /* Debug */,
-				CE5F3EE2253423EF001C12C7 /* Release */,
+				CECCBEF62765DDE20023235F /* Debug */,
+				CECCBEF72765DDE20023235F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
