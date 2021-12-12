@@ -45,7 +45,7 @@ div(
                   minHeight: r.value === rateId ? '40px' : '20px',
                   maxHeight: r.value === rateId ? '40px' : '20px',
                 }`
-                ).col.full-height
+                ).col.full-height.br
                 //- voters stats
                 div(:style=`{position: 'absolute', zIndex: 100, top: '-20px',}`).row.full-width.justify-center
                   small.text-white {{ getVotersCount(r.value) || '' }}

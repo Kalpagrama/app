@@ -32,7 +32,7 @@
         contentProvider: 'YOUTUBE',
       }`
       :isActive="false"
-      :isVisible="true"
+      :isVisible="false"
       :isMini="false"
       :options=`{
         mode: 'feed',

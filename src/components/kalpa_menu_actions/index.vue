@@ -21,7 +21,7 @@ q-btn(round flat :icon="icon" :color="color" :dense="dense")
         .col
         q-btn(round flat color="white" icon="clear" v-close-popup)
       //- body
-      .row.full-width.items-start.content-start.q-mb-xl
+      .row.full-width.items-start.content-start.q-mb-md
         q-btn(
           @click="a.cb()"
           v-for="(a,akey) in actions" :key="akey"

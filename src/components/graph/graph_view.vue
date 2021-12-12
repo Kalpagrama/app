@@ -46,7 +46,7 @@ div(ref="graphArea").row.full-width
       @close="itemFinderShow = false"
     ).b-30
   // item detail
-  q-dialog(
+  q-dialog(v-if="!jointCreatorShow"
     v-model="itemDetailsShow"
     :position="detailPosition"
     @hide="graphD3.selectedItem = null"
@@ -689,7 +689,10 @@ export default {
         }
 
         onTripleClick (d) {
-          if (d.oid) {
+          if (thiz.$store.getters.isGuest) {
+            thiz.$store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы выполнить действие, авторизуйтесь'}])
+          }
+          else if (d.oid) {
             thiz.$systemUtils.hapticsImpact()
             let joint = thiz.graphD3.joints.find(j => j.items[0].id === d.id || j.items[1].id === d.id)
             if (joint) thiz.removeJoint(joint)
