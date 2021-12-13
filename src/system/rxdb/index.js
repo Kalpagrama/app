@@ -145,10 +145,9 @@ class RxDBWrapper {
                      throw new Error('bad event' + eventKey)
                }
             } catch (err) {
-               logE('cant process rxdb event! before reload!', err)
-               await window.location.reload()
-               logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+               logC('cant process rxdb StoreEvent!', eventKey, err)
             }
+            logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
          }
       }
    }

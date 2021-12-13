@@ -136,7 +136,7 @@ export default {
       // this.$logW('comment=', comment)
       this.$log('refresh')
       this.refreshing = true
-      this.$wait(300).then(async () => await this.$systemUtils.vibrate(150))
+      this.$wait(100).then(async () => await this.$systemUtils.vibrate(150))
       await this.$systemUtils.reset()
       this.refreshing = false
     },

@@ -10,17 +10,20 @@ export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath
       logT(f, 'start')
       const t1 = performance.now()
       if (localStorage.getItem('k_rxdb_create_date')) {
-         alert('версия БД несовместима.')
+         // alert('версия БД несовместима.')
          await systemHardReset()
-         return
       }
-      await rxdb.create(store)
+      try {
+         await rxdb.create(store)
+      } catch (err) { // такое может быть если например, обновилась схема данных...
+         logE('err on rxdb create! try to reset')
+         await rxdb.reset(store)
+         logT('reset complete!')
+      }
       app.config.globalProperties.$rxdb = rxdb
       logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    } catch (err) {
-      console.error('cant create rxdb!', err)
-      logE('cant create rxdb!', err)
-      await systemReset(false)
+      logC('cant boot::rxdb!', err)
       throw err // без rxdb работать не можем!
    }
 })

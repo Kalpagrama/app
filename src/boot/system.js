@@ -22,7 +22,7 @@ export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath,
     await systemInit()
     logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   } catch (err) {
-    logC(err)
+    logC('cant boot::system', err)
     throw err // без initApplication работать не можем!
   }
 })

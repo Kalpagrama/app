@@ -41,7 +41,8 @@ class SystemUtils {
    }
 
    async reset () {
-      await systemReset()
+      await systemReset(false, true, true)
+      // window.location.reload()
    }
 
    async statusBarSetVisible (visible) {
@@ -234,20 +235,12 @@ async function resetLocalStorage () {
 
 // очистить кэши и БД
 // todo если systemReset не помогает вызывается слишком часто - во второй попробовать hardReset
-async function systemReset (clearAuthData = false, clearRxdb = true, reload = true, pwaResetFlag = true) {
+async function systemReset (clearAuthData = false, clearRxdb = true, pwaResetFlag = true) {
    const f = systemReset
    const t1 = performance.now()
    logT(f, 'start')
-   let resetDates = JSON.parse(sessionStorage.getItem('k_system_reset_dates') || '[]')
-   resetDates = resetDates.filter(dt => Date.now() - dt < 1000 * 60) // удаляем все что старше минуты
    try {
       await mutexGlobal.lock('system::systemReset')
-      if (resetDates.length > 5) { // за последнюю минуту произошло слишком много systemReset
-         logW('too often systemReset!')
-         alert('Приложение не может запуститься по неизвестной причине(resetDates.length > 5).\n Очистка данных и перезагрузка.')
-         await systemHardReset()
-         return
-      }
       if (clearRxdb) await rxdb.reset(store) // сначала очистим базу, потом resetLocalStorage (ей может понадобиться k_token)
       if (clearAuthData) await resetLocalStorage()
       if (pwaResetFlag && process.env.MODE === 'pwa') await pwaReset()
@@ -255,14 +248,8 @@ async function systemReset (clearAuthData = false, clearRxdb = true, reload = tr
          // сообщаем другим вкладкам
          setSyncEventStorageValue('k_logout_date', Date.now().toString())
       }
-      resetDates.push(Date.now())
-      sessionStorage.setItem('k_system_reset_dates', JSON.stringify(resetDates))
       await mutexGlobal.release('system::systemReset')
       logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      if (reload) {
-         logW('systemReset::before reload')
-         window.location.reload()
-      }
    } catch (err) {
       logE('Критическая ошибка в systemReset', err)
       alert(`Критическая ошибка в systemReset err=${JSON.stringify(err)}.\n Очистка данных и перезагрузка`)
@@ -272,7 +259,7 @@ async function systemReset (clearAuthData = false, clearRxdb = true, reload = tr
 
 // если уже войдено - ничего не сделает (опирается на k_user_oid и k_token)
 // если не войдено - попытается войти
-async function systemInit () {
+async function systemInit (recursive = false) {
    const f = systemInit
    logT(f, 'start')
    const t1 = performance.now()
@@ -331,20 +318,27 @@ async function systemInit () {
       window.KALPA_LOAD_COMPLETE = true
       logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    } catch (err) {
-      logE('error on systemInit!', err)
-      await systemReset(true, true, false, true)
-      window.location.reload()
+      logC('error on systemInit!', err)
+      if (!recursive){
+         logT('try systemReset')
+         await systemReset(true, true, true)
+         await systemInit(true)
+         logT('systemInit after error complete')
+      }
    }
 }
 
-async function systemHardReset (reload = true) {
+async function systemHardReset () {
    logW('before systemHardReset...')
-   alert('before systemHardReset')
+   let showAlert = false
    try {
       // await wait(1000)
+      let resetDates = JSON.parse(sessionStorage.getItem('k_system_hardreset_dates') || '[]')
+
       if (process.env.MODE === 'pwa') await pwaReset()
       localStorage.clear()
       sessionStorage.clear()
+      sessionStorage.setItem('k_system_hardreset_dates', JSON.stringify(resetDates))// восстанавливаем k_system_hardreset_dates
       if (window.indexedDB) {
          // let dbOpenRequest = window.indexedDB.deleteDatabase('kalpadb.db')
          let checkDelete = async (dbOpenRequest) => {
@@ -356,7 +350,7 @@ async function systemHardReset (reload = true) {
                   resolve()
                }
                dbOpenRequest.onblocked = function () {
-                  logW('Couldnt delete database due to the operation being blocked')
+                  logW('Couldn\'t delete database due to the operation being blocked')
                }
             })
          }
@@ -381,11 +375,24 @@ async function systemHardReset (reload = true) {
       logW('systemHardReset complete. reload after systemHardReset...')
       // await wait(1000)
       // alert('reload after systemHardReset...')
-      if (reload) window.location.reload()
+
+      resetDates = resetDates.filter(dt => Date.now() - dt < 1000 * 60) // удаляем все что старше минуты
+      if (resetDates.length > 3) { // за последнюю минуту произошло слишком много systemReset
+         logE('too often systemReset!')
+         showAlert = true // прекращаем бесконечные пререзагрузки
+      }
+      resetDates.push(Date.now())
+      sessionStorage.setItem('k_system_hardreset_dates', JSON.stringify(resetDates))
    } catch (err) {
-      alert('error on systemHardReset... reload' + JSON.stringify(err))
-      if (reload) window.location.reload()
+      logE('error on systemHardReset...', err)
+      showAlert = true // прекращаем бесконечные пререзагрузки
    }
+   if (showAlert) {
+      if (Platform.is.capacitor) alert('Приложение не смогло самостоятельно решить возникшую проблему.\n Попробуйте удалить приложение и установить его заново.')
+      else if (process.env.MODE === 'pwa') alert('Приложение не смогло самостоятельно решить возникшую проблему.\n Попробуйте удалить приложение и установить его заново и очистить кэш браузера.')
+      else alert('Приложение не смогло самостоятельно решить возникшую проблему.\n Попробуйте очистить кэш браузера.')
+   }
+   window.location.reload()
 }
 
 {

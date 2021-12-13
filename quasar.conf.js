@@ -27,13 +27,15 @@ module.exports = configure(function (ctx) {
       preFetch: true,
       // https://quasar.dev/quasar-cli/boot-files
       boot: [
+         'start',
          'log',
          'rxdb',
          'notify',
          'i18n',
          'apollo',
          'helpers',
-         ...(process.env.RUN_TESTS ? ['tests'] : ['libs', 'components', 'system']) // запустить рантайм-тесты после инициализации приложения
+         ...(process.env.RUN_TESTS ? ['tests'] : ['libs', 'components', 'system']), // запустить рантайм-тесты после инициализации приложения
+         'end'
       ].filter(b => !!b),
 
       // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css

@@ -1,7 +1,7 @@
 import { apollo } from 'src/boot/apollo'
 import gql from 'graphql-tag'
 import { rxdb, RxModuleEnum } from 'src/system/rxdb'
-import { systemReset } from 'src/system/services'
+import { systemInit, systemReset } from 'src/system/services'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { apiCall } from 'src/api/index'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.API)
@@ -24,7 +24,8 @@ class WorkspaceApi {
          return wsClear
       }
       let res = await apiCall(f, cb)
-      await systemReset(false, true, true, false)
+      await systemReset(false, true, false)
+      await systemInit()
       return res
    }
 

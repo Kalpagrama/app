@@ -152,10 +152,13 @@ class AuthApi {
          await apiCall(f, cb)
       } catch (err) {
          logE('err on logout', err)
-         return await systemReset(true, true, true, true) // вне cb (иначе дедлок)
+         await systemReset(true, true, true) // вне cb (иначе дедлок)
+         await systemInit()
+         // window.location.reload()
+         return
       }
       if (!token || token === localStorage.getItem('k_token')) {
-         await systemReset(true, true, false, true) // вне cb (иначе дедлок)
+         await systemReset(true, true, true) // вне cb (иначе дедлок)
          await systemInit()
       }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
@@ -165,7 +168,7 @@ class AuthApi {
       const f = AuthApi.userIdentify
       logD(f, 'start. userId=', userId_)
       const t1 = performance.now()
-      await systemReset(true, true, false, false) // вне cb (иначе дедлок)
+      await systemReset(true, true, false) // вне cb (иначе дедлок)
       const cb = async () => {
          let {
             data: {
@@ -237,7 +240,7 @@ class AuthApi {
       logD(f, 'start. route=', route)
       const t1 = performance.now()
       assert(route && route.query && route.query.token, '!route && route.query && route.query.token')
-      await systemReset(true, true, false, false) // вне cb (иначе дедлок)
+      await systemReset(true, true, false) // вне cb (иначе дедлок)
       const cb = async () => {
          let token, expires, userId, loginType, needInvite, needConfirm, userExist
          // take token from redirect url
