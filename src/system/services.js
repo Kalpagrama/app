@@ -342,24 +342,42 @@ async function systemHardReset (reload = true) {
    alert('before systemHardReset')
    try {
       // await wait(1000)
+      if (process.env.MODE === 'pwa') await pwaReset()
       localStorage.clear()
       sessionStorage.clear()
       if (window.indexedDB) {
+         // let dbOpenRequest = window.indexedDB.deleteDatabase('kalpadb.db')
+         let checkDelete = async (dbOpenRequest) => {
+            await new Promise((resolve, reject) => {
+               dbOpenRequest.onerror = function(event) {
+                  reject(event)
+               }
+               dbOpenRequest.onsuccess = function(event) {
+                  resolve()
+               }
+               dbOpenRequest.onblocked = function () {
+                  logW('Couldnt delete database due to the operation being blocked')
+               }
+            })
+         }
          if (window.indexedDB.databases) {
             let dbs = await window.indexedDB.databases()
             for (let db of dbs) {
                // alert('indexedDB.deleteDatabase(databaseName): ' + db.name)
-               logD('indexedDB.deleteDatabase(databaseName): ' + db.name)
-               window.indexedDB.deleteDatabase(db.name)
+               logT('indexedDB.deleteDatabase(databaseName): ' + db.name)
+               let dbOpenRequest = window.indexedDB.deleteDatabase(db.name)
+               await checkDelete(dbOpenRequest)
+               logT('delete db OK!: ' + db.name)
             }
          } else {
             // alert('systemHardReset 2')
             let name = 'kalpadb.db'
-            logD('indexedDB.deleteDatabase(databaseName): ' + name)
-            window.indexedDB.deleteDatabase(name)
+            logT('indexedDB.deleteDatabase(databaseName): ' + name)
+            let dbOpenRequest = window.indexedDB.deleteDatabase(name)
+            await checkDelete(dbOpenRequest)
+            logT('delete db OK!: ' + name)
          }
       } else window.alert('Ваш браузер не поддерживат стабильную версию IndexedDB.')
-      if (process.env.MODE === 'pwa') await pwaReset()
       logW('systemHardReset complete. reload after systemHardReset...')
       // await wait(1000)
       // alert('reload after systemHardReset...')
