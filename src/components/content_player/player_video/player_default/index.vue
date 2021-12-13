@@ -111,6 +111,7 @@ export default {
           await this.$wait(1000 + debounceIntervalItem) // нужно дать время чтобы изменные urlWithFormats сохранились в rxdb
           this.$logW('before reload!')
           window.location.reload() // TODO reload излишен!
+          return true
         }
       }
     }

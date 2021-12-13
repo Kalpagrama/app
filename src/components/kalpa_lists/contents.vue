@@ -32,7 +32,7 @@
           :itemState="itemState"
           :itemIndex="itemIndex"
           :mode="mode"
-          @item="bookmarkSelectHandle"
+          @item="bookmarkSelectHandle({ contentKalpa: null, bookmark: $event })"
         ).q-mb-sm
 </template>
 
@@ -43,6 +43,7 @@ import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import videoEditor from 'src/components/kalpa_item/item_card/editor/video_editor.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 import widgetUpload from 'src/pages/app/workspace/page_home/widget_upload/index.vue'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'listContents',
@@ -113,14 +114,19 @@ export default {
     }
   },
   methods: {
-    bookmarkSelectHandle (bookmark) {
-      this.$log('bookmarkSelectHandle', bookmark)
+    bookmarkSelectHandle ({ contentKalpa, bookmark }) {
+      assert(bookmark)
+      this.$log('bookmarkSelectHandle', contentKalpa, bookmark)
       if (this.mode === 'select') {
         this.$emit('item', bookmark)
       }
       else {
-        this.videoEditorContentOid = bookmark.oid
-        this.videoEditorShow = true
+        if (contentKalpa && contentKalpa.contentAuthor && contentKalpa.contentAuthor.oid === this.$store.getters.currentUser.oid) {
+          this.videoEditorContentOid = bookmark.oid
+          this.videoEditorShow = true
+        } else {
+          this.$router.push('/content/' + contentKalpa.oid)
+        }
       }
     }
   }

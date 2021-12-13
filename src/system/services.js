@@ -225,7 +225,7 @@ async function resetLocalStorage () {
       await mutexGlobal.lock('system::resetLocalStorage')
       let keysForRemove = []
       for (let key in localStorage) {
-         if (key.startsWith('k_') && key !== 'k_global_lock') keysForRemove.push(key)
+         if (key.startsWith('k_') && !key.in('k_leader_instance_id', 'k_global_lock')) keysForRemove.push(key)
       }
       for (let key of keysForRemove) localStorage.removeItem(key)
    } finally {
@@ -330,6 +330,7 @@ async function systemInit (recursive = false) {
 }
 
 async function deleteIndexedDb(dbName) {
+   logT('deleteIndexedDb: ', dbName)
    let dbOpenRequest = window.indexedDB.deleteDatabase(dbName)
    await new Promise((resolve, reject) => {
       dbOpenRequest.onerror = function(event) {
@@ -337,6 +338,7 @@ async function deleteIndexedDb(dbName) {
       }
       dbOpenRequest.onsuccess = function(event) {
          resolve()
+         logT('deleteIndexedDb complete', dbName)
       }
       dbOpenRequest.onblocked = function () {
          alert(`Не удается очистить БД ${dbName}. База занята.\nЗакройте другие вкладки с приложением`)
@@ -349,53 +351,48 @@ async function deleteIndexedDb(dbName) {
 async function systemHardReset () {
    logW('before systemHardReset...')
    let showAlert = false
+   let resetDates = JSON.parse(sessionStorage.getItem('k_system_hardreset_dates') || '[]')
+
    try {
       // await wait(1000)
-      let resetDates = JSON.parse(sessionStorage.getItem('k_system_hardreset_dates') || '[]')
-
       if (process.env.MODE === 'pwa') await pwaReset()
+      if (window.indexedDB) {
+         // alert('systemHardReset 2')
+         await deleteIndexedDb('kalpadb.db')
+         // if (window.indexedDB.databases) {
+         //    let dbs = await window.indexedDB.databases()
+         //    for (let db of dbs) {
+         //       // alert('indexedDB.deleteDatabase(databaseName): ' + db.name)
+         //       logT('indexedDB.deleteDatabase(databaseName): ' + db.name)
+         //       await deleteIndexedDb(db.name)
+         //       logT('delete db OK!: ' + db.name)
+         //    }
+         // }
+      } else window.alert('Ваш браузер не поддерживат стабильную версию IndexedDB.')
+   } catch (err) {
+      logE('error on systemHardReset...', err)
+      showAlert = true // прекращаем бесконечные автопререзагрузки
+   }
+   finally {
       localStorage.clear()
       sessionStorage.clear()
-      sessionStorage.setItem('k_system_hardreset_dates', JSON.stringify(resetDates))// восстанавливаем k_system_hardreset_dates
-      if (window.indexedDB) {
-         // let dbOpenRequest = window.indexedDB.deleteDatabase('kalpadb.db')
-         if (window.indexedDB.databases) {
-            let dbs = await window.indexedDB.databases()
-            for (let db of dbs) {
-               // alert('indexedDB.deleteDatabase(databaseName): ' + db.name)
-               logT('indexedDB.deleteDatabase(databaseName): ' + db.name)
-               await deleteIndexedDb(db.name)
-               logT('delete db OK!: ' + db.name)
-            }
-         } else {
-            // alert('systemHardReset 2')
-            let name = 'kalpadb.db'
-            logT('indexedDB.deleteDatabase(databaseName): ' + name)
-            await deleteIndexedDb(name)
-            logT('delete db OK!: ' + name)
-         }
-      } else window.alert('Ваш браузер не поддерживат стабильную версию IndexedDB.')
-      logW('systemHardReset complete. reload after systemHardReset...')
-      // await wait(1000)
-      // alert('reload after systemHardReset...')
-
       resetDates = resetDates.filter(dt => Date.now() - dt < 1000 * 60) // удаляем все что старше минуты
       if (resetDates.length > 3) { // за последнюю минуту произошло слишком много systemReset
          logE('too often systemReset!')
-         showAlert = true // прекращаем бесконечные пререзагрузки
+         showAlert = true // прекращаем бесконечные автопререзагрузки
       }
       resetDates.push(Date.now())
-      sessionStorage.setItem('k_system_hardreset_dates', JSON.stringify(resetDates))
-   } catch (err) {
-      logE('error on systemHardReset...', err)
-      showAlert = true // прекращаем бесконечные пререзагрузки
+      sessionStorage.setItem('k_system_hardreset_dates', JSON.stringify(resetDates))// восстанавливаем k_system_hardreset_dates
    }
    if (showAlert) {
       if (Platform.is.capacitor) alert('Приложение не смогло самостоятельно решить возникшую проблему.\n Попробуйте удалить приложение и установить его заново.')
       else if (process.env.MODE === 'pwa') alert('Приложение не смогло самостоятельно решить возникшую проблему.\n Попробуйте удалить приложение и установить его заново и очистить кэш браузера.')
       else alert('Приложение не смогло самостоятельно решить возникшую проблему.\n Попробуйте очистить кэш браузера.')
    }
+   logT('systemHardReset localStorage=', localStorage)
+   logW('systemHardReset complete. reload after systemHardReset...')
    window.location.reload()
+   return true
 }
 
 {

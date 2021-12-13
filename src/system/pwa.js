@@ -242,6 +242,7 @@ async function updatePWA () {
    logW('before reload!')
    await wait(2000)
    await window.location.reload()
+   return true
 }
 
 async function askForPwaWebPushPerm (store) {

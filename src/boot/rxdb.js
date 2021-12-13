@@ -9,10 +9,6 @@ export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath
       const f = { nameExtra: 'boot::rxdb' }
       logT(f, 'start')
       const t1 = performance.now()
-      if (localStorage.getItem('k_rxdb_create_date')) {
-         // alert('версия БД несовместима.')
-         await systemHardReset()
-      }
       try {
          await rxdb.create(store)
       } catch (err) { // такое может быть если например, обновилась схема данных...

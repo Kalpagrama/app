@@ -138,6 +138,7 @@ export default boot(async ({
       if (oldVal && !isEqual(oldVal, newVal)) {
         logD('new settings received! try reload page...')
         window.location.reload() // новые данные будут подхвачены после перезагрузки (необходимо пересоздать boot::apollo)
+        return true
       }
     }
 
