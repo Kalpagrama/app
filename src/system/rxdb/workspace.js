@@ -233,7 +233,7 @@ class Workspace {
    // работает в фоне и запускается по мере необходимости см ( switchOnSynchro )
    async synchronize () {
       const f = this.synchronize
-      logD(f, 'start')
+      logT(f, 'start')
       const t1 = performance.now()
       // запросит при необходимости данные и сольет с локальными изменениями
       const synchronizeWsWhole = async (forceMerge = false) => {
@@ -376,7 +376,7 @@ class Workspace {
          }
       }
       this.store.commit('core/stateSet', ['wsReady', true])
-      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, unsavedItems)
+      logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`, unsavedItems)
    }
 
    // от сервера прилетел эвент об изменении в мастерской (скорей всего - ответ на наши действия)

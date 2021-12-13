@@ -28,7 +28,7 @@ import { cacheSchema, schemaKeyValue } from 'src/system/rxdb/schemas'
 import cloneDeep from 'lodash/cloneDeep'
 import LruCache from 'lru-cache'
 import { GqlQueries } from 'src/system/rxdb/gql_query'
-import { setSyncEventStorageValue, systemInit } from 'src/system/services'
+import { deleteIndexedDb, setSyncEventStorageValue, systemInit } from 'src/system/services'
 import { reactive } from 'vue'
 
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB)
@@ -180,18 +180,7 @@ class RxDBWrapper {
             this.db = null
          } else if (clearStorageMethod === 'remove_db'){
             await this.db.remove()
-            // let dbOpenRequest = window.indexedDB.deleteDatabase('kalpadb.db')
-            // await new Promise((resolve, reject) => {
-            //    dbOpenRequest.onerror = function(event) {
-            //       reject(event)
-            //    }
-            //    dbOpenRequest.onsuccess = function(event) {
-            //       resolve()
-            //    }
-            //    dbOpenRequest.onblocked = function () {
-            //       logW('Couldnt delete database due to the operation being blocked')
-            //    }
-            // })
+            await deleteIndexedDb('kalpadb.db')
             this.db = null
          } else if (clearStorageMethod === 'remove_collections') {
             if (this.db && this.db.meta) await rxdbOperationProxyExec(this.db.meta, 'remove')

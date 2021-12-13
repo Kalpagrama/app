@@ -41,7 +41,7 @@ class SystemUtils {
    }
 
    async reset () {
-      await systemReset(false, true, true)
+      await systemReset(false, true, true, true)
       // window.location.reload()
    }
 
@@ -235,7 +235,7 @@ async function resetLocalStorage () {
 
 // очистить кэши и БД
 // todo если systemReset не помогает вызывается слишком часто - во второй попробовать hardReset
-async function systemReset (clearAuthData = false, clearRxdb = true, pwaResetFlag = true) {
+async function systemReset (clearAuthData = false, clearRxdb = true, pwaResetFlag = true, autoInit = true) {
    const f = systemReset
    const t1 = performance.now()
    logT(f, 'start')
@@ -248,12 +248,14 @@ async function systemReset (clearAuthData = false, clearRxdb = true, pwaResetFla
          // сообщаем другим вкладкам
          setSyncEventStorageValue('k_logout_date', Date.now().toString())
       }
+      if (autoInit) await systemInit()
       await mutexGlobal.release('system::systemReset')
       logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    } catch (err) {
+      await mutexGlobal.release('system::systemReset')
       logE('Критическая ошибка в systemReset', err)
       alert(`Критическая ошибка в systemReset err=${JSON.stringify(err)}.\n Очистка данных и перезагрузка`)
-      await systemHardReset()
+      await systemHardReset() // вызовет перезагрузку страницы
    }
 }
 
@@ -321,11 +323,26 @@ async function systemInit (recursive = false) {
       logC('error on systemInit!', err)
       if (!recursive){
          logT('try systemReset')
-         await systemReset(true, true, true)
-         await systemInit(true)
+         await systemReset(true, true, true, true)
          logT('systemInit after error complete')
       }
    }
+}
+
+async function deleteIndexedDb(dbName) {
+   let dbOpenRequest = window.indexedDB.deleteDatabase(dbName)
+   await new Promise((resolve, reject) => {
+      dbOpenRequest.onerror = function(event) {
+         reject(event)
+      }
+      dbOpenRequest.onsuccess = function(event) {
+         resolve()
+      }
+      dbOpenRequest.onblocked = function () {
+         logC('Couldn\'t delete database due to the operation being blocked', dbName)
+      }
+   })
+   return true
 }
 
 async function systemHardReset () {
@@ -341,34 +358,19 @@ async function systemHardReset () {
       sessionStorage.setItem('k_system_hardreset_dates', JSON.stringify(resetDates))// восстанавливаем k_system_hardreset_dates
       if (window.indexedDB) {
          // let dbOpenRequest = window.indexedDB.deleteDatabase('kalpadb.db')
-         let checkDelete = async (dbOpenRequest) => {
-            await new Promise((resolve, reject) => {
-               dbOpenRequest.onerror = function(event) {
-                  reject(event)
-               }
-               dbOpenRequest.onsuccess = function(event) {
-                  resolve()
-               }
-               dbOpenRequest.onblocked = function () {
-                  logW('Couldn\'t delete database due to the operation being blocked')
-               }
-            })
-         }
          if (window.indexedDB.databases) {
             let dbs = await window.indexedDB.databases()
             for (let db of dbs) {
                // alert('indexedDB.deleteDatabase(databaseName): ' + db.name)
                logT('indexedDB.deleteDatabase(databaseName): ' + db.name)
-               let dbOpenRequest = window.indexedDB.deleteDatabase(db.name)
-               await checkDelete(dbOpenRequest)
+               await deleteIndexedDb(db.name)
                logT('delete db OK!: ' + db.name)
             }
          } else {
             // alert('systemHardReset 2')
             let name = 'kalpadb.db'
             logT('indexedDB.deleteDatabase(databaseName): ' + name)
-            let dbOpenRequest = window.indexedDB.deleteDatabase(name)
-            await checkDelete(dbOpenRequest)
+            await deleteIndexedDb(name)
             logT('delete db OK!: ' + name)
          }
       } else window.alert('Ваш браузер не поддерживат стабильную версию IndexedDB.')
@@ -454,5 +456,6 @@ export {
    systemReset,
    shareIn,
    systemInit,
-   systemHardReset
+   systemHardReset,
+   deleteIndexedDb
 }

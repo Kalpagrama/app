@@ -74,8 +74,7 @@ export default boot(async ({
           //       logE('AuthApi.logout error', err)
           //       window.location.reload()
           //    })
-          systemReset(true, true, true)
-             .then(() => systemInit())
+          systemReset(true, true, true, true)
           // window.location.reload()
         }
       }
@@ -97,8 +96,7 @@ export default boot(async ({
         logE('gql network error ws', networkError)
         if (networkError.message === 'bad auth token!') {
           // alert('error on gql request2: ' + JSON.stringify(networkError))
-          systemReset(true, true, true)
-             .then(() => systemInit())
+          systemReset(true, true, true, true)
           // window.location.reload()
         }
       }
