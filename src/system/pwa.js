@@ -168,9 +168,11 @@ async function pwaShareWith (title, text, url) {
 
 async function pwaReset () {
    const f = pwaReset
-   logD(f, 'start', registration, registration.waiting)
+   logT(f, 'start', registration)
+   if (!registration) registration = await navigator.serviceWorker.register('/service-worker.js')
    const t1 = performance.now()
    if (registration && registration.waiting) { // если есть новый ожидающий SW - активируем его
+      logT('registration.waiting.skipWaiting...')
       await new Promise((resolve, reject) => {
          registration.waiting.addEventListener('statechange', (event) => {
             // alert('registration.waiting statechange: ' + event.target.state)
@@ -180,14 +182,16 @@ async function pwaReset () {
          })
          registration.waiting.postMessage({ type: 'skipWaiting' })
       })
+      logT('registration.waiting.skipWaiting OK!')
    }
    if (registration) {
-      logD(f, 'try registration.unregister...')
-      registration.unregister().then(() => {
-         logD(f, 'registration.unregister success')
-      }).catch((err) => {
-         logD(f, 'registration.unregister err', err)
-      })
+      try {
+         logT(f, 'try registration.unregister...')
+         await registration.unregister()
+         logT(f, 'registration.unregister success')
+      } catch (err) {
+         logE(f, 'registration.unregister err', err)
+      }
       // вызывает проблемы (кэш самостоятельно не запрашивается после этого)
       // caches.keys().then(cacheNames => {
       //   cacheNames.forEach(cacheName => { // прекэш сам обновляется( + у файлов уникальный префикс). Если удалить, то в след раз он заполнится только при инсталляции воркера!
@@ -199,12 +203,12 @@ async function pwaReset () {
       //   })
       // })
    }
-   logD(f, 'try clear sw Idb')
+   logT(f, 'try clear sw Idb')
    const swShareStore = createStore('sw-share', 'request-formData')
    const videoStore = createStore('sw-cache-video', 'video-responses')
    await clear(swShareStore)
    await clear(videoStore)
-   logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+   logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 }
 
 function showNotifyNewVer (store) {

@@ -339,7 +339,8 @@ async function deleteIndexedDb(dbName) {
          resolve()
       }
       dbOpenRequest.onblocked = function () {
-         logC('Couldn\'t delete database due to the operation being blocked', dbName)
+         alert(`Не удается очистить БД ${dbName}. База занята.\nЗакройте другие вкладки с приложением`)
+         deleteIndexedDb(dbName).then(resolve).catch(reject)
       }
    })
    return true

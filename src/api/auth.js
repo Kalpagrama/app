@@ -165,7 +165,7 @@ class AuthApi {
    // после вызова этого метода - система непригодна для использования тк нет юзера. юзер устанавливается либо через userAuthenticate->systemInit, либо systemInit->userIdentify
    static async userIdentify (userId_, masterToken = null, forceSendConfirmation = false) {
       const f = AuthApi.userIdentify
-      logD(f, 'start. userId=', userId_)
+      logD(f, 'start. userId= ', userId_)
       const t1 = performance.now()
       // autoInit=false - systemInit не вызывается!
       await systemReset(true, true, false, false) // вне cb (иначе дедлок)
