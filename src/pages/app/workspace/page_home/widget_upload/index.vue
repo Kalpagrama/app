@@ -72,7 +72,7 @@ export default {
       async handler (to, from) {
         if (this.isURL(to)) {
           this.urlLoading = true
-          this.contentKalpaFound(await ContentApi.contentCreateFromUrl(to, true))
+          await this.contentKalpaFound(await ContentApi.contentCreateFromUrl(to, true))
           this.$ym('CONTENT_ADDED')
           this.urlLoading = false
         }
@@ -101,13 +101,18 @@ export default {
           type: contentKalpa.type,
           oid: contentKalpa.oid,
           name: contentKalpa.name,
-          thumbUrl: contentKalpa.thumbUrl
+          thumbUrl: contentKalpa.thumbUrl,
+          isSubscribed: true
         }
-        bookmark = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, bookmarkInput)
+        if (contentKalpa.contentAuthor && contentKalpa.contentAuthor.oid === this.$store.getters.currentUser.oid){
+          bookmark = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, bookmarkInput)
+        } else {
+          bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
+        }
         if (!await UserApi.isSubscribed(contentKalpa.oid)) await UserApi.subscribe(contentKalpa.oid)
       }
       // go to content
-      this.$emit('uploaded', bookmark)
+      this.$emit('uploaded', { contentKalpa, bookmark })
     }
   },
   mounted () {

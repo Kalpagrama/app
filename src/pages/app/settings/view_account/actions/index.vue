@@ -136,7 +136,7 @@ export default {
       // this.$logW('comment=', comment)
       this.$log('refresh')
       this.refreshing = true
-      this.$wait(300).then(async () => await this.$systemUtils.vibrate(150))
+      this.$wait(100).then(async () => await this.$systemUtils.vibrate(150))
       await this.$systemUtils.reset()
       this.refreshing = false
     },
@@ -161,6 +161,7 @@ export default {
             alert('Ссылка на проблему скопирована в буфер обмена.\n отправьте ее в телеграм канал поддержки пользователей')
             this.$logW('before reload')
             window.location.reload() // у логрокет нет возможности прервать сессию. приходится перезагружать страницу
+            return true
           }
         }
       }

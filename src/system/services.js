@@ -41,7 +41,8 @@ class SystemUtils {
    }
 
    async reset () {
-      await systemReset()
+      await systemReset(false, true, true, true)
+      // window.location.reload()
    }
 
    async statusBarSetVisible (visible) {
@@ -224,7 +225,7 @@ async function resetLocalStorage () {
       await mutexGlobal.lock('system::resetLocalStorage')
       let keysForRemove = []
       for (let key in localStorage) {
-         if (key.startsWith('k_') && key !== 'k_global_lock') keysForRemove.push(key)
+         if (key.startsWith('k_') && !key.in('k_leader_instance_id', 'k_global_lock')) keysForRemove.push(key)
       }
       for (let key of keysForRemove) localStorage.removeItem(key)
    } finally {
@@ -234,20 +235,12 @@ async function resetLocalStorage () {
 
 // очистить кэши и БД
 // todo если systemReset не помогает вызывается слишком часто - во второй попробовать hardReset
-async function systemReset (clearAuthData = false, clearRxdb = true, reload = true, pwaResetFlag = true) {
+async function systemReset (clearAuthData = false, clearRxdb = true, pwaResetFlag = true, autoInit = true) {
    const f = systemReset
    const t1 = performance.now()
    logT(f, 'start')
-   let resetDates = JSON.parse(sessionStorage.getItem('k_system_reset_dates') || '[]')
-   resetDates = resetDates.filter(dt => Date.now() - dt < 1000 * 60) // удаляем все что старше минуты
    try {
       await mutexGlobal.lock('system::systemReset')
-      if (resetDates.length > 5) { // за последнюю минуту произошло слишком много systemReset
-         logW('too often systemReset!')
-         alert('Приложение не может запуститься по неизвестной причине(resetDates.length > 5).\n Очистка данных и перезагрузка.')
-         await systemHardReset()
-         return
-      }
       if (clearRxdb) await rxdb.reset(store) // сначала очистим базу, потом resetLocalStorage (ей может понадобиться k_token)
       if (clearAuthData) await resetLocalStorage()
       if (pwaResetFlag && process.env.MODE === 'pwa') await pwaReset()
@@ -255,24 +248,20 @@ async function systemReset (clearAuthData = false, clearRxdb = true, reload = tr
          // сообщаем другим вкладкам
          setSyncEventStorageValue('k_logout_date', Date.now().toString())
       }
-      resetDates.push(Date.now())
-      sessionStorage.setItem('k_system_reset_dates', JSON.stringify(resetDates))
+      if (autoInit) await systemInit()
       await mutexGlobal.release('system::systemReset')
       logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      if (reload) {
-         logW('systemReset::before reload')
-         window.location.reload()
-      }
    } catch (err) {
+      await mutexGlobal.release('system::systemReset')
       logE('Критическая ошибка в systemReset', err)
       alert(`Критическая ошибка в systemReset err=${JSON.stringify(err)}.\n Очистка данных и перезагрузка`)
-      await systemHardReset()
+      await systemHardReset() // вызовет перезагрузку страницы
    }
 }
 
 // если уже войдено - ничего не сделает (опирается на k_user_oid и k_token)
 // если не войдено - попытается войти
-async function systemInit () {
+async function systemInit (recursive = false) {
    const f = systemInit
    logT(f, 'start')
    const t1 = performance.now()
@@ -331,43 +320,79 @@ async function systemInit () {
       window.KALPA_LOAD_COMPLETE = true
       logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    } catch (err) {
-      logE('error on systemInit!', err)
-      await systemReset(true, true, false, true)
-      window.location.reload()
+      logC('error on systemInit!', err)
+      if (!recursive){
+         logT('try systemReset')
+         await systemReset(true, true, true, true)
+         logT('systemInit after error complete')
+      }
    }
 }
 
-async function systemHardReset (reload = true) {
+async function deleteIndexedDb(dbName) {
+   logT('deleteIndexedDb: ', dbName)
+   let dbOpenRequest = window.indexedDB.deleteDatabase(dbName)
+   await new Promise((resolve, reject) => {
+      dbOpenRequest.onerror = function(event) {
+         reject(event)
+      }
+      dbOpenRequest.onsuccess = function(event) {
+         resolve()
+         logT('deleteIndexedDb complete', dbName)
+      }
+      dbOpenRequest.onblocked = function () {
+         alert(`Не удается очистить БД ${dbName}. База занята.\nЗакройте другие вкладки с приложением`)
+         deleteIndexedDb(dbName).then(resolve).catch(reject)
+      }
+   })
+   return true
+}
+
+async function systemHardReset () {
    logW('before systemHardReset...')
-   alert('before systemHardReset')
+   let showAlert = false
+   let resetDates = JSON.parse(sessionStorage.getItem('k_system_hardreset_dates') || '[]')
+
    try {
       // await wait(1000)
+      if (process.env.MODE === 'pwa') await pwaReset()
+      if (window.indexedDB) {
+         // alert('systemHardReset 2')
+         await deleteIndexedDb('kalpadb.db')
+         // if (window.indexedDB.databases) {
+         //    let dbs = await window.indexedDB.databases()
+         //    for (let db of dbs) {
+         //       // alert('indexedDB.deleteDatabase(databaseName): ' + db.name)
+         //       logT('indexedDB.deleteDatabase(databaseName): ' + db.name)
+         //       await deleteIndexedDb(db.name)
+         //       logT('delete db OK!: ' + db.name)
+         //    }
+         // }
+      } else window.alert('Ваш браузер не поддерживат стабильную версию IndexedDB.')
+   } catch (err) {
+      logE('error on systemHardReset...', err)
+      showAlert = true // прекращаем бесконечные автопререзагрузки
+   }
+   finally {
       localStorage.clear()
       sessionStorage.clear()
-      if (window.indexedDB) {
-         if (window.indexedDB.databases) {
-            let dbs = await window.indexedDB.databases()
-            for (let db of dbs) {
-               // alert('indexedDB.deleteDatabase(databaseName): ' + db.name)
-               logD('indexedDB.deleteDatabase(databaseName): ' + db.name)
-               window.indexedDB.deleteDatabase(db.name)
-            }
-         } else {
-            // alert('systemHardReset 2')
-            let name = 'kalpadb.db'
-            logD('indexedDB.deleteDatabase(databaseName): ' + name)
-            window.indexedDB.deleteDatabase(name)
-         }
-      } else window.alert('Ваш браузер не поддерживат стабильную версию IndexedDB.')
-      if (process.env.MODE === 'pwa') await pwaReset()
-      logW('systemHardReset complete. reload after systemHardReset...')
-      // await wait(1000)
-      // alert('reload after systemHardReset...')
-      if (reload) window.location.reload()
-   } catch (err) {
-      alert('error on systemHardReset... reload' + JSON.stringify(err))
-      if (reload) window.location.reload()
+      resetDates = resetDates.filter(dt => Date.now() - dt < 1000 * 60) // удаляем все что старше минуты
+      if (resetDates.length > 3) { // за последнюю минуту произошло слишком много systemReset
+         logE('too often systemReset!')
+         showAlert = true // прекращаем бесконечные автопререзагрузки
+      }
+      resetDates.push(Date.now())
+      sessionStorage.setItem('k_system_hardreset_dates', JSON.stringify(resetDates))// восстанавливаем k_system_hardreset_dates
    }
+   if (showAlert) {
+      if (Platform.is.capacitor) alert('Приложение не смогло самостоятельно решить возникшую проблему.\n Попробуйте удалить приложение и установить его заново.')
+      else if (process.env.MODE === 'pwa') alert('Приложение не смогло самостоятельно решить возникшую проблему.\n Попробуйте удалить приложение и установить его заново и очистить кэш браузера.')
+      else alert('Приложение не смогло самостоятельно решить возникшую проблему.\n Попробуйте очистить кэш браузера.')
+   }
+   logT('systemHardReset localStorage=', localStorage)
+   logW('systemHardReset complete. reload after systemHardReset...')
+   window.location.reload()
+   return true
 }
 
 {
@@ -429,5 +454,6 @@ export {
    systemReset,
    shareIn,
    systemInit,
-   systemHardReset
+   systemHardReset,
+   deleteIndexedDb
 }

@@ -31,7 +31,7 @@ kalpa-layout
         v-else
         ).row.full-width.justify-center.q-px-sm
         div( :style=`{ maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start
-          widget-upload(@uploaded="$router.push('/content/' + $event.oid)").q-my-sm
+          widget-upload(@uploaded="$router.push('/content/' + $event.contentKalpa.oid)").q-my-sm
             template(v-slot:bottom)
               q-btn(outline no-caps color="grey" :label="$t('Create')" @click="addItemMenuShow = true").full-width.br-10.q-mt-sm
                 q-dialog(

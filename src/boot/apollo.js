@@ -11,7 +11,7 @@ import isEqual from 'lodash/isEqual'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { AuthApi } from 'src/api/auth'
-import { systemReset } from 'src/system/services'
+import { systemInit, systemReset } from 'src/system/services'
 import { EventApi } from 'src/api/event'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.BOOT)
 
@@ -51,12 +51,12 @@ export default boot(async ({
             // alert('error on gql request: ' + JSON.stringify(err))
             AuthApi.logout()
               .then(() => {
-                logW('AuthApi. before reload!')
-                window.location.reload()
+                logT('apollo::after AuthApi.logout()')
+                // window.location.reload()
               })
               .catch(err => {
-                logE('AuthApi.logout error. before reload', err)
-                window.location.reload()
+                logC('AuthApi.logout error!', err)
+                // window.location.reload()
               })
           } else if (err.code === 'BAD_DATA') {
             // alert(err.message)
@@ -75,6 +75,7 @@ export default boot(async ({
           //       window.location.reload()
           //    })
           systemReset(true, true, true, true)
+          // window.location.reload()
         }
       }
     })
@@ -96,6 +97,7 @@ export default boot(async ({
         if (networkError.message === 'bad auth token!') {
           // alert('error on gql request2: ' + JSON.stringify(networkError))
           systemReset(true, true, true, true)
+          // window.location.reload()
         }
       }
     })
@@ -135,7 +137,8 @@ export default boot(async ({
       logD(' settings onFetchFunc...')
       if (oldVal && !isEqual(oldVal, newVal)) {
         logD('new settings received! try reload page...')
-        window.location.reload() // новые данные будут подхвачены после перезагрузки
+        window.location.reload() // новые данные будут подхвачены после перезагрузки (необходимо пересоздать boot::apollo)
+        return true
       }
     }
 

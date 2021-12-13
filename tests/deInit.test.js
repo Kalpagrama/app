@@ -16,7 +16,7 @@ async function checkSystemReset ({ app, router, store }) {
    const f = checkSystemReset
    logD(f, 'start')
    const t1 = performance.now()
-   await systemReset(true, true, false, true)
+   await systemReset(true, true, true, true)
    logD(f, `systemReset complete: ${Math.floor(performance.now() - t1)} msec`)
    return true
 }

@@ -115,9 +115,10 @@ class Logger {
 
    prepareParams (module, msg) { // #69f542
       if (!msg) return
-      if (this.store.state.core.logFormat.funcName && msg[0] && (typeof msg[0] === 'function' || msg[0].nameExtra)) {
+      if (msg[0] && (typeof msg[0] === 'function' || msg[0].nameExtra)) {
          let func = msg[0]
-         msg.splice(0, 1, `[${func.nameExtra || func.name}]`)
+         msg.splice(0, 1)
+         if (this.store.state.core.logFormat.funcName) msg.splice(0, 0, `[${func.nameExtra || func.name}]`)
       }
       assert(module, '!module')
       msg.splice(0, 0, `%c[${module}] ${this.store.state.core.logFormat.time ? (new Date()).toLocaleTimeString() : ''}`, `color: ${module.toColor()}; font-style: italic; padding: 2px;`)
@@ -210,6 +211,7 @@ class Logger {
          if (reload) {
             console.warn('logger::before reload')
             window.location.reload()
+            return
          }
          if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevel) {
             this.prepareParams(msg)
@@ -225,13 +227,13 @@ class Logger {
       }
    }
 }
-
-let logD = (...msg) => console.log(...msg)
-let logT = (...msg) => console.log(...msg)
-let logI = (...msg) => console.log(...msg)
-let logW = (...msg) => console.warn(...msg)
-let logE = (...msg) => console.error(...msg)
-let logC = (...msg) => console.error(...msg)
+let trimParams = (msg) => msg && msg.length && typeof msg[0] === 'function' ? msg.slice(1) : msg
+let logD = (...msg) => console.log(...trimParams(msg))
+let logT = (...msg) => console.log(...trimParams(msg))
+let logI = (...msg) => console.log(...trimParams(msg))
+let logW = (...msg) => console.warn(...trimParams(msg))
+let logE = (...msg) => console.error(...trimParams(msg))
+let logC = (...msg) => console.error(...trimParams(msg))
 
 function getLogFunc (level, module) {
    switch (level) {

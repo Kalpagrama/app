@@ -28,8 +28,10 @@ import { cacheSchema, schemaKeyValue } from 'src/system/rxdb/schemas'
 import cloneDeep from 'lodash/cloneDeep'
 import LruCache from 'lru-cache'
 import { GqlQueries } from 'src/system/rxdb/gql_query'
-import { setSyncEventStorageValue, systemInit } from 'src/system/services'
+import { deleteIndexedDb, setSyncEventStorageValue, systemInit } from 'src/system/services'
 import { reactive } from 'vue'
+import { Platform } from 'quasar'
+import { wait } from 'src/system/common/common_func'
 
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB)
 
@@ -132,23 +134,34 @@ class RxDBWrapper {
             try {
                switch (eventKey) {
                   case 'k_rxdb_reset_date':
-                     // TODO у rxdb проблемы при работе на неск-ких вкладках после очистки БД
-                     // на другой вкладке произошла очистка данных
-                     // await systemInit()
+                     logT(f, 'на другой вкладке произошла очистка данных', eventKey)
+                     // {
+                     //    // TODO у rxdb проблемы при работе на неск-ких вкладках после очистки БД удалить этот блок после multiInstance = true!
+                     //    logW('TODO у rxdb проблемы при работе на неск-ких вкладках после очистки БД. REMOVE THIS!')
+                     //    await wait(1000) // это не надо при норальной работе rxdb
+                     //    await this.destroy('destroy') // это не надо приноральной работе rxdb
+                     //    await this.create(this.store) // это не надо при норальной работе rxdb
+                     // }
+                     await systemInit()
                      break
                   case 'k_rxdb_set_auth_user':
-                     // TODO у rxdb проблемы при работе на неск-ких вкладках после очистки БД
-                     // на другой вкладке произошла авторизация
-                     // await systemInit()
+                     logT(f, 'на другой вкладке произошла авторизация', eventKey)
+                     // {
+                     //    // TODO у rxdb проблемы при работе на неск-ких вкладках после очистки БД удалить этот блок после multiInstance = true!
+                     //    logW('TODO у rxdb проблемы при работе на неск-ких вкладках после очистки БД. REMOVE THIS!')
+                     //    await wait(1000) // это не надо при норальной работе rxdb
+                     //    await this.destroy('destroy') // это не надо приноральной работе rxdb
+                     //    await this.create(this.store) // это не надо при норальной работе rxdb
+                     // }
+                     await systemInit()
                      break
                   default:
                      throw new Error('bad event' + eventKey)
                }
             } catch (err) {
-               logE('cant process rxdb event! before reload!', err)
-               await window.location.reload()
-               logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+               logC('cant process rxdb StoreEvent!', eventKey, err)
             }
+            logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
          }
       }
    }
@@ -179,20 +192,9 @@ class RxDBWrapper {
             if (this.db && this.db.meta) await rxdbOperationProxyExec(this.db.meta, 'destroy')
             if (this.db) await this.db.destroy()
             this.db = null
-         } else if (clearStorageMethod === 'remove_db'){
+         } else if (clearStorageMethod === 'remove_db') {
             await this.db.remove()
-            // let dbOpenRequest = window.indexedDB.deleteDatabase('kalpadb.db')
-            // await new Promise((resolve, reject) => {
-            //    dbOpenRequest.onerror = function(event) {
-            //       reject(event)
-            //    }
-            //    dbOpenRequest.onsuccess = function(event) {
-            //       resolve()
-            //    }
-            //    dbOpenRequest.onblocked = function () {
-            //       logW('Couldnt delete database due to the operation being blocked')
-            //    }
-            // })
+            await deleteIndexedDb('kalpadb.db')
             this.db = null
          } else if (clearStorageMethod === 'remove_collections') {
             if (this.db && this.db.meta) await rxdbOperationProxyExec(this.db.meta, 'remove')
@@ -218,7 +220,7 @@ class RxDBWrapper {
          await this.lock('create')
          if (!this.db) {
             this.rxStorage = getRxStorageLoki({
-               adapter: new LokiIncrementalIndexedDBAdapter(),
+               adapter: new LokiIncrementalIndexedDBAdapter()
                // * Do not set lokiJS persistence options like autoload and autosave,
                // * RxDB will pick proper defaults based on the given adapter
             })
@@ -226,7 +228,8 @@ class RxDBWrapper {
             this.db = await createRxDatabase({
                name: 'kalpadb',
                storage: this.rxStorage,
-               multiInstance: false // <- multiInstance (optional, default: true)
+               // для нативных приложений multiInstance=false. для web - multiInstance=true
+               multiInstance: Platform.is.capacitor ? false : false // <- multiInstance (optional, default: true)
                // eventReduce: false // если поставить true - будут теряться события об обновлении (по всей видимости - это баг)<- eventReduce (optional, default: true)
                // pouchSettings: { revs_limit: 1 }
             })
@@ -274,7 +277,7 @@ class RxDBWrapper {
    // получить юзера, запустить обработку эвентов и синхронизацию мастерской (dummyUser - для входа без регистрации). вызывается при каждой загрузке приложения
    async setup (authUser, settings) {
       const f = this.setup
-      logD(f, 'start')
+      logT(f, 'start', authUser, !!settings)
       const t1 = performance.now()
       try {
          await this.lock('setup')

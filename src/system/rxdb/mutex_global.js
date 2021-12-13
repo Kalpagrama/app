@@ -33,7 +33,7 @@ class MutexGlobal {
          // отслеживание открыта ли вкладка
          const thiz = this
          watch(() => AppVisibility.appVisible, state => {
-            // alert('appVisibility' + !!state)
+            logT('appVisibility', state)
             if (state) {
                thiz.setLeaderToMe()
             }
@@ -50,11 +50,13 @@ class MutexGlobal {
                   logW('другая вкладка захватила наш мьютекс тк посчитала это дедлоком. before reload', current.instanceId, mutexGlobal.getInstanceId())
                   // alert('другая вкладка стала лидером принудительно и захватила управление(0).\nReload required!')
                   window.location.reload() // не мжем дальше выполняться. Нас прервала другая вкладка!
+                  throw new Error('другая вкладка стала лидером принудительно и захватила управление(захватила наш мьютекс тк посчитала это дедлоком). reload...')
                }
             } else {
                logW('был сделан hardReset (может даже и нами(в safari - нет возможности узнать это - пожтому делаем reload)')
                // alert('был сделан hardReset.\nReload required!')
                window.location.reload() // не мжем дальше выполняться. Нас прервала другая вкладка!
+               throw new Error('на одной из вкладок был сделан hardReset. reload...')
             }
          }
          if (event.key && event.key.in('k_leader_instance_id')) {
@@ -80,6 +82,7 @@ class MutexGlobal {
       if (Platform.is.capacitor) return true
       let currentLeaderInstanceId = localStorage.getItem('k_leader_instance_id')
       if (!currentLeaderInstanceId) {
+         logT('currentLeaderInstanceId is null!', currentLeaderInstanceId)
          this.setLeaderToMe()
          currentLeaderInstanceId = this.instanceId
       }
@@ -125,9 +128,10 @@ class MutexGlobal {
             // todo
             let current = JSON.parse(localStorage.getItem('k_global_lock') || null)
             if (!current || current.instanceId !== mutexGlobal.getInstanceId()) {
-               logW('другая вкладка захватила наш мьютекс тк посчитала это дедлоком. current k_global_lock=', current, mutexGlobal.getInstanceId())
+               logW('другая вкладка захватила наш мьютекс тк посчитала это дедлоком(on timer). current k_global_lock=', current, mutexGlobal.getInstanceId())
                // alert('другая вкладка стала лидером принудительно и захватила управление(1). \n Reload required!')
-               window.location.reload() // не мжем дальше выполняться. Нас прервала другая вкладка!
+               window.location.reload() // не можем дальше выполняться. Нас прервала другая вкладка!
+               throw new Error('другая вкладка стала лидером принудительно и захватила управление(on timer) (захватила наш мьютекс тк посчитала это дедлоком). reload...')
             } else { // обновляем актуальность блокировки
                if (Date.now() - current.dt > warnMutexWaitTime && Date.now() - current.dtActual > 1000) logE('MutexGlobal::long operation!', current.lockOwner)
                current.dtActual = Date.now()
@@ -154,9 +158,10 @@ class MutexGlobal {
             current.locked = false
             localStorage.setItem('k_global_lock', JSON.stringify(current)) // нельзя удалять k_global_lock (см window.addEventListener('storage'... )!
          } else { // кто-то перехватил наш mutex. мы теперь не владеем этим мьютексом
-            logW(f, `кто то перехватил наш мьютекс: ${JSON.stringify(current)}   window.location.reload...`)
+            logW(f, `кто то перехватил наш мьютекс((on release)): ${JSON.stringify(current)}   window.location.reload...`)
             // alert('кто то перехватил наш мьютекс. \n Reload required!')
             window.location.reload() // не мжем дальше выполняться. Нас прервала другая вкладка!
+            throw new Error('другая вкладка стала лидером принудительно и захватила управление(on release) (захватила наш мьютекс тк посчитала это дедлоком). reload...')
          }
       }
    }

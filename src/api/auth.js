@@ -152,19 +152,22 @@ class AuthApi {
          await apiCall(f, cb)
       } catch (err) {
          logE('err on logout', err)
-         return await systemReset(true, true, true, true) // вне cb (иначе дедлок)
+         await systemReset(true, true, true, true) // вне cb (иначе дедлок)
+         // window.location.reload()
+         return
       }
       if (!token || token === localStorage.getItem('k_token')) {
-         await systemReset(true, true, false, true) // вне cb (иначе дедлок)
-         await systemInit()
+         await systemReset(true, true, true, true) // вне cb (иначе дедлок)
       }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
+   // после вызова этого метода - система непригодна для использования тк нет юзера. юзер устанавливается либо через userAuthenticate->systemInit, либо systemInit->userIdentify
    static async userIdentify (userId_, masterToken = null, forceSendConfirmation = false) {
       const f = AuthApi.userIdentify
-      logD(f, 'start. userId=', userId_)
+      logD(f, 'start. userId= ', userId_)
       const t1 = performance.now()
+      // autoInit=false - systemInit не вызывается!
       await systemReset(true, true, false, false) // вне cb (иначе дедлок)
       const cb = async () => {
          let {
@@ -230,13 +233,14 @@ class AuthApi {
       return res
    }
 
-   // oauth вход
+   // oauth вход. После - надо вызвать userAuthenticate(а он вызовет systemInit)
    static async userIdentifyByRoute (route) {
       assert(route, '!route')
       const f = AuthApi.userIdentifyByRoute
       logD(f, 'start. route=', route)
       const t1 = performance.now()
       assert(route && route.query && route.query.token, '!route && route.query && route.query.token')
+      // autoInit=false - systemInit не вызывается!
       await systemReset(true, true, false, false) // вне cb (иначе дедлок)
       const cb = async () => {
          let token, expires, userId, loginType, needInvite, needConfirm, userExist
