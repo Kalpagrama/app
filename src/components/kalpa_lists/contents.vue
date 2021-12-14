@@ -32,7 +32,7 @@
           :itemState="itemState"
           :itemIndex="itemIndex"
           :mode="mode"
-          @item="bookmarkSelectHandle({ contentKalpa: null, bookmark: $event })"
+          @item="bookmarkOptionsClickHandle"
         ).q-mb-sm
 </template>
 
@@ -125,9 +125,14 @@ export default {
           this.videoEditorContentOid = bookmark.oid
           this.videoEditorShow = true
         } else {
-          this.$router.push('/content/' + contentKalpa.oid)
+          this.$router.push('/content/' + bookmark.oid)
         }
       }
+    },
+    bookmarkOptionsClickHandle (bookmark) {
+      assert(bookmark && bookmark.oid)
+      this.videoEditorContentOid = bookmark.oid
+      this.videoEditorShow = true
     }
   }
 }
