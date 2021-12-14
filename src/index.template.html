@@ -138,8 +138,9 @@
            //      console.error('kalpaLoadingInterval too long! break it!!!!')
            //      window.KALPA_LOAD_COMPLETE = true
            //  }, 60 * 1000)
+            let cnt = 0
             const kalpaLoadingInterval = setInterval(() => {
-                console.count('kalpaLoadingInterval curr val=' + document.getElementById('kalpa-loading-text').innerHTML)
+                if(((++cnt) % 10) === 0)console.count('kalpaLoadingInterval curr val=' + document.getElementById('kalpa-loading-text').innerHTML)
                 // if(window.KALPA_LOAD_SW_STATUS){
                 //    if (window.KALPA_LOAD_SW_STATUS === 'active') {
                 //       document.getElementById('kalpa-loading-text').innerHTML = 'Настройка...'
