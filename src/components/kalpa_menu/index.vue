@@ -98,52 +98,52 @@
           .row.fit.items-center.content-center
             span(:style=`{fontSize: '18px'}`).text-grey-5.text-bold {{$t('Login')}}
       //- Create new
-      div(
-        v-if="!$store.getters.isGuest"
-        @click="addItemMenuShow = true"
-        :style=`{
-            height: '60px',
-            borderRadius: '10px',
-            overflow: 'hidden',
-          }`
-      ).row.full-width.menu-item.cursor-pointer
-        q-dialog(
-          v-model="addItemMenuShow"
-          position="standard"
-          :maximized="false"
-        )
-          div(:style=`{background: 'rgb(35,35,35)',borderRadius: '10px'}`).row.full-width.q-pa-md.justify-center
-            q-btn(
-              outline color="grey-8"
-              size="xl"
-              align="center"
-              :label="$t('Essence core')"
-              icon='adjust'
-              round flat no-caps
-              @click="itemEditorShow = true, addItemMenuShow = false"
-            ).row.full-width.create-item.q-pa-sm
-              //q-dialog(
-              //  v-model="itemEditorShow"
-              //  :maximized="false"
-              //  position="standard")
-              //  item-editor(
-              //    :item="newNode"
-              //    :publish="true"
-              //    @close="itemEditorShow=false")
-            q-btn(
-              outline color="grey-8"
-              align="center"
-              size="xl"
-              :to="'/workspace/edit?mode=block'"
-              :label="$t('Essence block')"
-              icon='dashboard_customize'
-              round flat no-caps
-            ).row.full-width.create-item.q-pa-sm
-        div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-          q-icon(size="30px" name='add_circle_outline' color='grey-5')
-        div(v-if="!mini").col.full-height
-          .row.fit.items-center.content-center
-            span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-grey-5.text-bold {{$t('Create')}}
+      //div(
+      //  v-if="!$store.getters.isGuest"
+      //  @click="addItemMenuShow = true"
+      //  :style=`{
+      //      height: '60px',
+      //      borderRadius: '10px',
+      //      overflow: 'hidden',
+      //    }`
+      //).row.full-width.menu-item.cursor-pointer
+      //  q-dialog(
+      //    v-model="addItemMenuShow"
+      //    position="standard"
+      //    :maximized="false"
+      //  )
+      //    div(:style=`{background: 'rgb(35,35,35)',borderRadius: '10px'}`).row.full-width.q-pa-md.justify-center
+      //      q-btn(
+      //        outline color="grey-8"
+      //        size="xl"
+      //        align="center"
+      //        :label="$t('Essence core')"
+      //        icon='adjust'
+      //        round flat no-caps
+      //        @click="itemEditorShow = true, addItemMenuShow = false"
+      //      ).row.full-width.create-item.q-pa-sm
+      //        //q-dialog(
+      //        //  v-model="itemEditorShow"
+      //        //  :maximized="false"
+      //        //  position="standard")
+      //        //  item-editor(
+      //        //    :item="newNode"
+      //        //    :publish="true"
+      //        //    @close="itemEditorShow=false")
+      //      q-btn(
+      //        outline color="grey-8"
+      //        align="center"
+      //        size="xl"
+      //        :to="'/workspace/edit?mode=block'"
+      //        :label="$t('Essence block')"
+      //        icon='dashboard_customize'
+      //        round flat no-caps
+      //      ).row.full-width.create-item.q-pa-sm
+      //  div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
+      //    q-icon(size="30px" name='add_circle_outline' color='grey-5')
+      //  div(v-if="!mini").col.full-height
+      //    .row.fit.items-center.content-center
+      //      span(:style=`{fontSize: '18px', lineHeight: 1.1}`).text-grey-5.text-bold {{$t('Create')}}
             //- small.text-grey-4.full-width {{ '@'+$store.getters.currentUser.username }}
       //How it work?
       div(
