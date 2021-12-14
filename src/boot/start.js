@@ -14,9 +14,12 @@ export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath
    logT('boot::start localStorage=', localStorage)
 
    if (localStorage.getItem('k_launch_start')) {
-      alert('Штатная загрузка не удалась.\nПытаемся очистить старые данные...')
-      await systemHardReset() // предыдущий запуск был неудачным
-      throw new Error('startup error!')
+      // предыдущий запуск был неудачным
+      if (confirm('Штатная загрузка не удалась.\nОчистить данные и попытаться снова?')) {
+         await systemHardReset()
+         throw new Error('startup error!')
+      }
    }
+   // начата загрузка приложения (закончится когда все бут-модули отработают(end.js))
    localStorage.setItem('k_launch_start', 1)
 })
