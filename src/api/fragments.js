@@ -146,6 +146,8 @@ const videoFragment = gql`${objectFragment} ${objectShortFragment} ${ObjectShort
     ...objectFragment
     author{...objectShortFragment}
     contentAuthor{...objectShortFragment}
+    description
+    spheres { oid name }
     commentStat{
             lastComment{...commentFragment}
             topComment{...commentFragment}
@@ -157,7 +159,6 @@ const videoFragment = gql`${objectFragment} ${objectShortFragment} ${ObjectShort
     urlOriginal
     duration
     strips
-    description
 #    contentSource
     relatedContent
     subtitlesRus: subtitles(lang: RUS)
@@ -171,6 +172,7 @@ const bookFragment = gql`${objectFragment} ${objectShortFragment} ${ObjectShortP
     author{...objectShortFragment}
     contentAuthor{...objectShortFragment}
     description
+    spheres { oid name }
     commentStat{
             lastComment{...commentFragment}
             topComment{...commentFragment}
@@ -187,6 +189,7 @@ const imageFragment = gql`${objectFragment} ${objectShortFragment} ${ObjectShort
     ...objectFragment
     author{...objectShortFragment}
     description
+    spheres { oid name }
     commentStat{
             lastComment{...commentFragment}
             topComment{...commentFragment}
@@ -341,10 +344,7 @@ const essenceFragment = gql`
       name
       thumbUrl(preferWidth: 50)
     }
-    spheres {
-      oid
-      name
-    }
+    spheres { oid name }
     category
     layout
     #    items {

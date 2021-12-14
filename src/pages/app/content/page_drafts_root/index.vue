@@ -88,7 +88,8 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_NODE,
-          'items.0.layers.0.contentOid': this.contentKalpa.oid
+          'items.layers.contentOid': this.contentKalpa.oid
+          // 'items.0.layers.0.contentOid': this.contentKalpa.oid
         },
         sort: [
           {updatedAt: 'desc'},
@@ -126,6 +127,7 @@ export default {
   async mounted () {
     this.$log('mounted')
     this.itemsRes = await this.$rxdb.find(this.query)
+    // alert(this.itemsRes.items.length)
   }
 }
 </script>
