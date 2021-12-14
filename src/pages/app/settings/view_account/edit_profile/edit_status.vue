@@ -49,6 +49,13 @@ export default {
     async save () {
       this.$log('save')
       await ObjectApi.update(this.currentUser.oid, 'profile.status', this.status)
+      // this.$notify('info', this.$t('Сохранено'))
+      this.$q.notify({
+        type: 'positive',
+        position: 'top',
+        message: this.$t('Сохранено'),
+        timeout: 600,
+      })
     }
   },
   async mounted () {
