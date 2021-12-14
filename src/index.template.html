@@ -140,19 +140,19 @@
            //  }, 60 * 1000)
             const kalpaLoadingInterval = setInterval(() => {
                 console.count('kalpaLoadingInterval curr val=' + document.getElementById('kalpa-loading-text').innerHTML)
-                if(window.KALPA_LOAD_SW_STATUS){
-                   if (window.KALPA_LOAD_SW_STATUS === 'active') {
-                      document.getElementById('kalpa-loading-text').innerHTML = 'Настройка...'
-                   } else {
-                      document.getElementById('kalpa-loading-text').innerHTML = 'Инициализация...'
-                   }
-                }
+                // if(window.KALPA_LOAD_SW_STATUS){
+                //    if (window.KALPA_LOAD_SW_STATUS === 'active') {
+                //       document.getElementById('kalpa-loading-text').innerHTML = 'Настройка...'
+                //    } else {
+                //       document.getElementById('kalpa-loading-text').innerHTML = 'Инициализация...'
+                //    }
+                // }
                 if (window.KALPA_LOAD_COMPLETE) {
                     let kalpaLoading = document.getElementById('kalpa-loading')
                     kalpaLoading.style.display = 'none'
                     clearInterval(kalpaLoadingInterval)
                 }
-            }, 150)
+            }, 100)
         </script>
         <div id="kalpa-loading">
             <div class="loader"></div>
