@@ -132,7 +132,7 @@ export default {
       // return votes filtered by selected rateId
       if (this.rateInfo) {
         return this.stats.votes.filter(v => {
-          return v.rate >= this.rateInfo.valueMin && v.rate < this.rateInfo.valueMax
+          return v.rate >= this.rateInfo.valueMin && v.rate <= this.rateInfo.valueMax
         })
         // return this.stats.votes
       }
@@ -147,7 +147,7 @@ export default {
       if (!this.stats) return 0
       let rateInfo = this.$rateMeta.find(r => r.value === value)
       return this.stats.votes.filter(v => {
-        return v.rate >= rateInfo.valueMin && v.rate < rateInfo.valueMax
+        return v.rate >= rateInfo.valueMin && v.rate <= rateInfo.valueMax
       }).length
     },
     rateRadius (ri) {
