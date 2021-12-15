@@ -150,8 +150,8 @@ export default boot(async ({
       })
     logD('settings=', settings)
     assert(settings && settings.services, '!services!!!')
-    let urlLocal = sessionStorage.getItem('k_debug') === '2' ? 'http://localhost:8000/graphql' : null
-    let urlLocalWs = sessionStorage.getItem('k_debug') === '2' ? 'ws://localhost:8000/graphql' : null
+    let urlLocal = sessionStorage.getItem('k_debug') === '2' ? 'http://localhost:9000/graphql' : null
+    let urlLocalWs = sessionStorage.getItem('k_debug') === '2' ? 'ws://localhost:9000/graphql' : null
     let linkAuth = urlLocal || settings.services.authUrl
     let linkApi = urlLocal || settings.services.apiUrl
     let linkWs = urlLocalWs || settings.services.subscriptionsUrl

@@ -250,19 +250,10 @@ export default {
       this.$log('showKalpaTutorial TODO!')
       this.$eventBus.$emit('notice-check', { notice: notice, force: true })
     },
-    copyLink () {
+    async copyLink () {
       this.$log('copyLink')
       this.shareLink = makeRoutePath(this.player.contentKalpa, true)
-      this.clipboardWrite(this.shareLink, this.$t('Ссылка скопирована!'))
-    },
-    clipboardWrite (val, message) {
-      this.$log('clipboardWrite', val)
-      navigator.permissions.query({name: 'clipboard-write'}).then(async (result) => {
-        if (result.state === 'granted' || result.state === 'prompt') {
-          await navigator.clipboard.writeText(val)
-          if (message) this.$q.notify({type: 'positive', position: 'top', message: message})
-        }
-      })
+      await this.$clipboardWriteText(this.shareLink, this.$t('Ссылка скопирована!'))
     },
     goOriginal () {
       this.$log('goOriginal')

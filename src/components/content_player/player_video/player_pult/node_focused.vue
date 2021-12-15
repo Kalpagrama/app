@@ -45,7 +45,7 @@ div(
             :style=`{
               height: '50px',
             }`
-            @click="copyLink()"
+            @click="copyLink"
             ).full-width
             span.text-bold {{$t('Copy link')}}
           q-btn(
@@ -141,19 +141,10 @@ export default {
     },
   },
   methods: {
-    copyLink () {
+    async copyLink () {
       this.$log('copyLink')
       this.shareLink = makeRoutePath(this.player.node, true)
-      this.clipboardWrite(this.shareLink, this.$t('Ссылка скопирована!'))
-    },
-    clipboardWrite (val, message) {
-      this.$log('clipboardWrite', val)
-      navigator.permissions.query({name: 'clipboard-write'}).then(async (result) => {
-        if (result.state === 'granted' || result.state === 'prompt') {
-          await navigator.clipboard.writeText(val)
-          if (message) this.$q.notify({type: 'positive', position: 'top', message: message})
-        }
-      })
+      await this.$clipboardWriteText(this.shareLink, this.$t('Ссылка скопирована!'))
     },
     nodeRefresh () {
       this.$log('nodeRefresh')

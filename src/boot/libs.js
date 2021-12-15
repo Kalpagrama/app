@@ -131,6 +131,19 @@ export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath,
          let ref = this.$refs[refName] // тут иногда элемент, а иногда - массив (если элемент используется вместе с v-for)
          return ref && ref[0] ? ref[0] : ref
       }
+
+      app.config.globalProperties.$clipboardWriteText = async (text, notifyMessage) => {
+         this.$log('$clipboardWriteText', text)
+         if (!text) return
+         if (!navigator.clipboard) return
+         assert(typeof text === 'string')
+         let result = navigator.permissions ? await navigator.permissions.query({name: 'clipboard-write'}) : {state: 'granted'}
+         if (result.state === 'granted' || result.state === 'prompt') {
+            await navigator.clipboard.writeText(text)
+            if (notifyMessage) this.$q.notify({type: 'positive', position: 'top', message: notifyMessage})
+         }
+      }
+
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 
       // App go, last position, and feeds refresh...
