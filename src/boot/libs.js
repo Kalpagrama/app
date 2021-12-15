@@ -125,6 +125,12 @@ export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath,
          }
          return five;
       }
+
+      app.config.globalProperties.$getRef = function (refName) {
+         assert(this.$refs)
+         let ref = this.$refs[refName] // тут иногда элемент, а иногда - массив (если элемент используется вместе с v-for)
+         return ref && ref[0] ? ref[0] : ref
+      }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 
       // App go, last position, and feeds refresh...

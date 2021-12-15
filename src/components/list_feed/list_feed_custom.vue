@@ -303,7 +303,7 @@ export default {
         for (let itemMiddle of this.itemMiddleHistory) {
           itemMiddle.item = this.itemsRes.itemsHeaderFooter.find(item => item[this.itemKey] === itemMiddle.key)
           // this.$log('ims item.name', item?.name)
-          let itemRef = this.$refs[`item-${itemMiddle.key}`]
+          let itemRef = this.$getRef(`item-${itemMiddle.key}`)
           if (itemRef) itemMiddle.ref = itemRef
         }
         this.itemMiddleHistory.splice(0, this.itemMiddleHistory.length, ...this.itemMiddleHistory.filter(im => !!im.item && !!im.ref)) // удаляем те, которых нет в новом списке
@@ -465,12 +465,12 @@ export default {
       if (this.itemActivePersist) this.itemsRes.setProperty('currentId', key)
       let item = this.itemsRes.itemsHeaderFooter[idx]
       // this.$log('ims item.name', item?.name)
-      let itemRef = this.$refs[`item-${key}`]
+      let itemRef = this.$getRef(`item-${key}`)
       if (itemRef) {
         this.itemMiddle = {
           key: key,
           // idx: idx -  можем и запоминать, но тогда надо будет синхронищировать в вотчере при изменении itemsRes
-          ref: itemRef[0] || itemRef,
+          ref: itemRef,
           item: item,
           name: item?.name,
           top: 0

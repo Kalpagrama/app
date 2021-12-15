@@ -215,7 +215,7 @@ export default {
       else {
         // get rowActiveIndex position of top
         // move there ?
-        let rowRef = this.$refs[`row-${this.rowActiveKey}`]
+        let rowRef = this.$getRef(`row-${this.rowActiveKey}`)
         if (rowRef) {
           rowRef = rowRef.$el
           this.$log('rowRef', rowRef)
@@ -232,7 +232,7 @@ export default {
     async jointCreated (joint) {
       this.$log('jointCreated', joint)
       // go to current row and go
-      let rowRef = this.$refs[`row-${this.rowActiveKey}`]
+      let rowRef = this.$getRef(`row-${this.rowActiveKey}`)
       if (rowRef) {
         this.$log('jointCreated rowRef', rowRef)
         await rowRef.jointsRes.setProperty('currentId', joint.oid)
@@ -271,7 +271,7 @@ export default {
       if (['ArrowLeft', 'ArrowRight'].includes(e.key)) {
         e.preventDefault()
         // find active row and go somewhere...
-        let rowRef = this.$refs[`row-${this.rowActiveKey}`]
+        let rowRef = this.$getRef(`row-${this.rowActiveKey}`)
         this.$log('rowRef', rowRef)
         if (!rowRef) return
         rowRef.jointMakeVisible(null, true, e.key === 'ArrowRight' ? 'right' : 'left')

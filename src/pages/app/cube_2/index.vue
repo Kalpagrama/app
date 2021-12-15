@@ -178,7 +178,7 @@ export default {
     },
     getActiveRow () {
       this.$log('getActiveRow')
-      let rowRef = this.$refs[`row-${this.rowActiveKey}`]
+      let rowRef = this.$getRef(`row-${this.rowActiveKey}`)
       return rowRef
     },
     rowBecameActive (entry) {
@@ -195,7 +195,7 @@ export default {
       // this.$log('rowMakeActive', row)
       if (useDirection) {
         if (useDirection === 'next') {
-          row = this.$refs[this.rowActiveKey]
+          row = this.$getRef(this.rowActiveKey)
         }
         if (useDirection === 'prev') {
           // need to select prev row...
