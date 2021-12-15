@@ -168,9 +168,7 @@ export default {
   },
   methods: {
     rateMeta (val) {
-      let rate = this.$rateMeta.find(r => {
-        return val >= r.valueMin && val <= r.valueMax
-      })
+      let rate = this.$rateMeta.find(r => this.$rateMeta.checkHitRate(val, r))
       if (rate) return rate
       else return { name: val, color: 'red', colorBackground: 'red' }
     },

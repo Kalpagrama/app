@@ -412,7 +412,7 @@ export default {
                 this.$logD('node highlight clicked', item)
                 this.selectedEssence = await this.$rxdb.get(RxCollectionEnum.OBJ, item.oid)
               }, undefined, {
-                fill: rate ? this.$rateMeta.find(r => rate >= r.valueMin && rate <= r.valueMax).color : 'rgba(156,39,176,0.7)',
+                fill: rate ? this.$rateMeta.find(r => this.$rateMeta.checkHitRate(rate, r)).color : 'rgba(156,39,176,0.7)',
                 'fill-opacity': '0.5',
                 'mix-blend-mode': 'multiply'
               })

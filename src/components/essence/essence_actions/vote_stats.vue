@@ -85,7 +85,7 @@ div(
                   width: '26px',
                   height: '26px',
                   borderRadius: '50%',
-                  background: $rateMeta.find(r => v.rate >= r.valueMin && v.rate <= r.valueMax).color,
+                  background: $rateMeta.find(r => $rateMeta.checkHitRate(v.rate, r)).color,
                 }`
                 ).q-mr-sm
       //- footer
@@ -131,9 +131,7 @@ export default {
       if (!this.stats) return []
       // return votes filtered by selected rateId
       if (this.rateInfo) {
-        return this.stats.votes.filter(v => {
-          return v.rate >= this.rateInfo.valueMin && v.rate <= this.rateInfo.valueMax
-        })
+        return this.stats.votes.filter(v => this.$rateMeta.checkHitRate(v.rate, this.rateInfo))
         // return this.stats.votes
       }
       // return all the voters
@@ -146,9 +144,7 @@ export default {
     getVotersCount (value) {
       if (!this.stats) return 0
       let rateInfo = this.$rateMeta.find(r => r.value === value)
-      return this.stats.votes.filter(v => {
-        return v.rate >= rateInfo.valueMin && v.rate <= rateInfo.valueMax
-      }).length
+      return this.stats.votes.filter(v => this.$rateMeta.checkHitRate(v.rate, rateInfo)).length
     },
     rateRadius (ri) {
       if (ri === 0) {

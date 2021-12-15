@@ -10,6 +10,12 @@ const rateMeta = [
   {name: EventApi.verbalizeRate(0.8), value: 0.75, valueMin: 0.6, valueMax: 0.8, colorName: 'blue-8', color: 'rgba(32,150,243,0.7)', colorBackground: 'rgba(32,150,243,0.4)', order: 2},
   {name: EventApi.verbalizeRate(1), value: 1, valueMin: 0.8, valueMax: 1, colorName: 'purple-8', color: 'rgba(156,39,176,0.7)', colorBackground: 'rgba(156,39,176,0.4)', order: 1}
 ]
+rateMeta.checkHitRate = (rate, rateInfo) => {
+  assert(rate >= 0 && rate <= 1)
+  assert(rateInfo && rateInfo.valueMin >= 0 && rateInfo.valueMax <= 1)
+  if (rate === 0 && rateInfo.valueMin === 0) return true
+  return rate > rateInfo.valueMin && rate <= rateInfo.valueMax
+}
 
 const nodeItemTypes = [
   {id: 'ESSENCE', name: 'По сути', pair: 'ESSENCE'},
@@ -53,7 +59,7 @@ const nodeItemType = (type) => {
 export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath, redirect }) => {
   app.config.globalProperties.$rateMeta = rateMeta
   app.config.globalProperties.$getRateMeta = (rate) => {
-    let res = rateMeta.find(r => rate >= r.valueMin && rate <= r.valueMax)
+    let res = rateMeta.find(r => rateMeta.checkHitRate(rate, r))
     assert(res)
     return res
   }

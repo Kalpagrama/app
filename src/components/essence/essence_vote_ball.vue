@@ -62,7 +62,7 @@ div(
         top: '12px', left: '-16px',
         width: '10px', height: '10px',
         borderRadius: '50%',
-        background: $rateMeta.find(r => essence.rateUser >= r.valueMin && essence.rateUser <= r.valueMax).colorBackground,
+        background: $rateMeta.find(r => $rateMeta.checkHitRate(essence.rateUser, r)).colorBackground,
       }`
       ).row
     //- voteCounts
