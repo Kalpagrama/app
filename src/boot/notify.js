@@ -46,6 +46,18 @@ export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath
           Notify.create({...options, ...payload})
           break
         }
+        case 'success': {
+          let options = {
+            position: 'top',
+            type: 'positive',
+            message: message,
+            textColor: 'white',
+            multiLine: false,
+            timeout: 1500
+          }
+          Notify.create({...options, ...payload})
+          break
+        }
       }
     }
     app.config.globalProperties.$notify = notify

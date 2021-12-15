@@ -301,12 +301,7 @@ export default {
         this.player.setState('node', null)
         this.player.setState('nodeMode', null)
         this.$emit('pageId', null)
-        this.$q.notify({
-          type: 'positive',
-          position: 'top',
-          message: this.$t('Заметка сохранена'),
-          timeout: 1500,
-        })
+        this.$notify('success', this.$t('Сохранено'))
       }
       catch (e) {
         this.$log('nodeSaveAction error', e)

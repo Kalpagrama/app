@@ -27,7 +27,7 @@
       }`
       @blur="sphereAdd()"
       @keydown.enter="sphereAdd()"
-      @keydown.backspace="!sphere && sphereOwner.spheres.length > 0 ? sphereBackspaceDelete() : ''"
+      @keydown.backspace="onBackspacePressed()"
     ).row.q-pl-sm.full-width
   .row.full-width
       slot(name="left")
@@ -86,10 +86,12 @@ export default {
       this.$log('sphereDelete', s)
       this.sphereOwner.spheres = this.sphereOwner.spheres.filter(i => i.name !== s.name)
     },
-    sphereBackspaceDelete () {
+    onBackspacePressed () {
       this.$log('sphereDelete')
-      let deletedSphere = this.sphereOwner.spheres.pop()
-      this.sphere = deletedSphere.name
+      if (!this.sphere && this.sphereOwner.spheres.length) {
+        let deletedSphere = this.sphereOwner.spheres.pop()
+        this.sphere = deletedSphere.name
+      }
     },
   }
 }
