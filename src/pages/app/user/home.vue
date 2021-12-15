@@ -169,7 +169,7 @@ export default {
   methods: {
     rateMeta (val) {
       let rate = this.$rateMeta.find(r => {
-        return val > r.valueMin && val <= r.valueMax
+        return val >= r.valueMin && val <= r.valueMax
       })
       if (rate) return rate
       else return { name: val, color: 'red', colorBackground: 'red' }
