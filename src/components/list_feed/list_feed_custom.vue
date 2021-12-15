@@ -470,7 +470,7 @@ export default {
         this.itemMiddle = {
           key: key,
           // idx: idx -  можем и запоминать, но тогда надо будет синхронищировать в вотчере при изменении itemsRes
-          ref: itemRef,
+          ref: itemRef[0] || itemRef,
           item: item,
           name: item?.name,
           top: 0

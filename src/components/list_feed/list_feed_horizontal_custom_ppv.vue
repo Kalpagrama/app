@@ -378,7 +378,7 @@ export default {
       assert(item)
       this.itemActive = {
         indx: indx,
-        ref: itemRef,
+        ref: itemRef[0] || itemRef,
         item: item,
         name: item.name,
         left: 0
