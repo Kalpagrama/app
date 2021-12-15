@@ -1,6 +1,6 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
-  div(ref="scrolledArea").scroll.row.full-width.items-center.content-center.no-wrap
+  div(ref="scrolledArea" :style=`{backgroundColor: backgroundColor, minHeight: '40px'}`).scroll.row.full-width.items-center.content-center.br-10.q-pa-xs
     q-btn(
       v-for="(s,si) in sphereOwner.spheres" :key="si"
       flat no-caps dense color="white"
@@ -8,25 +8,27 @@
         whiteSpace: 'nowrap',
       }`
       @click="sphereDelete(s)"
-    ).q-px-xs {{ '✦'+s.name }}
-  .row.full-width
-    q-input(
+    ).q-px-xs.ellipsis
+      span(:style=`{maxWidth: $q.screen.width > $store.state.ui.pageMinWidthDesktop ? '500px' : '300px'}`).ellipsis.text-caption {{ '✦'+s.name }}
+    q-input( v-if="sphereOwner.spheres.length !== maxSphereCnt"
       v-model="sphere"
-       dark dense
+       dark dense borderless
+       maxlength="108"
        color="green"
-      :placeholder="placeholder"
+      :placeholder="sphereOwner.spheres.length < 1 ? placeholder : sphereOwner.spheres.length === maxSphereCnt ? '' : 'Можно добавить ещё ' + (maxSphereCnt - sphereOwner.spheres.length)"
       :input-style=`{
-      textAlign: 'center',
+      textAlign: 'left',
       // paddingLeft: '16px',
     }`
       :style=`{
-        minWidth: '100px',
+        minWidth: '260px',
         borderRadius: '5px',
         // border: '1px solid grey'
       }`
       @blur="sphereAdd()"
       @keydown.enter="sphereAdd()"
-    ).full-width
+      @keydown.backspace="!sphere && sphereOwner.spheres.length > 0 ? sphereBackspaceDelete() : ''"
+    ).row.q-pl-sm.full-width
   .row.full-width
       slot(name="left")
   .row.full-width.justify-end
@@ -43,6 +45,7 @@ export default {
     sphereOwner: {type: Object, required: true},
     maxSphereCnt: {type: Number, default: 5},
     placeholderText: {type: String},
+    backgroundColor: {type: String, default: 'rgba(30,30,30,0.9)'},
   },
   data () {
     return {
@@ -82,6 +85,11 @@ export default {
     sphereDelete (s) {
       this.$log('sphereDelete', s)
       this.sphereOwner.spheres = this.sphereOwner.spheres.filter(i => i.name !== s.name)
+    },
+    sphereBackspaceDelete () {
+      this.$log('sphereDelete')
+      let deletedSphere = this.sphereOwner.spheres.pop()
+      this.sphere = deletedSphere.name
     },
   }
 }

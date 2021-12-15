@@ -21,6 +21,7 @@
       :maximized="false"
       position="standard")
       item-editor(
+        :style=`{maxHeight: '500px'}`
         :item="pageId==='images' ? newNodeSameEssence : newNodeSameImage"
         :publish="true"
         @close="setNode($event? $event.oid : node.oid), itemEditorShow=false")

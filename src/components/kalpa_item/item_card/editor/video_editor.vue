@@ -147,6 +147,33 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
       minHeight: '100px',
     }`
       ).full-width.q-px-sm
+      .row.full-width.q-pl-lg
+        small.text-grey-6 {{$t('Сферы')}}
+      .row.full-width
+        //div(:style=`{minHeight: '70px'}`).row.full-width.q-px-sm.q-pt-md.br-10.b-50
+        edit-spheres(:sphereOwner="contentCopy" :maxSphereCnt="20" :placeholderText="$t('Добавьте ключевые слова')" :backgroundColor="'rgba(45,45,45,1)'").q-px-sm
+      .row.full-width.q-pl-lg.q-mt-sm
+        small.text-grey-6 {{$t('Ссылка на источник')}}
+      div(:style=`{minHeight: '45px'}`).row.full-width.q-px-sm
+        .row.full-width
+          q-input(
+            v-model="contentCopy.urlOriginal"
+            reverse-fill-mask
+            color="green"
+            borderless dark dense
+            :style=`{borderRadius: '10px', height: '40px'}`
+            :placeholder="$t('Введите ссылку на источник')"
+            :input-style=`{
+            // background: 'rgb(45,45,45)',
+            // borderRadius: '10px',
+            maxWidth: '250px',
+            minWidth: '250px',
+            minHeight: '30px',
+            textAlign: 'center',
+            }`).row.b-45.q-mr-sm.q-mb-sm.q-px-md
+            template(v-slot="append")
+              .row.content-center.items-center.q-pl-xs
+                q-icon(name="link" color="grey-5" size="sm" )
       .row.full-width.justify-start.q-pl-sm
         .row.full-width.justify-start.content-center.items-center.q-mb-sm
           q-toggle(
@@ -200,7 +227,7 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
         q-tooltip(dense dark) {{$t('Удалить контент')}}
     .col
     q-btn(outline no-caps color="red" :label="$t('Cancel')" v-close-popup).q-mr-sm
-    q-btn(outline no-caps color="green" :disable="!needSave" :loading="loading" :label="$t('Save')" @click="save")
+    q-btn(outline no-caps color="green" :loading="loading" :label="$t('Save')" @click="save")
     slot(v-if="showBottomMenu" name="bottomMenu")
       div(v-if="showBottomMenu").row.full-width
         div(:style=`{
@@ -225,6 +252,7 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { objectTypeName, objectUrl } from 'src/system/common/object_info.js';
 import differenceWith from 'lodash/differenceWith'
+import editSpheres from 'src/pages/app/content/node_editor/edit_spheres.vue'
 import paidUsers from 'src/components/kalpa_lists/paid_users.vue'
 import cloneDeep from 'lodash/cloneDeep'
 import { assert } from 'src/system/common/utils.js';
@@ -239,11 +267,13 @@ export default {
     showBottomMenu: { type: Boolean, default: true }
   },
   components: {
-    paidUsers
+    paidUsers,
+    editSpheres
   },
   data () {
     return {
       isPaid: false,
+      sourceLink: false,
       collectionsModel: { collectionId: null, collections: [], selectedCollectionIds: [] },
       contentDeleting: false,
       content: null,
@@ -260,7 +290,7 @@ export default {
   },
   computed: {
     needSave () {
-      return this.content && (this.rangeModel || this.nameChanged || this.descriptionChanged || this.priceChanged || this.thumbUrlChanged || this.previewUrlChanged)
+      return this.content && (this.rangeModel || this.nameChanged || this.descriptionChanged || this.priceChanged || this.thumbUrlChanged || this.previewUrlChanged || this.spheresChanged || this.urlOriginalChanged)
     },
     nameChanged () {
       return this.contentCopy.name !== this.content.name
@@ -273,6 +303,12 @@ export default {
     },
     thumbUrlChanged () {
       return this.contentCopy.thumbUrl !== this.content.thumbUrl
+    },
+    spheresChanged () {
+      return this.contentCopy.spheres !== this.content.spheres
+    },
+    urlOriginalChanged () {
+      return this.contentCopy.urlOriginal !== this.content.urlOriginal
     },
     previewUrlChanged () {
       return this.previewUrlOrig !== this.previewUrl
@@ -381,16 +417,20 @@ export default {
           return
         }
         this.loading = true
-        let name, description, price, fileThumb, filePreview
+        let name, description, spheres, urlOriginal, price, fileThumb, filePreview
 
         if (this.nameChanged) name = this.contentCopy.name
         if (this.descriptionChanged) description = this.contentCopy.description
+        if (this.spheresChanged) spheres = this.contentCopy.spheres
+        if (this.urlOriginalChanged) urlOriginal = this.contentCopy.urlOriginal
         if (this.priceChanged) price = this.contentCopy.payInfo.price
         if (this.thumbUrlChanged) fileThumb = this.fileThumb
         if (this.previewUrlChanged) filePreview = this.filePreview
 
         if (name !== undefined) await ObjectApi.update(this.content.oid, 'name', name)
         if (description !== undefined) await ObjectApi.update(this.content.oid, 'description', description)
+        if (spheres !== undefined) await ObjectApi.update(this.content.oid, 'spheres', spheres)
+        if (urlOriginal !== undefined) await ObjectApi.update(this.content.oid, 'urlOriginal', urlOriginal)
         if (price !== undefined) await ObjectApi.update(this.content.oid, 'payInfo.price', price)
         if (fileThumb !== undefined) await ObjectApi.update(this.content.oid, 'thumb', fileThumb)
         if (filePreview !== undefined) await ObjectApi.update(this.content.oid, 'preview', filePreview)

@@ -50,7 +50,15 @@ export default {
   methods: {
     async save () {
       this.$log('save')
-      if (this.name.length) await ObjectApi.update(this.currentUser.oid, 'profile.name', this.name)
+      if (this.name.length) {
+        await ObjectApi.update(this.currentUser.oid, 'profile.name', this.name)
+        this.$q.notify({
+          type: 'positive',
+          position: 'top',
+          message: this.$t('Сохранено'),
+          timeout: 600,
+        })
+      }
     }
   },
   async mounted () {

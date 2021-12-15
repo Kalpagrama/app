@@ -40,7 +40,7 @@
     :label="$t('Create joint')"
     :loading="jointPublishing"
     :style=`{height: '50px', borderRadius: '0px'}`
-    @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить связь авторизуйтесь'}]) : jointPublish").row.full-width.text-green.text-bold
+    @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить связь авторизуйтесь'}]) : jointPublish()").row.full-width.text-green.text-bold
 </template>
 
 <script>

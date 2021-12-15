@@ -51,7 +51,7 @@ position: 'relative',
     // category and spheres
     div(ref="spheresRef").row.full-width.full-height.q-pt-sm
       edit-spheres(
-        :sphereOwner="block")
+        :sphereOwner="block").q-px-sm
         template(v-slot:left)
           edit-category(
             :node="block"

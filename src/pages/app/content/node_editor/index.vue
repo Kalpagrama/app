@@ -4,69 +4,76 @@
   //- Desktop editor
   div(
     v-if="$q.screen.gt.sm"
-    :style=`{maxWidth: 600+'px'}`).row.full-width
+    :style=`{maxWidth: 600+'px'}`).row.full-width.div
     //- name
-    div(:style=`{height: '60px'}`).row.full-width
-      q-input(
-        v-model="node.name"
-        borderless dark
-        ref="nameInput"
-        type="textarea" autogrow
-        :placeholder="$t('What do you see?')"
-        :autofocus="true"
-        :input-style=`{
-          paddingTop: '16px',
-          paddingBottom: '10px',
-          paddingLeft: '20px',
-          paddingRight: '10px',
-          //- textAlign: 'center',
-          fontWeight: 'bold',
-          fontSize: fontSize+'px',
-          lineHeight: 1.3,
-          minHeight: '60px',
-        }`
-        ).full-width
-    //- category and spheres
-    edit-spheres(:sphereOwner="node")
-      template(v-slot:left)
-        edit-category(
-          :node="node"
-          :class=`{
-            br: !node.category && categoryError,
+    .row.full-width.q-pa-sm
+      div(:style=`{height: '60px', backgroundColor: 'rgba(30,30,30,0.9)'}`).row.full-width.br-10
+        q-input(
+          v-model="node.name"
+          borderless dark
+          ref="nameInput"
+          type="text"
+          maxlength="108"
+          :placeholder="$t('В чём смысл?')"
+          :autofocus="true"
+          :input-style=`{
+            paddingTop: '16px',
+            paddingBottom: '10px',
+            paddingLeft: '20px',
+            paddingRight: '10px',
+            textAlign: 'center',
+            fontWeight: 'bold',
+            fontSize: fontSize+'px',
+            lineHeight: 1.3,
+            minHeight: '60px',
           }`
-          :style=`{
-            borderRadius: '10px',
-          }`)
-      template(v-slot:right)
-        .row
-          //- Delete from notes
-          q-btn(
-            v-if="node.wsItemType === 'WS_NODE'"
-            outline no-caps color="red"
-            :loading="nodeSaving"
-            :style=`{}`
-            @click="nodeDeleteAction()"
-            ).q-mr-sm
-            span {{$t('Delete draft')}}
-          //- Save to notes
-          q-btn(
-            v-if="node.wsItemType !== 'WS_NODE'"
-            outline no-caps color="white"
-            :loading="nodeSaving"
-            :style=`{}`
-            @click="nodeSaveAction()"
-            ).q-mr-sm
-            span {{$t('Save as draft')}}
-          //- Publish
-          q-btn(
-            color="green" no-caps
-            :loading="nodePublishing"
-            :style=`{
-              //- height: '50px',
+          ).full-width.relative-position
+          div(v-if="node.name").row.absolute-top-left.q-pt-xs.q-pl-md
+            small.text-grey-6 {{$t('В чём смысл?')}}
+    //- category and spheres
+    transition(enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown")
+      edit-spheres(v-if="node.name.length > 0"
+        :sphereOwner="node"
+        ).q-px-md
+        template(v-slot:left)
+          edit-category(
+            :node="node"
+            :class=`{
+              br: !node.category && categoryError,
             }`
-            @click="nodePublish()"
-            )
-            span {{$t('Publish')}}
+            :style=`{
+              borderRadius: '10px',
+            }`)
+        template(v-slot:right)
+          .row
+            //- Delete from notes
+            q-btn(
+              v-if="node.wsItemType === 'WS_NODE'"
+              outline no-caps color="red"
+              :loading="nodeSaving"
+              :style=`{}`
+              @click="nodeDeleteAction()"
+              ).q-mr-sm
+              span {{$t('Удалить заметку')}}
+            //- Save to notes
+            q-btn(
+              v-if="node.wsItemType !== 'WS_NODE'"
+              outline no-caps color="white"
+              :loading="nodeSaving"
+              :style=`{}`
+              @click="nodeSaveAction()"
+              ).q-mr-sm
+              span {{$t('Сохранить как заметку')}}
+            //- Publish
+            q-btn(
+              color="green" no-caps
+              :loading="nodePublishing"
+              :style=`{
+                //- height: '50px',
+              }`
+              @click="nodePublish()"
+              )
+              span {{$t('Publish')}}
   //- ===
   //- Mobile editor
   div(
@@ -90,8 +97,10 @@
           v-model="node.name"
           borderless dark
           ref="nameInput"
-          type="textarea" autogrow
-          :placeholder="$t('What do you see?')"
+          type="text"
+          maxlength="108"
+          :autofocus="true"
+          :placeholder="$t('В чём смысл?')"
           :input-style=`{
             paddingTop: '20px',
             paddingBottom: '10px',
@@ -106,39 +115,40 @@
           ).full-width
       //- category and spheres
       .row.full-width.q-pt-sm
-        edit-spheres(
-          v-if="node.name.length > 0"
-          :sphereOwner="node")
-          template(v-slot:left)
-            edit-category(
-              v-if="node.name.length > 0"
-              :node="node"
-              :class=`{
-                br: !node.category && categoryError,
-              }`
-              :style=`{
-                borderRadius: '10px',
-              }`)
-          template(v-slot:right)
-            div(v-if="node.name.length > 0").row
-              //- Delete from notes
-              q-btn(
-                v-if="node.wsItemType === 'WS_NODE'"
-                outline no-caps color="red"
-                :loading="nodeSaving"
-                :style=`{}`
-                @click="nodeDeleteAction()"
-                ).q-mr-sm
-                span {{$t('Delete draft')}}
-              //- Save to notes
-              q-btn(
-                v-if="node.wsItemType !== 'WS_NODE'"
-                outline no-caps color="white"
-                :loading="nodeSaving"
-                :style=`{}`
-                @click="nodeSaveAction()"
-                ).q-mr-sm
-                span {{$t('Save as draft')}}
+        transition(enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown")
+          edit-spheres(
+            v-if="node.name.length > 0"
+            :sphereOwner="node").q-px-md
+            template(v-slot:left)
+              edit-category(
+                v-if="node.name.length > 0"
+                :node="node"
+                :class=`{
+                  br: !node.category && categoryError,
+                }`
+                :style=`{
+                  borderRadius: '10px',
+                }`)
+            template(v-slot:right)
+              div(v-if="node.name.length > 0").row
+                //- Delete from notes
+                q-btn(
+                  v-if="node.wsItemType === 'WS_NODE'"
+                  outline no-caps color="red"
+                  :loading="nodeSaving"
+                  :style=`{}`
+                  @click="nodeDeleteAction()"
+                  ).q-mr-sm
+                  span {{$t('Delete draft')}}
+                //- Save to notes
+                q-btn(
+                  v-if="node.wsItemType !== 'WS_NODE'"
+                  outline no-caps color="white"
+                  :loading="nodeSaving"
+                  :style=`{}`
+                  @click="nodeSaveAction()"
+                  ).q-mr-sm
+                  span {{$t('Сохранить как заметку')}}
     //- publish
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
@@ -288,6 +298,15 @@ export default {
         // TODO: set nodeMode: edit
         this.$log('nodeSaveAction done')
         this.nodeSaving = false
+        this.player.setState('node', null)
+        this.player.setState('nodeMode', null)
+        this.$emit('pageId', null)
+        this.$q.notify({
+          type: 'positive',
+          position: 'top',
+          message: this.$t('Заметка сохранена'),
+          timeout: 1500,
+        })
       }
       catch (e) {
         this.$log('nodeSaveAction error', e)

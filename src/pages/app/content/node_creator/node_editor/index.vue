@@ -24,7 +24,7 @@
         color: 'white'}`
       ).full-width
         q-btn(round flat color="white" icon="clear" @click="close")
-      edit-spheres(:sphereOwner="node")
+      edit-spheres(:sphereOwner="node").q-px-md
       actions(
         :node="node" :player="player" :contentKalpa="contentKalpa" :showColor="showColor"
         @close="close"
