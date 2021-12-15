@@ -15,6 +15,7 @@ import isEqual from 'lodash/isEqual'
 import debounce from 'lodash/debounce'
 import throttle from 'lodash/throttle'
 import { assert } from 'src/system/common/utils'
+import { notify } from 'src/boot/notify'
 
 const contentful = require('contentful')
 
@@ -133,14 +134,14 @@ export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath,
       }
 
       app.config.globalProperties.$clipboardWriteText = async (text, notifyMessage) => {
-         this.$log('$clipboardWriteText', text)
+         logD('$clipboardWriteText', text)
          if (!text) return
          if (!navigator.clipboard) return
          assert(typeof text === 'string')
          let result = navigator.permissions ? await navigator.permissions.query({name: 'clipboard-write'}) : {state: 'granted'}
          if (result.state === 'granted' || result.state === 'prompt') {
             await navigator.clipboard.writeText(text)
-            if (notifyMessage) this.$q.notify({type: 'positive', position: 'top', message: notifyMessage})
+            if (notifyMessage) notify('info', notifyMessage)
          }
       }
 
