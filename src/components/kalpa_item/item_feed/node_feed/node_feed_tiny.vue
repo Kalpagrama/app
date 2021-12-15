@@ -24,13 +24,15 @@ div(
     :itemState="data"
     :isVisible="isVisible"
     :isActive="isActive"
-    :nodeOid="node.oid")
+    :nodeOid="node.oid"
+    :muted="muted")
   essence-items(
     v-if="showItems && !$slots.items && node.items.length === 2"
     :node="node"
     :itemState="data"
     :isActive="isActive"
-    :isVisible="isVisible")
+    :isVisible="isVisible"
+    :muted="muted")
   div(:style=`{pointerEvents: 'none', background: 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 50%)', zIndex: 10}`).fit.absolute-center
   div(:style=`{zIndex: 10}`).row.full-width.absolute-bottom
     //- NAME: dynamic link/ dynamic fontSize
@@ -98,7 +100,8 @@ export default {
     styles: { type: Object },
     borderRadius: { type: String, default: '10px' },
     actionsColor: { type: String, default: 'grey-9' },
-    height: { type: Number, required: true }
+    height: { type: Number, required: true },
+    muted: { type: Boolean, default: false }
   },
   computed: {
     data () {

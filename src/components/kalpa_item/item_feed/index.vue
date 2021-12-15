@@ -74,6 +74,7 @@ export default {
     actionsColor: { type: String, default: 'grey-9' },
     height: { type: Number },
     layout: { type: String, default: 'card'}, // line | card_tiny | card
+    muted: { type: Boolean, default: false },
   },
   components: {
     blockFeed,

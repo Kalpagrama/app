@@ -50,7 +50,8 @@ kalpa-layout
                 :scrolling="scrolling"
                 :layout="'card-tiny'"
                 :showContext="false"
-                :height="150").q-px-xs
+                :height="150"
+                :muted="true").q-px-xs
           span.text-grey-5.text-h6.q-py-sm.q-pl-sm {{$t('Категории')}}
           .row.full-width
             div(v-for="(c, ix) in $store.getters.nodeCategories").col-6.q-pa-xs
@@ -109,8 +110,9 @@ export default {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
           objectTypeEnum: { $in: ['NODE'] },
           oidSphere: this.$store.getters.nodeCategories[0].sphere.oid,
-          sortStrategy: 'SHUFFLE', // 'ACTIVITY', // AGE
-          stack: 'item0'
+          sortStrategy: 'HOT', // 'ACTIVITY', // AGE
+          shuffle: true,
+          stack: 'item0' // схлопываться по условию
         },
         populateObjects: false
       }

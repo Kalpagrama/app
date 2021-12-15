@@ -43,13 +43,15 @@ div(
           :itemState="data"
           :isVisible="isVisible"
           :isActive="isActive"
-          :nodeOid="node.oid")
+          :nodeOid="node.oid"
+          :muted="muted")
         essence-items(
           v-if="showItems && !$slots.items && node.items.length === 2"
           :node="node"
           :itemState="data"
           :isActive="isActive"
-          :isVisible="isVisible")
+          :isVisible="isVisible"
+          :muted="muted")
       //- NAME: dynamic link/ dynamic fontSize
       slot(name="name")
       router-link(
@@ -140,7 +142,8 @@ export default {
     },
     styles: { type: Object },
     borderRadius: { type: String, default: '10px' },
-    actionsColor: { type: String, default: 'grey-9' }
+    actionsColor: { type: String, default: 'grey-9' },
+    muted: { type: Boolean, default: false }
   },
   computed: {
     data() {
