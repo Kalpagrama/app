@@ -259,7 +259,7 @@ export default {
           // this.$log('itemsRes.items $nextTick', this.itemActive, this.itemsRes.getProperty('itemActiveIndx'))
           this.noDummyAreaCenterIndx = this.itemActive ? this.itemActive.indx : 0
           if (this.itemActivePersist && !this.itemActive) {
-            let ref = this.$refs[`item-${this.itemsRes.getProperty('itemActiveIndx')}`]
+            let ref = this.$getRef(`item-${this.itemsRes.getProperty('itemActiveIndx')}`)
             if (ref) {
               ref.scrollIntoView(false)
               this.$nextTick(() => {
@@ -372,7 +372,7 @@ export default {
       assert(indx >= 0 && indx < this.length)
       this.noDummyAreaCenterIndx = indx
       if (this.itemActivePersist) this.itemsRes.setProperty('itemActiveIndx', indx)
-      let itemRef = this.$refs[`item-${indx}`]
+      let itemRef = this.$getRef(`item-${indx}`)
       let item = this.vsItems[indx]
       assert(itemRef)
       assert(item)

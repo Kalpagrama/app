@@ -122,7 +122,7 @@ export default {
     },
     async shareLinkCopy () {
       this.$log('shareLinkCopy')
-      this.clipboardWrite(this.data.shareLink, this.$t('Ссылка скопирована!'))
+      await this.$clipboardWriteText(this.data.shareLink, this.$t('Ссылка скопирована!'))
       // await this.$wait(500)
       this.data.shareDialogOpened = false
     },
@@ -132,18 +132,9 @@ export default {
     },
     async shareEmbedCopy () {
       this.$log('shareEmbedCopy')
-      this.clipboardWrite(this.shareEmbedText, 'Copied to clipboard!')
+      await this.$clipboardWriteText(this.shareEmbedText, 'Copied to clipboard!')
       // await this.$wait(500)
       this.data.shareDialogOpened = false
-    },
-    clipboardWrite (val, message) {
-      this.$log('clipboardWrite', val)
-      navigator.permissions.query({name: 'clipboard-write'}).then(async (result) => {
-        if (result.state === 'granted' || result.state === 'prompt') {
-          await navigator.clipboard.writeText(val)
-          if (message) this.$q.notify({type: 'positive', position: 'top', message: message})
-        }
-      })
     },
     shareWithTwitter () {
       this.$log('shareWithTwitter')

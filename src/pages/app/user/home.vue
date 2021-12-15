@@ -78,7 +78,7 @@ kalpa-layout
               :isActive="isActive"
               :isVisible="isVisible"
               :isPreload="isPreload"
-              :layout="item.type.in('NODE', 'JOINT', 'BLOCK') ? 'card' : 'line'"
+              :layout="item.type && item.type.in('NODE', 'JOINT', 'BLOCK') ? 'card' : 'line'"
               :scrolling="scrolling").q-pb-xl
 </template>
 
@@ -168,9 +168,7 @@ export default {
   },
   methods: {
     rateMeta (val) {
-      let rate = this.$rateMeta.find(r => {
-        return val > r.valueMin && val <= r.valueMax
-      })
+      let rate = this.$rateMeta.find(r => this.$rateMeta.checkHitRate(val, r))
       if (rate) return rate
       else return { name: val, color: 'red', colorBackground: 'red' }
     },

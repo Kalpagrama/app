@@ -29,8 +29,8 @@ module.exports = configure(function (ctx) {
       boot: [
          'start',
          'log',
-         'rxdb',
          'notify',
+         'rxdb',
          'i18n',
          'apollo',
          'helpers',

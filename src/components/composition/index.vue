@@ -40,6 +40,7 @@ div(
       :height="data.height"
       :width="data.width"
       :options="options || data.options"
+      :muted="muted"
       @playing="$emit('playing')"
       @ended="$emit('ended')"
     )
@@ -110,7 +111,8 @@ export default {
     options: {},
     styles: {},
     nodeOid: {},
-    isSquare: {}
+    isSquare: {},
+    muted: { type: Boolean, default: false },
   },
 
   computed: {

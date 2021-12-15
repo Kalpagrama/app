@@ -68,7 +68,8 @@ export default {
       default () {
         return {}
       }
-    }
+    },
+    muted: { type: Boolean, default: false },
   },
   data () {
     return {

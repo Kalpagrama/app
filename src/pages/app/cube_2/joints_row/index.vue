@@ -150,7 +150,7 @@ export default {
         this.$log('jointMakeActive NO JOINT !')
         return
       }
-      let jointRef = this.$refs[`joint-${joint.oid}`]
+      let jointRef = this.$getRef(`joint-${joint.oid}`)
       if (!jointRef) {
         this.$log('jointMakeActive NO JOINT_REF !')
         return

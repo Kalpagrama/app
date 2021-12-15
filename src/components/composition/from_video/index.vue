@@ -64,7 +64,7 @@ import { reactive } from 'vue'
 
 export default {
   name: 'fromVideo',
-  props: ['composition', 'itemState', 'isActive', 'isVisible', 'objectFit', 'options'],
+  props: ['composition', 'itemState', 'isActive', 'isVisible', 'objectFit', 'options', 'muted'],
   computed: {
     data () {
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
@@ -173,7 +173,7 @@ export default {
     },
     videoClick (e) {
       // this.$log('videoClick', e)
-      if (e.target.muted && localStorage.getItem('k_sound')) {
+      if (e.target.muted && localStorage.getItem('k_sound') && !this.muted) {
         e.target.muted = false
       } else {
         // if (e.target.paused) e.target.play()
@@ -256,7 +256,7 @@ export default {
           currentTime: e.target.currentTime - this.urlMeta[0].t
         }
       }
-      if (localStorage.getItem('k_sound') && this.$q.platform.is.desktop) {
+      if (localStorage.getItem('k_sound') && this.$q.platform.is.desktop && !this.muted) {
         e.target.muted = false
         this.data.player.muted = false
       }

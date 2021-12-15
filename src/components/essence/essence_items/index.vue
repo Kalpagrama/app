@@ -41,6 +41,7 @@ div(
           :isVisible="isVisible"
           :nodeOid="null"
           :isSquare="true"
+          :muted="muted"
           :options=`{
                 loop: false,
                 paused: data.compositionPlayBackState[ii]
@@ -68,6 +69,7 @@ div(
             :isVisible="isVisible"
             :nodeOid="i.items[0].oid"
             :isSquare="true"
+            :muted="muted"
             :options=`{
                 playBackState: data.compositionPlayBackState[ii]
               }`
@@ -122,7 +124,7 @@ import { assert } from 'src/system/common/utils'
 import { reactive } from 'vue'
 export default {
   name: 'essenceItems',
-  props: ['node', 'isActive', 'isVisible', 'itemState', 'showContext'],
+  props: ['node', 'isActive', 'isVisible', 'itemState', 'showContext', 'muted'],
   computed: {
     data() {
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties

@@ -15,6 +15,7 @@ import isEqual from 'lodash/isEqual'
 import debounce from 'lodash/debounce'
 import throttle from 'lodash/throttle'
 import { assert } from 'src/system/common/utils'
+import { notify } from 'src/boot/notify'
 
 const contentful = require('contentful')
 
@@ -125,6 +126,25 @@ export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath,
          }
          return five;
       }
+
+      app.config.globalProperties.$getRef = function (refName) {
+         assert(this.$refs)
+         let ref = this.$refs[refName] // тут иногда элемент, а иногда - массив (если элемент используется вместе с v-for)
+         return ref && ref[0] ? ref[0] : ref
+      }
+
+      app.config.globalProperties.$clipboardWriteText = async (text, notifyMessage) => {
+         logD('$clipboardWriteText', text)
+         if (!text) return
+         if (!navigator.clipboard) return
+         assert(typeof text === 'string')
+         let result = navigator.permissions ? await navigator.permissions.query({name: 'clipboard-write'}) : {state: 'granted'}
+         if (result.state === 'granted' || result.state === 'prompt') {
+            await navigator.clipboard.writeText(text)
+            if (notifyMessage) notify('info', notifyMessage)
+         }
+      }
+
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 
       // App go, last position, and feeds refresh...

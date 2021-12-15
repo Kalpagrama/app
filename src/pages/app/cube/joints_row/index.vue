@@ -268,10 +268,10 @@ export default {
         let idx = this.jointsRes.items.findIndex(j => j.oid === this.jointVisibleOid)
         if (direction === 'right') idx += 1
         if (direction === 'left') idx -= 1
-        if (this.jointsRes.items[idx]) jointRef = this.$refs[`joint-${this.jointsRes.items[idx].oid}`]
+        if (this.jointsRes.items[idx]) jointRef = this.$getRef(`joint-${this.jointsRes.items[idx].oid}`)
       }
       else {
-        jointRef = this.$refs[`joint-${joint.oid}`]
+        jointRef = this.$getRef(`joint-${joint.oid}`)
       }
       // check and go
       if (jointRef) {
