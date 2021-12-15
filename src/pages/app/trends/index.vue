@@ -109,7 +109,7 @@ export default {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
           objectTypeEnum: { $in: ['NODE'] },
           oidSphere: this.$store.getters.nodeCategories[0].sphere.oid,
-          sortStrategy: 'ACTIVITY', // 'ACTIVITY', // AGE
+          sortStrategy: 'SHUFFLE', // 'ACTIVITY', // AGE
           stack: 'item0'
         },
         populateObjects: false
