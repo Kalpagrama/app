@@ -44,7 +44,8 @@ kalpa-layout
               :scrolling="scrolling"
               :showContext="false"
               :layout="'card-tiny'"
-              :height="150").q-px-xs
+              :height="150"
+              :muted="true").q-px-xs
         span.text-grey-5.text-h6.q-py-md.q-pl-sm {{$t('Новое по подпискам')}}
         tab-list-feed(
           ref="listFeed"
