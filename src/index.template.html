@@ -93,24 +93,27 @@
             //}
         </style>
         <!-- Setup -->
-        <script>
+        <!-- /Yandex.Metrika counter -->
+        <script async>
             window.yaCounterId = 60818698
             window.ChatraSetup = {
                 yaCounterId: window.yaCounterId
             };
         </script>
-        <!--        <script type="text/javascript" >-->
-        <!--            (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};-->
-        <!--            m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})-->
-        <!--            (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");-->
-        <!--            ym(window.yaCounterId, "init", {-->
-        <!--                clickmap: true,-->
-        <!--                trackLinks: true,-->
-        <!--                accurateTrackBounce: true,-->
-        <!--                webvisor: window.location.href.includes('local') ? false : true-->
-        <!--            });-->
-        <!--        </script>-->
-        <!--        <noscript><div><img src="https://mc.yandex.ru/watch/60818698" style="position:absolute; left:-9999px;" alt="" /></div></noscript>-->
+        <script async type="text/javascript" >
+            (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+            (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+            ym(window.yaCounterId, "init", {
+                clickmap: true,
+                trackLinks: true,
+                accurateTrackBounce: true,
+                webvisor: window.location.href.includes('local') ? false : true
+            });
+        </script>
+        <noscript><div><img src="https://mc.yandex.ru/watch/60818698" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+        <!-- /Yandex.Metrika counter -->
+
         <!--        <script>-->
         <!--            (function(d, w, c) {-->
         <!--                w.ChatraID = 'jdd2vnDGM9XbW6r4W';-->
@@ -135,21 +138,22 @@
            //      console.error('kalpaLoadingInterval too long! break it!!!!')
            //      window.KALPA_LOAD_COMPLETE = true
            //  }, 60 * 1000)
+            let cnt = 0
             const kalpaLoadingInterval = setInterval(() => {
-                console.count('kalpaLoadingInterval curr val=' + document.getElementById('kalpa-loading-text').innerHTML)
-                if(window.KALPA_LOAD_SW_STATUS){
-                   if (window.KALPA_LOAD_SW_STATUS === 'active') {
-                      document.getElementById('kalpa-loading-text').innerHTML = 'Настройка...'
-                   } else {
-                      document.getElementById('kalpa-loading-text').innerHTML = 'Инициализация...'
-                   }
-                }
+                if(((++cnt) % 10) === 0)console.count('kalpaLoadingInterval curr val=' + document.getElementById('kalpa-loading-text').innerHTML)
+                // if(window.KALPA_LOAD_SW_STATUS){
+                //    if (window.KALPA_LOAD_SW_STATUS === 'active') {
+                //       document.getElementById('kalpa-loading-text').innerHTML = 'Настройка...'
+                //    } else {
+                //       document.getElementById('kalpa-loading-text').innerHTML = 'Инициализация...'
+                //    }
+                // }
                 if (window.KALPA_LOAD_COMPLETE) {
                     let kalpaLoading = document.getElementById('kalpa-loading')
                     kalpaLoading.style.display = 'none'
                     clearInterval(kalpaLoadingInterval)
                 }
-            }, 200)
+            }, 100)
         </script>
         <div id="kalpa-loading">
             <div class="loader"></div>

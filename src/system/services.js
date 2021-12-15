@@ -352,10 +352,12 @@ async function systemHardReset () {
    logW('before systemHardReset...')
    let showAlert = false
    let resetDates = JSON.parse(sessionStorage.getItem('k_system_hardreset_dates') || '[]')
-
+   logT('systemHardReset1')
    try {
       // await wait(1000)
+      logT('systemHardReset2')
       if (process.env.MODE === 'pwa') await pwaReset()
+      logT('systemHardReset3')
       if (window.indexedDB) {
          // alert('systemHardReset 2')
          await deleteIndexedDb('kalpadb.db')
@@ -369,11 +371,13 @@ async function systemHardReset () {
          //    }
          // }
       } else window.alert('Ваш браузер не поддерживат стабильную версию IndexedDB.')
+      logT('systemHardReset4')
    } catch (err) {
       logE('error on systemHardReset...', err)
       showAlert = true // прекращаем бесконечные автопререзагрузки
    }
    finally {
+      logT('systemHardReset5')
       localStorage.clear()
       sessionStorage.clear()
       resetDates = resetDates.filter(dt => Date.now() - dt < 1000 * 60) // удаляем все что старше минуты
@@ -383,6 +387,7 @@ async function systemHardReset () {
       }
       resetDates.push(Date.now())
       sessionStorage.setItem('k_system_hardreset_dates', JSON.stringify(resetDates))// восстанавливаем k_system_hardreset_dates
+      logT('systemHardReset6')
    }
    if (showAlert) {
       if (Platform.is.capacitor) alert('Приложение не смогло самостоятельно решить возникшую проблему.\n Попробуйте удалить приложение и установить его заново.')
