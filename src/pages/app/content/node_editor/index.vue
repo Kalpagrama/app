@@ -34,7 +34,7 @@
     transition(enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown")
       edit-spheres(v-if="node.name.length > 0"
         :sphereOwner="node"
-        )
+        ).q-px-md
         template(v-slot:left)
           edit-category(
             :node="node"
@@ -99,6 +99,7 @@
           ref="nameInput"
           type="text"
           maxlength="108"
+          :autofocus="true"
           :placeholder="$t('В чём смысл?')"
           :input-style=`{
             paddingTop: '20px',
@@ -117,7 +118,7 @@
         transition(enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown")
           edit-spheres(
             v-if="node.name.length > 0"
-            :sphereOwner="node")
+            :sphereOwner="node").q-px-md
             template(v-slot:left)
               edit-category(
                 v-if="node.name.length > 0"

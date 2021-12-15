@@ -1,6 +1,6 @@
 <template lang="pug">
-.row.full-width.items-start.content-start.q-px-md
-  div(ref="scrolledArea" :style=`{backgroundColor: 'rgba(30,30,30,0.9)', minHeight: '40px'}`).scroll.row.full-width.items-center.content-center.br-10.q-px-xs
+.row.full-width.items-start.content-start
+  div(ref="scrolledArea" :style=`{backgroundColor: backgroundColor, minHeight: '40px'}`).scroll.row.full-width.items-center.content-center.br-10.q-pa-xs
     q-btn(
       v-for="(s,si) in sphereOwner.spheres" :key="si"
       flat no-caps dense color="white"
@@ -9,7 +9,7 @@
       }`
       @click="sphereDelete(s)"
     ).q-px-xs.ellipsis
-      small(:style=`{maxWidth: $q.screen.width > $store.state.ui.pageMinWidthDesktop ? '500px' : '300px'}`).ellipsis {{ '✦'+s.name }}
+      span(:style=`{maxWidth: $q.screen.width > $store.state.ui.pageMinWidthDesktop ? '500px' : '300px'}`).ellipsis.text-caption {{ '✦'+s.name }}
     q-input( v-if="sphereOwner.spheres.length !== maxSphereCnt"
       v-model="sphere"
        dark dense borderless
@@ -45,6 +45,7 @@ export default {
     sphereOwner: {type: Object, required: true},
     maxSphereCnt: {type: Number, default: 5},
     placeholderText: {type: String},
+    backgroundColor: {type: String, default: 'rgba(30,30,30,0.9)'},
   },
   data () {
     return {
