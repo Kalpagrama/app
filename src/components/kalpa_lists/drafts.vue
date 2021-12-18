@@ -14,7 +14,7 @@
         @close="bookmarkEditorShow = false, bookmarkSelected = null")
     tab-list-feed(
       :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
-      :navHeaderText="useNavHeader ? $t('Drafts') : ''"
+      :navHeaderText="useNavHeader ? $t('Заметки') : ''"
       :searchInputState="searchInputState"
       :searchString="searchString"
       :pages="pages"
@@ -83,7 +83,7 @@ export default {
       let pages = [
         // {id: 'collections', name: this.$t('Collections')},
         { id: 'nodes', name: this.$t('Nodes') },
-        { id: 'joints', name: this.$t('Joints') },
+        // { id: 'joints', name: this.$t('Joints') },
         { id: 'blocks', name: this.$t('Blocks') }
       ]
       if (this.pagesFilter) return this.pagesFilter(pages)

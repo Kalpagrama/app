@@ -12,7 +12,7 @@ div(
       overflow: 'hidden',
       ...styles,
     }`
-  ).row.full-width.items-start.content-start
+  ).row.full-width.items-start.content-start.b-30
     q-resize-observer(@resize="data.nodeWidth = $event.width")
     slot(name="wrapper")
     //- wrapper
