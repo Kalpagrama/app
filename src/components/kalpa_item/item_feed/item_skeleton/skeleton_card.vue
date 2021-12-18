@@ -20,7 +20,7 @@ div(:style=`{width: $q.screen.width + 'px'}`)
           q-skeleton(:height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 1.8)+'px'" animation="none" dark square).col
           q-skeleton(v-if="item.type === 'JOINT'" :height="(Math.min($q.screen.width, $store.state.ui.pageWidth) / 1.8)+'px'" animation="none" dark square).col.q-ml-sm
         div().row.full-width.text-grey.text-h6.text-bold.items-center.content-center.justify-center.q-py-md
-          span {{item.name || (item.vertexType || item.verices ? $nodeItemType(item.vertexType || item.verices[0]).name : '')}}
+          span(:style=`{fontSize: fontSize+'px',}`) {{item.name || (item.vertexType || item.verices ? $nodeItemType(item.vertexType || item.verices[0]).name : '')}}
   .row.full-width.justify-center.q-px-sm.q-pt-sm
     div(
       :style=`{
@@ -39,5 +39,14 @@ div(:style=`{width: $q.screen.width + 'px'}`)
 export default {
   name: 'skeletonCard',
   props: ['item', 'animation'],
+  computed: {
+    fontSize () {
+      let l = this.item.name.length
+      if (l < 20) return 22
+      else if (l < 30) return 20
+      else if (l < 40) return 16
+      else return 14
+    }
+  }
 }
 </script>
