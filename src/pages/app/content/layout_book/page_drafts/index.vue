@@ -14,15 +14,23 @@
         span.text-white.text-bold {{$t('Notes')}}
         .col
         q-btn(round flat color="white" icon="clear" @click="$emit('close')")
-      list-feed(
-        ref="list-feed"
+      //list-feed(
+      //  :query="query"
+      //  :itemActivePersist="false"
+      //  :style=`{
+      //    maxWidth: 600+'px',
+      //    //- marginBottom: '100px',
+      //  }`)
+      tab-list-feed(
+        :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
+        :navHeaderText="useNavHeader ? $t('Drafts') : ''"
+        :searchInputState="searchInputState"
+        :searchString="searchString"
         :query="query"
+        :itemHeightApprox="100"
         :itemActivePersist="false"
-        :style=`{
-          maxWidth: 600+'px',
-          //- marginBottom: '100px',
-        }`
-        @ready="listFeedReady")
+        showAddBtn=true
+      ).row.full-width
         //- template(v-slot:prepend)
         template(v-slot:item=`{item:draft,itemIndex:draftIndex,isActive,isVisible,isPreload, scrolling}`)
           q-btn(
@@ -53,7 +61,8 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_NODE,
-          contentOids: { $elemMatch: { $eq: this.contentKalpa.oid } }
+          'items.layers.contentOid': this.contentKalpa.oid
+          // contentOids: { $elemMatch: { $eq: this.contentKalpa.oid } }
         },
         sort: [{ createdAt: 'desc' }]
       }

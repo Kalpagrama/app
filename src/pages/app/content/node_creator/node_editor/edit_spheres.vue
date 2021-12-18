@@ -1,9 +1,9 @@
 <template lang="pug">
 .row.full-width.items-start.content-start.q-pl-sm
-  edit-category(:node="node")
+  edit-category(:node="sphereOwner")
   div(
     @click="sphereDelete(si)"
-    v-for="(s,si) in node.spheres" :key="si"
+    v-for="(s,si) in sphereOwner.spheres" :key="si"
     :style=`{
       background: 'rgba(40,40,40,0.5)',
       borderRadius: '10px',
@@ -20,7 +20,7 @@
     placeholder="Введите сферу"
     :input-style=`{
       paddingTop: '12px',
-      //- paddingLeft: node.spheres.length === 0 ? '12px' : '4px',
+      //- paddingLeft: sphereOwner.spheres.length === 0 ? '12px' : '4px',
       paddingLeft: '4px',
       minWidth: '60px',
     }`
@@ -35,7 +35,7 @@ export default {
   components: {
     editCategory,
   },
-  props: ['node'],
+  props: ['sphereOwner'],
   data () {
     return {
       sphereAdding: false,
@@ -47,24 +47,24 @@ export default {
       this.$log('sphereAdd')
       let sphereName = this.sphere.trim()
       if (sphereName.length === 0) return
-      if (this.node.spheres.find(s => s.name === sphereName)) {
+      if (this.sphereOwner.spheres.find(s => s.name === sphereName)) {
         this.sphere = ''
         return
       }
-      this.node.spheres.push({ name: sphereName })
+      this.sphereOwner.spheres.push({ name: sphereName })
       this.sphere = ''
     },
     sphereDelete (si) {
       this.$log('sphereDelete', si)
-      this.$delete(this.node.spheres, si)
+      this.$delete(this.sphereOwner.spheres, si)
     },
     sphereInputOnKeydown (e) {
       this.$log('sphereInputOnKeydown', e)
       const key = e.key
       if (key === 'Backspace' || key === 'Delete') {
         if (this.sphere.length === 0) {
-          if (this.node.spheres.length > 0) {
-            this.$delete(this.node.spheres, this.node.spheres.length - 1)
+          if (this.sphereOwner.spheres.length > 0) {
+            this.$delete(this.sphereOwner.spheres, this.sphereOwner.spheres.length - 1)
           }
         }
         return false
@@ -72,7 +72,7 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$log('mounted', this.sphereOwner)
     this.$refs.sphereInput.$el.addEventListener('keydown', this.sphereInputOnKeydown)
   },
   beforeUnmount () {
