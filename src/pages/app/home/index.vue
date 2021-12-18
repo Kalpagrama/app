@@ -65,7 +65,7 @@ kalpa-layout
               :isVisible="isVisible"
               :isPreload="isPreload"
               :layout="item.object.type.in('NODE', 'JOINT', 'BLOCK') ? 'card' : 'line'"
-              :scrolling="scrolling").q-pb-xl
+              :scrolling="scrolling").q-pb-md
 </template>
 
 <script>
