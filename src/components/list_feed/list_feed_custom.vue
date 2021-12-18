@@ -460,7 +460,7 @@ export default {
     },
     itemMiddleSet (key, idx) {
       this.$log('ims', idx)
-      assert(key && idx && idx >= 0)
+      assert(key && idx >= 0)
       if (key.in('header', 'footer')) return
       if (this.itemActivePersist) this.itemsRes.setProperty('currentId', key)
       let item = this.itemsRes.itemsHeaderFooter[idx]

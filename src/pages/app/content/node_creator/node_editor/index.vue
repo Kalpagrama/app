@@ -85,7 +85,7 @@ export default {
   },
   watch: {},
   created () {
-    this.$log('created')
+    this.$log('created!!!', this.node)
   }
 }
 </script>

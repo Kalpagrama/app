@@ -431,17 +431,17 @@ export default {
         this.findDraftsRes = await this.$rxdb.find({
           selector: {
             rxCollectionEnum: RxCollectionEnum.WS_NODE,
-            'items.0.layers.0.contentOid': this.contentKalpa.oid
+            'items.layers.contentOid': this.contentKalpa.oid
           }
         })
         // массив изменился (скорей всего создали новое ядро и оно добавилось в массив) - нарисуем заново
         this.$watch('findDraftsRes.items', async (newVal, oldVal) => {
-          this.$log('showAllDraftsForCurrentLocation items changed', oldVal.length, newVal.length)
+          // this.$log('showAllDraftsForCurrentLocation items changed', oldVal.length, newVal.length)
           // this.clearSelection() // иначе при добавлении нового ядра, новое выделение исчезнет после клика мышкой (см addEventListener('mouseup' ...))
           await this.showAllDraftsForCurrentLocation() // выделим заново
         }, {
           immediate: false,
-          deep: false
+          deep: true
         })
       }
       if (this.tmpDraftEpubCfis) {
