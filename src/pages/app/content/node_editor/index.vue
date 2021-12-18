@@ -301,7 +301,7 @@ export default {
         this.player.setState('node', null)
         this.player.setState('nodeMode', null)
         this.$emit('pageId', null)
-        this.$notify('success', this.$t('Сохранено'))
+        this.$notify('success', this.$t('Заметка сохранена'))
       }
       catch (e) {
         this.$log('nodeSaveAction error', e)
