@@ -19,7 +19,7 @@ div(
       :showAuthorAlways="showAuthorAlways"
       :style=`{
     }`)
-    composition-editor(:node="node" :isActive="isActive" :isVisible="isVisible")
+    composition-editor(:style=`{maxHeight: '40vh'}` :node="node" :isActive="isActive" :isVisible="isVisible")
     //- NAME: dynamic link/ dynamic fontSize
     slot(name="name")
     q-input(
