@@ -17,7 +17,7 @@ div(
         }`).row.full-width.items-start.content-start
         //- header
         .row.full-width
-          div(:class="$q.screen.xs ? 'q-pt-xs' : 'q-pt-md'").row.full-width
+          div(v-if="!$q.screen.xs" :class="$q.screen.xs ? 'q-pt-xs' : 'q-pt-md'").row.full-width
             .col-9
               img(
                 draggable="false"
@@ -37,8 +37,11 @@ div(
               //  //kalpa-save(:item="contentKalpa" dense :isActive="true" inactiveColor="white" color="grey-2")
               //  kalpa-share(type="content" color="grey-2" :item="contentKalpa")
                 //q-btn(outline icon="share" @click="copyLink()" color="white").br
-          .row.full-width.q-py-x
+          //- name
+          .row.full-width.q-py-xs.no-wrap
             span(:style=`{fontSize: '16px',}`).text-white.text-bold {{ contentKalpa.name }}
+            .col
+            kalpa-menu-actions(v-if="$q.screen.xs" icon="more_vert" dense color="grey-2" :title="contentKalpa.name" :actions="actions")
           //- stats
           .row.full-width.content-center.items-center
             small.text-grey-3 {{$t('Views')}}: {{ contentKalpa.countStat.countViews }}
@@ -47,7 +50,7 @@ div(
             kalpa-share(:item="contentKalpa" :itemState="itemState" :isActive="true" inactiveColor="white" color="grey-2" :headerText="$t('Share')")
           //- origin
           .row.full-width.items-center.content-center
-            q-btn(v-if="!contentKalpa.contentProvider.in('KALPA', 'USER_DEVICE')"
+            q-btn(v-if="contentKalpa.urlOriginal"
               @click="goOriginal"
               align="left"
               outline color="grey-3" no-caps
