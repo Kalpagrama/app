@@ -294,6 +294,7 @@ export default {
       let indx = this.graphD3.nodes.findIndex(n => n.id === item.id || n.oid === item.oid)
       if (indx >= 0) this.graphD3.nodes.splice(indx, 1)
       this.$emit('changed')
+      this.itemDetailsShow = false
     },
     removeJoint (joint) {
       // this.$log('removeJoint', joint)
