@@ -69,7 +69,7 @@
     "mediaelement": "^4.2.14",
     "pug": "^3.0.0",
     "quasar": "^2.0.0",
-    "rxdb": "^10.5.4",
+    "rxdb": "11.0.0-beta.8",
     "rxjs": "^7.2.0",
     "subscriptions-transport-ws": "^0.11.0",
     "tiny-emitter": "^2.1.0",
