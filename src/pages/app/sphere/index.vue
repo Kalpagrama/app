@@ -3,9 +3,9 @@ kalpa-layout
   template(v-slot:footer)
     kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
       template(v-slot:center)
-        q-btn(flat ripple=false icon="add" size="sm" color="green" :label="$t('Добавить образ')" @click="itemEditorShow=true")
+        q-btn(v-if="isCategory" flat ripple=false icon="add" size="sm" color="green" :label="$t('Добавить образ')" @click="itemEditorShow=true")
       template(v-slot:left-button)
-        nav-mobile
+        nav-mobile(v-if="isCategory")
   template(v-slot:body)
     .row.full-width.items-start.content-start.justify-center
       q-dialog(
@@ -97,6 +97,30 @@ export default {
         // {id: 'users', name: this.$t('Users')}
       ]
     },
+    // isCategory() {
+    //   return !this.sphere.oid.in(
+    //     '100958592395419654',
+    //     '100958595004276745',
+    //     '240094717834993691',
+    //     '100958595625033739',
+    //     '240094717994377244',
+    //     '100958593859231751',
+    //     '100958595302072330',
+    //     '240094718212481053',
+    //     '100958594719064072',
+    //     '100958595964772364',
+    //     '100958596275150861',
+    //     '240094718267007006',
+    //     '240094718296367135',
+    //     '100958597248229392',
+    //     '240094718334115872',
+    //     '100958597571190801',
+    //     '240094718376058913',
+    //     '240094718401224738',
+    //     '240094718430584867',
+    //     '240094718459944996',
+    //     '240094718485110821')
+    // },
     query () {
       let objectTypes
       if (this.pageId === 'all') {
