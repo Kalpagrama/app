@@ -12,8 +12,9 @@
           v-model="node.name"
           borderless dark
           ref="nameInput"
-          type="text"
+          type="textarea" autogrow
           maxlength="108"
+          @keydown.enter.prevent.exact=""
           :placeholder="$t('В чём смысл?')"
           :autofocus="true"
           :input-style=`{
@@ -97,8 +98,9 @@
           v-model="node.name"
           borderless dark
           ref="nameInput"
-          type="text"
+          type="textarea" autogrow
           maxlength="108"
+          @keydown.enter.prevent.exact=""
           :autofocus="true"
           :placeholder="$t('В чём смысл?')"
           :input-style=`{
