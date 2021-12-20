@@ -261,6 +261,14 @@ const routes = [
             }
          },
          {
+            name: 'category',
+            // path: 'category/:categoryId',
+            path: 'category/:oid/:sort?',
+            // component: () => import('src/pages/app/trends/category.vue'),
+            component: () => import('src/pages/app/sphere/index.vue'),
+            meta: { roleMinimal: 'GUEST' }
+         },
+         {
             name: 'sphere-threads',
             path: 'sphere-threads/:oid',
             component: () => import('src/pages/app/sphere_threads/index'),
@@ -276,12 +284,6 @@ const routes = [
             name: 'trends',
             path: 'trends',
             component: () => import('src/pages/app/trends/index.vue'),
-            meta: { roleMinimal: 'GUEST' }
-         },
-         {
-            name: 'category',
-            path: 'category/:categoryId',
-            component: () => import('src/pages/app/trends/category.vue'),
             meta: { roleMinimal: 'GUEST' }
          },
          {
