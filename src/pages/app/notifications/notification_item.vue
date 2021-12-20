@@ -67,6 +67,7 @@ export default {
         WORD: '/sphere/',
         SENTENCE: '/sphere/',
         JOINT: '/joint/',
+        BLOCK: '/block/',
         VIDEO: '/content/',
         IMAGE: '/content/',
         BOOK: '/content/',
