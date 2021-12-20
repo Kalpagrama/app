@@ -40,7 +40,7 @@ const UploadFormatEnum = Object.freeze({
 })
 
 class ContentApi {
-   static async contentCreateFromUrl (url, youtubeUpload = true) {
+   static async contentCreateFromUrl (url, extractProviderContent = true) {
       const f = ContentApi.contentCreateFromUrl
       logD(f, 'start', url)
       const t1 = performance.now()
@@ -50,14 +50,14 @@ class ContentApi {
             mutation: gql`
                 ${fragments.objectFullFragment}
                 mutation ($url: String!, $youtubeUpload: Boolean!) {
-                    contentCreateFromUrl (url: $url, youtubeUpload: $youtubeUpload) {
+                    contentCreateFromUrl (url: $url, extractProviderContent: $youtubeUpload) {
                         ...objectFullFragment
                     }
                 }
             `,
             variables: {
                url,
-               youtubeUpload
+               extractProviderContent
             }
          })
          logD('contentCreateFromUrl complete', contentCreateFromUrl)
@@ -157,8 +157,10 @@ class ContentApi {
       let url = object.url
       if (!url && object.urlWithFormats) url = ContentApi.urlSelect_internal(object.urlWithFormats)
       if (!url && object.previewUrlWithFormats) url = ContentApi.urlSelect_internal(object.previewUrlWithFormats)
+      if (!url) url = object.urlRaw
       if (!url) url = object.urlOriginal
       if (!url) url = object.thumbUrl
+      logT('urlSelect url=', url)
       return url
    }
 }

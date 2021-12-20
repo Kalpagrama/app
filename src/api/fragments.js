@@ -157,6 +157,7 @@ const videoFragment = gql`${objectFragment} ${objectShortFragment} ${ObjectShort
     urlWithFormats{ format url }
     previewUrlWithFormats{ format url }
     urlOriginal
+    urlRaw
     duration
     strips
 #    contentSource

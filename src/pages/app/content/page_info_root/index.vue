@@ -62,15 +62,21 @@ div(
                 v-if="contentKalpa.contentProvider === 'YOUTUBE'"
                 name="fab fa-youtube" color="red" size="30px").q-mx-sm
               q-icon(
+                v-if="contentKalpa.contentProvider === 'INSTAGRAM'"
+                name="fab fa-instagram" color="red" size="30px").q-mx-sm
+              q-icon(
                 v-if="contentKalpa.contentProvider === 'CUSTOM_URL'"
                 name="public" color="grey-3" size="30px").q-mx-sm
               span(
                 v-if="contentKalpa.contentProvider === 'YOUTUBE'"
               ).text-bold.text-grey-3 YouTube
               span(
+                v-if="contentKalpa.contentProvider === 'INSTAGRAM'"
+              ).text-bold.text-grey-3 Instagram
+              span(
                 v-if="contentKalpa.contentProvider === 'CUSTOM_URL'"
               ).text-bold.text-grey-3 {{ $t('интернет') }}
-            div(v-if="contentKalpa.contentProvider !== 'YOUTUBE'").row.full-width.q-py-md
+            div(v-if="contentKalpa.contentProvider !== 'YOUTUBE' && contentKalpa.contentProvider !== 'INSTAGRAM'").row.full-width.q-py-md
               q-btn(:to="'/user/'+contentKalpa.author.oid" size="sm" round flat no-caps padding="none" :style=`{zIndex: '100'}`).q-px-sm
                 q-avatar(:size="'30px'" :style=`{position:'relative', overflow: 'hidden'}`).q-mr-xs
                   //img(:src="contentKalpa.author.thumbUrl" :to="'/user/'+contentKalpa.author.oid")
@@ -260,7 +266,7 @@ export default {
     },
     goOriginal () {
       this.$log('goOriginal')
-      if (this.contentKalpa.contentProvider === 'YOUTUBE') {
+      if (this.contentKalpa.contentProvider === 'YOUTUBE' || this.contentKalpa.contentProvider === 'INSTAGRAM') {
         let arr = this.contentKalpa.urlOriginal.split('/')
         let isEmbed = arr[arr.length - 2] === 'embed'
         if (isEmbed) openURL(`https://www.youtube.com/watch?v=${arr[arr.length - 1]}`)
