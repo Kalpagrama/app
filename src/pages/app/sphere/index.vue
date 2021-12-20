@@ -3,9 +3,9 @@ kalpa-layout
   template(v-slot:footer)
     kalpa-menu-mobile(v-if="$q.screen.lt.md && !$store.state.ui.userTyping")
       template(v-slot:center)
-        q-btn(v-if="$route.name === 'category'" flat ripple=false icon="add" size="sm" color="green" :label="$t('Добавить образ')" @click="itemEditorShow=true")
+        q-btn(v-if="$route.name !== 'category'" flat ripple=false icon="add" size="sm" color="green" :label="$t('Добавить образ')" @click="itemEditorShow=true")
       template(v-slot:left-button)
-        nav-mobile(v-if="$route.name === 'category'")
+        nav-mobile(v-if="$route.name !== 'category'")
   template(v-slot:body)
     .row.full-width.items-start.content-start.justify-center
       q-dialog(
