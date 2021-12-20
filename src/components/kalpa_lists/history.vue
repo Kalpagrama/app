@@ -65,11 +65,13 @@ export default {
   computed: {
     pages () {
       return [
-        {id: 'all', name: this.$t('All')},
-        {id: 'content', name: this.$t('Media')},
-        {id: 'nodes', name: this.$t('Nodes')},
-        {id: 'joints', name: this.$t('Joints')},
-        {id: 'spheres', name: this.$t('Spheres')}
+        { id: 'all', name: this.$t('All') },
+        { id: 'content', name: this.$t('Media') },
+        { id: 'nodes', name: this.$t('Nodes') },
+        { id: 'joints', name: this.$t('Joints') },
+        { id: 'blocks', name: this.$t('Blocks') },
+        { id: 'users', name: this.$t('Users') },
+        { id: 'spheres', name: this.$t('Spheres') }
       ]
     },
     query () {
@@ -89,8 +91,14 @@ export default {
       else if (this.pageId === 'joints') {
         res.selector.type = {$in: ['JOINT']}
       }
+      else if (this.pageId === 'blocks') {
+        res.selector.type = {$in: ['BLOCK']}
+      }
       else if (this.pageId === 'spheres') {
         res.selector.type = {$in: ['SPHERE', 'WORD', 'SENTENCE']}
+      }
+      else if (this.pageId === 'users') {
+        res.selector.type = {$in: ['USER']}
       }
       // Search by name
       if (this.searchString.length > 0) {
