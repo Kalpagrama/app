@@ -142,6 +142,7 @@ class RxDBWrapper {
                      //    await this.destroy('destroy') // это не надо приноральной работе rxdb
                      //    await this.create(this.store) // это не надо при норальной работе rxdb
                      // }
+                     // alert('k_rxdb_reset_date')
                      await systemInit()
                      break
                   case 'k_rxdb_set_auth_user':
@@ -153,6 +154,7 @@ class RxDBWrapper {
                      //    await this.destroy('destroy') // это не надо приноральной работе rxdb
                      //    await this.create(this.store) // это не надо при норальной работе rxdb
                      // }
+                     // alert('k_rxdb_set_auth_user')
                      await systemInit()
                      break
                   default:
@@ -192,7 +194,7 @@ class RxDBWrapper {
             if (this.db && this.db.meta) await rxdbOperationProxyExec(this.db.meta, 'destroy')
             if (this.db) await this.db.destroy()
             this.db = null
-         } else if (clearStorageMethod === 'remove_db') {
+         } else if (this.db && clearStorageMethod === 'remove_db') {
             await this.db.remove()
             await deleteIndexedDb('kalpadb.db')
             this.db = null
