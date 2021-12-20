@@ -194,7 +194,7 @@ class RxDBWrapper {
             if (this.db && this.db.meta) await rxdbOperationProxyExec(this.db.meta, 'destroy')
             if (this.db) await this.db.destroy()
             this.db = null
-         } else if (clearStorageMethod === 'remove_db') {
+         } else if (this.db && clearStorageMethod === 'remove_db') {
             await this.db.remove()
             await deleteIndexedDb('kalpadb.db')
             this.db = null
