@@ -238,7 +238,7 @@ class Workspace {
       // запросит при необходимости данные и сольет с локальными изменениями
       const synchronizeWsWhole = async (forceMerge = false) => {
          const f = synchronizeWsWhole
-         logD(f, 'start')
+         logT(f, 'start')
          const t1 = performance.now()
          assert(this.reactiveUser && this.reactiveUser.wsRevision >= 0, '!wsRevision')
          let wsFetchDate = await rxdb.get(RxCollectionEnum.META, 'wsFetchDate')
@@ -247,6 +247,7 @@ class Workspace {
          //  reactiveUser.wsRevision - ревизия мастерской по мнению сервера (меняется в processEvent и при первой загрузке приложения)
          //  reactiveUser.wsVersion - версия мастерской (меняется сервером после пересоздания мастерской)
          if (forceMerge || wsRevisionLocal !== this.reactiveUser.wsRevision || !wsFetchDate || wsVersionLocal !== this.reactiveUser.wsVersion) {
+            logT(f, 'need merge1!')
             let wsServer = await WorkspaceApi.getWs()
             let itemsServer = []
             for (let wsItemTypeEnum in WsItemTypeEnum) {
@@ -259,6 +260,7 @@ class Workspace {
             let newItems = []
             let outdatedItems = []
             let extraItems = []
+            logT(f, 'need merge2!', wsVersionLocal, wsServer.ver)
             if (wsVersionLocal === wsServer.ver) {
                logT(f, 'try merge local ws with server...')
                let unsavedIds = new Set((await rxdbOperationProxyExec(this.db.ws_changes, 'find')).map(item => item.id))
@@ -266,6 +268,9 @@ class Workspace {
                newItems = itemsServer.filter(item => !localMap[item.id])
                // есть и на сервере и у нас, но у нас - устаревшая копия
                outdatedItems = itemsServer.filter(item => localMap[item.id] && (item.rev !== localMap[item.id].rev || item.updatedAt > localMap[item.id].updatedAt))
+               if (outdatedItems.length > 100) {
+                  logW('outdatedItems.length > 100', itemsServer, itemsLocal, outdatedItems)
+               }
                // есть у нас, но нет на сервере. (надо удалить у нас)
                extraItems = itemsLocal.filter(item => !serverMap[item.id])
                   .filter(item => !unsavedIds.has(item.id)) // только те, что НЕ были изменены c момента последнего сохранения
@@ -279,8 +284,11 @@ class Workspace {
                await rxdbOperationProxy(this.db.ws_items, 'find').update({ $set: { rev: 0 } }) // для того чтобы события об удалении не отправлялись на сервер
                await rxdbOperationProxy(this.db.ws_items, 'find', { selector: { id: { $in: extraItems.map(item => item.id) } } }).remove()
             }
+            logT('try insert newItems', newItems.length)
             await rxdbOperationProxyExec(this.db.ws_items, 'bulkInsert', newItems)
+            logT('try atomicUpsert outdated', outdatedItems.length)
             for (let outdated of outdatedItems) await rxdbOperationProxyExec(this.db.ws_items, 'atomicUpsert', outdated)
+            logT('atomicUpsert complete')
             await rxdb.set(RxCollectionEnum.META, { id: 'wsFetchDate', valueString: (new Date()).toISOString() })
             await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsServer.rev.toString() })
             await rxdb.set(RxCollectionEnum.META, { id: 'wsVersion', valueString: wsServer.ver.toString() })
