@@ -40,7 +40,7 @@ div(ref="graphArea").row.full-width
     :maximized="true")
     kalpa-finder(
       :height="$q.screen.height"
-      :headerTitle="$t('Pick new element for graph')",
+      :headerTitle="$t('Выберите новый элемент')",
       :style=`{maxWidth: width  + 'px', borderRadius: '10px' }`
       @item="addItemToGraph"
       @close="itemFinderShow = false"
