@@ -19,6 +19,7 @@ import { getRxCollectionEnumFromId, rxdb } from 'src/system/rxdb'
 
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_WS)
 
+const trashBitTTLDefault = 1000 * 60 * 60 * 24 * 7 // время жизни элементов в корзине - неделя
 const synchroTimeDefault = 1000 * 60 * 1 // раз в 1 минут шлем изменения на сервер
 // const synchroTimeDefault = 1000 * 10 // раз в 1 минут шлем изменения на сервер
 // logE('synchroTimeDefault!!! 1000 * 10')
@@ -134,13 +135,10 @@ class Workspace {
          const initWsItem = (plainData) => {
             assert(plainData.wsItemType, '!plainData.wsItemType')
             plainData.rev = plainData.rev || 0
-            switch (plainData.wsItemType) {
-               case WsItemTypeEnum.WS_COLLECTION:
-                  plainData.bookmarks = plainData.bookmarks || []
-                  break
-               case WsItemTypeEnum.WS_BOOKMARK:
-                  plainData.collections = plainData.collections || []
-                  break
+            if (plainData.wsItemType === WsItemTypeEnum.WS_SPHERE){
+               plainData.wsSphereItems = plainData.wsSphereItems || []
+            } else {
+               plainData.wsSpheres = plainData.wsSpheres || []
             }
          }
          this.db.ws_items.preSave(async (plainData, rxDoc) => {
@@ -238,7 +236,7 @@ class Workspace {
       // запросит при необходимости данные и сольет с локальными изменениями
       const synchronizeWsWhole = async (forceMerge = false) => {
          const f = synchronizeWsWhole
-         logD(f, 'start')
+         logT(f, 'start')
          const t1 = performance.now()
          assert(this.reactiveUser && this.reactiveUser.wsRevision >= 0, '!wsRevision')
          let wsFetchDate = await rxdb.get(RxCollectionEnum.META, 'wsFetchDate')
@@ -247,6 +245,7 @@ class Workspace {
          //  reactiveUser.wsRevision - ревизия мастерской по мнению сервера (меняется в processEvent и при первой загрузке приложения)
          //  reactiveUser.wsVersion - версия мастерской (меняется сервером после пересоздания мастерской)
          if (forceMerge || wsRevisionLocal !== this.reactiveUser.wsRevision || !wsFetchDate || wsVersionLocal !== this.reactiveUser.wsVersion) {
+            logT(f, 'need merge1!')
             let wsServer = await WorkspaceApi.getWs()
             let itemsServer = []
             for (let wsItemTypeEnum in WsItemTypeEnum) {
@@ -259,6 +258,7 @@ class Workspace {
             let newItems = []
             let outdatedItems = []
             let extraItems = []
+            logT(f, 'need merge2!', wsVersionLocal, wsServer.ver)
             if (wsVersionLocal === wsServer.ver) {
                logT(f, 'try merge local ws with server...')
                let unsavedIds = new Set((await rxdbOperationProxyExec(this.db.ws_changes, 'find')).map(item => item.id))
@@ -266,6 +266,9 @@ class Workspace {
                newItems = itemsServer.filter(item => !localMap[item.id])
                // есть и на сервере и у нас, но у нас - устаревшая копия
                outdatedItems = itemsServer.filter(item => localMap[item.id] && (item.rev !== localMap[item.id].rev || item.updatedAt > localMap[item.id].updatedAt))
+               if (outdatedItems.length > 100) {
+                  logW('outdatedItems.length > 100', itemsServer, itemsLocal, outdatedItems)
+               }
                // есть у нас, но нет на сервере. (надо удалить у нас)
                extraItems = itemsLocal.filter(item => !serverMap[item.id])
                   .filter(item => !unsavedIds.has(item.id)) // только те, что НЕ были изменены c момента последнего сохранения
@@ -279,8 +282,11 @@ class Workspace {
                await rxdbOperationProxy(this.db.ws_items, 'find').update({ $set: { rev: 0 } }) // для того чтобы события об удалении не отправлялись на сервер
                await rxdbOperationProxy(this.db.ws_items, 'find', { selector: { id: { $in: extraItems.map(item => item.id) } } }).remove()
             }
+            logT('try insert newItems', newItems.length)
             await rxdbOperationProxyExec(this.db.ws_items, 'bulkInsert', newItems)
+            logT('try atomicUpsert outdated', outdatedItems.length)
             for (let outdated of outdatedItems) await rxdbOperationProxyExec(this.db.ws_items, 'atomicUpsert', outdated)
+            logT('atomicUpsert complete')
             await rxdb.set(RxCollectionEnum.META, { id: 'wsFetchDate', valueString: (new Date()).toISOString() })
             await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsServer.rev.toString() })
             await rxdb.set(RxCollectionEnum.META, { id: 'wsVersion', valueString: wsServer.ver.toString() })
@@ -470,8 +476,14 @@ class Workspace {
             })
             // let found = foundOtherDocs.find(doc => doc.id !== itemCopy.id)
             if (foundOtherDocs.length) {
+               let rxDoc = foundOtherDocs[0]
                if (!itemCopy.id) { // создание нового элемента
-                  return foundOtherDocs[0] // вернем существующий
+                  if (rxDoc.deletedAt) {
+                     rxDoc = await rxDoc.atomicPatch({
+                        deletedAt: undefined
+                     })
+                  }
+                  return rxDoc // вернем существующий
                } else { // изменение существующего элемента
                   throw new Error(`same sphere found! ${itemCopy.name}`) // нельзя изменить имя на itemCopy.name (такое уже есть)
                }
@@ -532,67 +544,32 @@ class Workspace {
 
    // добавить методы для работы с итемом
    populateReactiveWsItem (reactiveItem) {
-      if (reactiveItem.wsItemType === WsItemTypeEnum.WS_COLLECTION) {
-         // добавиить в коллекцию объект с ленты или букмарк
-         const reactiveCollection = reactiveItem
-         reactiveCollection.addBookmarkToCollection = async (objectShortOrWsBookmark) => {
-            let bm
-            if (objectShortOrWsBookmark.wsItemType) { // добавить букмарк в коллекцию
-               assert(objectShortOrWsBookmark.wsItemType === WsItemTypeEnum.WS_BOOKMARK, '!objectShortOrWsBookmark.wsItemType === WsItemTypeEnum.WS_BOOKMARK')
-               bm = objectShortOrWsBookmark
-            } else { // найти / создать букмарк из objectShort и добавить его в коллекцию
-               assert(objectShortOrWsBookmark.oid && objectShortOrWsBookmark.type && objectShortOrWsBookmark.thumbUrl, '!objectShortOrWsBookmark.oid')
-               let { items } = await rxdb.find({
-                  selector: {
-                     rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK,
-                     oid: objectShortOrWsBookmark.oid
-                  }
-               })
-               if (items.length) bm = items[0]
-               else {
-                  let objBookmarkInput = {
-                     oid: objectShortOrWsBookmark.oid,
-                     name: objectShortOrWsBookmark.name,
-                     thumbUrl: objectShortOrWsBookmark.thumbUrl,
-                     type: objectShortOrWsBookmark.type,
-                     wsItemType: 'WS_BOOKMARK',
-                     collections: []
-                  }
-                  bm = await rxdb.set(RxCollectionEnum.WS_BOOKMARK, objBookmarkInput)
-               }
-            }
-            if (!bm.collections.includes(reactiveCollection.id)) bm.collections.push(reactiveCollection.id)
-            if (!reactiveCollection.bookmarks.includes(bm.id)) reactiveCollection.bookmarks.push(bm.id)
-         }
-         reactiveCollection.removeBookmarkFromCollection = async (wsBookmark) => {
-            assert(wsBookmark && wsBookmark.wsItemType === WsItemTypeEnum.WS_BOOKMARK, '!wsBookmark && wsBookmark.wsItemType === WsItemTypeEnum.WS_BOOKMARK')
-            wsBookmark.collections = wsBookmark.collections.filter(id => id !== reactiveCollection.id)
-            reactiveCollection.bookmarks = reactiveCollection.bookmarks.filter(id => id !== wsBookmark.id)
-         }
-         reactiveCollection.beforeRemove = async (permanent = false) => {
-            // удалить себя(коллекцию) из всех bookmarks
-            assert(reactiveCollection.bookmarks, '!reactiveCollection.bookmarks')
+      reactiveItem.beforeRemove = async (permanent = false) => {
+         if (reactiveItem.wsItemType === WsItemTypeEnum.WS_SPHERE) {
+            const reactiveWsSphere = reactiveItem
+            // удалить себя(сферу) из всех wsSphereItems
+            assert(reactiveWsSphere.wsSphereItems, '!reactiveWsSphere.wsSphereItems')
             if (permanent) {
-               let { items: bookmarks } = await rxdb.find({ selector: { id: { $in: reactiveCollection.bookmarks } } })
-               for (let bm of bookmarks) {
-                  bm.collections = bm.collections.filter(id => id !== reactiveCollection.id)
+               let { items: wsItems } = await rxdb.find({ selector: { id: { $in: reactiveWsSphere.wsSphereItems } } })
+               for (let wsItem of wsItems) {
+                  assert(wsItem.wsSpheres && Array.isArray(wsItem.wsSpheres))
+                  wsItem.wsSpheres = wsItem.wsSpheres.filter(id => id !== reactiveWsSphere.id)
                }
             }
-         }
-      } else if (reactiveItem.wsItemType === WsItemTypeEnum.WS_BOOKMARK) {
-         const reactiveBookmark = reactiveItem
-         reactiveBookmark.beforeRemove = async (permanent = false) => {
-            // удалить себя(букмарк) из всех коллекций
-            assert(reactiveBookmark.collections, '!removedItem.collections')
-            if (permanent && reactiveBookmark.collections && reactiveBookmark.collections.length > 0) {
-               let { items: collections } = await rxdb.find({
-                  selector: {
-                     rxCollectionEnum: RxCollectionEnum.WS_COLLECTION,
-                     id: { $in: reactiveBookmark.collections }
+         } else {
+            if (reactiveItem.wsSpheres) {
+               // удалить себя из всех сфер
+               if (permanent && reactiveItem.wsSpheres.length > 0) {
+                  let { items: wsSpheres } = await rxdb.find({
+                     selector: {
+                        rxCollectionEnum: RxCollectionEnum.WS_SPHERE,
+                        id: { $in: reactiveItem.wsSpheres }
+                     }
+                  })
+                  for (let s of wsSpheres) {
+                     assert(s.wsSphereItems && Array.isArray(s.wsSphereItems))
+                     s.wsSphereItems = s.wsSphereItems.filter(id => id !== reactiveItem.id)
                   }
-               })
-               for (let c of collections) {
-                  c.bookmarks = c.bookmarks.filter(id => id !== reactiveBookmark.id)
                }
             }
          }

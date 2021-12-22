@@ -1,6 +1,6 @@
 <template lang="pug">
 list-collections(
-  :collectionId="$route.params.id"
+  :wsSphereId="$route.params.id"
   @item="$emit('item', $event)")
   template(v-slot:header)
     div(

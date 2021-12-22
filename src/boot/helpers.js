@@ -1,6 +1,8 @@
 import { boot } from 'quasar/wrappers'
 import { EventApi } from 'src/api/event'
 import { assert } from 'src/system/common/utils'
+import differenceWith from 'lodash/differenceWith'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 // node rate meta
 const rateMeta = [
@@ -66,4 +68,30 @@ export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath
   app.config.globalProperties.$nodeItemTypes = nodeItemTypes
   app.config.globalProperties.$nodeItemType = nodeItemType
   app.config.globalProperties.$nodeItemTypesPairs = nodeItemTypesPairs
+  // todo убрать эту ф-ю отсюда туда где идет работа с коллекциями
+  app.config.globalProperties.synchronizeSelectedSphereIds = async (selectedSphereIds, bookmark, collectionsModel, rxdb) => {
+     assert(selectedSphereIds && bookmark && collectionsModel && rxdb)
+     if (!bookmark.wsSpheres) bookmark.wsSpheres = []
+     let addedSpheres = differenceWith(selectedSphereIds, bookmark.wsSpheres)
+     let removedSpheres = differenceWith(bookmark.wsSpheres, selectedSphereIds)
+     bookmark.wsSpheres.splice(0, bookmark.wsSpheres.length, ...selectedSphereIds)
+     for (let sphereId of removedSpheres){
+        let sphere = collectionsModel.wsSpheres.find(el => el.id === sphereId)
+        if (sphere) {
+           let indxB = sphere.wsSphereItems.findIndex(bid => bid === bookmark.id)
+           if (indxB >= 0) sphere.wsSphereItems.splice(indxB, 1)
+        }
+     }
+     for (let wsSphereId of addedSpheres) {
+        // не используем collectionsModel.wsSpheres, тк при добавлении новой коллекции addCollectionToBookmark вызывается раньше, чем изменяется this.collectionsModel.wsSpheres
+        let sphere = await rxdb.get(RxCollectionEnum.WS_SPHERE, wsSphereId)
+        if (sphere) {
+           if (!sphere.wsSphereItems) sphere.wsSphereItems = []
+           if (!sphere.wsSphereItems.find(bid => bid === bookmark.id)) {
+              sphere.wsSphereItems.push(bookmark.id)
+              sphere.thumbUrl = bookmark.thumbUrl
+           }
+        }
+     }
+  }
 })

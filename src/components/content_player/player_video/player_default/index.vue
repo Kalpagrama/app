@@ -235,6 +235,7 @@ export default {
       }
     },
     playerCreate (type) {
+      // alert('playerCreate' + type)
       this.$log('playerCreate', type)
       if (type === 'player-youtube') {
         const me = new window.MediaElementPlayer(this.$refs.videoRef, {

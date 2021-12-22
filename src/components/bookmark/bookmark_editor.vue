@@ -195,7 +195,7 @@ export default {
   },
   data() {
     return {
-      collectionsModel: {collectionId: null, collections: [], selectedCollectionIds: []},
+      collectionsModel: {wsSphereId: null, wsSpheres: [], selectedSphereIds: []},
       bookmarkDeleting: false,
     }
   },
@@ -208,42 +208,17 @@ export default {
     }
   },
   watch: {
-    'collectionsModel.selectedCollectionIds': {
+    'collectionsModel.selectedSphereIds': {
       deep: true,
       handler(to, from){
-        this.synchronizeSelectedCollectionIds(to)
+        this.synchronizeSelectedSphereIds(to, this.bookmark, this.collectionsModel, this.$rxdb)
       }
     }
   },
   methods: {
-    getCollectionName(collectionId) {
-      let collection = this.collectionsModel.collections.find(el => el.id === collectionId)
-      return collection ? collection.name : null
-    },
-    async synchronizeSelectedCollectionIds(selectedCollectionIds) {
-      assert(selectedCollectionIds)
-      if (!this.bookmark.collections) this.bookmark.collections = []
-      let addedCollections = differenceWith(selectedCollectionIds, this.bookmark.collections)
-      let removedCollections = differenceWith(this.bookmark.collections, selectedCollectionIds)
-      this.bookmark.collections.splice(0, this.bookmark.collections.length, ...selectedCollectionIds)
-      for (let collectionId of removedCollections){
-        let collection = this.collectionsModel.collections.find(el => el.id === collectionId)
-        if (collection) {
-          let indxB = collection.bookmarks.findIndex(bid => bid === this.bookmark.id)
-          if (indxB >= 0) collection.bookmarks.splice(indxB, 1)
-        }
-      }
-      for (let collectionId of addedCollections) {
-        // не используем this.collectionsModel.collections, тк при добавлении новой коллекции addCollectionToBookmark вызывается раньше, чем изменяется this.collectionsModel.collections
-        let collection = await this.$rxdb.get(RxCollectionEnum.WS_COLLECTION, collectionId)
-        if (collection) {
-          if (!collection.bookmarks) collection.bookmarks = []
-          if (!collection.bookmarks.find(bid => bid === this.bookmark.id)) {
-            collection.bookmarks.push(this.bookmark.id)
-            collection.thumbUrl = this.bookmark.thumbUrl
-          }
-        }
-      }
+    getCollectionName(sphereId) {
+      let sphere = this.collectionsModel.wsSpheres.find(el => el.id === sphereId)
+      return sphere ? sphere.name : null
     },
     bookmarkLaunch() {
       this.$log('bookmarkLaunch')
@@ -262,7 +237,7 @@ export default {
   },
   async mounted() {
     this.$log('mounted')
-    this.collectionsModel.selectedCollectionIds = cloneDeep(this.bookmark.collections) || []
+    this.collectionsModel.selectedSphereIds = cloneDeep(this.bookmark.wsSpheres) || []
   }
 }
 </script>

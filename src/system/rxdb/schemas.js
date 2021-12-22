@@ -70,6 +70,13 @@ export const wsSchemaItem = {
       type: 'boolean',
       default: false
     },
+    wsSpheres: { // список id WS_SPHERE в которые попал этот item
+      type: 'array',
+      uniqueItems: true,
+      items: {
+        type: 'string'
+      }
+    },
     // ---- node ----
     contentOids: {
       type: 'array',
@@ -100,6 +107,9 @@ export const wsSchemaItem = {
     layout: {
       type: 'string'
     },
+    vertices: {
+      type: 'array',
+    },
     // ---- content ----
     layers: {
       type: 'array',
@@ -121,25 +131,18 @@ export const wsSchemaItem = {
     payInfo: { // платный контент
       type: 'object'
     },
-    // ---- collection ----
-    bookmarks: { // список id букмарков в этой коллекции
+    // ---- sphere(collection) ----
+    isCollection: { // вручную созданная коллекция в мастерской для организации bookmarks
+      type: 'boolean',
+    },
+    wsSphereItems: { // список id элементов(bookmarks/nodes/joints/blocks/etc) мастерской на этой сфере(коллекции)
       type: 'array',
       uniqueItems: true,
       items: {
         type: 'string'
       }
-    },
-    vertices: {
-      type: 'array',
     },
     // ---- bookmark ----
-    collections: { // список id коллекций в которые попал букмарк
-      type: 'array',
-      uniqueItems: true,
-      items: {
-        type: 'string'
-      }
-    },
     isSubscribed: {
       type: 'boolean',
       default: true,

@@ -239,7 +239,6 @@ const WsItemTypeEnum = Object.freeze({
    WS_BOOKMARK: 'WS_BOOKMARK',
    WS_PUBLISHED: 'WS_PUBLISHED', // ссылки на мои опубликванные ядра джойнты и блоки
    WS_HISTORY: 'WS_HISTORY',
-   WS_COLLECTION: 'WS_COLLECTION',
 })
 
 const FindCollectionEnum = Object.freeze({

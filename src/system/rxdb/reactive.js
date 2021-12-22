@@ -14,7 +14,6 @@ import cloneDeep from 'lodash/cloneDeep'
 import { reactive, watch } from 'vue'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_REACTIVE)
 
-// dummyObject - не создавать реактивный объект с нуля, а использовать dummyObject (нужно когда dummyObject уже ушел в UI и нужно сохранить реактивность)
 function getReactive (rxDocOrObject) {
    let reactiveDocFactory = isRxDocument(rxDocOrObject) ? new ReactiveDocFactory(rxDocOrObject) : new ReactiveObjFactory(rxDocOrObject)
    return reactiveDocFactory.getReactive()
@@ -124,27 +123,6 @@ class ReactiveDocFactory {
          }
          this.setReactiveDoc = (plainData) => {
             assert(plainData && typeof plainData === 'object', '!typeof plainData === object') // сейчас plainData - всегда объект (даже для META)
-            // if (dummyObject) {
-            //    for (let key of Object.keys(dummyObject)){
-            //       delete dummyObject[key]
-            //    }
-            //    switch (this.itemType) {
-            //       case 'wsItem': // wsSchemaItem
-            //          ReactiveDocFactory.mergeReactive(dummyObject, plainData)
-            //          plainData = dummyObject
-            //          break
-            //       case 'object': // cacheSchema
-            //          ReactiveDocFactory.mergeReactive(dummyObject, plainData.cached.data)
-            //          plainData.cached.data = dummyObject
-            //          break
-            //       case 'meta':// schemaKeyValue
-            //          ReactiveDocFactory.mergeReactive(dummyObject, plainData.valueString)
-            //          plainData.valueString = dummyObject
-            //          break
-            //       default:
-            //          throw new Error('bad itemType: ' + this.itemType)
-            //    }
-            // }
             this.vm.reactiveData.doc = plainData
             const reactiveDoc = this.vm.reactiveData.doc
             reactiveDoc.getPayload = () => {

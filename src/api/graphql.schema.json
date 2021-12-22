@@ -2422,7 +2422,7 @@
                 "deprecationReason": null
               },
               {
-                "name": "youtubeUpload",
+                "name": "extractProviderContent",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
@@ -2569,7 +2569,7 @@
                 "deprecationReason": null
               },
               {
-                "name": "youtubeUpload",
+                "name": "extractProviderContent",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
@@ -10860,6 +10860,18 @@
           {
             "name": "urlOriginal",
             "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "urlRaw",
+            "description": "ссылка на стриминговый сервер ютуба или инстаграма",
             "args": [],
             "type": {
               "kind": "SCALAR",

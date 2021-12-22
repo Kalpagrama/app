@@ -34,11 +34,11 @@
           // add collection btn
           add-collection-btn(v-model="collectionsModel")
           q-chip(
-            v-for="(c,ci) in collectionsModel.collections" :key="c.id"
+            v-for="(c,ci) in collectionsModel.wsSpheres" :key="c.id"
             clickable outline
             :name="c.id" :label="getCollectionNameWithCnt(c)"
-            :color="collectionsModel.collectionId==c.id ? 'green' : 'grey-8'"
-            @click="collectionsModel.collectionId=c.id")
+            :color="collectionsModel.wsSphereId==c.id ? 'green' : 'grey-8'"
+            @click="collectionsModel.wsSphereId=c.id")
       template(v-slot:item=`{item:bookmark,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
         bookmark-list-item(
           :item="bookmark"
@@ -65,7 +65,7 @@ export default {
     searchInputState: { type: String },
     searchString: { type: String, default: '' },
     mode: { type: String },
-    collectionId: { type: String, default: '' },
+    wsSphereId: { type: String, default: '' },
     pageFilter: { type: Object},
   },
   components: {
@@ -74,7 +74,7 @@ export default {
   },
   data () {
     return {
-      collectionsModel: { collectionId: null, collections: [] },
+      collectionsModel: { wsSphereId: null, wsSpheres: [] },
       collectionsRes: null,
       pageId: null,
       bookmarkSelected: null,
@@ -102,10 +102,10 @@ export default {
         },
         sort: [{ createdAt: 'desc' }]
       }
-      if (this.collectionsModel.collectionId !== 'all') {
+      if (this.collectionsModel.wsSphereId !== 'all') {
         // в зависимости от выбранной коллекции фильтровать закладки
-        let collection = this.collectionsModel.collections.find(el => el.id === this.collectionsModel.collectionId)
-        if (collection) res.selector.id = { $in: collection.bookmarks || [] }
+        let wsSphere = this.collectionsModel.wsSpheres.find(el => el.id === this.collectionsModel.wsSphereId)
+        if (wsSphere) res.selector.id = { $in: wsSphere.wsSphereItems || [] }
       }
       if (this.pageId === 'nodes') {
         res.selector.type = { $in: ['NODE'] }
@@ -127,18 +127,19 @@ export default {
     async createCollection () {
       assert(this.newCollectionName)
       let collectionInput = {
-        name: this.newCollectionName
+        name: this.newCollectionName,
+        isCollection: true
       }
-      let newCollection = await this.$rxdb.set(RxCollectionEnum.WS_COLLECTION, collectionInput)
-      this.collectionsModel.collectionId = newCollection.id
+      let newCollection = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, collectionInput)
+      this.collectionsModel.wsSphereId = newCollection.id
       this.newCollectionName = ''
     },
     async removeCollection (id) {
       await this.$rxdb.remove(id)
     },
-    getCollectionNameWithCnt (collection) {
-      if (collection.id === 'all') return collection.name
-      else return collection.name + `(${collection?.bookmarks?.length || 0})`
+    getCollectionNameWithCnt (wsSphere) {
+      if (wsSphere.id === 'all') return wsSphere.name
+      else return wsSphere.name + `(${wsSphere?.wsSphereItems?.length || 0})`
     },
     bookmarkSelectHandle (bookmark) {
       this.$log('bookmarkSelectHandle', bookmark)
@@ -151,7 +152,7 @@ export default {
     }
   },
   watch: {
-    'collectionsModel.collectionId': {
+    'collectionsModel.wsSphereId': {
       handler (to, from) {
         if (!this.searchString) this.searchInputShow = false
         if (this.itemActivePersist) this.$store.commit('ui/stateSet', ['pageIdCollectionCollections', to])
@@ -171,7 +172,7 @@ export default {
       pageCollectionId = this.$store.state.ui.pageIdCollectionCollections
     }
     this.pageId = pageId || (this.pages ? this.pages[0]?.id : null)
-    this.collectionsModel.collectionId = this.collectionId || pageCollectionId || this.collectionsModel.collectionId
+    this.collectionsModel.wsSphereId = this.wsSphereId || pageCollectionId || this.collectionsModel.wsSphereId
   }
 }
 </script>
