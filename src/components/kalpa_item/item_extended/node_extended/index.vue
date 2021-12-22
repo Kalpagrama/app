@@ -53,7 +53,7 @@
             .col
             q-icon(
               dense name="add" color="green-9" size="sm"
-              @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить смысл авторизуйтесь'}]) : itemEditorShow=true"
+              @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить смысл авторизуйтесь'}]) : itemEditorShow = true"
             ).cursor-pointer.q-pr-xs
             //small(v-if="state.node.items[0].layers[0].contentName").text-grey-7.text-weight-bolder.text-italic.q-pl-xs.q-mt-xs {{state.node.items[0].layers[0].contentName.substring(0, 22)}}{{state.node.items[0].layers[0].contentName.length > 22 ? '...': ''}}
           div(v-else @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить смысл авторизуйтесь'}]) : itemEditorShow=true").row.full-width.cursor-pointer.items-center
@@ -249,6 +249,10 @@ export default {
     }
   },
   watch: {
+    itemEditorShow (to) {
+      if (to) this.state.imageActive = false
+      else this.state.imageActive = true
+    },
     'state.essencesNodesIndx': {
       handler (to, from) {
         // this.$log('state.essencesNodesIndx TO', to)
