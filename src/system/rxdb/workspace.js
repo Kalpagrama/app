@@ -476,8 +476,14 @@ class Workspace {
             })
             // let found = foundOtherDocs.find(doc => doc.id !== itemCopy.id)
             if (foundOtherDocs.length) {
+               let rxDoc = foundOtherDocs[0]
                if (!itemCopy.id) { // создание нового элемента
-                  return foundOtherDocs[0] // вернем существующий
+                  if (rxDoc.deletedAt) {
+                     rxDoc = await rxDoc.atomicPatch({
+                        deletedAt: undefined
+                     })
+                  }
+                  return rxDoc // вернем существующий
                } else { // изменение существующего элемента
                   throw new Error(`same sphere found! ${itemCopy.name}`) // нельзя изменить имя на itemCopy.name (такое уже есть)
                }
