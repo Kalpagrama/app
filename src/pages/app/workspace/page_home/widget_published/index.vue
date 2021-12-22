@@ -10,7 +10,7 @@
     router-link(
       to="/workspace/published"
       :style=`{}`).row.full-width.items-center.content-center.q-pa-md
-      q-icon(name="filter_tilt_shift" color="white" size="24px").q-mr-sm
+      q-icon(name="adjust" color="white" size="24px").q-mr-sm
       .col
         span.text-white.text-bold {{$t('My published')}}
     //- scrolled bookmarks preview max 10...
