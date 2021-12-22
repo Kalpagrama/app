@@ -86,12 +86,6 @@ export default {
       handler (to, from) {
         this.searchInputShow = !!to
       }
-    },
-    collectionId: {
-      immediate: true,
-      handler (to, from) {
-        this.showHeader = true
-      }
     }
   },
   computed: {

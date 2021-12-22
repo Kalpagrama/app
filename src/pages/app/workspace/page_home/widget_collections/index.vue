@@ -70,7 +70,8 @@ export default {
     query () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_COLLECTION,
+          rxCollectionEnum: RxCollectionEnum.WS_SPHERE,
+          isCollection: true
         },
         limit: 10,
         sort: [{createdAt: 'desc'}]

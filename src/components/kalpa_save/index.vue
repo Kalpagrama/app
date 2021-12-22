@@ -118,7 +118,7 @@ export default {
         name: item.name,
         thumbUrl: item.thumbUrl,
         isSubscribed: true,
-        collections: [],
+        wsSpheres: [],
         ...fields
       }
       let bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
@@ -152,7 +152,7 @@ export default {
         }
         // save to collection named all...
         else {
-          this.data.bookmark = await this.createBookmark(this.item, {collections: []})
+          this.data.bookmark = await this.createBookmark(this.item, {})
           this.data.bookmarkCreatedDialogShow = true
         }
       }

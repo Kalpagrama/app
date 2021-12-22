@@ -10,12 +10,11 @@
       ).row.full-width
         q-input(v-model="newCollectionName", autofocus, borderless dark :placeholder="$t('New collection')" @keyup.enter="createCollection(true)").col.full-width
         q-btn(v-close-popup round flat :color="newCollectionName ? 'green' : null", icon="add", :disable="!newCollectionName" @click="createCollection(true)")
-  //div(v-for="(c,ci) in modelValue.collections" :key="c.id").col.full-width.wrap
   div(:style=`{maxHeight: '180px'}`).row.scroll.full-width
     q-chip(
-      v-for="(c,ci) in modelValue.collections" :key="c.id"
+      v-for="(c,ci) in modelValue.wsSpheres" :key="c.id"
       no-caps clickable text-color="white" outline
-      :color="modelValue.selectedCollectionIds.includes(c.id) && highlightSelected? 'green' : 'grey-8'"
+      :color="modelValue.selectedSphereIds.includes(c.id) && highlightSelected? 'green' : 'grey-8'"
       @click="addRemoveCollection(c)"
     ).q-pl-sm
       div(:style=`{maxWidth: $q.screen.width > $store.state.ui.pageMinWidthDesktop ? '500px' : '250px', fontSize: '12px'}`).ellipsis {{ c.name }}
@@ -50,9 +49,7 @@ export default {
             id: 'all',
             name: this.$t('All')
           }
-          this.modelValue.collections = (this.showAllCollection ? [collectionAll, ...this.collectionsRes.items] : this.collectionsRes.items)
-          // this.modelValue.collections.splice(0, this.modelValue.collections.length, ...[collectionAll, ...this.collectionsRes.items])
-          // this.$set(this.modelValue, 'collections', [collectionAll, ...this.collectionsRes.items])
+          this.modelValue.wsSpheres = (this.showAllCollection ? [collectionAll, ...this.collectionsRes.items] : this.collectionsRes.items)
         }
       }
     }
@@ -61,7 +58,8 @@ export default {
     queryCollections () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_COLLECTION
+          rxCollectionEnum: RxCollectionEnum.WS_SPHERE,
+          isCollection: true
         },
         sort: [{ createdAt: 'desc' }]
       }
@@ -70,26 +68,27 @@ export default {
   },
   methods: {
     addRemoveCollection(c) {
-      let indx = this.modelValue.selectedCollectionIds.findIndex(id => c.id === id)
-      if (indx >= 0) this.modelValue.selectedCollectionIds.splice(indx, 1)
-      else this.modelValue.selectedCollectionIds.push(c.id)
+      let indx = this.modelValue.selectedSphereIds.findIndex(id => c.id === id)
+      if (indx >= 0) this.modelValue.selectedSphereIds.splice(indx, 1)
+      else this.modelValue.selectedSphereIds.push(c.id)
     },
     async createCollection (add = false) {
       assert(this.newCollectionName)
       let collectionInput = {
-        name: this.newCollectionName
+        name: this.newCollectionName,
+        isCollection: true
       }
-      let newCollection = await this.$rxdb.set(RxCollectionEnum.WS_COLLECTION, collectionInput)
-      this.modelValue.collectionId = newCollection.id
+      let newCollection = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, collectionInput)
+      this.modelValue.wsSphereId = newCollection.id
       this.newCollectionName = ''
-      this.$emit('collection-select', this.modelValue.collectionId)
+      this.$emit('collection-select', this.modelValue.wsSphereId)
       this.showMenu = false
       if (add) this.addRemoveCollection(newCollection)
-      return this.modelValue.collectionId
+      return this.modelValue.wsSphereId
     },
     async removeCollection (id) {
       await this.$rxdb.remove(id)
-      if (id === this.modelValue.collectionId) this.modelValue.collectionId = 'all'
+      if (id === this.modelValue.wsSphereId) this.modelValue.wsSphereId = 'all'
     },
     update(key, modelValue) {
       this.$emit('update:modelValue', { ...this.modelValue, [key]: modelValue })
@@ -98,8 +97,8 @@ export default {
   async mounted () {
     this.$log('mounted')
     this.collectionsRes = await this.$rxdb.find(this.queryCollections)
-    // this.$set(this.modelValue, 'collectionId', this.collectionsRes.items.length ? this.collectionsRes.items[0].id : 'all')
-    this.modelValue.collectionId = this.modelValue.collectionId || 'all'
+    // this.$set(this.modelValue, 'wsSphereId', this.collectionsRes.items.length ? this.collectionsRes.items[0].id : 'all')
+    this.modelValue.wsSphereId = this.modelValue.wsSphereId || 'all'
   }
 }
 </script>
