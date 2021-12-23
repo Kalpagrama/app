@@ -65,6 +65,8 @@ div(
             //- q-tooltip Начать с текущего
     //- spinner, no itemsRes
     q-spinner-dots(v-if="!itemsRes" color="green" size="60px" :style=`{left: 'calc(50% - 30px)', top: '60px'}`).absolute-top
+    div(v-if="itemsRes && !length").row.full-width
+      slot(name="nodata")
     // items
     // коробка с итемом. ее размер меняется только тогда, когда скролл стоит
     div(v-for="({source: item, state}, itemIndex) in vsItems"
@@ -240,7 +242,7 @@ export default {
       async handler (to, from) {
         if (!to) return
         this.$log('itemsRes.items:', to.length, this.itemsRes.getProperty('itemActiveIndx'), this.noDummyAreaCenterIndx)
-        this.vsItems = this.vsItems = this.itemsRes.items.map(item => {
+        this.vsItems = this.itemsRes.items.map(item => {
           return {
             // debugInfo: item.debugInfo,
             source: item.populatedObject || item,

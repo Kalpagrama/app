@@ -74,6 +74,8 @@ div(
     div(:style=`{ position: 'sticky', top: '0px', zIndex: 100}`).row.full-width
       q-resize-observer(@resize="stickyHeaderHeight = $event.height")
       slot(name="sticky-header")
+    div(v-if="itemsRes && !length").row.full-width
+      slot(name="nodata")
     // коробка с итемом. ее размер меняется только тогда, когда скролл стоит
     div(v-for="({source: item, state}, itemIndex) in vsItems"
       :ref="`item-${itemIndex}`"
@@ -244,7 +246,7 @@ export default {
       async handler (to, from) {
         if (!to) return
         this.$log('itemsRes.items:', to.length, this.itemsRes.getProperty('itemActiveIndx'), this.noDummyAreaCenterIndx)
-        this.vsItems = this.vsItems = this.itemsRes.items.map(item => {
+        this.vsItems = this.itemsRes.items.map(item => {
           return {
             // debugInfo: item.debugInfo,
             source: item.populatedObject || item,
