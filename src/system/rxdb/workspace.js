@@ -513,6 +513,7 @@ class Workspace {
 
    // проанализировать wsItem. Вытащить из него все сферы и добавить их в мастерскую
    async updateWsSpheres(wsItemRxDoc) {
+      if (wsItemRxDoc.wsItemType === WsItemTypeEnum.WS_HISTORY) return // не обновляем сферы для ядер, которые польжователь просто серфит
       // найдем все сферы этой сути и добавим их в мастерскую + добавим себя в newSphere.wsSphereItems
       if (wsItemRxDoc.type && wsItemRxDoc.type.in('NODE', 'JOINT', 'BLOCK') && wsItemRxDoc.oid) {
          logD('try find item spheres')
