@@ -16,10 +16,11 @@ import cloneDeep from 'lodash/cloneDeep'
 import differenceWith from 'lodash/differenceWith'
 import intersectionWith from 'lodash/intersectionWith'
 import { getRxCollectionEnumFromId, rxdb } from 'src/system/rxdb'
+import { isRxDocument } from 'rxdb'
+import { updateRxDocPayload } from 'src/system/rxdb/reactive'
 
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_WS)
 
-const trashBitTTLDefault = 1000 * 60 * 60 * 24 * 7 // время жизни элементов в корзине - неделя
 const synchroTimeDefault = 1000 * 60 * 1 // раз в 1 минут шлем изменения на сервер
 // const synchroTimeDefault = 1000 * 10 // раз в 1 минут шлем изменения на сервер
 // logE('synchroTimeDefault!!! 1000 * 10')
@@ -169,7 +170,7 @@ class Workspace {
          this.db.ws_items.postRemove(async (plainData) => {
             if (!this.created) return // см. destroy ('remove_rows')
             // сработает НЕ на всех вкладках (только на той, что изменила итем)
-            // если нет rev - то элемент еще не создавался на сервере (удалять с сервера не надо его)
+            // если !rev - то элемент еще не создавался на сервере (удалять с сервера не надо его) либо его там УЖЕ нет (см synchronize)
             logD('postRemove')
             if (plainData.rev) await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE, plainData)
             rxdb.onRxDocDelete(plainData.id) // удалить из lru(иначе он будет находиться через rxdb.get())
@@ -267,7 +268,11 @@ class Workspace {
                // есть и на сервере и у нас, но у нас - устаревшая копия
                outdatedItems = itemsServer.filter(item => localMap[item.id] && (item.rev !== localMap[item.id].rev || item.updatedAt > localMap[item.id].updatedAt))
                if (outdatedItems.length > 100) {
-                  logW('outdatedItems.length > 100', itemsServer, itemsLocal, outdatedItems)
+                  // TODO убрать
+                  logW('outdatedItems.length > 100 outdatedItems:', cloneDeep(outdatedItems))
+                  logW('outdatedItems.length > 100 itemsServer:', cloneDeep(itemsServer))
+                  logW('outdatedItems.length > 100 itemsLocal:', cloneDeep(itemsLocal))
+                  logW('outdatedItems.length > 100 localMap:', cloneDeep(localMap))
                }
                // есть у нас, но нет на сервере. (надо удалить у нас)
                extraItems = itemsLocal.filter(item => !serverMap[item.id])
@@ -279,8 +284,9 @@ class Workspace {
                newItems = itemsServer
             }
             if (extraItems.length) { // удаляем те, которых нет на сервере
-               await rxdbOperationProxy(this.db.ws_items, 'find').update({ $set: { rev: 0 } }) // для того чтобы события об удалении не отправлялись на сервер
-               await rxdbOperationProxy(this.db.ws_items, 'find', { selector: { id: { $in: extraItems.map(item => item.id) } } }).remove()
+               let query = rxdbOperationProxy(this.db.ws_items, 'find', { selector: { id: { $in: extraItems.map(item => item.id) } } })
+               await query.update({ $set: { rev: 0 } }) // для того чтобы события об удалении не отправлялись на сервер`(см postRemove)
+               await query.remove()
             }
             logT('try insert newItems', newItems.length)
             await rxdbOperationProxyExec(this.db.ws_items, 'bulkInsert', newItems)
@@ -455,18 +461,12 @@ class Workspace {
       const f = this.set
       logD(f, 'start')
       const t1 = performance.now()
+      let existingOtherRxDoc
       try {
          await this.lock('rxdb::ws::set') // нельзя чтобы метод сработал во время synchronize
          assert(this.created, '!this.created')
          let itemCopy = JSON.parse(JSON.stringify(item))
-         if (itemCopy.wsItemType === WsItemTypeEnum.WS_NODE) {
-            itemCopy.contentOids = itemCopy.items.reduce((acc, val) => {
-               val.layers.forEach(l => {
-                  acc.push(l.contentOid)
-               })
-               return acc
-            }, [])
-         } else if (itemCopy.wsItemType === WsItemTypeEnum.WS_SPHERE) {
+         if (itemCopy.wsItemType === WsItemTypeEnum.WS_SPHERE) {
             const foundOtherDocs = await rxdbOperationProxyExec(this.db.ws_items, 'find', {
                selector: {
                   wsItemType: RxCollectionEnum.WS_SPHERE,
@@ -474,25 +474,28 @@ class Workspace {
                   id: { $ne: itemCopy.id || 0 }
                }
             })
-            // let found = foundOtherDocs.find(doc => doc.id !== itemCopy.id)
-            if (foundOtherDocs.length) {
-               let rxDoc = foundOtherDocs[0]
-               if (!itemCopy.id) { // создание нового элемента
-                  if (rxDoc.deletedAt) {
-                     rxDoc = await rxDoc.atomicPatch({
-                        deletedAt: undefined
-                     })
-                  }
-                  return rxDoc // вернем существующий
-               } else { // изменение существующего элемента
-                  throw new Error(`same sphere found! ${itemCopy.name}`) // нельзя изменить имя на itemCopy.name (такое уже есть)
-               }
-            }
+            existingOtherRxDoc = foundOtherDocs[0]
          }
-         itemCopy.updatedAt = Date.now()
-         if (!itemCopy.createdAt) itemCopy.createdAt = Date.now()
-         if (!itemCopy.id) itemCopy.id = `${itemCopy.wsItemType}::${Date.now()}::{}` // генерируем id для нового элемента
-         let rxDoc = await rxdbOperationProxyExec(this.db.ws_items, 'atomicUpsert', itemCopy)
+         let resultRxDoc
+         if (existingOtherRxDoc){
+            if (!itemCopy.id) { // создание нового элемента
+               if (existingOtherRxDoc.deletedAt || (!existingOtherRxDoc.oid && item.oid)) {
+                  await updateRxDocPayload(existingOtherRxDoc, '', oldData => {
+                     oldData.deletedAt = undefined
+                     oldData.oid = oldData.oid || item.oid
+                     return oldData
+                  }, false)
+               }
+            } else { // изменение существующего элемента
+               throw new Error(`other sphere with same name found! cant change name to ${itemCopy.name}`) // нельзя изменить имя на itemCopy.name (такое уже есть)
+            }
+            resultRxDoc = existingOtherRxDoc // вернем существующий
+         } else {
+            itemCopy.updatedAt = Date.now()
+            if (!itemCopy.createdAt) itemCopy.createdAt = Date.now()
+            if (!itemCopy.id) itemCopy.id = `${itemCopy.wsItemType}::${Date.now()}::{}` // генерируем id для нового элемента
+            resultRxDoc = await rxdbOperationProxyExec(this.db.ws_items, 'atomicUpsert', itemCopy)
+         }
          { // если синхронизация давно не делалась - форсируем (нужно для кейса, когда мастерская была очищена из другой вкладки)
             let wsSynchroDateStr = await rxdb.get(RxCollectionEnum.META, 'wsSynchroDate')
             let wsSynchroDate = wsSynchroDateStr ? new Date(wsSynchroDateStr) : new Date(0)
@@ -501,11 +504,85 @@ class Workspace {
             }
          }
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-         return rxDoc
+         return resultRxDoc
       } finally {
          this.release()
          // logD(f, 'unlocked')
       }
+   }
+
+   // проанализировать wsItem. Вытащить из него все сферы и добавить их в мастерскую
+   async updateWsSpheres(wsItemRxDoc) {
+      // найдем все сферы этой сути и добавим их в мастерскую + добавим себя в newSphere.wsSphereItems
+      if (wsItemRxDoc.type && wsItemRxDoc.type.in('NODE', 'JOINT', 'BLOCK') && wsItemRxDoc.oid) {
+         logD('try find item spheres')
+         // берем только те что есть в кэше ( с сервера не запрашиваем)
+         let object = await rxdb.get(RxCollectionEnum.OBJ, wsItemRxDoc.oid, {priority: -1})
+         if (!object) return
+         let spheres = []
+         if (object.sphereFromName) spheres.push(object.sphereFromName)
+         if (object.spheres) spheres.push(...object.spheres)
+         if (object.items) {
+            for (let item of object.items) {
+               if (item.sphereFromName) spheres.push(item.sphereFromName)
+               if (item.spheres) spheres.push(...item.spheres)
+            }
+         }
+         logD('item spheres', spheres)
+         for (let s of spheres) {
+            assert(s && s.name && s.oid)
+            let sphereInput = {
+               name: s.name,
+               oid: s.oid
+            }
+            let newSphere = await rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
+            await newSphere.updateExtended('hitCnt', hitCnt => (hitCnt || 0) + 1, false)
+            assert(newSphere.wsSphereItems)
+            // logT('newSphere add wsSphereItem', cloneDeep(newSphere), cloneDeep(wsItemRxDoc))
+            if (!newSphere.wsSphereItems.find(wsItemId => wsItemId === wsItemRxDoc.id)) {
+               newSphere.wsSphereItems.push(wsItemRxDoc.id) // добавляем себя
+            }
+         }
+      }
+   }
+
+   // добавить на wsItem contentOids(для позиционирования черновиков на контенте)
+   async updateContentOids(wsItemRxDoc) {
+      assert(wsItemRxDoc && isRxDocument(wsItemRxDoc))
+      let getContentOids = (item, type) => {
+         assert(type && type in WsItemTypeEnum)
+         let result
+         if (type === WsItemTypeEnum.WS_NODE) {
+            result = item.items.reduce((acc, val) => {
+               val.layers.forEach(l => {
+                  acc.push(l.contentOid)
+               })
+               return acc
+            }, [])
+         } else if (type === WsItemTypeEnum.WS_BLOCK){
+            result = [] // todo
+         } else if (type === WsItemTypeEnum.WS_JOINT){
+            result = [] // todo
+         } else return undefined
+         return result
+      }
+      let objectFull
+      let contentOids
+      if (wsItemRxDoc.type && wsItemRxDoc.type.in('NODE', 'JOINT', 'BLOCK') && wsItemRxDoc.oid) {
+         // берем только те что есть в кэше ( с сервера не запрашиваем)
+         objectFull = await rxdb.get(RxCollectionEnum.OBJ, wsItemRxDoc.oid, {priority: -1})
+      }
+      if (objectFull) {
+         let type
+         if (objectFull.type === 'NODE') type = WsItemTypeEnum.WS_NODE
+         else if (objectFull.type === 'JOINT') type = WsItemTypeEnum.WS_JOINT
+         else if (objectFull.type === 'BLOCK') type = WsItemTypeEnum.WS_BLOCK
+         else throw new Error('bad objectFull.type' + objectFull.type)
+         contentOids = getContentOids(objectFull, type)
+      } else {
+         contentOids = getContentOids(wsItemRxDoc, wsItemRxDoc.wsItemType)
+      }
+      if (contentOids) await wsItemRxDoc.atomicPatch({ contentOids: contentOids })
    }
 
    async get (id) {

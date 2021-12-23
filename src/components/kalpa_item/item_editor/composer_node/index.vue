@@ -22,6 +22,7 @@ div(
     composition-editor(:style=`{maxHeight: '40vh'}` :node="node" :isActive="isActive" :isVisible="isVisible")
     //- NAME: dynamic link/ dynamic fontSize
     slot(name="name")
+    sphere-hints(:name="node.name", @click="node.name = $event").b-40
     q-input(
       v-if="showName"
       v-model="node.name"
@@ -67,15 +68,18 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import { assert } from 'src/system/common/utils'
 import cloneDeep from 'lodash/cloneDeep'
 import essenceHeader from 'src/components/essence/essence_header'
+import sphereHints from 'src/components/kalpa_item/sphere_hints.vue'
 import editSpheres from 'src/pages/app/content/node_editor/edit_spheres.vue'
 import editCategory from 'src/pages/app/content/node_editor/edit_category.vue'
 import compositionEditor from 'src/components/kalpa_item/item_editor/composition_editor.vue'
 import { ObjectTypeEnum } from 'src/system/common/enums'
+import debounce from 'lodash/debounce'
 
 export default {
   name: 'composerNode',
   components: {
     essenceHeader,
+    sphereHints,
     editSpheres,
     editCategory,
     compositionEditor
@@ -158,7 +162,7 @@ export default {
           this.publishing = false
         }
       }
-    }
+    },
   },
   mounted () {
     this.$log('mounted', this.node)
