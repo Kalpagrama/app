@@ -42,10 +42,11 @@ div(
         v-else
         :style=`{
           height: '50px',
-          width: '50px',
+          minWidth: '90px',
+          maxWidth: '90px',
         }`
-        ).row.items-center.content-center.justify-center
-        q-icon(name="blur_on" color="white" size="30px")
+        ).row.items-center.content-center.justify-center.q-mt-sm.q-ml-sm.q-mb-sm
+        q-icon(name="blur_on" color="white" size="50px")
       //- right side
       .col
         div(:style=`{minHeight: '50px',}`).row.full-width.items-start.content-start.q-pt-sm.q-px-sm

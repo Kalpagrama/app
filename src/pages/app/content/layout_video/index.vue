@@ -27,6 +27,10 @@ div(
   //    objectFit: 'contain',
   //  }`
   //  ).full-width.br
+  div(
+    v-if="!player"
+  ).row.fit.items-center.content-center.justify-center
+    q-spinner(size="50px" color="white")
   content-player(
     :contentKalpa="contentKalpa"
     :options=`{

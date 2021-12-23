@@ -40,7 +40,7 @@ div(ref="graphArea").row.full-width
     :maximized="true")
     kalpa-finder(
       :height="$q.screen.height"
-      :headerTitle="$t('Pick new element for graph')",
+      :headerTitle="$t('Выберите новый элемент')",
       :style=`{maxWidth: width  + 'px', borderRadius: '10px' }`
       @item="addItemToGraph"
       @close="itemFinderShow = false"
@@ -294,6 +294,7 @@ export default {
       let indx = this.graphD3.nodes.findIndex(n => n.id === item.id || n.oid === item.oid)
       if (indx >= 0) this.graphD3.nodes.splice(indx, 1)
       this.$emit('changed')
+      this.itemDetailsShow = false
     },
     removeJoint (joint) {
       // this.$log('removeJoint', joint)

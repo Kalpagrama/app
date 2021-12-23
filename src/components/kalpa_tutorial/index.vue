@@ -30,7 +30,7 @@ div(
         height: '300px',
         borderRadius: '10px',
       }`
-      ).row.items-between.content-between.q-pa-sm.b-40
+      ).row.items-between.content-between.q-pa-sm.b-40.absolute-center
       .row.full-width
         .row.full-width.q-pa-md
           span(:style=`{fontSize: '22px'}`).text-white.text-bold {{ doc.fields.name }}
@@ -45,52 +45,53 @@ div(
         @click="showTutorial = true").col
         span.text-bold {{ $t('Start') }}
   //- body
-  div(
-    v-if="showTutorial"
-    :style=`{position: 'relative',borderRadius: '0px', overflow: 'hidden'}`).col.full-width
-      //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      //- v-if="showTutorial"
-      q-carousel(
-        ref="slides-carousel"
-        v-model="slide"
-        transition-prev="slide-right"
-        transition-next="slide-left"
-        swipeable animated navigation arrows
-        infinite
-        :autoplay="15000"
-        control-color="green"
-        :style=`{
-          position: 'absolute',
-          zIndex: 10,
-        }`).fit
-        template(v-slot:navigation-icon="{ active, btnProps, onClick  }")
-          q-btn(v-if="active" size="sm" :icon="btnProps.icon" color="green" flat round dense @click="onClick")
-          q-btn(v-else size="sm" :icon="btnProps.icon" color="grey" flat round dense @click="onClick")
-        q-carousel-slide(
-          v-for="(s,si) in slides" :key="s.id"
-          :name="s.id"
+  transition(enter-active-class="animated zoomIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="showTutorial"
+      :style=`{position: 'relative',borderRadius: '0px', overflow: 'hidden'}`).col.full-width
+        //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        //- v-if="showTutorial"
+        q-carousel(
+          ref="slides-carousel"
+          v-model="slide"
+          transition-prev="slide-right"
+          transition-next="slide-left"
+          swipeable animated navigation arrows
+          infinite
+          :autoplay="15000"
+          control-color="green"
           :style=`{
-            position: 'relative',
-            zIndex: 'auto',
-            userSelect: 'none',
-          }`
-          ).row.fit.items-center.content-center.justify-center.b-30
-          img(
-            draggable="false"
-            :src="s.url"
+            position: 'absolute',
+            zIndex: 10,
+          }`).fit
+          template(v-slot:navigation-icon="{ active, btnProps, onClick  }")
+            q-btn(v-if="active" size="sm" :icon="btnProps.icon" color="green" flat round dense @click="onClick")
+            q-btn(v-else size="sm" :icon="btnProps.icon" color="grey" flat round dense @click="onClick")
+          q-carousel-slide(
+            v-for="(s,si) in slides" :key="s.id"
+            :name="s.id"
             :style=`{
-              objectFit: 'contain',
-              pointerEvents: 'none',
+              position: 'relative',
+              zIndex: 'auto',
               userSelect: 'none',
             }`
-            ).fit
-      q-btn(
-        flat color="white" no-caps icon="close" dence
-        :style=`{
-          height: '50px',
-          zIndex: 20
-        }`
-        @click="$emit('close')").absolute-top-right
+            ).row.fit.items-center.content-center.justify-center.b-30
+            img(
+              draggable="false"
+              :src="s.url"
+              :style=`{
+                objectFit: 'contain',
+                pointerEvents: 'none',
+                userSelect: 'none',
+              }`
+              ).fit
+        q-btn(
+          flat color="white" no-caps icon="close" dence
+          :style=`{
+            height: '50px',
+            zIndex: 20
+          }`
+          @click="$emit('close')").absolute-top-right
 </template>
 
 <script>

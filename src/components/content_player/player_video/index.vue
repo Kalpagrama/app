@@ -55,7 +55,7 @@
     //- Tint bottom - on pause and desktops only and youtube
     transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
-        v-if="player && !player.playing && player.playerType === 'player-youtube' && $q.screen.width > 600"
+        v-if="player && !player.playing && player.playerType === 'player-youtube' && $q.screen.width > 480"
         v-show="options.showTint"
         :style=`{
         position: 'absolute', zIndex: 10, bottom: '0px',
@@ -74,6 +74,7 @@
         }`
           @click="player.play()")
           q-icon(name="fas fa-play" color="white" size="100px").q-ml-md
+
   //- footer
   .row.full-width.justify-center
     div(:style=`{maxWidth: 600+'px'}`).row.full-width

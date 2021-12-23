@@ -56,7 +56,8 @@ div(
         ).row.full-width.q-px-sm.q-pb-sm
         item-preview(
           :item="joint.items[1]"
-          :isActive="!isFocused")
+          :isActive="!isFocused"
+          :show-actions="false")
         //- Actions
         .row.full-width.justify-center.q-pt-md.q-pb-sm
           //- Remove
