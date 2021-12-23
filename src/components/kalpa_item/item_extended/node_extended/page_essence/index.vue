@@ -38,7 +38,7 @@
           div(:style=`{background: 'rgba(0,0,0,0.4)', zIndex: '50'}`).fit.absolute
         .column.items-start
           span.text-grey-5 {{node.author.name}}
-          small(:style=`{marginTop: '-7px'}`).text-grey-7.text-italic 4тыс подписчиков
+          small(v-if="author" :style=`{marginTop: '-7px'}`).text-grey-7.text-italic {{author.countStat.countSubscribers}} {{$getNoun(length, $t('подписчик'), $t('подписчика'), $t('подписчиков'))}}
       //q-btn(round flat padding="none" no-caps=false size="sm" color="green-8" :label="$t('подписаться')").col
       small(size="sm").row.items-center.text-grey-7.text-italic {{node.countStat.countViews}} {{$getNoun(node.countStat.countViews,$t('просмотр'),$t('просмотра'),$t('просмотров'))}}
     //widget-images(
@@ -79,6 +79,7 @@ export default {
   data () {
     return {
       node: null,
+      author: null,
     }
   },
   watch: {
@@ -86,6 +87,7 @@ export default {
       immediate: true,
       async handler(to, from){
         this.node = await this.$rxdb.get(RxCollectionEnum.OBJ, to)
+        if (this.node) this.author = await this.$rxdb.get(RxCollectionEnum.OBJ, this.node.author.oid)
       }
     }
   },
@@ -100,6 +102,9 @@ export default {
   },
   async created () {
     this.$log('created')
+  },
+  async mounted () {
+
   },
   beforeUnmount () {
     this.$log('beforeDestroy')
