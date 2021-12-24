@@ -11,6 +11,7 @@ import { router } from 'src/boot/system'
 import { store } from 'src/store/index'
 import { ContentApi } from 'src/api/content'
 import { makeRoutePath } from 'src/system/common/common_func'
+import { notify } from 'src/boot/notify'
 
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.SYSTEM)
 let {
@@ -29,6 +30,23 @@ class SystemUtils {
    async vibrate (patternOrDuration = 100) {
       if (Platform.is.capacitor) await capacitor.vibrate()
       else if (navigator.vibrate) navigator.vibrate(patternOrDuration)
+   }
+
+   async writeToClipboard (text, notifyMessage) {
+      let result = false
+      if (Platform.is.capacitor) {
+         result = await capacitor.writeToClipboard(text)
+      } else if (navigator.clipboard) {
+         let resultPermissions = navigator.permissions ? await navigator.permissions.query({name: 'clipboard-write'}) : {state: 'granted'}
+         if (resultPermissions.state === 'granted' || resultPermissions.state === 'prompt') {
+            await navigator.clipboard.writeText(text)
+            result = true
+         }
+      }
+      if (result && notifyMessage) {
+         if (notifyMessage) notify('info', notifyMessage)
+      }
+      return result
    }
 
    async hapticsImpact (style = 'medium') {

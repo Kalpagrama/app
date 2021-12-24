@@ -153,7 +153,7 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
         //div(:style=`{minHeight: '70px'}`).row.full-width.q-px-sm.q-pt-md.br-10.b-50
         edit-spheres(:sphereOwner="contentCopy" :maxSphereCnt="20" :placeholderText="$t('Добавьте ключевые слова')" :backgroundColor="'rgba(45,45,45,1)'").q-px-sm
       .row.full-width.q-pl-lg.q-mt-sm
-        small.text-grey-6 {{$t('Ссылка на источник')}}
+        small.text-grey-6 {{$t('Ссылка на оригинал')}}
       div(:style=`{minHeight: '45px'}`).row.full-width.q-px-sm
         .row.full-width
           q-input(
@@ -162,7 +162,7 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
             color="green"
             borderless dark dense
             :style=`{borderRadius: '10px', height: '40px'}`
-            :placeholder="$t('Введите ссылку на источник')"
+            :placeholder="$t('Введите ссылку на оригинал')"
             :input-style=`{
             // background: 'rgb(45,45,45)',
             // borderRadius: '10px',

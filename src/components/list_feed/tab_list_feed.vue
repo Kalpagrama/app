@@ -76,6 +76,8 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
       q-btn(v-if="showAddBtn" round flat icon="add" color="green" @click="$emit('add')" ).row.full-width
     template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible, isPreload, scrolling}`)
       slot(name="item" :item="item" :itemState="itemState" :itemIndex="itemIndex" :isActive="isActive" :isVisible="isVisible" :isPreload="isPreload" :scrolling="scrolling")
+    template(v-slot:nodata)
+      slot(name="nodata")
 </template>
 
 <script>

@@ -22,7 +22,7 @@ async function saveHistory (oid) {
       for (let item of res.items) {
          if (item.oid === oid) await item.remove(true)
       }
-      // console.log('history after remove=', res.items.map(item => item.name))
+      // logT('history after remove=', res.items.length)
       let historyItemInput = {
          type: item.type,
          oid: item.oid,
@@ -30,7 +30,7 @@ async function saveHistory (oid) {
          thumbUrl: item.thumbUrl
       }
       let historyItem = await rxdb.set(RxCollectionEnum.WS_HISTORY, historyItemInput)
-      // console.log('history after=', res.items.map(item => item.name))
+      // logT('history after=', res.items.length)
       for (let i = 0; i < res.items.length - 100; i++) { // максимум 100 в истории
          // console.log('history remove=', res.items[i].name)
          res.items[i].remove(true)

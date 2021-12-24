@@ -155,7 +155,7 @@ export default {
       } else {
         this.$store.commit('core/stateSet', ['logRocket', false])
         if (this.$store.state.core.logRocketSessionUrl) {
-          await this.$clipboardWriteText(this.$store.state.core.logRocketSessionUrl)
+          await this.$systemUtils.writeToClipboard(this.$store.state.core.logRocketSessionUrl)
           alert('Ссылка на проблему скопирована в буфер обмена.\n отправьте ее в телеграм канал поддержки пользователей')
           this.$logW('before reload')
           window.location.reload() // у логрокет нет возможности прервать сессию. приходится перезагружать страницу

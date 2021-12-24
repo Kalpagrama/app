@@ -10,6 +10,7 @@ import { Share } from '@capacitor/share'
 import { AuthApi } from 'src/api/auth'
 import { makeRoutePath } from 'src/system/common/common_func'
 import { shareIn } from 'src/system/services'
+import { Clipboard } from '@capacitor/clipboard'
 
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.CP)
 
@@ -151,6 +152,19 @@ async function orientationLock (mode) {
    else await window.screen.orientation.lock(mode);
 }
 
+async function writeToClipboard (text) {
+   if (!text || typeof text !== 'string') return false
+   await Clipboard.write({
+      string: text
+   })
+   return true
+}
+
+const checkClipboard = async () => {
+   const { type, value } = await Clipboard.read()
+   alert(`Got ${type} from clipboard: ${value}`)
+};
+
 Browser.addListener('browserFinished', (info) => {
    // alert('browserFinished' + JSON.stringify(info))
 })
@@ -193,5 +207,6 @@ export {
    vibrate,
    hapticsImpact,
    openUrl,
-   screenshot
+   screenshot,
+   writeToClipboard
 }

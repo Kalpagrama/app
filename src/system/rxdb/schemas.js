@@ -142,6 +142,9 @@ export const wsSchemaItem = {
         type: 'string'
       }
     },
+    hitCnt: { // популярность этой сферы при указании сути
+      type: 'integer',
+    },
     // ---- bookmark ----
     isSubscribed: {
       type: 'boolean',

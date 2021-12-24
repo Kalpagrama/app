@@ -102,6 +102,8 @@ div(:style=`{ position: 'relative'}`).row.full-width.items-start.content-start
         q-resize-observer(@resize="stickyHeaderHeight = $event.height")
         slot(name="sticky-header")
         //div(:style=`{height: '50px', background: 'red'}`).row.full-width.bg
+      div(v-if="itemsRes && !length").row.full-width
+        slot(name="nodata")
       // items list
       q-virtual-scroll(
         ref="vs"
@@ -256,7 +258,7 @@ export default {
       this.preloadInterval = { from: -1, to: -1 }
       this.scrollHeight = 0
       this.itemsRes = itemsRes
-      this.vsItems = this.vsItems = itemsRes?.items.map(item => {
+      this.vsItems = itemsRes?.items.map(item => {
         return {
           source: item.populatedObject || item,
           state: {

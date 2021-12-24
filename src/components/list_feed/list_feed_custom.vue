@@ -1,3 +1,4 @@
+// deprecated
 // если указан scrollAreaHeight - сделает внутренний скролл - иначе - воспользуется скроллом window
 <template lang="pug">
 div(
@@ -88,6 +89,8 @@ div(
     div(:style=`{ position: 'sticky', top: '0px', zIndex: 100}`).row.full-width
       q-resize-observer(@resize="stickyHeaderHeight = $event.height")
       slot(name="sticky-header")
+    div(v-if="itemsRes && !length").row.full-width
+      slot(name="nodata")
     //- items
     div(
       v-if="itemsRes"
@@ -309,7 +312,7 @@ export default {
         this.itemMiddleHistory.splice(0, this.itemMiddleHistory.length, ...this.itemMiddleHistory.filter(im => !!im.item && !!im.ref)) // удаляем те, которых нет в новом списке
         this.itemMiddleTopUpdate()
         this.itemMiddleScrollIntoView('itemsRes.itemsHeaderFooter WATCHER')
-        this.vsItems = this.vsItems = this.itemsRes.itemsHeaderFooter.map(item => {
+        this.vsItems = this.itemsRes.itemsHeaderFooter.map(item => {
           return {
             // debugInfo: item.debugInfo,
             source: item.populatedObject || item,

@@ -20,7 +20,7 @@ function getReactive (rxDocOrObject) {
 }
 
 // все изменения rxDoc - только через эту ф-ю!!! Иначе - возможны гонки (из-за debounce)
-// либо - менять непосредственно reactiveDoc.payload(payload.prop = ...) (либо через reactiveItem.updateExtended)
+// либо - менять непосредственно reactiveItem (reactiveItem.prop = ...) (либо через reactiveItem.updateExtended)
 // synchro - синхронить эти изменения на сервер
 async function updateRxDocPayload (rxDocOrId, path, valueOrFunc, debouncedSave = true, synchro = true) {
    const f = updateRxDocPayload
@@ -68,7 +68,7 @@ const debounceIntervalItem = 2000 // дебаунс сохранения реа�
 class ReactiveObjFactory {
    constructor (object) {
       assert(typeof object === 'object')
-      this.vm = reactive({ reactiveData: {}, rev: 1 })
+      this.vm = reactive({ reactiveData: {}, revRx: 1 })
       this.getReactive = () => {
          assert(this.vm.reactiveData.doc, '!this.vm.reactiveData.doc')
          return this.vm.reactiveData.doc
@@ -114,7 +114,7 @@ class ReactiveDocFactory {
       } else {
          this.rxDoc = rxDoc
          this.mutex = new MutexLocal('ReactiveDocFactory::constructor')
-         this.vm = reactive({ reactiveData: {}, rev: rxDoc._rev })
+         this.vm = reactive({ reactiveData: {}, revRx: rxDoc._rev })
          this.debouncedSave = true
          this.synchro = true
          this.getReactive = () => {
@@ -169,8 +169,8 @@ class ReactiveDocFactory {
             }
 
             if (typeof payload === 'object') {
-               payload.updateExtended = async (path, value, debouncedSave = true, synchro = true) => {
-                  await updateRxDocPayload(this.rxDoc, path, value, debouncedSave, synchro)
+               payload.updateExtended = async (path, valueOrFunc, debouncedSave = true, synchro = true) => {
+                  await updateRxDocPayload(this.rxDoc, path, valueOrFunc, debouncedSave, synchro)
                }
                payload.setChanged = (res = true) => {
                   payload.hasChanges = res
@@ -217,11 +217,11 @@ class ReactiveDocFactory {
             this.synchro = flag
          }
          this.getRev = () => {
-            return this.vm.rev
+            return this.vm.revRx
          }
-         this.setRev = (rev) => {
-            assert(rev, '!_rev')
-            this.vm.rev = rev
+         this.setRev = (revRx) => {
+            assert(revRx, '!_rev')
+            this.vm.revRx = revRx
          }
          this.setReactiveDoc(cloneDeep(rxDoc.toJSON())) // rxDoc.toJSON() - иммутабелен
          this.rxDocSubscribe()
@@ -246,7 +246,7 @@ class ReactiveDocFactory {
 
    rxDocSubscribe () {
       const f = this.rxDocSubscribe
-      // logD(f, `rxDoc subscribe ${this.rxDoc.id} rev: ${this.rxDoc.rev}`)
+      // logD(f, `rxDoc subscribe ${this.rxDoc.id}`)
       if (this.rxDocSubscription) return
       // skip - для пропуска n первых эвантов (после subscribe - сразу генерится эвент(даже если данные не менялись))
       this.rxDocSubscription = this.rxDoc.$.pipe(skip(1)).subscribe(async changePlainDoc => {
@@ -256,7 +256,7 @@ class ReactiveDocFactory {
             assert(this.getRev() && changePlainDoc._rev, '!this.getRev() && changePlainDoc._rev')
             if (this.getRev() === changePlainDoc._rev) return // изменения уже применены к reactiveDoc (см this.reactiveSubscribe())
             this.reactiveUnsubscribe()
-            ReactiveDocFactory.mergeReactive(this.getReactive(), changePlainDoc)
+            ReactiveDocFactory.mergeReactive(this.getReactive(), cloneDeep(changePlainDoc))
             this.setRev(changePlainDoc._rev)
             // logD(f, 'reactiveDoc changed stop')
          } finally {
@@ -268,7 +268,7 @@ class ReactiveDocFactory {
 
    rxDocUnsubscribe () {
       const f = this.rxDocUnsubscribe
-      // logD(f, `rxDoc unsubscribe ${this.rxDoc.id} rev: ${this.rxDoc.rev}`)
+      // logD(f, `rxDoc unsubscribe ${this.rxDoc.id}`)
       if (this.rxDocSubscription) this.rxDocSubscription.unsubscribe()
       delete this.rxDocSubscription
    }

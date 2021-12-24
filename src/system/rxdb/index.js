@@ -650,6 +650,8 @@ class RxDBWrapper {
          data.wsItemType = data.wsItemType || rxCollectionEnum
          assert(data.wsItemType === rxCollectionEnum, '!data.wsItemType === rxCollectionEnum')
          rxDoc = await this.workspace.set(data)
+         await this.workspace.updateWsSpheres(rxDoc) // создать все сферы и добавить на них rxDoc
+         await this.workspace.updateContentOids(rxDoc) // добавить на элемент contentOids(для позиционирования черновиков на контете)
       } else if (rxCollectionEnum === RxCollectionEnum.OBJ) {
          let id = makeId(rxCollectionEnum, data.oid)
          rxDoc = await this.cache.set(id, data, actualAge, notEvict)
@@ -669,7 +671,6 @@ class RxDBWrapper {
 
    async remove (id) {
       assert(this.created, 'cant remove! !this.created')
-      // alert('delete!!!!!!' + id)
       const f = this.remove
       const t1 = performance.now()
       try {

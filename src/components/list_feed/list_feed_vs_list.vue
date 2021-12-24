@@ -1,3 +1,4 @@
+// deprecated
 <template lang="pug">
 .row.full-width.items-start.content-start
   .row.full-width
@@ -12,6 +13,8 @@
         q-resize-observer(@resize="stickyHeaderHeight = $event.height")
         slot(name="sticky-header")
         //div(:style=`{height: '50px', background: 'red'}`).row.full-width.bg
+      div(v-if="itemsRes && !length").row.full-width
+        slot(name="nodata")
       // items list
       virtual-list(
         v-if="itemsRes"
