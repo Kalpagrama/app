@@ -1,0 +1,43 @@
+<template lang="pug">
+div(
+  :style=`{
+  height: '50vh',
+  }`
+  ).row.full-width.justify-center.q-mb-lg
+    div(
+      :style=`{
+      maxWidth: $store.state.ui.pageWidth+'px',
+      borderRadius: '10px',
+    }`).row.full-width.items-center.content-center.justify-center.b-35.q-pa-md
+      .row.full-width.justify-center
+        q-icon(:name="icon" color="grey-8" size="100px")
+      div(
+       :style=`{textAlign: 'center'}`
+      ).row.full-width.justify-center
+       span.text-white.text-h6.q-mb-sm  {{title}}
+       span.text-white.full-width  {{message}}
+      .row.full-width.justify-center.q-pt-md
+        q-btn(
+          outline color="white" no-caps
+        :style=`{
+          height: '50px',
+          minWidth: '200px',
+        }`
+          @click="$go(clickPath)"
+        )
+          h1.text-white {{ buttonName }}
+      //div(:style=`{minHeight: '80px'}`).row.full-width.justify-center.q-pt-md
+</template>
+
+<script>
+export default {
+  name: 'view_empty',
+  props: {
+    icon: {type: String},
+    title: {type: String},
+    message: {type: String},
+    buttonName: {type: String},
+    clickPath: {type: String},
+  },
+}
+</script>
