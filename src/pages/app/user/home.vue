@@ -96,7 +96,7 @@ import { UserApi } from 'src/api/user'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import listFollowers from 'src/components/kalpa_lists/followers.vue'
 import listFollowing from 'src/components/kalpa_lists/following.vue'
-import viewEmpty from 'src/layouts/view_empty'
+import viewEmpty from 'src/components/kalpa_guard/view_empty'
 
 import navHeader from './nav_header.vue'
 import navTabs from './nav_tabs.vue'
