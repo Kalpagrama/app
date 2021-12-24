@@ -144,7 +144,7 @@ export default {
     async copyLink () {
       this.$log('copyLink')
       this.shareLink = makeRoutePath(this.player.node, true)
-      await this.$clipboardWriteText(this.shareLink, this.$t('Ссылка скопирована!'))
+      await this.$systemUtils.writeToClipboard(this.shareLink, this.$t('Ссылка скопирована!'))
     },
     nodeRefresh () {
       this.$log('nodeRefresh')

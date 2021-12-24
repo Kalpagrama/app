@@ -122,7 +122,7 @@ export default {
     },
     async shareLinkCopy () {
       this.$log('shareLinkCopy')
-      await this.$clipboardWriteText(this.data.shareLink, this.$t('Ссылка скопирована!'))
+      await this.$systemUtils.writeToClipboard(this.data.shareLink, this.$t('Ссылка скопирована!'))
       // await this.$wait(500)
       this.data.shareDialogOpened = false
     },
@@ -132,7 +132,7 @@ export default {
     },
     async shareEmbedCopy () {
       this.$log('shareEmbedCopy')
-      await this.$clipboardWriteText(this.shareEmbedText, 'Copied to clipboard!')
+      await this.$systemUtils.writeToClipboard(this.shareEmbedText, 'Copied to clipboard!')
       // await this.$wait(500)
       this.data.shareDialogOpened = false
     },

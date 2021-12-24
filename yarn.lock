@@ -1169,7 +1169,12 @@
   resolved "https://registry.yarnpkg.com/@capacitor/browser/-/browser-1.0.6.tgz#8d7648b14e7704e06a974293b03c36b34980c3ad"
   integrity sha512-ZDx+HNPRQZKHpWxbYEyDz34Ge4fwhiiGg2UEnA+ol+pmdvHyYxw/c8HafCEVRJutHrXcVdSNoBNAeEPkQeabrQ==
 
-"@capacitor/core@^3.3.2":
+"@capacitor/clipboard@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@capacitor/clipboard/-/clipboard-1.0.6.tgz#7b8259b96a6dec3422656953708f160a497ca271"
+  integrity sha512-5vgarkdcFKflJJlX/cMBkpZ5ZRYg1Brl6b8LnM1P257lQbLPXeC5Aa0qVtiS9TFixULZ1rxGkQzWidt3+ngH4Q==
+
+"@capacitor/core@^3.3.3":
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/@capacitor/core/-/core-3.3.3.tgz#a1868a536a0b82381c2eaeb9aeca424ffbc5bca3"
   integrity sha512-5oN3dUxdVXSvrTvTkmKBoBh7qISi+PVrsxHyjqq7Kr573dQnm8LsZ0/24PpJsGp08lD/+nFtFzOtPODJvYLVgg==
