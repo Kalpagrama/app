@@ -82,12 +82,12 @@ kalpa-layout
               :scrolling="scrolling").q-pb-xl
           template(v-slot:nodata)
             nodata-guard(
-              :button="true"
-              icon="icon"
-              title="Здесь пока ничего нет"
-              message="Создайте смысловое ядро и оно отобразится здесь"
-              buttonName="Создать ядро"
-              clickPath="/workspace"
+              :button="nodataGuardParams.button"
+              :icon="nodataGuardParams.icon"
+              :title="nodataGuardParams.title"
+              :message="nodataGuardParams.message"
+              :buttonName="nodataGuardParams.buttonName"
+              :clickPath="nodataGuardParams.clickPath"
             )
 </template>
 
@@ -117,14 +117,6 @@ export default {
       showFollowDialog: false,
       scrollTop: 0,
       pageId: 'nodes',
-      viewEmptyParams: {
-        icon: null,
-        title: null,
-        message: null,
-        button: false,
-        name: null,
-        clickPath: '/workspace',
-      },
     }
   },
   computed: {
@@ -133,10 +125,46 @@ export default {
     },
     pages () {
       return [
-        { id: 'nodes', name: this.$t('Nodes') },
-        { id: 'joints', name: this.$t('Joints') },
-        { id: 'blocks', name: this.$t('Essence blocks') },
-        { id: 'votes', name: this.$t('Votes') }
+        { id: 'nodes',
+          name: this.$t('Nodes'),
+          nodataGuardParams: {
+            icon: 'adjust',
+            button: true,
+            message: this.$t('Создайте смысловое ядро и оно отобразится здесь'),
+            buttonName: this.$t('Создать ядро'),
+            title: this.$t('Здесь пока ничего нет'),
+            clickPath: '/workspace',
+          }},
+        { id: 'joints',
+          name: this.$t('Joints'),
+          nodataGuardParams: {
+            icon: 'fas fa-link',
+            button: false,
+            message: this.$t('Создайте связь и она отобразится здесь'),
+            // buttonName: this.$t('Создать ядро'),
+            title: this.$t('Здесь пока ничего нет'),
+            // clickPath: '/workspace',
+          }},
+        { id: 'blocks',
+          name: this.$t('Essence blocks'),
+          nodataGuardParams: {
+            icon: 'dashboard_customize',
+            button: true,
+            message: this.$t('Создайте смысловой блок и он отобразится здесь'),
+            buttonName: this.$t('Создать смысловой блок'),
+            title: this.$t('Здесь пока ничего нет'),
+            clickPath: '/workspace/edit?mode=block',
+          }},
+        { id: 'votes',
+          name: this.$t('Votes'),
+          nodataGuardParams: {
+            icon: 'poll',
+            button: false,
+            message: this.$t('Ваши голоса появятся здесь'),
+            buttonName: this.$t('Создать ядро'),
+            title: this.$t('Здесь пока ничего нет'),
+            clickPath: '/workspace',
+          }}
       ]
     },
     query () {
@@ -170,21 +198,12 @@ export default {
         },
         populateObjects: false
       }
+    },
+    nodataGuardParams() {
+      return this.pages.find(page => page.id === this.pageId).nodataGuardParams
     }
   },
   watch: {
-    pageId: {
-      immediate: true,
-      handler (to, from) {
-        switch (to) {
-          case 'nodes' :
-            this.icon = 'icon1'
-            this.viewEmptyIcon = 'icon1'
-            break
-          default: throw new Error('bad pageId' + to)
-        }
-      }
-    },
     '$route.params.oid': {
       immediate: true,
       async handler (to, from) {
