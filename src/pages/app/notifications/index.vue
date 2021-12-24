@@ -20,7 +20,7 @@ kalpa-layout
               q-btn(
                 round flat color="white" icon="more_vert")
         //- guest
-        view-guest(
+        guest-guard(
           v-if="$store.getters.isGuest")
         //- user
         tab-list-feed(
@@ -45,13 +45,13 @@ kalpa-layout
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import notificationItem from './notification_item.vue'
-import viewGuest from 'src/components/kalpa_guard/view_guest.vue';
+import guestGuard from 'src/components/kalpa_guard/guest_guard.vue';
 
 export default {
   name: 'pageApp__notifications',
   components: {
     notificationItem,
-    viewGuest,
+    guestGuard,
   },
   data () {
     return {

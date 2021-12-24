@@ -11,7 +11,7 @@
   slot(name="header")
   //- body
   div(:style=`{position: 'relative',}`).col.full-width.scroll
-    view-guest(
+    guest-guard(
       v-if="$store.getters.isGuest")
     div(
       v-else-if="itemsRes"
@@ -32,13 +32,13 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import viewGuest from './view_guest.vue'
+import guestGuard from './view_guest.vue'
 
 export default {
   name: 'pageDraftsRoot',
   props: ['contentKalpa', 'player'],
   components: {
-    viewGuest
+    guestGuard
   },
   data () {
     return {
