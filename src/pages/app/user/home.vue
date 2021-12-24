@@ -80,6 +80,15 @@ kalpa-layout
               :isPreload="isPreload"
               :layout="item.type && item.type.in('NODE', 'JOINT', 'BLOCK') ? 'card' : 'line'"
               :scrolling="scrolling").q-pb-xl
+          template(v-slot:nodata)
+            view-empty(
+              :button="true"
+              icon="icon"
+              title="Здесь пока ничего нет"
+              message="Создайте смысловое ядро и оно отобразится здесь"
+              buttonName="Создать ядро"
+              clickPath="/workspace"
+            )
 </template>
 
 <script>
@@ -87,6 +96,7 @@ import { UserApi } from 'src/api/user'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import listFollowers from 'src/components/kalpa_lists/followers.vue'
 import listFollowing from 'src/components/kalpa_lists/following.vue'
+import viewEmpty from 'src/layouts/view_empty'
 
 import navHeader from './nav_header.vue'
 import navTabs from './nav_tabs.vue'
@@ -97,7 +107,8 @@ export default {
     navHeader,
     navTabs,
     listFollowers,
-    listFollowing
+    listFollowing,
+    viewEmpty
   },
   data () {
     return {
@@ -105,7 +116,15 @@ export default {
       followersFollowing: null,
       showFollowDialog: false,
       scrollTop: 0,
-      pageId: 'nodes'
+      pageId: 'nodes',
+      viewEmptyParams: {
+        icon: null,
+        title: null,
+        message: null,
+        button: false,
+        name: null,
+        clickPath: '/workspace',
+      },
     }
   },
   computed: {
@@ -154,6 +173,18 @@ export default {
     }
   },
   watch: {
+    pageId: {
+      immediate: true,
+      handler (to, from) {
+        switch (to) {
+          case 'nodes' :
+            this.icon = 'icon1'
+            this.viewEmptyIcon = 'icon1'
+            break
+          default: throw new Error('bad pageId' + to)
+        }
+      }
+    },
     '$route.params.oid': {
       immediate: true,
       async handler (to, from) {

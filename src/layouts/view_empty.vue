@@ -17,7 +17,7 @@ div(
        span.text-white.text-h6.q-mb-sm  {{title}}
        span.text-white.full-width  {{message}}
       .row.full-width.justify-center.q-pt-md
-        q-btn(
+        q-btn(v-if="button"
           outline color="white" no-caps
         :style=`{
           height: '50px',
@@ -33,6 +33,7 @@ div(
 export default {
   name: 'view_empty',
   props: {
+    button: {type: Boolean, default: false},
     icon: {type: String},
     title: {type: String},
     message: {type: String},
