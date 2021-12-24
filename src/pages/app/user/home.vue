@@ -81,7 +81,7 @@ kalpa-layout
               :layout="item.type && item.type.in('NODE', 'JOINT', 'BLOCK') ? 'card' : 'line'"
               :scrolling="scrolling").q-pb-xl
           template(v-slot:nodata)
-            view-empty(
+            nodata-guard(
               :button="true"
               icon="icon"
               title="Здесь пока ничего нет"
@@ -96,7 +96,7 @@ import { UserApi } from 'src/api/user'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import listFollowers from 'src/components/kalpa_lists/followers.vue'
 import listFollowing from 'src/components/kalpa_lists/following.vue'
-import viewEmpty from 'src/components/kalpa_guard/nodata_guard'
+import nodataGuard from 'src/components/kalpa_guard/nodata_guard'
 
 import navHeader from './nav_header.vue'
 import navTabs from './nav_tabs.vue'
@@ -108,7 +108,7 @@ export default {
     navTabs,
     listFollowers,
     listFollowing,
-    viewEmpty
+    nodataGuard
   },
   data () {
     return {
