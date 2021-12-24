@@ -19,7 +19,7 @@ kalpa-layout()
 </template>
 
 <script>
-import viewGuest from 'src/layouts/view_guest.vue'
+import viewGuest from 'src/components/kalpa_guard/view_guest.vue'
 
 export default {
   name: 'pageApp_settings',

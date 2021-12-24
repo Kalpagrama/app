@@ -77,7 +77,7 @@ import widgetContents from './widget_contents/index.vue'
 import widgetWatchLater from './widget_watch_later/index.vue'
 import widgetHistory from './widget_history/index.vue'
 import widgetUpload from './widget_upload/index.vue'
-import viewGuest from 'src/layouts/view_guest.vue'
+import viewGuest from 'src/components/kalpa_guard/view_guest.vue'
 
 export default {
   name: 'pageHome',

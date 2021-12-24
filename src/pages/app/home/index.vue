@@ -71,7 +71,7 @@ kalpa-layout
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import listFeedCustomHorizontalPPV from 'src/components/list_feed/list_feed_horizontal_custom_ppv.vue'
-import viewGuest from 'src/layouts/view_guest.vue';
+import viewGuest from 'src/components/kalpa_guard/view_guest.vue';
 
 export default {
   name: 'feeds_feed',
