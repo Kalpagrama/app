@@ -23,6 +23,7 @@ let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnu
 
 const synchroTimeDefault = 1000 * 60 * 1 // раз в 1 минут шлем изменения на сервер
 // const synchroTimeDefault = 1000 * 10 // раз в 1 минут шлем изменения на сервер
+if (synchroTimeDefault < 1000 * 60 * 1) logE('TODO increase synchroTimeDefault')
 // logE('synchroTimeDefault!!! 1000 * 10')
 class WaitBreakable {
    constructor (ms) {
@@ -302,26 +303,6 @@ class Workspace {
          }
          await rxdb.set(RxCollectionEnum.META, { id: 'wsSynchroDate', valueString: (new Date()).toISOString() })
       }
-      // отправить изменения на сервер
-      // const saveToServer = async (wsOperationEnum, item, wsRevision, wsVersion) => {
-      //    assert(item && item.id, '!item')
-      //    assert(wsRevision, '!wsRevision')
-      //    assert(this.created, '!this.created')
-      //    assert(!('hasChanges' in item), '!!(hasChanges in item)')
-      //    const f = saveToServer
-      //    logD(f, `start ${item.id} rev:${item.rev}`)
-      //    const t1 = performance.now()
-      //    assert(wsOperationEnum in WsOperationEnum, 'bad operation' + wsOperationEnum)
-      //    if (wsOperationEnum === WsOperationEnum.UPSERT) {
-      //       await WorkspaceApi.wsItemUpsert(item, wsRevision, wsVersion)
-      //    } else {
-      //       if (item.rev) { // если нет rev - то элемент еще не создавался на сервере
-      //          await WorkspaceApi.wsItemDelete(item, wsRevision, wsVersion)
-      //       }
-      //    }
-      //    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
-      // }
-
       const clearTrash = async () => {
          await rxdbOperationProxy(this.db.ws_items, 'find', {
             selector: { deletedAt: { $gt: 0 } },
@@ -370,7 +351,7 @@ class Workspace {
          this.synchroLoopWaitObj.setTimeout(synchroTimeDefault)
       } catch (err) {
          if (err.networkError) { // если ошибка не сетевая - увеличить интервал
-            logD(f, 'неудачная попытка отправить данные на сервер. проблемы сети. попоробуем позже...', err)
+            logT(f, 'неудачная попытка отправить данные на сервер. проблемы сети. попоробуем позже...', err)
             this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeDefault * 10))
             await rxdbOperationProxyExec(this.db.ws_changes, 'bulkInsert', unsavedItems)// вставляем обратно
          } else {
@@ -395,7 +376,7 @@ class Workspace {
    async processEvent (event) {
       const f = this.processEvent
       const t1 = performance.now()
-      logD(f, 'start')
+      logT(f, 'start', event)
       let { type, wsItem: itemServer, wsRevision } = event
       assert(this.created, '!this.created')
       assert(this.reactiveUser, '!this.reactiveUser') // почему я получил этот эвент, если я гость???

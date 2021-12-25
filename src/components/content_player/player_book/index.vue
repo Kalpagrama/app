@@ -454,7 +454,7 @@ export default {
       }
       this.tmpDraftEpubCfis = []
       for (let draft of this.findDraftsRes.items) {
-        this.$logW('draft item=', draft)
+        this.$logD('draft item=', draft)
         let { name, items, color } = draft
         color = color || 'grey'
         let draftEpubCfi = items[0].layers[0].figuresAbsolute[0].epubCfi
