@@ -35,6 +35,15 @@
           :mode="mode"
           @item="bookmarkSelectHandle"
         ).q-mb-sm
+      template(v-slot:nodata)
+        nodata-guard(
+          :button="nodataGuardParams.button"
+          :icon="nodataGuardParams.icon"
+          :title="nodataGuardParams.title"
+          :message="nodataGuardParams.message"
+          :buttonName="nodataGuardParams.buttonName"
+          :clickPath="nodataGuardParams.clickPath"
+        )
 </template>
 
 <script>
@@ -42,6 +51,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
+import nodataGuard from 'src/components/kalpa_guard/nodata_guard'
 
 export default {
   name: 'listPublished',
@@ -56,7 +66,8 @@ export default {
   },
   components: {
     bookmarkListItem,
-    bookmarkEditor
+    bookmarkEditor,
+    nodataGuard
   },
   data () {
     return {
@@ -91,11 +102,50 @@ export default {
   computed: {
     pages () {
       return [
-        { id: 'all', name: this.$t('All') },
-        { id: 'nodes', name: this.$t('Nodes') },
-        { id: 'joints', name: this.$t('Joints') },
-        { id: 'blocks', name: this.$t('Blocks') }
+        { id: 'all',
+          name: this.$t('All'),
+          nodataGuardParams: {
+            icon: 'adjust',
+            button: true,
+            message: this.$t('Всё что Вы опубликуете появится здесь'),
+            buttonName: this.$t('Создать что-нибудь'),
+            title: this.$t('Здесь пока ничего нет'),
+            clickPath: '/workspace',
+          }},
+        { id: 'nodes',
+          name: this.$t('Nodes'),
+          nodataGuardParams: {
+            icon: 'adjust',
+            button: true,
+            message: this.$t('Смысловые ядра кторые Вы опубликуете появятся здесь'),
+            buttonName: this.$t('Создать ядро'),
+            title: this.$t('Здесь пока ничего нет'),
+            clickPath: '/workspace',
+          }},
+        { id: 'joints',
+          name: this.$t('Joints'),
+          nodataGuardParams: {
+            icon: 'fas fa-link',
+            button: false,
+            message: this.$t('Связи кторые Вы опубликуете появятся здесь'),
+            buttonName: this.$t('Создать ядро'),
+            title: this.$t('Здесь пока ничего нет'),
+            clickPath: '/workspace',
+          }},
+        { id: 'blocks',
+          name: this.$t('Blocks'),
+          nodataGuardParams: {
+            icon: 'dashboard_customize',
+            button: true,
+            message: this.$t('Смысловые блоки кторые Вы опубликуете появятся здесь'),
+            buttonName: this.$t('Создать смысловой блок'),
+            title: this.$t('Здесь пока ничего нет'),
+            clickPath: '/workspace/edit?mode=block',
+          }},
       ].filter(p => !this?.pageFilter?.whiteList || this?.pageFilter?.whiteList.includes(p.id))
+    },
+    nodataGuardParams() {
+      return this.pages.find(page => page.id === this.pageId).nodataGuardParams
     },
     query () {
       let res = {

@@ -40,18 +40,26 @@ kalpa-layout
               :notificationIndex="itemIndex"
               :isActive="isActive"
               :isVisible="isVisible").q-mb-sm
+          template(v-slot:nodata)
+            nodata-guard(
+              icon="notifications"
+              title="Здесь пока ничего нет"
+              message="Уведомления о активности появятся здесь"
+            )
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import notificationItem from './notification_item.vue'
 import guestGuard from 'src/components/kalpa_guard/guest_guard.vue';
+import nodataGuard from 'src/components/kalpa_guard/nodata_guard'
 
 export default {
   name: 'pageApp__notifications',
   components: {
     notificationItem,
     guestGuard,
+    nodataGuard,
   },
   data () {
     return {

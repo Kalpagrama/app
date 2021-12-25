@@ -1,3 +1,4 @@
+// Компонент отображающий пояснение что будет находиться в списке, если там пока ничего нет
 <template lang="pug">
 div(
   :style=`{
@@ -6,9 +7,10 @@ div(
   ).row.full-width.justify-center.q-mb-lg
     div(
       :style=`{
+      backgroundColor: backgroundColor,
       maxWidth: $store.state.ui.pageWidth+'px',
       borderRadius: '10px',
-    }`).row.full-width.items-center.content-center.justify-center.b-35.q-pa-md
+    }`).row.full-width.items-center.content-center.justify-center.q-pa-md
       .row.full-width.justify-center
         q-icon(:name="icon" color="grey-8" size="100px")
       div(
@@ -39,6 +41,7 @@ export default {
     message: {type: String},
     buttonName: {type: String},
     clickPath: {type: String},
+    backgroundColor: {type: String, default: 'rgba(35,35,35,1)'},
   },
 }
 </script>

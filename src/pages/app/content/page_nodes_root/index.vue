@@ -16,6 +16,13 @@
         }`
         @ready="listFeedReady")
         //- template(v-slot:prepend)
+        template(v-slot:nodata)
+          nodata-guard(
+            icon="adjust"
+            :title="$t('Здесь пока ничего нет')"
+            :message="$t('Создайте смысловое ядро и оно появится здесь')"
+            backgroundColor="rgba(35,35,35,0)"
+          )
         template(v-slot:item=`{item:group,itemIndex,isActive,isVisible,isPreload, scrolling}`)
           div(
             :style=`{
@@ -60,10 +67,14 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import nodataGuard from 'src/components/kalpa_guard/nodata_guard'
 
 export default {
   name: 'pageNodes',
   props: ['contentKalpa', 'player'],
+  components: {
+    nodataGuard,
+  },
   data () {
     return {
     }
