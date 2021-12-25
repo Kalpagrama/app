@@ -47,12 +47,30 @@ kalpa-layout
             .row.full-width
               div(v-if="pageId === 'contents'").q-pb-md
               div(v-else).q-pb-xl
+          template(v-slot:nodata)
+            nodata-guard(
+              :button="nodataGuardParams.button"
+              :icon="nodataGuardParams.icon"
+              :title="nodataGuardParams.title"
+              :message="nodataGuardParams.message"
+              :buttonName="nodataGuardParams.buttonName"
+              :clickPath="nodataGuardParams.clickPath"
+            )
+              template(v-slot:footer)
+                q-btn(v-if="pageId === 'nodes'"
+                outline color="white"
+                no-caps
+                :style=`{height: '50px', minWidth: '200px',}`
+                @click="itemEditorShow=true"
+                )
+                  h1.text-white {{ nodataGuardParams.buttonName }}
 </template>
 
 //  @item="$go('/content/'+item.oid)
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import navMobile from 'src/components/kalpa_menu_mobile/nav_mobile.vue'
+import nodataGuard from 'src/components/kalpa_guard/nodata_guard'
 
 import pageHeader from './page_header.vue'
 import { ObjectTypeEnum } from 'src/system/common/enums'
@@ -61,7 +79,8 @@ export default {
   name: 'pageApp__sphere',
   components: {
     pageHeader,
-    navMobile
+    navMobile,
+    nodataGuard,
   },
   data () {
     return {
@@ -89,13 +108,52 @@ export default {
       return [
         // { id: 'all', name: this.$t('All') },
         // {id: 'contents', name: this.$t('Media')},
-        { id: 'nodes', name: this.$t('Nodes') },
-        { id: 'joints', name: this.$t('Joints') },
-        { id: 'blocks', name: this.$t('Blocks') },
-        { id: 'contents', name: this.$t('Контент') }
+        { id: 'nodes',
+          name: this.$t('Nodes'),
+          nodataGuardParams: {
+            icon: 'adjust',
+            button: false,
+            message: this.$t('Создайте смысловое ядро связанное с этим смыслом  и оно отобразится здесь'),
+            buttonName: this.$t('Создать ядро'),
+            title: this.$t('Здесь пока ничего нет'),
+            clickPath: '/workspace',
+          }},
+        { id: 'joints',
+          name: this.$t('Joints'),
+          nodataGuardParams: {
+            icon: 'fas fa-link',
+            button: false,
+            message: this.$t('Создайте связь связанную с этим смыслом и она отобразится здесь'),
+            // buttonName: this.$t('Создать ядро'),
+            title: this.$t('Здесь пока ничего нет'),
+            // clickPath: '/workspace',
+          }},
+        { id: 'blocks',
+          name: this.$t('Essence blocks'),
+          nodataGuardParams: {
+            icon: 'dashboard_customize',
+            button: true,
+            message: this.$t('Создайте смысловой блок связанный с этим смыслом и он отобразится здесь'),
+            buttonName: this.$t('Создать смысловой блок'),
+            title: this.$t('Здесь пока ничего нет'),
+            clickPath: '/workspace/edit?mode=block',
+          }},
+        { id: 'contents',
+          name: this.$t('Контент'),
+          nodataGuardParams: {
+            icon: 'select_all',
+            button: true,
+            message: this.$t('Добавьте контент связанный с этим смыслом и он отобразится здесь'),
+            buttonName: this.$t('Добавить'),
+            title: this.$t('Здесь пока ничего нет'),
+            clickPath: '/workspace',
+          }},
         // {id: 'spheres', name: this.$t('Spheres')},
         // {id: 'users', name: this.$t('Users')}
       ]
+    },
+    nodataGuardParams() {
+      return this.pages.find(page => page.id === this.pageId).nodataGuardParams
     },
     query () {
       let objectTypes

@@ -28,6 +28,7 @@ div(
           @click="$go(clickPath)"
         )
           h1.text-white {{ buttonName }}
+        slot(name="footer")
       //div(:style=`{minHeight: '80px'}`).row.full-width.justify-center.q-pt-md
 </template>
 
