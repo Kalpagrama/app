@@ -20,6 +20,13 @@ div(
       q-btn(
         @click="player.forward(false)"
         round flat  color="white" icon="replay_5").col
+        q-tooltip(
+          anchor="center left"
+          self="center right"
+          :offset="[10, 10]"
+          transition-show="jump-left"
+          transition-hide="jump-up"
+        ) {{$t('- 5 сек')}}
       q-btn(
         @click="player.playing ? player.pause() : player.play()"
         round flat color="white").col
@@ -29,6 +36,13 @@ div(
       q-btn(
         @click="player.forward(true)"
         round flat  color="white" icon="forward_5").col
+        q-tooltip(
+          anchor="center right"
+          self="center left"
+          :offset="[10, 10]"
+          transition-show="jump-right"
+          transition-hide="jump-up"
+        ) {{$t('+ 5 сек')}}
   //- controls for figures
   figures-controls(
     v-if="player.nodeMode === 'edit'"
@@ -39,6 +53,13 @@ div(
     v-if="player.nodeMode !== 'edit'"
     @click="nodeCreate()"
     round flat color="green" icon="add_circle_outline")
+    q-tooltip(
+      anchor="center left"
+      self="center right"
+      :offset="[10, 10]"
+      transition-show="jump-left"
+      transition-hide="jump-up"
+      ) {{$t('Создать ядро')}}
   //- destroy player.figure
   q-btn(
     v-if="player.node && player.nodeMode === 'edit'"
