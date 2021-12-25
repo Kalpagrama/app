@@ -10,7 +10,7 @@ q-layout(
   q-dialog(
     v-model="kalpaTutorialShow"
     maximized
-    position="bottom")
+    position="standard")
     kalpa-tutorial(
       :tutorialId="noticeName"
       @close="kalpaTutorialShow = null")
