@@ -29,7 +29,7 @@ class Event {
    async processEvent (event, store) {
       assert(event && store, 'event && store')
       const f = this.processEvent
-      logD(f, 'start', event)
+      logT(f, 'start', event)
       const t1 = performance.now()
 
       if (event.type === 'BATCH_EVENTS') {
@@ -70,9 +70,11 @@ class Event {
                eventBus.$emit('event-progress', event)
                break
             case 'NOTICE':
+               notify('info', event.message)
                break
             case 'OBJECT_CHANGED':
                await this.objects.processEvent(event)
+               eventBus.$emit('event-object-changed', event)
                break
             case 'OBJECT_CREATED':
                await this.objects.processEvent(event) // обновить  статистику на ядре

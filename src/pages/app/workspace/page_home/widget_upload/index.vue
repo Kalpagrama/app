@@ -105,7 +105,7 @@ export default {
           isSubscribed: true
         }
         if (contentKalpa.contentAuthor && contentKalpa.contentAuthor.oid === this.$store.getters.currentUser.oid){
-          bookmark = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, bookmarkInput)
+          // бэкенд сам добавляет в "мой контент"
         } else {
           bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
         }
