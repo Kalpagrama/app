@@ -1,5 +1,14 @@
 <template lang="pug">
 .row.full-width.justify-center
+  q-dialog(
+    v-model="contentCardEditorShow"
+    :maximized="$q.screen.xs"
+    @hide="")
+    content-card-editor(
+      v-if="createdContent"
+      :showBottomMenu="false"
+      :contentOid="createdContent.oid"
+      @close="contentCardEditorShow = false, this.$router.replace('/workspace/contents/')")
   div(
     :style=`{
       position: 'relative',
@@ -110,11 +119,14 @@
 
 <script>
 import imageCropper from 'src/components/image_cropper/index.vue'
+import contentCardEditor from 'src/components/kalpa_item/item_card/editor/content.vue'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { ContentApi } from 'src/api/content'
 import { UserApi } from 'src/api/user'
 
 import nodeEditor from 'src/pages/app/content/node_creator/node_editor/index.vue'
+import { assert } from 'src/system/common/utils'
+import { ObjectTypeEnum } from 'src/system/common/enums'
 
 export default {
   name: 'fromImage',
@@ -122,6 +134,7 @@ export default {
   components: {
     imageCropper,
     nodeEditor,
+    contentCardEditor
   },
   data () {
     return {
@@ -129,12 +142,21 @@ export default {
       src: null,
       srcBlob: null,
       stage: 'idle', // idle, editing, essence, (uploading, publishing, loading)
-      figure: [{t: null, points: []}]
+      figure: [{t: null, points: []}],
+      progressValue: 0,
+      createdContent: null,
+      contentCardEditorShow: false,
     }
   },
-  computed: {
-    uploadContentConfirmMessage () {
-      return 'Загружая изображение, оно будет доступно всем в сети Кальпаграма, согласны ?'
+  watch: {
+    createdContent: {
+      deep: true,
+      async handler(to) {
+        if (to.primaryOid) { // загрузили, а в системе уже есть такой...
+          this.$notify('info', this.$t('Такой контент уже загружен ранее.\nПереходим на существующий.'))
+          await this.$router.replace('/content/' + to.primaryOid)
+        }
+      }
     }
   },
   methods: {
@@ -157,29 +179,35 @@ export default {
       // let confirmed = confirm(this.uploadContentConfirmMessage)
       // if (!confirmed) return
       // get contentKalpa by file
-      let contentKalpa = await ContentApi.contentCreateFromFile(this.file)
-      this.$log('contentKalpa', contentKalpa)
-      // check bookmark with contentKalpa.oid
-      let {items: [content]} = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_CONTENT, oid: contentKalpa.oid}})
-      if (!content) { // create bookmark
-        let contentInput = {
-          type: 'IMAGE',
-          oid: contentKalpa.oid,
-          name: '',
-          thumbUrl: contentKalpa.thumbUrl,
-        }
-        this.$log('contentInput', contentInput)
-        // create
-        content = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, contentInput)
-        this.$log('content', content)
-      }
-      // go to this content...
-      await this.$router.push('/content/' + contentKalpa.oid)
-      // this.$router.push('/workspace/contents')
+      this.createdContent = await ContentApi.contentCreateFromFile(this.file)
+      this.contentCardEditorShow = true
+      // бэкенд сам вставит в мастерскую WS_CONTENT и пришлет события о создании контента
     },
     nodePublish () {
       this.$log('nodePublish')
+    },
+    async onCreateEvent(event) {
+      assert(event && event.object)
+      // событие о создании приходит до того как отработает contentCreateFromFile
+      if (event.object.type === ObjectTypeEnum.IMAGE){
+        this.createdContent = await this.$rxdb.get(RxCollectionEnum.OBJ, event.object.oid) // получим полный созданный объект\
+        this.contentCardEditorShow = true
+      }
+    },
+    onProgressEvent(event) {
+      this.$log('onProgressEvent', 'event', event)
+      this.progressValue = event.progress
     }
+  },
+  mounted () {
+    this.$log('mounted')
+    this.$eventBus.$on('event-object-created', this.onCreateEvent)
+    this.$eventBus.$on('event-progress', this.onProgressEvent)
+  },
+  beforeUnmount () {
+    this.$log('beforeDestroy')
+    this.$eventBus.$off('event-object-created', this.onCreateEvent)
+    this.$eventBus.$off('event-progress', this.onProgressEvent)
   }
 }
 </script>

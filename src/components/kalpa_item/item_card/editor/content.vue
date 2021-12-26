@@ -264,7 +264,7 @@ import { ObjectTypeEnum } from '../../../../system/common/enums';
 import { ContentApi } from 'src/api/content'
 
 export default {
-  name: 'videoEditor',
+  name: 'contentCardEditor',
   props: {
     contentOid: { type: String, required: true },
     showBottomMenu: { type: Boolean, default: true }
@@ -327,11 +327,11 @@ export default {
       return res
     },
     previewUrl () {
-      let res = this.contentCopy.previewUrlWithFormats.length ? this.contentCopy.previewUrlWithFormats[0].url : null
+      let res = this.contentCopy.previewUrlWithFormats && this.contentCopy.previewUrlWithFormats.length ? this.contentCopy.previewUrlWithFormats[0].url : null
       return res
     },
     previewUrlOrig () {
-      let res = this.content.previewUrlWithFormats.length ? this.content.previewUrlWithFormats[0].url : null
+      let res = this.content.previewUrlWithFormats && this.content.previewUrlWithFormats.length ? this.content.previewUrlWithFormats[0].url : null
       return res
     }
   },
