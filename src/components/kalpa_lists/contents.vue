@@ -103,12 +103,12 @@ export default {
     }
   },
   watch: {
-    '$route.params.contentOid': {
+    '$route.params.pageId': {
       immediate: true,
       handler(to) {
         if (to) {
-          this.contentCardEditorContentOid = to
-          this.contentCardEditorShow = true
+          assert(to.in('video', 'book', 'image'))
+          this.pageId = to
         }
       }
     }

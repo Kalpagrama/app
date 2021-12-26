@@ -8,7 +8,7 @@
       v-if="createdContent"
       :showBottomMenu="false"
       :contentOid="createdContent.oid"
-      @close="contentCardEditorShow = false, this.$router.replace('/workspace/contents/')")
+      @close="contentCardEditorShow = false, this.$router.replace('/workspace/contents/video')")
   div( :style=`{ maxWidth: $store.state.ui.pageWidth+'px' }`).row.full-width.q-mt-sm
     video(
       controls
