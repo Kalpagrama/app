@@ -105,7 +105,7 @@ div(
             ).full-width
             span.text-bold {{ $t('Next') }}
           q-btn(
-            v-if="pageId === 'node-editor'"
+            v-if="pageId === 'node-editor' && !$store.state.ui.userTyping"
             flat color="green" no-caps
             :style=`{
               height: '44px',
