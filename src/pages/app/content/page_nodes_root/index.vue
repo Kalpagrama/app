@@ -22,6 +22,7 @@
             :title="$t('Здесь пока ничего нет')"
             :message="$t('Создайте смысловое ядро и оно появится здесь')"
             backgroundColor="rgba(35,35,35,0)"
+            iconColor="grey"
           )
         template(v-slot:item=`{item:group,itemIndex,isActive,isVisible,isPreload, scrolling}`)
           div(

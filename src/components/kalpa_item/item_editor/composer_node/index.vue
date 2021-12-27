@@ -24,8 +24,9 @@ div(
     slot(name="name")
     .row.full-width
       q-menu(v-model="showTooltip" no-focus anchor="top left" self="bottom left" dark).transparent
-        div(:style=`{height: compositionHeight + 'px', width: compositionWidth + 'px'}`).row.content-end
-          sphere-hints(:name="node.name", @click="node.name = $event" :style=`{maxHeight: compositionHeight + 'px', maxWidth: compositionWidth + 'px'}`)
+        div(:style=`{height: compositionHeight + 'px', width: compositionWidth + 'px'}`).row.content-end.q-px-md
+          transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+            sphere-hints(:name="node.name", @click="node.name = $event" :style=`{maxHeight: compositionHeight + 'px', maxWidth: compositionWidth + 'px'}`)
     q-input(
       v-if="showName"
       v-model="node.name"

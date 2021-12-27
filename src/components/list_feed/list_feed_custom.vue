@@ -89,7 +89,7 @@ div(
     div(:style=`{ position: 'sticky', top: '0px', zIndex: 100}`).row.full-width
       q-resize-observer(@resize="stickyHeaderHeight = $event.height")
       slot(name="sticky-header")
-    div(v-if="itemsRes && !length").row.full-width
+    div(v-if="itemsRes && length <= 2").row.full-width
       slot(name="nodata")
     //- items
     div(

@@ -12,7 +12,7 @@ div(
       borderRadius: '10px',
     }`).row.full-width.items-center.content-center.justify-center.q-pa-md
       .row.full-width.justify-center
-        q-icon(:name="icon" color="grey-8" size="100px")
+        q-icon(:name="icon" :color="iconColor" size="100px")
       div(
        :style=`{textAlign: 'center'}`
       ).row.full-width.justify-center
@@ -34,10 +34,11 @@ div(
 
 <script>
 export default {
-  name: 'view_empty',
+  name: 'nodata_guard',
   props: {
     button: {type: Boolean, default: false},
     icon: {type: String},
+    iconColor: {type: String, default: 'grey-8'},
     title: {type: String},
     message: {type: String},
     buttonName: {type: String},

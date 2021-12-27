@@ -17,6 +17,7 @@
       icon="filter_tilt_shift"
       :title="$t('Здесь пока ничего нет')"
       :message="$t('Всё что Вы сохраните в заметки появится здесь')"
+      iconColor="grey"
       backgroundColor="rgba(35,35,35,0)"
     )
     div(

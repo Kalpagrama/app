@@ -6,9 +6,9 @@
 </style>
 
 <template lang="pug">
-div(v-if="name && selectedSphereName !== name").row.full-width.scroll-y.q-pt-xs
+div(v-if="spheresAutocomplete.length && name && selectedSphereName !== name").row.full-width.scroll-y.q-pt-xs
   span(v-for="(s,si) in spheresAutocomplete" :key="s.id" @click="selectedSphereName=s.name, $emit('click', s.name)"
-    ).hint-item.cursor-pointer.text-grey-8.ellipsis.q-px-sm.q-mr-sm.q-mb-xs.bg.br-5 {{s.name}}
+    ).hint-item.cursor-pointer.text-grey-1.ellipsis.q-px-sm.q-mr-sm.q-mb-xs.br-5.b-100 {{s.name}}
 </template>
 
 <script>
@@ -27,25 +27,36 @@ export default {
   },
   watch: {
     name: {
+      immediate: true,
       async handler (to) {
-        if (to && to !== this.selectedSphereName) this.fillSpheresAutoCompleteDebounced(to)
+        this.$logT('name changed', to)
+        if (to && to !== this.selectedSphereName) this.fillSpheresAutoComplete(to)
       }
     }
   },
+  methods: {
+    fillSpheresAutoComplete(name) {
+      if (!this.fillSpheresAutoCompleteDebounced){
+        this.fillSpheresAutoCompleteDebounced = debounce(async (name) => {
+          // this.$logT('fillSpheresAutoCompleteDebounced', name)
+          let searchRegex = new RegExp(name, 'i');
+          let spheresRes = await this.$rxdb.find({
+            selector: {
+              rxCollectionEnum: RxCollectionEnum.WS_SPHERE,
+              name: { $regex: searchRegex }
+            },
+            sort: [{ hitCnt: 'desc' }],
+            limit: 100
+          })
+          this.spheresAutocomplete = spheresRes.items
+          this.$logT('this.spheresAutocomplete=' + this.spheresAutocomplete.length)
+        }, 300)
+      }
+      return this.fillSpheresAutoCompleteDebounced(name)
+    }
+  },
   mounted () {
-    this.$log('mounted')
-    this.fillSpheresAutoCompleteDebounced = debounce(async (name) => {
-      let searchRegex = new RegExp(name, 'i');
-      let spheresRes = await this.$rxdb.find({
-        selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_SPHERE,
-          name: { $regex: searchRegex }
-        },
-        sort: [{ hitCnt: 'desc' }],
-        limit: 100
-      })
-      this.spheresAutocomplete = spheresRes.items
-    }, 300)
+    this.$logT('mounted', this.name)
   }
 }
 </script>

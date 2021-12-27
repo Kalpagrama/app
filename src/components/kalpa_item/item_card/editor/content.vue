@@ -174,9 +174,9 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
             minHeight: '30px',
             textAlign: 'center',
             }`).row.b-45.q-mr-sm.q-mb-sm.q-px-md
-            template(v-slot="append")
-              .row.content-center.items-center.q-pl-xs
-                q-icon(name="link" color="grey-5" size="sm" )
+            //template(v-slot="append")
+            //  .row.content-center.items-center.q-pl-xs
+            //    q-icon(name="link" color="grey-5" size="sm" )
       .row.full-width.justify-start.q-pl-sm
         .row.full-width.justify-start.content-center.items-center.q-mb-sm
           q-toggle(
