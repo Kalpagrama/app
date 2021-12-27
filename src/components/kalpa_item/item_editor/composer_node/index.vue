@@ -22,9 +22,6 @@ div(
       q-resize-observer(@resize="compositionHeight = $event.height, compositionWidth = $event.width, $logT('$event=', $event)")
     //- NAME: dynamic link/ dynamic fontSize
     slot(name="name")
-    //.row.full-width
-    //  q-menu(v-model="showTooltip" no-focus anchor="top left" self="bottom left" dark :max-width="compositionWidth + 'px'" :max-height="compositionHeight + 'px'").transparent
-    //    sphere-hints(:name="node.name", @click="node.name = $event" :style=`{height: compositionHeight/1.5 + 'px'}`)
     .row.full-width
       q-menu(v-model="showTooltip" no-focus anchor="top left" self="bottom left" dark).transparent
         div(:style=`{height: compositionHeight + 'px', width: compositionWidth + 'px'}`).row.content-end
