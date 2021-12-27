@@ -16,13 +16,15 @@ div(
     essence-header(
       v-if="showHeader && node.oid"
       :essence="node"
-      :showAuthorAlways="showAuthorAlways"
-      :style=`{
-    }`)
-    composition-editor(:style=`{maxHeight: '40vh'}` :node="node" :isActive="isActive" :isVisible="isVisible")
+      :showAuthorAlways="showAuthorAlways")
+    .row.full-width
+      composition-editor(:style=`{maxHeight: '40vh'}` :node="node" :isActive="isActive" :isVisible="isVisible")
+      q-resize-observer(@resize="compositionHeight = $event.height, compositionWidth = $event.width, $logT('$event=', $event)")
     //- NAME: dynamic link/ dynamic fontSize
     slot(name="name")
-    sphere-hints(:name="node.name", @click="node.name = $event").b-40
+    .row.full-width
+      q-menu(v-model="showTooltip" no-focus anchor="top left" self="bottom left" dark :max-width="compositionWidth + 'px'" :max-height="compositionHeight + 'px'").transparent
+        sphere-hints(:name="node.name", @click="node.name = $event" :style=`{height: compositionHeight/1.5 + 'px'}`)
     q-input(
       v-if="showName"
       v-model="node.name"
@@ -98,11 +100,19 @@ export default {
   },
   data () {
     return {
+      showTooltip: false,
+      compositionHeight: 0,
+      compositionWidth: 0,
       node: null,
       publishing: false,
     }
   },
   watch: {
+    'node.name': {
+      handler(to) {
+        this.showTooltip = !!to
+      }
+    },
     item: {
       immediate: true,
       handler(to) {

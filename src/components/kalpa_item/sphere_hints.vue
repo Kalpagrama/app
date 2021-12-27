@@ -6,7 +6,7 @@
 </style>
 
 <template lang="pug">
-div(v-if="name && selectedSphereName !== name" :style=`{maxHeight: '63px'}`).row.full-width.scroll-y.q-pt-xs
+div(v-if="name && selectedSphereName !== name").row.full-width.scroll-y.q-pt-xs
   span(v-for="(s,si) in spheresAutocomplete" :key="s.id" @click="selectedSphereName=s.name, $emit('click', s.name)"
     ).hint-item.cursor-pointer.text-grey-8.ellipsis.q-px-sm.q-mr-sm.q-mb-xs.bg.br-5 {{s.name}}
 </template>
