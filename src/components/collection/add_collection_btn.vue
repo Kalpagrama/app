@@ -75,7 +75,7 @@ export default {
       this.$emit('collection-select', this.modelValue.wsSphereId)
     },
     async removeCollection (id) {
-      await this.$rxdb.remove(id)
+      await this.$rxdb.remove(id, false)
       if (id === this.modelValue.wsSphereId) this.modelValue.wsSphereId = 'all'
     },
     update(key, modelValue) {
