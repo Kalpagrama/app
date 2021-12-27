@@ -3,14 +3,14 @@
   div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
     //- bookmark editor
     q-dialog(
-      v-model="videoEditorShow"
+      v-model="contentCardEditorShow"
       :maximized="$q.screen.xs"
-      @hide="videoEditorContentOid = null, $router.replace('/workspace/contents')")
-      video-editor(
-        v-if="videoEditorContentOid"
+      @hide="contentCardEditorContentOid = null, $router.replace('/workspace/contents')")
+      content-card-editor(
+        v-if="contentCardEditorContentOid"
         :showBottomMenu="false"
-        :contentOid="videoEditorContentOid"
-        @close="videoEditorShow = false, videoEditorContentOid = null")
+        :contentOid="contentCardEditorContentOid"
+        @close="contentCardEditorShow = false, contentCardEditorContentOid = null")
     tab-list-feed(
       :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
       :navHeaderText="useNavHeader ? $t('Contents') : ''"
@@ -49,7 +49,7 @@
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
-import videoEditor from 'src/components/kalpa_item/item_card/editor/video_editor.vue'
+import contentCardEditor from 'src/components/kalpa_item/item_card/editor/content.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 import widgetUpload from 'src/pages/app/workspace/page_home/widget_upload/index.vue'
 import nodataGuard from 'src/components/kalpa_guard/nodata_guard'
@@ -67,16 +67,16 @@ export default {
   components: {
     bookmarkListItem,
     bookmarkEditor,
-    videoEditor,
+    contentCardEditor,
     widgetUpload,
     nodataGuard,
   },
   data () {
     return {
       pageId: 'video',
-      videoEditorShow: false,
+      contentCardEditorShow: false,
       searchString: '',
-      videoEditorContentOid: null
+      contentCardEditorContentOid: null
     }
   },
   computed: {
@@ -144,12 +144,12 @@ export default {
     }
   },
   watch: {
-    '$route.params.contentOid': {
+    '$route.params.pageId': {
       immediate: true,
       handler(to) {
         if (to) {
-          this.videoEditorContentOid = to
-          this.videoEditorShow = true
+          assert(to.in('video', 'book', 'image'))
+          this.pageId = to
         }
       }
     }
@@ -163,8 +163,8 @@ export default {
       }
       else {
         if (contentKalpa && contentKalpa.contentAuthor && contentKalpa.contentAuthor.oid === this.$store.getters.currentUser.oid) {
-          this.videoEditorContentOid = bookmark.oid
-          this.videoEditorShow = true
+          this.contentCardEditorContentOid = bookmark.oid
+          this.contentCardEditorShow = true
         } else {
           this.$router.push('/content/' + bookmark.oid)
         }
@@ -172,8 +172,8 @@ export default {
     },
     bookmarkOptionsClickHandle (bookmark) {
       assert(bookmark && bookmark.oid)
-      this.videoEditorContentOid = bookmark.oid
-      this.videoEditorShow = true
+      this.contentCardEditorContentOid = bookmark.oid
+      this.contentCardEditorShow = true
     }
   }
 }

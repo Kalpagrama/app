@@ -165,6 +165,7 @@ const videoFragment = gql`${objectFragment} ${objectShortFragment} ${ObjectShort
     subtitlesRus: subtitles(lang: RUS)
     subtitlesEng: subtitles(lang: ENG)
     payInfo{paid, price, paidUsers {...ObjectShortPaidFragment}}
+    primaryOid
   }
 `
 const bookFragment = gql`${objectFragment} ${objectShortFragment} ${ObjectShortPaidFragment}
@@ -183,6 +184,7 @@ const bookFragment = gql`${objectFragment} ${objectShortFragment} ${ObjectShortP
     providerInfo
     urlWithFormats{ format url }
     payInfo{paid, price, paidUsers {...ObjectShortPaidFragment}}
+    primaryOid
   }
 `
 const imageFragment = gql`${objectFragment} ${objectShortFragment} ${ObjectShortPaidFragment}
@@ -200,6 +202,7 @@ const imageFragment = gql`${objectFragment} ${objectShortFragment} ${ObjectShort
     urlWithFormats{ format url }
     urlOriginal
     payInfo{paid, price, paidUsers {...ObjectShortPaidFragment}}
+    primaryOid
   }
 `
 

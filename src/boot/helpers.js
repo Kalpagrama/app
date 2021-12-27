@@ -69,7 +69,7 @@ export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath
   app.config.globalProperties.$nodeItemType = nodeItemType
   app.config.globalProperties.$nodeItemTypesPairs = nodeItemTypesPairs
   // todo убрать эту ф-ю отсюда туда где идет работа с коллекциями
-  app.config.globalProperties.synchronizeSelectedSphereIds = async (selectedSphereIds, bookmark, collectionsModel, rxdb) => {
+  app.config.globalProperties.$synchronizeSelectedSphereIds = async (selectedSphereIds, bookmark, collectionsModel, rxdb) => {
      assert(selectedSphereIds && bookmark && collectionsModel && rxdb)
      if (!bookmark.wsSpheres) bookmark.wsSpheres = []
      let addedSpheres = differenceWith(selectedSphereIds, bookmark.wsSpheres)

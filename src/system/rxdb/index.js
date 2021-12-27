@@ -383,7 +383,7 @@ class RxDBWrapper {
             await mutexGlobal.release('rxdb::processEvent')
          }
       } else {
-         logD(f, 'event ignored', event)
+         logT(f, 'event ignored', event)
       }
    }
 

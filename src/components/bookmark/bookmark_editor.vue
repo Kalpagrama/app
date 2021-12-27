@@ -211,7 +211,7 @@ export default {
     'collectionsModel.selectedSphereIds': {
       deep: true,
       handler(to, from){
-        this.synchronizeSelectedSphereIds(to, this.bookmark, this.collectionsModel, this.$rxdb)
+        this.$synchronizeSelectedSphereIds(to, this.bookmark, this.collectionsModel, this.$rxdb)
       }
     }
   },

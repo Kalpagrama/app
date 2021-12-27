@@ -35,10 +35,11 @@ export default {
   mounted () {
     this.$log('mounted')
     this.fillSpheresAutoCompleteDebounced = debounce(async (name) => {
+      let searchRegex = new RegExp(name, 'i');
       let spheresRes = await this.$rxdb.find({
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_SPHERE,
-          name: { $regex: name }
+          name: { $regex: searchRegex }
         },
         sort: [{ hitCnt: 'desc' }],
         limit: 100

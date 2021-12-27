@@ -59,6 +59,7 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
                   @click="$refs.inputThumb.pickFiles()"
                   flat no-caps color="grey"
                   :ripple="false"
+                  :disable="!content || content.uploadStage === 'BLANK'"
                   :label="$t('Изменить')"
                   :style=`{}`)
           div(v-if="pageId === 'preview'").row.full-width.items-start.content-start.justify-center
@@ -75,7 +76,8 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
                 q-btn(v-if="!rangeModel && !previewUrl"
                   @click="$refs.inputPreview.pickFiles()"
                   flat no-caps color="green" stack
-                :label="$t('Загрузить')"
+                  :disable="!content || content.uploadStage === 'BLANK'"
+                  :label="$t('Загрузить')"
                   icon="add"
                   :style=`{
                     border: '2px solid rgb(60,60,60)'
@@ -83,6 +85,7 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
               .row.full-width.items-start.content-start.justify-center
                 q-btn(v-if="content && !previewUrl && !rangeModel"
                   flat no-caps color="green-8"
+                  :disable="!content || content.uploadStage === 'BLANK'"
                   :label="$t('Выделить диапазон')"
                   @click="rangeModel = {min: 0, max: Math.min(60 * 5, content.duration / 2)}")
                 div(v-if="rangeModel").row.full-width
@@ -261,7 +264,7 @@ import { ObjectTypeEnum } from '../../../../system/common/enums';
 import { ContentApi } from 'src/api/content'
 
 export default {
-  name: 'videoEditor',
+  name: 'contentCardEditor',
   props: {
     contentOid: { type: String, required: true },
     showBottomMenu: { type: Boolean, default: true }
@@ -324,18 +327,15 @@ export default {
       return res
     },
     previewUrl () {
-      let res = this.contentCopy.previewUrlWithFormats.length ? this.contentCopy.previewUrlWithFormats[0].url : null
+      let res = this.contentCopy.previewUrlWithFormats && this.contentCopy.previewUrlWithFormats.length ? this.contentCopy.previewUrlWithFormats[0].url : null
       return res
     },
     previewUrlOrig () {
-      let res = this.content.previewUrlWithFormats.length ? this.content.previewUrlWithFormats[0].url : null
+      let res = this.content.previewUrlWithFormats && this.content.previewUrlWithFormats.length ? this.content.previewUrlWithFormats[0].url : null
       return res
     }
   },
   watch: {
-    'collectionsModel.selectedSphereIds' (to) {
-      this.synchronizeSelectedSphereIds(to, this.bookmark, this.collectionsModel, this.$rxdb)
-    },
     isPaid (to) {
       if (to) this.contentCopy.payInfo.price = 100
       else this.contentCopy.payInfo.price = 0
@@ -343,10 +343,10 @@ export default {
     content: {
       deep: true,
       async handler (to) {
-        this.$log('content changed!', cloneDeep(this.content))
+        // this.$logT('content changed!', cloneDeep(to))
         this.contentCopy = cloneDeep(this.content)
-        this.bookmark.name = this.content.name
-        this.bookmark.thumbUrl = this.content.thumbUrl
+        // if (this.bookmark) this.bookmark.name = this.content.name
+        // if (this.bookmark) this.bookmark.thumbUrl = this.content.thumbUrl
         await this.$nextTick()
       }
     },
@@ -376,13 +376,10 @@ export default {
       this.$log('contentDelete start')
       this.contentDeleting = true
       // await this.$wait(1000)
-      // TODO удалять контент на сервере
+      // TODO удалять контент на сервере. сервер должен удалить контент(разобраться с ядрами), удалить WS_CONTENT, увеличить квоты
       throw new Error('not impl!!!!!!!!!!!!!!!!')
       // eslint-disable-next-line no-unreachable
-      await this.bookmark.remove(true)
       this.contentDeleting = false
-      this.$log('bookmarkDelete done')
-      this.$emit('deleted')
       this.$emit('close')
     },
     async save () {
@@ -442,20 +439,8 @@ export default {
   },
   async mounted () {
     this.$log('mounted', this.contentOid)
-    let { items: [bookmark] } = await this.$rxdb.find({
-      selector: {
-        rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
-        oid: this.contentOid
-      }
-    })
-    this.$log('mounted1', bookmark)
-    assert(bookmark)
-    this.bookmark = bookmark
-    this.collectionsModel.selectedSphereIds = cloneDeep(this.bookmark.wsSpheres) || []
     this.content = await this.$rxdb.get(RxCollectionEnum.OBJ, this.contentOid)
-    this.$log('mounted2', this.content)
     this.$nextTick(() => {
-      this.$logD('this.isPaid = this.content.payInfo.price > 0')
       this.isPaid = this.content.payInfo.price > 0
       this.initialized = true
     })
