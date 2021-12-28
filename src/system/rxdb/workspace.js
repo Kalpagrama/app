@@ -378,11 +378,11 @@ class Workspace {
       const f = this.processEvent
       const t1 = performance.now()
       logT(f, 'start', event)
-      let { type, wsItem: itemServer, wsRevision: wsRevisionServer } = event
+      let { type: typeOperationServer, wsItem: itemServer, wsRevision: wsRevisionServer } = event
       assert(this.created, '!this.created')
       assert(this.reactiveUser, '!this.reactiveUser') // почему я получил этот эвент, если я гость???
       assert(itemServer.id && itemServer.rev, 'assert itemServer !check')
-      assert(type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED' || type === 'WS_ITEM_UPDATED', 'bad ev type')
+      assert(typeOperationServer === 'WS_ITEM_CREATED' || typeOperationServer === 'WS_ITEM_DELETED' || typeOperationServer === 'WS_ITEM_UPDATED', 'bad ev type')
       try {
          await this.lock('rxdb::ws::processEvent')
          itemServer.hasChanges = false
@@ -398,19 +398,19 @@ class Workspace {
          assert(itemServer.wsItemType in RxCollectionEnum, 'itemServer.wsItemType in RxCollectionEnum)')
          let reactiveItem = await rxdb.get(null, null, { id: itemServer.id })
          // применим изменения
-         if (!reactiveItem || type === 'WS_ITEM_DELETED' || reactiveItem.rev + 1 < itemServer.rev || reactiveItem.updatedAt < itemServer.updatedAt) {
-            logD(f, 'Берем изменения с сервера', type)
-            if (reactiveItem && type === 'WS_ITEM_DELETED') {
+         if (!reactiveItem || typeOperationServer === 'WS_ITEM_DELETED' || reactiveItem.rev + 1 < itemServer.rev || reactiveItem.updatedAt < itemServer.updatedAt) {
+            logD(f, 'Берем изменения с сервера', typeOperationServer)
+            if (reactiveItem && typeOperationServer === 'WS_ITEM_DELETED') {
                // logD('try remove ws item', await this.db.ws_items.find({ selector: { id: itemServer.id } }).exec())
                await reactiveItem.updateExtended('hasChanges', false, false, false)// пометим итем как не подлежащий синхронизации (см this.db.ws_items.postRemove)
                await rxdbOperationProxy(this.db.ws_items, 'find', { selector: { id: itemServer.id } }).remove()
-            } else if (type !== 'WS_ITEM_DELETED') {
+            } else if (typeOperationServer !== 'WS_ITEM_DELETED') {
                // logD(f, 'try update ws item')
                assert(!itemServer.hasChanges, 'itemServer.hasChanges')
                await rxdbOperationProxyExec(this.db.ws_items, 'atomicUpsert', itemServer) // itemServer.hasChanges === false (не подлежит синхронизации (см this.db.ws_items.postInsert/postSave))
             }
             await rxdbOperationProxy(this.db.ws_changes, 'find', { selector: { id: itemServer.id } }).remove() // см onCollectionUpdate
-         } else {
+         } else { // это мы отправляли данные на сохнанение. Они сохранились и теперь надо просто обновить ревизию (назначается сервером)
             logD(f, `event проигнорирован (у нас актуальная версия) ${reactiveItem.id} rev: ${reactiveItem.rev}`)
             // просто возьмем ревизию с сервера (нальзя полностью менять данные тк у нас могут быть данные свежее, чем на сервере)
             await reactiveItem.updateExtended('rev', itemServer.rev, false, false) // ревизию назначает сервер. это изменение не попадает в ws_changes (synchro = false)
