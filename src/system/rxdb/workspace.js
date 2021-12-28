@@ -378,7 +378,7 @@ class Workspace {
       const f = this.processEvent
       const t1 = performance.now()
       logT(f, 'start', event)
-      let { type, wsItem: itemServer, wsRevision } = event
+      let { type, wsItem: itemServer, wsRevision: wsRevisionServer } = event
       assert(this.created, '!this.created')
       assert(this.reactiveUser, '!this.reactiveUser') // почему я получил этот эвент, если я гость???
       assert(itemServer.id && itemServer.rev, 'assert itemServer !check')
@@ -387,9 +387,9 @@ class Workspace {
          await this.lock('rxdb::ws::processEvent')
          itemServer.hasChanges = false
          let wsRevisionLocal = parseInt(await rxdb.get(RxCollectionEnum.META, 'wsRevision')) || 0 // версия локальной мастерской
-         await this.reactiveUser.updateExtended('wsRevision', wsRevision, false) // версия мастерской по мнению сервера (сохраняем в this.reactiveUser.wsRevision - нужно для synchronizeWsWhole)
-         if (wsRevisionLocal !== wsRevision && wsRevisionLocal + 1 !== wsRevision) { // мы пропустили некоторые изменения надо синхронизировать всю мастерскую (synchronizeWsWhole)
-            logW(f, `WS expired! wsRevisionLocal=${wsRevisionLocal} wsRevisionServer=${wsRevision}`)
+         await this.reactiveUser.updateExtended('wsRevision', wsRevisionServer, false) // версия мастерской по мнению сервера (сохраняем в this.reactiveUser.wsRevision - нужно для synchronizeWsWhole)
+         if (wsRevisionLocal !== wsRevisionServer && wsRevisionLocal + 1 !== wsRevisionServer) { // мы пропустили некоторые изменения надо синхронизировать всю мастерскую (synchronizeWsWhole)
+            logW(f, `WS expired! wsRevisionLocal=${wsRevisionLocal} wsRevisionServer=${wsRevisionServer}`)
             // здесь нельзя явно вызывать synchronizeWsWhole
             this.synchroLoopWaitObj.break()// форсировать синхронизацию (см synchroLoop)
             return
@@ -416,7 +416,7 @@ class Workspace {
             await reactiveItem.updateExtended('rev', itemServer.rev, false, false) // ревизию назначает сервер. это изменение не попадает в ws_changes (synchro = false)
          }
          // все пришедшие изменения применены. Актуализируем версию локальной мастерской (см synchronizeWsWhole)
-         await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsRevision.toString() })
+         await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsRevisionServer.toString() })
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } finally {
          this.release()
@@ -509,10 +509,11 @@ class Workspace {
 
    // проанализировать wsItem. Вытащить из него все сферы и добавить их в мастерскую
    async updateWsSpheres (wsItemRxDoc) {
-      if (wsItemRxDoc.wsItemType === WsItemTypeEnum.WS_HISTORY) return // не обновляем сферы для ядер, которые польжователь просто серфит
+      if (wsItemRxDoc.wsItemType === WsItemTypeEnum.WS_HISTORY) return // не обновляем сферы для ядер, которые пользователь просто серфит
       // найдем все сферы этой сути и добавим их в мастерскую + добавим себя в newSphere.wsSphereItems
       if (wsItemRxDoc.type && wsItemRxDoc.type.in('NODE', 'JOINT', 'BLOCK') && wsItemRxDoc.oid) {
          logD('try find item spheres')
+         assert(wsItemRxDoc.wsSpheres && Array.isArray(wsItemRxDoc.wsSpheres))
          // берем только те что есть в кэше ( с сервера не запрашиваем)
          let object = await rxdb.get(RxCollectionEnum.OBJ, wsItemRxDoc.oid, { priority: -1 })
          if (!object) return
@@ -533,12 +534,17 @@ class Workspace {
                oid: s.oid
             }
             let newSphere = await rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
-            await newSphere.updateExtended('hitCnt', hitCnt => (hitCnt || 0) + 1, false)
             assert(newSphere.wsSphereItems)
             // logT('newSphere add wsSphereItem', cloneDeep(newSphere), cloneDeep(wsItemRxDoc))
             if (!newSphere.wsSphereItems.find(wsItemId => wsItemId === wsItemRxDoc.id)) {
-               newSphere.wsSphereItems.push(wsItemRxDoc.id) // добавляем себя
+               newSphere.wsSphereItems.push(wsItemRxDoc.id) // добавляем в эту сферу себя
+               newSphere.hitCnt = (newSphere.hitCnt || 0) + 1
             }
+            await updateRxDocPayload(wsItemRxDoc, 'wsSpheres', oldVal => {
+               assert(oldVal && Array.isArray(oldVal))
+               if (!oldVal.find(id => id === newSphere.id)) oldVal.push(newSphere.id) // добавляем в список сфер (по-типу коллекций)
+               return oldVal
+            }, false)
          }
       }
    }
