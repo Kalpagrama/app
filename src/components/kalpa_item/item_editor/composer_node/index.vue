@@ -19,14 +19,11 @@ div(
       :showAuthorAlways="showAuthorAlways")
     .row.full-width
       composition-editor(:style=`{maxHeight: '40vh'}` :node="node" :isActive="isActive" :isVisible="isVisible")
-      q-resize-observer(@resize="compositionHeight = $event.height, compositionWidth = $event.width, $logT('$event=', $event)")
+      q-resize-observer(@resize="compositionHeight = $event.height, compositionWidth = $event.width")
     //- NAME: dynamic link/ dynamic fontSize
     slot(name="name")
-    .row.full-width
-      q-menu(v-model="showTooltip" no-focus anchor="top left" self="bottom left" dark).transparent
-        div(:style=`{height: compositionHeight + 'px', width: compositionWidth + 'px'}`).row.content-end.q-px-md
-          transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-            sphere-hints(:name="node.name", @click="node.name = $event" :style=`{maxHeight: compositionHeight + 'px', maxWidth: compositionWidth + 'px'}`)
+    sphere-hints(v-if="!lockName && toolTipFilterName" :padding="true" :name="toolTipFilterName" :maxHeight="compositionHeight", :maxWidth="compositionWidth", @click="node.name = $event")
+    sphere-hints(v-if="toolTipFilterSphere" :padding="true" :name="toolTipFilterSphere" :maxHeight="compositionHeight", :maxWidth="compositionWidth", @click="$refs.editSpheres.sphereAdd($event)").q-pa-sm
     q-input(
       v-if="showName"
       v-model="node.name"
@@ -38,8 +35,9 @@ div(
         // minHeight: '60px',
         fontSize: fontSize+'px',
         textAlign: 'center',
-      }`).row.full-width.items-center.content-center.justify-center.q-pa-md
-    edit-spheres(v-if="node.name" ref="editSpheres" :sphereOwner="node").q-px-md
+      }`
+      ).row.full-width.items-center.content-center.justify-center.q-pa-md
+    edit-spheres(v-if="node.name" ref="editSpheres" :sphereOwner="node" @toolTipFilter="toolTipFilterName = null, toolTipFilterSphere=$event").q-px-md
     //q-input(
     //  v-model="node.description"
     //  borderless dark dense
@@ -102,7 +100,8 @@ export default {
   },
   data () {
     return {
-      showTooltip: false,
+      toolTipFilterName: '',
+      toolTipFilterSphere: '',
       compositionHeight: 0,
       compositionWidth: 0,
       node: null,
@@ -112,7 +111,8 @@ export default {
   watch: {
     'node.name': {
       handler(to) {
-        this.showTooltip = !!to
+        this.toolTipFilterSphere = null
+        this.toolTipFilterName = to
       }
     },
     item: {
@@ -154,6 +154,7 @@ export default {
   },
   methods: {
     async nodePublish () {
+      this.$refs.editSpheres.sphereAdd(this.$refs.editSpheres.sphere)
       if (this.action) {
         this.$log('nodePublish', this.node)
         await this.action(this.node)

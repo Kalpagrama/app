@@ -54,6 +54,7 @@ div(
           minHeight: [null,'node','node-editor'].includes(pageId) ? '0px' : '500px',
           maxHeight: 500+'px',
         }`).row.full-width
+        q-resize-observer(@resize="editorHeight = $event.height")
         component(
           v-if="pageId"
           :is="`page-${pageId}`"
@@ -67,6 +68,7 @@ div(
         page-node-editor(
           v-if="player.node && player.nodeMode === 'edit'"
           :contentKalpa="contentKalpa"
+          :topScreenHeight="topScreenHeight"
           :player="player"
           :style=`{
             borderRadius: '10px',
@@ -78,11 +80,13 @@ div(
       div(
         v-if="pageId && player && $q.screen.lt.md"
         :style=`{height: $q.screen.height-50-contentHeight+'px',}`).row.full-width
+        q-resize-observer(@resize="editorHeight = $event.height")
         component(
           :is="`page-${pageId}`"
           :contentKalpa="contentKalpa"
           :itemState="{}"
           :player="player"
+          :topScreenHeight="topScreenHeight"
           @node="nodeFocused"
           @draft="draftFocused"
           @pageId="pageIdChange"
@@ -90,6 +94,7 @@ div(
       div(
         v-if="player"
         :style=`{position: 'relative'}`).row.full-width
+        q-resize-observer(@resize="footerHeight = $event.height")
         //- Mobile button overlay
         div(
           v-if="player.nodeMode === 'edit' && $q.screen.lt.md"
@@ -130,6 +135,7 @@ import pageNodeEditor from '../node_editor/index.vue'
 import pageDrafts from './page_drafts/index.vue'
 import pageInfo from '../page_info_root/index.vue'
 import figuresControls from 'src/components/content_player/player_video/player_pult/figures_controls.vue'
+import {assert} from '../../../../system/common/utils';
 
 export default {
   name: 'layoutVideo',
@@ -149,11 +155,21 @@ export default {
     return {
       player: null,
       pageId: null,
+      autocompleteName: '',
       contentHeight: 0,
-      // contentHeightMin: 0,
+      editorHeight: 0,
+      footerHeight: 0
     }
   },
   computed: {
+    topScreenHeight () {
+      // this.$logT('this.$q.screen.height', this.$q.screen.height)
+      // this.$logT('this.editorHeight', this.editorHeight)
+      // this.$logT('this.footerHeight', this.footerHeight)
+      assert(this.$q.screen.height - this.editorHeight - this.footerHeight > 0)
+      // this.$logT('topScreenHeight', this.$q.screen.height - this.editorHeight - this.footerHeight)
+      return this.$q.screen.height - this.editorHeight - this.footerHeight
+    },
     contentHeightMin () {
       let tW = this.contentKalpa.thumbWidth
       let tH = this.contentKalpa.thumbHeight

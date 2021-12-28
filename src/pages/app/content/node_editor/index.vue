@@ -1,12 +1,15 @@
 <template lang="pug">
 .row.full-width.items-between.justify-center
+  q-resize-observer(@resize="editorHeight = $event.height, editorWidth = $event.width")
+  sphere-hints(v-if="toolTipFilterName" :name="toolTipFilterName" :maxHeight="!$q.screen.gt.sm ? topScreenHeight-10 : Math.max(topScreenHeight-300, 100)", :maxWidth="editorWidth", :offset="[5, 5]" @click="node.name = $event")
+  sphere-hints(v-if="toolTipFilterSphere" :name="toolTipFilterSphere" :maxHeight="!$q.screen.gt.sm ? topScreenHeight-10 : Math.max(topScreenHeight-300, 100)", :maxWidth="editorWidth", :offset="[5, 5]" @click="$refs.editSpheres.sphereAdd($event)")
   //- ===
   //- Desktop editor
   div(
     v-if="$q.screen.gt.sm"
-    :style=`{maxWidth: 600+'px'}`).row.full-width.div
+    :style=`{maxWidth: 600+'px'}`).row.full-width
     //- name
-    .row.full-width.q-pa-sm
+    .row.full-width.q-pa-sm.justify-center
       div(:style=`{height: '60px', backgroundColor: 'rgba(30,30,30,0.9)'}`).row.full-width.br-10
         q-input(
           v-model="node.name"
@@ -34,7 +37,9 @@
     //- category and spheres
     transition(enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown")
       edit-spheres(v-if="node.name.length > 0"
+        ref="editSpheres"
         :sphereOwner="node"
+        @toolTipFilter="toolTipFilterName = null, toolTipFilterSphere=$event"
         ).q-px-md
         template(v-slot:left)
           edit-category(
@@ -78,7 +83,7 @@
   //- ===
   //- Mobile editor
   div(
-    v-if="$q.screen.lt.md"
+    v-else
     :style=`{maxWidth: 600+'px',}`).row.fit.items-between.content-between
     .row.full-width.items-start.content-start
       div(
@@ -120,7 +125,10 @@
         transition(enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown")
           edit-spheres(
             v-if="node.name.length > 0"
-            :sphereOwner="node").q-px-md
+            ref="editSpheres"
+            :sphereOwner="node"
+            @toolTipFilter="toolTipFilterName = null, toolTipFilterSphere=$event"
+            ).q-px-md
             template(v-slot:left)
               edit-category(
                 v-if="node.name.length > 0"
@@ -154,7 +162,7 @@
     //- publish
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
-        v-if="node.name.length > 0"
+        v-if="node.name.length > 0 && !$store.state.ui.userTyping"
         ).row.full-width.q-pa-md
         q-btn(
           color="green" no-caps
@@ -172,6 +180,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import { ObjectCreateApi } from 'src/api/object_create'
 import { UserApi } from 'src/api/user'
 
+import sphereHints from 'src/components/kalpa_item/sphere_hints.vue'
 import editSpheres from './edit_spheres.vue'
 import editCategory from './edit_category.vue'
 import { ObjectTypeEnum } from 'src/system/common/enums'
@@ -181,15 +190,21 @@ export default {
   components: {
     editSpheres,
     editCategory,
+    sphereHints,
   },
-  props: ['player', 'contentKalpa'],
+  props: ['player', 'contentKalpa', 'topScreenHeight'],
+  // emits: ['toolTipFilterName'],
   data () {
     return {
       nodePublishing: false,
       nodeDeleting: false,
       nodeSaving: false,
       sphere: '',
+      toolTipFilterName: '',
+      toolTipFilterSphere: '',
       categoryError: false,
+      editorHeight: 0,
+      editorWidth: 0,
     }
   },
   computed: {
@@ -205,6 +220,17 @@ export default {
     }
   },
   watch: {
+    'node.name': {
+      handler(to) {
+        this.toolTipFilterSphere = null
+        this.toolTipFilterName = to
+      }
+    },
+    autocompleteName: {
+      handler(to) {
+        this.node.name = to
+      }
+    }
   },
   methods: {
     compositionCreate () {
@@ -341,6 +367,7 @@ export default {
     },
     async nodePublish () {
       try {
+        this.$refs.editSpheres.sphereAdd(this.$refs.editSpheres.sphere)
         this.$log('nodePublish start')
         // ---
         // loading
@@ -416,7 +443,7 @@ export default {
     this.$log('created')
   },
   mounted () {
-    this.$log('mounted')
+    // this.$logT('mounted!!!', this.topScreenHeight)
   },
   beforeUnmount () {
     this.$log('beforeDestroy')

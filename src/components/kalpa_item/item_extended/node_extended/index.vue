@@ -22,6 +22,7 @@
       position="standard")
       item-editor(
         :item="pageId==='images' ? newNodeSameEssence : newNodeSameImage"
+        :lockName="pageId==='images'"
         :publish="true"
         @close="setNode($event? $event.oid : node.oid), itemEditorShow=false")
     // образ
@@ -51,7 +52,7 @@
               size="9px"
               boundary-numbers)
             .col
-            q-icon(
+            q-icon(v-show="pageId!=='images'"
               dense name="add" color="green-9" size="sm"
               @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить смысл авторизуйтесь'}]) : itemEditorShow = true"
             ).cursor-pointer.q-pr-xs

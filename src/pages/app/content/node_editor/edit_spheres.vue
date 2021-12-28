@@ -25,8 +25,8 @@
         borderRadius: '5px',
         // border: '1px solid grey'
       }`
-      @blur="sphereAdd()"
-      @keydown.enter="sphereAdd()"
+      @blur=""
+      @keydown.enter="sphereAdd(sphere)"
       @keydown.backspace="onBackspacePressed()"
     ).row.q-pl-sm.full-width
   .row.full-width
@@ -41,6 +41,7 @@ const { getScrollTarget, setHorizontalScrollPosition, getScrollWidth } = scroll
 
 export default {
   name: 'editSpheres',
+  emits: ['toolTipFilter'],
   props: {
     sphereOwner: {type: Object, required: true},
     maxSphereCnt: {type: Number, default: 5},
@@ -52,24 +53,30 @@ export default {
       sphere: ''
     }
   },
+  watch: {
+    sphere(to) {
+      this.$emit('toolTipFilter', to)
+    },
+  },
   computed: {
     placeholder() {
       return this.placeholderText || this.$t('Добавьте дополнительные смыслы')
     }
   },
   methods: {
-    sphereAdd () {
+    sphereAdd (sphere) {
+      if (!sphere) return
       this.$log('sphereAdd')
       // checks
-      if (this.sphere.length === 0) return
-      if (this.sphereOwner.name === this.sphere) {
+      if (sphere.length === 0) return
+      if (this.sphereOwner.name === sphere) {
         this.$q.notify({type: 'negative', position: 'top', message: this.$t('major essence is equal minor')})
-        this.sphere = ''
+        if (this.sphere === sphere) this.sphere = ''
         return
       }
-      if (this.sphereOwner.spheres.find(s => s.name === this.sphere)) {
+      if (this.sphereOwner.spheres.find(s => s.name === sphere)) {
         this.$q.notify({type: 'negative', position: 'top', message: this.$t('Already added!')})
-        this.sphere = ''
+        if (this.sphere === sphere) this.sphere = ''
         return
       }
       if (this.sphereOwner.spheres.length >= this.maxSphereCnt) {
@@ -77,7 +84,7 @@ export default {
         return
       }
       // do stuff
-      this.sphereOwner.spheres.push({name: this.sphere})
+      this.sphereOwner.spheres.push({name: sphere})
       this.sphere = ''
       let scrollTarget = getScrollTarget(this.$refs.scrolledArea)
       setHorizontalScrollPosition(scrollTarget, getScrollWidth(scrollTarget), 1000)

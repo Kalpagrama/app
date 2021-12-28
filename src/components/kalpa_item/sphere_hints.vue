@@ -6,9 +6,13 @@
 </style>
 
 <template lang="pug">
-div(v-if="spheresAutocomplete.length && name && selectedSphereName !== name").row.full-width.scroll-y.q-pt-xs
-  span(v-for="(s,si) in spheresAutocomplete" :key="s.id" @click="selectedSphereName=s.name, $emit('click', s.name)"
-    ).hint-item.cursor-pointer.text-grey-1.ellipsis.q-px-sm.q-mr-sm.q-mb-xs.br-5.b-100 {{s.name}}
+.row.full-width
+  q-menu(v-model="showTooltip" no-focus auto-close anchor="top middle" :offset="offset" self="bottom middle" dark).transparent.no-shadow
+    div(:style=`{height: maxHeight + 'px', width: maxWidth + 'px'}` :class=`{'q-pa-xs': padding}`).row.content-end
+      transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+        div(v-if="spheresAutocomplete.length && name && selectedSphereName !== name" :style=`{maxHeight: '100%', maxWidth: '100%',backgroundColor: "rgba(35,35,35,0.8)"}`).row.full-width.scroll-y.br-10.q-pa-sm
+          span(v-for="(s,si) in spheresAutocomplete" :key="s.id" @click="selectedSphereName=s.name, $emit('click', s.name)"
+            ).hint-item.cursor-pointer.text-grey-1.ellipsis.q-px-sm.q-mr-sm.q-mb-sm.br-5.bs {{s.name}}
 </template>
 
 <script>
@@ -17,10 +21,11 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'sphereHints',
-  props: ['name'],
+  props: ['name', 'maxHeight', 'maxWidth', 'offset', 'padding'],
   emits: ['click'],
   data () {
     return {
+      showTooltip: true,
       spheresAutocomplete: [],
       selectedSphereName: null
     }
@@ -29,7 +34,8 @@ export default {
     name: {
       immediate: true,
       async handler (to) {
-        this.$logT('name changed', to)
+        this.showTooltip = !!to
+        // this.$logT('name changed', to, this.showTooltip)
         if (to && to !== this.selectedSphereName) this.fillSpheresAutoComplete(to)
       }
     }
@@ -49,14 +55,17 @@ export default {
             limit: 100
           })
           this.spheresAutocomplete = spheresRes.items
-          this.$logT('this.spheresAutocomplete=' + this.spheresAutocomplete.length)
+          // this.$logT('this.spheresAutocomplete=' + this.spheresAutocomplete.length)
         }, 300)
       }
       return this.fillSpheresAutoCompleteDebounced(name)
     }
   },
   mounted () {
-    this.$logT('mounted', this.name)
+    // this.$logT('mounted', this.maxHeight)
+  },
+  unmounted() {
+    // this.$logT('unmounted', this.name)
   }
 }
 </script>
