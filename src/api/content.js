@@ -40,7 +40,7 @@ const UploadFormatEnum = Object.freeze({
 })
 
 class ContentApi {
-   static async contentCreateFromUrl (url, extractProviderContent = true) {
+   static async contentCreateFromUrl (url, extractProviderContent = false) {
       const f = ContentApi.contentCreateFromUrl
       logD(f, 'start', url)
       const t1 = performance.now()

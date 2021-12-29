@@ -72,7 +72,7 @@ export default {
       async handler (to, from) {
         if (this.isURL(to)) {
           this.urlLoading = true
-          await this.contentKalpaFound(await ContentApi.contentCreateFromUrl(to, true))
+          await this.contentKalpaFound(await ContentApi.contentCreateFromUrl(to, false))
           this.$ym('CONTENT_ADDED')
           this.urlLoading = false
         }
@@ -108,6 +108,7 @@ export default {
           // бэкенд сам добавляет в "мой контент"
         } else {
           bookmark = await this.$rxdb.set(RxCollectionEnum.WS_BOOKMARK, bookmarkInput)
+          this.$logT('create bookmark OK!', bookmark)
         }
         if (!await UserApi.isSubscribed(contentKalpa.oid)) await UserApi.subscribe(contentKalpa.oid)
       }
