@@ -44,8 +44,12 @@ export default {
       }
     },
     'contentKalpa.payInfo.paid': {
+      immediate: true,
       async handler (to, from) {
-        if (!to) this.$go('/cover/' + this.contentKalpa.oid)
+        if (!to && this.contentKalpa && this.contentKalpa.payInfo.price && this.contentKalpa.author.oid !== this.$store.getters.currentUser.oid) {
+          this.$logT('content is paid! goto short version...')
+          await this.$router.replace('/cover/' + this.contentKalpa.oid)
+        }
       }
     }
   },
