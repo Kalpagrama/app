@@ -1,4 +1,5 @@
 <template lang="pug">
+// оплата - только для web и pwa
 div(v-if="contentIsPaid").row
   slot(v-if="!formOnly" name="action" :start="start" :item="item")
     q-btn(
@@ -13,7 +14,11 @@ div(v-if="contentIsPaid").row
         v-model="showDialog"
         position="standard"
         :maximized="false")
-        payanyway-form(:item="item" @successPay="onSuccessPay")
+        .row
+          payanyway-form(v-if="!$q.platform.is.capacitor" :item="item" @successPay="onSuccessPay")
+          q-btn(v-else color="green-8" outline
+            :label="$t('оплата возможна только в web-версии. Нажмите чтобы продолжить.')"
+            @click="$systemUtils.writeToClipboard(originUrl, $t('Ссылка скопирована в буфер обмена! Вставьте ее в браузере')), showDialog=false")
       q-menu( v-if="false" dark)
         .row
           img(
@@ -31,7 +36,7 @@ div(v-if="contentIsPaid").row
               icon='shopping_cart'
               round flat no-caps
             )
-  payanyway-form(v-if="formOnly" :item="item" @successPay="onSuccessPay")
+  payanyway-form(v-if="formOnly && !$q.platform.is.capacitor" :item="item" @successPay="onSuccessPay")
 </template>
 
 <script>
@@ -65,6 +70,9 @@ export default {
     },
     contentIsPaid () {
       return this.item.payInfo.price > 0
+    },
+    originUrl() {
+      return process.env.ORIGIN_URL
     }
   },
   methods: {

@@ -8,7 +8,7 @@
       v-if="createdContent"
       :showBottomMenu="false"
       :contentOid="createdContent.oid"
-      @close="contentCardEditorShow = false, this.$router.replace('/workspace/contents/image')")
+      @close="contentCardEditorShow = false, this.$router.replace('/workspace/contents?pageId=image&categoryId=uploaded')")
   div(
     :style=`{
       position: 'relative',

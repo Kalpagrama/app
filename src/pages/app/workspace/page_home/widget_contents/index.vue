@@ -12,7 +12,7 @@
       :style=`{}`).row.full-width.items-center.content-center.q-pa-md
       q-icon(name="perm_media" color="white" size="24px").q-mr-sm
       .col
-        span.text-white.text-bold {{$t('My content')}}
+        span.text-white.text-bold {{$t('Контент')}}
     //- scrolled bookmarks preview max 10...
     .row.full-width.scroll
       //- bookmarks mockup

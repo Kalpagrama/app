@@ -188,7 +188,7 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
           .col
           q-btn(v-if="contentCopy.payInfo.price > 0"
             flat color="white" no-caps dense
-          @click="paidUsersListShow = true"
+            @click="paidUsersListShow = true"
             :ripple="false"
             :style=`{borderRadius: '10px', marginTop: '3px'}`)
             span(:style=`{fontSize: $q.screen.width > 320 ? '14px' : '11px'}`).text-body1 {{$t('Список оплативших')}}
@@ -197,9 +197,9 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
               :maximized="true")
               paid-users(:content="content" @close="paidUsersListShow=false")
           .col
-        div(v-if="false" :style=`{minHeight: '45px'}`).row.full-width
+        div(:style=`{minHeight: '45px'}`).row.full-width
           .row.full-width
-            q-input(v-if="false && contentCopy.payInfo.price > 0"
+            q-input(v-if="contentCopy.payInfo.price > 0"
               v-model="contentCopy.payInfo.price"
               mask="#"
               reverse-fill-mask
@@ -398,7 +398,14 @@ export default {
         if (this.priceChanged) price = this.contentCopy.payInfo.price
         if (this.thumbUrlChanged) fileThumb = this.fileThumb
         if (this.previewUrlChanged) filePreview = this.filePreview
-
+        if (this.priceChanged) { // для того чтобы работал фильтр "платный контент"
+          let findResult = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_CONTENT, oid: this.content.oid}})
+          assert(findResult.items.length === 1)
+          let wsContent = findResult.items[0]
+          if (!wsContent.payInfo) wsContent.payInfo = {}
+          wsContent.payInfo.price = price
+          this.$logT('WS_CONTENT change', wsContent)
+        }
         if (name !== undefined) await ObjectApi.update(this.content.oid, 'name', name)
         if (description !== undefined) await ObjectApi.update(this.content.oid, 'description', description)
         if (spheres !== undefined) await ObjectApi.update(this.content.oid, 'spheres', spheres)
