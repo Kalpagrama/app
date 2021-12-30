@@ -35,12 +35,22 @@
           :mode="mode"
           @draft="draftSelectHandle"
         ).q-mb-sm
+      template(v-slot:nodata)
+        nodata-guard(
+          :button="true"
+          icon="filter_tilt_shift"
+          title="Здесь пока ничего нет"
+          message="Всё что Вы сохрание в заметки появится здесь"
+          buttonName="Создать что-нибудь"
+          clickPath="/workspace"
+        )
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import draftListItem from 'src/components/draft/draft_list_item.vue'
+import nodataGuard from 'src/components/kalpa_guard/nodata_guard'
 
 export default {
   name: 'listDrafts',
@@ -52,7 +62,8 @@ export default {
     pagesFilter: { type: Function }
   },
   components: {
-    draftListItem
+    draftListItem,
+    nodataGuard
   },
   data () {
     return {

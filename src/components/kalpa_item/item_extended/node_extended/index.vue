@@ -22,6 +22,7 @@
       position="standard")
       item-editor(
         :item="pageId==='images' ? newNodeSameEssence : newNodeSameImage"
+        :lockName="pageId==='images'"
         :publish="true"
         @close="setNode($event? $event.oid : node.oid), itemEditorShow=false")
     // образ
@@ -51,10 +52,11 @@
               size="9px"
               boundary-numbers)
             .col
-            q-icon(
+            q-icon(v-show="pageId!=='images'"
               dense name="add" color="green-9" size="sm"
-              @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить смысл авторизуйтесь'}]) : itemEditorShow=true"
+              @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить смысл авторизуйтесь'}]) : itemEditorShow = true"
             ).cursor-pointer.q-pr-xs
+              q-tooltip {{$t('Добавить смысл на этот образ')}}
             //small(v-if="state.node.items[0].layers[0].contentName").text-grey-7.text-weight-bolder.text-italic.q-pl-xs.q-mt-xs {{state.node.items[0].layers[0].contentName.substring(0, 22)}}{{state.node.items[0].layers[0].contentName.length > 22 ? '...': ''}}
           div(v-else @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы добавить смысл авторизуйтесь'}]) : itemEditorShow=true").row.full-width.cursor-pointer.items-center
             small.text-grey-7.text-weight-thin.q-pl-xs  {{$t('Добавить смысл на этот образ')}}
@@ -249,6 +251,10 @@ export default {
     }
   },
   watch: {
+    itemEditorShow (to) {
+      if (to) this.state.imageActive = false
+      else this.state.imageActive = true
+    },
     'state.essencesNodesIndx': {
       handler (to, from) {
         // this.$log('state.essencesNodesIndx TO', to)

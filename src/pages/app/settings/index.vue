@@ -12,19 +12,19 @@ kalpa-layout()
             span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white {{$t('Настройки')}}
   template(v-slot:body)
     .row.full-width.items-start.content-start.justify-center
-      view-guest(
+      guest-guard(
         v-if="$store.getters.isGuest").q-mt-sm
       router-view(
         v-else)
 </template>
 
 <script>
-import viewGuest from 'src/layouts/view_guest.vue'
+import guestGuard from 'src/components/kalpa_guard/guest_guard.vue'
 
 export default {
   name: 'pageApp_settings',
   components: {
-    viewGuest
+    guestGuard
   },
   data () {
     return {

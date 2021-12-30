@@ -34,6 +34,15 @@
           :showMenuBtn="false"
           @item="bookmarkSelectHandle"
         ).q-mb-sm
+      template(v-slot:nodata)
+        nodata-guard(
+          :button="true"
+          icon="history"
+          title="Здесь пока ничего нет"
+          message="История посещённых страниц появится здесь"
+          buttonName="Начать исследование"
+          clickPath="/trends"
+        )
 </template>
 
 <script>
@@ -41,6 +50,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
+import nodataGuard from 'src/components/kalpa_guard/nodata_guard'
 
 export default {
   name: 'listHistory',
@@ -53,6 +63,7 @@ export default {
   components: {
     bookmarkListItem,
     bookmarkEditor,
+    nodataGuard
   },
   data () {
     return {

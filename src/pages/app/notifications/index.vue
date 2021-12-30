@@ -20,7 +20,7 @@ kalpa-layout
               q-btn(
                 round flat color="white" icon="more_vert")
         //- guest
-        view-guest(
+        guest-guard(
           v-if="$store.getters.isGuest")
         //- user
         tab-list-feed(
@@ -40,18 +40,26 @@ kalpa-layout
               :notificationIndex="itemIndex"
               :isActive="isActive"
               :isVisible="isVisible").q-mb-sm
+          template(v-slot:nodata)
+            nodata-guard(
+              icon="notifications"
+              title="Здесь пока ничего нет"
+              message="Уведомления о активности появятся здесь"
+            )
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import notificationItem from './notification_item.vue'
-import viewGuest from 'src/layouts/view_guest.vue';
+import guestGuard from 'src/components/kalpa_guard/guest_guard.vue';
+import nodataGuard from 'src/components/kalpa_guard/nodata_guard'
 
 export default {
   name: 'pageApp__notifications',
   components: {
     notificationItem,
-    viewGuest,
+    guestGuard,
+    nodataGuard,
   },
   data () {
     return {

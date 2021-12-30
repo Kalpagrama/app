@@ -11,8 +11,15 @@
   slot(name="header")
   //- body
   div(:style=`{position: 'relative',}`).col.full-width.scroll
-    view-guest(
+    guest-guard(
       v-if="$store.getters.isGuest")
+    nodata-guard(v-else-if="itemsRes.items<1"
+      icon="filter_tilt_shift"
+      :title="$t('Здесь пока ничего нет')"
+      :message="$t('Всё что Вы сохраните в заметки появится здесь')"
+      iconColor="grey"
+      backgroundColor="rgba(35,35,35,0)"
+    )
     div(
       v-else-if="itemsRes"
       ).row.full-width.items-strat.content-start.justify-center.q-px-sm
@@ -32,13 +39,15 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import viewGuest from './view_guest.vue'
+import guestGuard from './view_guest.vue'
+import nodataGuard from 'src/components/kalpa_guard/nodata_guard'
 
 export default {
   name: 'pageDraftsRoot',
   props: ['contentKalpa', 'player'],
   components: {
-    viewGuest
+    guestGuard,
+    nodataGuard
   },
   data () {
     return {

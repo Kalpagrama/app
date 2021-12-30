@@ -47,12 +47,19 @@
           :mode="mode"
           @item="bookmarkSelectHandle"
         ).q-mb-sm
+      template(v-slot:nodata)
+        nodata-guard(
+          icon="collections_bookmark"
+          title="Здесь пока ничего нет"
+          message="Всё что Вы добавите в закладки появится здесь"
+        )
 </template>
 
 <script>
 import { getRxCollectionEnumFromId, RxCollectionEnum } from 'src/system/rxdb'
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
+import nodataGuard from 'src/components/kalpa_guard/nodata_guard';
 import { assert } from 'src/system/common/utils'
 
 export default {
@@ -69,7 +76,8 @@ export default {
   },
   components: {
     bookmarkListItem,
-    bookmarkEditor
+    bookmarkEditor,
+    nodataGuard
   },
   data () {
     return {

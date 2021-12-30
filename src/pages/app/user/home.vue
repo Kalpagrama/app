@@ -80,6 +80,15 @@ kalpa-layout
               :isPreload="isPreload"
               :layout="item.type && item.type.in('NODE', 'JOINT', 'BLOCK') ? 'card' : 'line'"
               :scrolling="scrolling").q-pb-xl
+          template(v-slot:nodata)
+            nodata-guard(
+              :button="nodataGuardParams.button"
+              :icon="nodataGuardParams.icon"
+              :title="nodataGuardParams.title"
+              :message="nodataGuardParams.message"
+              :buttonName="nodataGuardParams.buttonName"
+              :clickPath="nodataGuardParams.clickPath"
+            )
 </template>
 
 <script>
@@ -87,6 +96,7 @@ import { UserApi } from 'src/api/user'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import listFollowers from 'src/components/kalpa_lists/followers.vue'
 import listFollowing from 'src/components/kalpa_lists/following.vue'
+import nodataGuard from 'src/components/kalpa_guard/nodata_guard'
 
 import navHeader from './nav_header.vue'
 import navTabs from './nav_tabs.vue'
@@ -97,7 +107,8 @@ export default {
     navHeader,
     navTabs,
     listFollowers,
-    listFollowing
+    listFollowing,
+    nodataGuard
   },
   data () {
     return {
@@ -105,7 +116,7 @@ export default {
       followersFollowing: null,
       showFollowDialog: false,
       scrollTop: 0,
-      pageId: 'nodes'
+      pageId: 'nodes',
     }
   },
   computed: {
@@ -114,10 +125,46 @@ export default {
     },
     pages () {
       return [
-        { id: 'nodes', name: this.$t('Nodes') },
-        { id: 'joints', name: this.$t('Joints') },
-        { id: 'blocks', name: this.$t('Essence blocks') },
-        { id: 'votes', name: this.$t('Votes') }
+        { id: 'nodes',
+          name: this.$t('Nodes'),
+          nodataGuardParams: {
+            icon: 'adjust',
+            button: true,
+            message: this.$t('Создайте смысловое ядро и оно отобразится здесь'),
+            buttonName: this.$t('Создать ядро'),
+            title: this.$t('Здесь пока ничего нет'),
+            clickPath: '/workspace',
+          }},
+        { id: 'joints',
+          name: this.$t('Joints'),
+          nodataGuardParams: {
+            icon: 'fas fa-link',
+            button: false,
+            message: this.$t('Создайте связь и она отобразится здесь'),
+            // buttonName: this.$t('Создать ядро'),
+            title: this.$t('Здесь пока ничего нет'),
+            // clickPath: '/workspace',
+          }},
+        { id: 'blocks',
+          name: this.$t('Essence blocks'),
+          nodataGuardParams: {
+            icon: 'dashboard_customize',
+            button: true,
+            message: this.$t('Создайте смысловой блок и он отобразится здесь'),
+            buttonName: this.$t('Создать смысловой блок'),
+            title: this.$t('Здесь пока ничего нет'),
+            clickPath: '/workspace/edit?mode=block',
+          }},
+        { id: 'votes',
+          name: this.$t('Votes'),
+          nodataGuardParams: {
+            icon: 'poll',
+            button: false,
+            message: this.$t('Ваши голоса появятся здесь'),
+            buttonName: this.$t('Создать ядро'),
+            title: this.$t('Здесь пока ничего нет'),
+            clickPath: '/workspace',
+          }}
       ]
     },
     query () {
@@ -151,6 +198,9 @@ export default {
         },
         populateObjects: false
       }
+    },
+    nodataGuardParams() {
+      return this.pages.find(page => page.id === this.pageId).nodataGuardParams
     }
   },
   watch: {

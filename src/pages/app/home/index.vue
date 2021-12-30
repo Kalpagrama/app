@@ -19,7 +19,7 @@ kalpa-layout
               q-btn(
                 round flat color="white" icon="more_vert")
         //- guest
-        view-guest
+        guest-guard
       div(v-if="!$store.getters.isGuest" :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         // подписки
         span.text-grey-5.text-h6.q-py-sm.q-pl-sm {{$t('Мои подписки')}}
@@ -66,19 +66,27 @@ kalpa-layout
               :isPreload="isPreload"
               :layout="item.object.type.in('NODE', 'JOINT', 'BLOCK') ? 'card' : 'line'"
               :scrolling="scrolling").q-pb-md
+          template(v-slot:nodata)
+            nodata-guard(
+              icon="newspaper"
+              title="Здесь пока ничего нет"
+              message="Новости и обновления появятся здесь"
+            )
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import listFeedCustomHorizontalPPV from 'src/components/list_feed/list_feed_horizontal_custom_ppv.vue'
-import viewGuest from 'src/layouts/view_guest.vue';
+import guestGuard from 'src/components/kalpa_guard/guest_guard.vue'
+import nodataGuard from 'src/components/kalpa_guard/nodata_guard'
 
 export default {
   name: 'feeds_feed',
   props: ['feed'],
   components: {
     listFeedCustomHorizontalPPV,
-    viewGuest
+    guestGuard,
+    nodataGuard,
   },
   data () {
     return {

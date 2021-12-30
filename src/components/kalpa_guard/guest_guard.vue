@@ -52,7 +52,7 @@ div(
 
 <script>
 export default {
-  name: 'pageViewGuest',
+  name: 'guestGuard',
   props: ['message'],
   computed: {
     messageName() {

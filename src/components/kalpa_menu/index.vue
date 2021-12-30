@@ -68,7 +68,7 @@
           borderRadius: '10px',
           overflow: 'hidden',
         }`
-      ).row.full-width.items-center.content-center.menu-item.cursor-pointer
+      ).row.full-width.items-center.content-center.menu-item.cursor-pointer.q-mb-sm
         div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
           user-avatar(:url="$store.getters.currentUser.thumbUrl" :width="40" :height="40")
         div(v-if="!mini").col.full-height
@@ -84,7 +84,7 @@
           borderRadius: '10px',
           overflow: 'hidden'
         }`
-      ).row.full-width.items-cener.content-center.menu-item
+      ).row.full-width.items-cener.content-center.menu-item.q-mb-sm
         div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
           div(
             :style=`{

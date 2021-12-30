@@ -57,6 +57,15 @@
           :mode="mode"
           @item="bookmarkOptionsClickHandle"
         ).q-mb-sm
+      template(v-slot:nodata)
+        nodata-guard(
+          :button="nodataGuardParams.button"
+          :icon="nodataGuardParams.icon"
+          :title="nodataGuardParams.title"
+          :message="nodataGuardParams.message"
+          :buttonName="nodataGuardParams.buttonName"
+          :clickPath="nodataGuardParams.clickPath"
+        )
 </template>
 
 <script>
@@ -66,6 +75,7 @@ import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import contentCardEditor from 'src/components/kalpa_item/item_card/editor/content.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 import widgetUpload from 'src/pages/app/workspace/page_home/widget_upload/index.vue'
+import nodataGuard from 'src/components/kalpa_guard/nodata_guard'
 import { assert } from 'src/system/common/utils'
 import cloneDeep from 'lodash/cloneDeep'
 
@@ -82,6 +92,7 @@ export default {
     bookmarkEditor,
     contentCardEditor,
     widgetUpload,
+    nodataGuard,
   },
   data () {
     return {
@@ -107,10 +118,40 @@ export default {
     pages () {
       return [
         // {id: 'collections', name: this.$t('Collections')},
-        {id: 'video', name: this.$t('Video'), type: 'VIDEO'},
-        {id: 'book', name: this.$t('Books'), type: 'BOOK'},
-        {id: 'image', name: this.$t('Images'), type: 'IMAGE'}
+        {id: 'video',
+          name: this.$t('Video'),
+          nodataGuardParams: {
+            icon: 'theaters',
+            button: true,
+            message: this.$t('Видео которые Вы загрузите появятся здесь'),
+            buttonName: this.$t('Загрузить'),
+            title: this.$t('Здесь пока ничего нет'),
+            clickPath: '/workspace/edit?mode=upload',
+          }},
+        {id: 'book',
+          name: this.$t('Books'),
+          nodataGuardParams: {
+            icon: 'menu_book',
+            button: true,
+            message: this.$t('Книги которые Вы загрузите появятся здесь'),
+            buttonName: this.$t('Загрузить'),
+            title: this.$t('Здесь пока ничего нет'),
+            clickPath: '/workspace/edit?mode=upload',
+          }},
+        {id: 'image',
+          name: this.$t('Images'),
+          nodataGuardParams: {
+            icon: 'o_image',
+            button: true,
+            message: this.$t('Изображения которые Вы загрузите появятся здесь'),
+            buttonName: this.$t('Загрузить'),
+            title: this.$t('Здесь пока ничего нет'),
+            clickPath: '/workspace/edit?mode=upload',
+          }},
       ]
+    },
+    nodataGuardParams() {
+      return this.pages.find(page => page.id === this.pageId).nodataGuardParams
     },
     query () {
       let res = {
