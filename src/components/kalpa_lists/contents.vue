@@ -120,6 +120,7 @@ export default {
         // {id: 'collections', name: this.$t('Collections')},
         {id: 'video',
           name: this.$t('Video'),
+          type: 'VIDEO',
           nodataGuardParams: {
             icon: 'theaters',
             button: true,
@@ -130,6 +131,7 @@ export default {
           }},
         {id: 'book',
           name: this.$t('Books'),
+          type: 'BOOK',
           nodataGuardParams: {
             icon: 'menu_book',
             button: true,
@@ -140,6 +142,7 @@ export default {
           }},
         {id: 'image',
           name: this.$t('Images'),
+          type: 'IMAGE',
           nodataGuardParams: {
             icon: 'o_image',
             button: true,
