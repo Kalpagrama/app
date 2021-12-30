@@ -36,7 +36,7 @@
       @pageId="pageId = $event"
     ).row.full-width
       template(v-slot:externalHeader)
-        widget-upload(@uploaded="bookmarkSelectHandle($event)").q-mt-sm
+        widget-upload(@uploaded="onUploadComplete($event)").q-mt-sm
       template(v-slot:stickyHeaderTop)
         div(:style=`{
         maxWidth: $store.state.ui.pageWidth+'px',
@@ -67,6 +67,7 @@ import contentCardEditor from 'src/components/kalpa_item/item_card/editor/conten
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 import widgetUpload from 'src/pages/app/workspace/page_home/widget_upload/index.vue'
 import { assert } from 'src/system/common/utils'
+import cloneDeep from 'lodash/cloneDeep'
 
 export default {
   name: 'listContents',
@@ -161,18 +162,18 @@ export default {
     }
   },
   methods: {
-    bookmarkSelectHandle ({ contentKalpa, bookmark }) {
-      assert(bookmark)
-      this.$log('bookmarkSelectHandle', contentKalpa, bookmark)
+    onUploadComplete (contentKalpa) {
+      assert(contentKalpa)
+      this.$logT('onUploadComplete', cloneDeep(contentKalpa))
       if (this.mode === 'select') {
-        this.$emit('item', bookmark)
+        // this.$emit('item', bookmark)
       }
       else {
         if (contentKalpa && contentKalpa.contentAuthor && contentKalpa.contentAuthor.oid === this.$store.getters.currentUser.oid) {
-          this.contentCardEditorContentOid = bookmark.oid
+          this.contentCardEditorContentOid = contentKalpa.oid
           this.contentCardEditorShow = true
         } else {
-          this.$router.push('/content/' + bookmark.oid)
+          this.$router.push('/content/' + contentKalpa.oid)
         }
       }
     },

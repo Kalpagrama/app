@@ -57,6 +57,7 @@ import viewUpload from 'src/pages/app/workspace/page_edit/view_upload'
 
 export default {
   name: 'widgetUpload',
+  emits: ['uploaded'],
   components: {
     viewUpload,
   },
@@ -113,7 +114,7 @@ export default {
         if (!await UserApi.isSubscribed(contentKalpa.oid)) await UserApi.subscribe(contentKalpa.oid)
       }
       // go to content
-      this.$emit('uploaded', { contentKalpa, bookmark })
+      this.$emit('uploaded', contentKalpa)
     }
   },
   mounted () {

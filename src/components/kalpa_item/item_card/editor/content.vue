@@ -112,6 +112,8 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
         paddingLeft: $q.screen.xs ? '0px' : '10px',
         paddingRight: $q.screen.xs ? '0px' : '10px'
   }`).row.full-width
+      // progress
+      q-linear-progress(v-if="progress" size='5px' :value="progress / 100" color="green-10").row.full-width.q-px-sm
       .row.full-width.q-pl-lg
         small.text-grey-6 {{$t('Название')}}
       q-input(
@@ -288,7 +290,8 @@ export default {
         { id: 'cover', name: this.$t('Обложка') },
         { id: 'preview', name: this.$t('Превью') }],
       rangeModel: null,
-      maxPreviewDur: 20 * 60
+      maxPreviewDur: 20 * 60,
+      progress: 0
     }
   },
   computed: {
@@ -442,6 +445,10 @@ export default {
     },
     async previewDelete () {
       this.$set_deprecated(this.contentCopy, 'previewUrlWithFormats', [])
+    },
+    onProgressEvent(event) {
+      this.$log('onProgressEvent', 'event', event)
+      if (this.content && event.oid === this.content.oid) this.progress = event.progress
     }
   },
   async mounted () {
@@ -451,6 +458,11 @@ export default {
       this.isPaid = this.content.payInfo.price > 0
       this.initialized = true
     })
+    this.$eventBus.$on('event-progress', this.onProgressEvent)
+  },
+  beforeUnmount () {
+    this.$log('beforeDestroy')
+    this.$eventBus.$off('event-progress', this.onProgressEvent)
   }
 }
 </script>
