@@ -669,7 +669,7 @@ class RxDBWrapper {
       return getReactive(rxDoc).getPayload()
    }
 
-   async remove (id) {
+   async remove (id, permanent = false) {
       assert(this.created, 'cant remove! !this.created')
       const f = this.remove
       const t1 = performance.now()
@@ -678,7 +678,7 @@ class RxDBWrapper {
          logD(f, 'start')
          let collection = getRxCollectionEnumFromId(id)
          if (collection in WsCollectionEnum) {
-            await this.workspace.remove(id)
+            await this.workspace.remove(id, permanent)
          } else {
             throw new Error('bad id!!' + id)
          }

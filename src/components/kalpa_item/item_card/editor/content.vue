@@ -112,6 +112,8 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
         paddingLeft: $q.screen.xs ? '0px' : '10px',
         paddingRight: $q.screen.xs ? '0px' : '10px'
   }`).row.full-width
+      // progress
+      q-linear-progress(v-if="progress" size='5px' :value="progress / 100" color="green-10").row.full-width.q-px-sm
       .row.full-width.q-pl-lg
         small.text-grey-6 {{$t('Название')}}
       q-input(
@@ -188,7 +190,7 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
           .col
           q-btn(v-if="contentCopy.payInfo.price > 0"
             flat color="white" no-caps dense
-          @click="paidUsersListShow = true"
+            @click="paidUsersListShow = true"
             :ripple="false"
             :style=`{borderRadius: '10px', marginTop: '3px'}`)
             span(:style=`{fontSize: $q.screen.width > 320 ? '14px' : '11px'}`).text-body1 {{$t('Список оплативших')}}
@@ -197,9 +199,9 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
               :maximized="true")
               paid-users(:content="content" @close="paidUsersListShow=false")
           .col
-        div(v-if="false" :style=`{minHeight: '45px'}`).row.full-width
+        div(:style=`{minHeight: '45px'}`).row.full-width
           .row.full-width
-            q-input(v-if="false && contentCopy.payInfo.price > 0"
+            q-input(v-if="contentCopy.payInfo.price > 0"
               v-model="contentCopy.payInfo.price"
               mask="#"
               reverse-fill-mask
@@ -288,7 +290,8 @@ export default {
         { id: 'cover', name: this.$t('Обложка') },
         { id: 'preview', name: this.$t('Превью') }],
       rangeModel: null,
-      maxPreviewDur: 20 * 60
+      maxPreviewDur: 20 * 60,
+      progress: 0
     }
   },
   computed: {
@@ -398,7 +401,14 @@ export default {
         if (this.priceChanged) price = this.contentCopy.payInfo.price
         if (this.thumbUrlChanged) fileThumb = this.fileThumb
         if (this.previewUrlChanged) filePreview = this.filePreview
-
+        if (this.priceChanged) { // для того чтобы работал фильтр "платный контент"
+          let findResult = await this.$rxdb.find({selector: {rxCollectionEnum: RxCollectionEnum.WS_CONTENT, oid: this.content.oid}})
+          assert(findResult.items.length === 1)
+          let wsContent = findResult.items[0]
+          if (!wsContent.payInfo) wsContent.payInfo = {}
+          wsContent.payInfo.price = price
+          this.$logT('WS_CONTENT change', wsContent)
+        }
         if (name !== undefined) await ObjectApi.update(this.content.oid, 'name', name)
         if (description !== undefined) await ObjectApi.update(this.content.oid, 'description', description)
         if (spheres !== undefined) await ObjectApi.update(this.content.oid, 'spheres', spheres)
@@ -435,6 +445,10 @@ export default {
     },
     async previewDelete () {
       this.$set_deprecated(this.contentCopy, 'previewUrlWithFormats', [])
+    },
+    onProgressEvent(event) {
+      this.$log('onProgressEvent', 'event', event)
+      if (this.content && event.oid === this.content.oid) this.progress = event.progress
     }
   },
   async mounted () {
@@ -444,6 +458,11 @@ export default {
       this.isPaid = this.content.payInfo.price > 0
       this.initialized = true
     })
+    this.$eventBus.$on('event-progress', this.onProgressEvent)
+  },
+  beforeUnmount () {
+    this.$log('beforeDestroy')
+    this.$eventBus.$off('event-progress', this.onProgressEvent)
   }
 }
 </script>

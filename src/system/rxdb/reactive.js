@@ -12,6 +12,7 @@ import { store } from 'src/store/index'
 import cloneDeep from 'lodash/cloneDeep'
 
 import { reactive, watch } from 'vue'
+
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_REACTIVE)
 
 function getReactive (rxDocOrObject) {
@@ -44,7 +45,8 @@ async function updateRxDocPayload (rxDocOrId, path, valueOrFunc, debouncedSave =
          reactiveDocFactory.setSynchro(synchro)
          let value
          if (typeof valueOrFunc === 'function') {
-            let changedData = lodashGet(JSON.parse(JSON.stringify(reactiveDoc.getPayload() || null)), path, null)
+            let allData = JSON.parse(JSON.stringify(reactiveDoc.getPayload() || null))
+            let changedData = path ? lodashGet(allData, path, null) : allData
             value = valueOrFunc(changedData)
             assert(value, '!value')
          } else value = valueOrFunc
@@ -164,7 +166,7 @@ class ReactiveDocFactory {
                let changedPropName = fullPath.split('.').slice(-1).join('.')
                let valueParent = propPathParent ? lodashGet(reactiveDoc, propPathParent) : reactiveDoc // родитель измененного свойства
                if (valueParent) {
-                     ReactiveDocFactory.mergeReactive(valueParent, { [changedPropName]: value })
+                  ReactiveDocFactory.mergeReactive(valueParent, changedPropName ? { [changedPropName]: value } : value)
                } else logE(`cant find prop ${fullPath} in object`, reactiveDoc)
             }
 
@@ -339,7 +341,8 @@ class Group {
       this.propsReactive = propsReactive
       this.screenSize = screenSize // максимальная длина ленты (при превышении - обрезается снизу или сверху)
       assert(this.propsReactive, '!this.propsReactive')
-      this.vm = reactive({ reactiveGroup: {
+      this.vm = reactive({
+         reactiveGroup: {
             id,
             name,
             pages: [], // вся лента разбита на пагинированные блоки(страницы)
@@ -367,7 +370,8 @@ class Group {
             setProperty: this.setProperty.bind(this),
             getProperty: this.getProperty.bind(this),
             refresh: this.refresh.bind(this)
-         } })
+         }
+      })
       this.reactiveGroup = this.vm.reactiveGroup
       this.updateReactiveGroup = () => {
          this.reactiveGroup.hasNext = this.hasNext()

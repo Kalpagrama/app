@@ -8,7 +8,7 @@
       v-if="createdContent"
       :showBottomMenu="false"
       :contentOid="createdContent.oid"
-      @close="contentCardEditorShow = false, this.$router.replace('/workspace/contents/book')")
+      @close="contentCardEditorShow = false, this.$router.replace('/workspace/contents?pageId=book&categoryId=uploaded')")
   q-spinner(size="50px" color="green").q-my-xl
 </template>
 

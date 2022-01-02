@@ -59,6 +59,7 @@
                 div(:style=`{ borderRadius: '10px', color: 'white', border: '2px solid rgb(76,175,79)', paddingLeft: '10px', background: 'rgba(40,40,40)'}`).row.full-width
                   q-input(v-model="promoCode", autofocus, borderless dark :placeholder="$t('Введите промокод')" @keyup.enter="sendPromoCode(promoCode)").col.full-width
                   q-btn(v-close-popup round flat :color="promoCode ? 'green' : null", icon="done", :disable="!promoCode" @click="sendPromoCode(promoCode)")
+                  kalpa-pay( v-if="true" :item="item" @success="")
             q-btn(v-if="paid"
               no-caps outline
               size="xs"
@@ -125,6 +126,7 @@
       .row.full-width.content-center.items-center.q-px-sm
         small(size="sm").row.items-center.text-grey-7.text-italic.q-pt-xs {{item.countStat.countViews}} {{$getNoun(item.countStat.countViews,$t('просмотр'),$t('просмотра'),$t('просмотров'))}}
         .col
+        kalpa-pay( v-if="true" :item="item" @success="")
         kalpa-save(:item="item" dense :isActive="true" inactiveColor="white" color="grey-2").q-pl-md
         kalpa-share(:item="item" :itemState="item" :isActive="true" inactiveColor="white" color="grey-2" :headerText="$t('Share')")
         //.q-pa-sm.text-white {{ item.countStat.countSubscribers }}
@@ -295,6 +297,7 @@ export default {
       return ContentApi.urlSelect(this.item)
     },
     paid () {
+      if (!this.item.payInfo.price || this.item.author.oid === this.$store.getters.currentUser.oid) return true // если контент бесплатный либо я - автор
       return this.item.payInfo.paid
     },
     queryPopular () {
@@ -322,6 +325,15 @@ export default {
         if (to) {
           this.following = await UserApi.isSubscribed(to.oid)
           this.followingConfirmed = true
+        }
+      }
+    },
+    'item.payInfo.paid': {
+      immediate: true,
+      async handler (to, from) { // оплатили. Перейдем на полный контент
+        if (to) {
+          this.$logT('content is paid! goto full version...')
+          await this.$router.replace('/content/' + this.item.oid)
         }
       }
     }

@@ -286,7 +286,7 @@ export default {
       }
       else {
         this.relatedContentLoading = contentIndex
-        let contentKalpa = await ContentApi.contentCreateFromUrl(content.urlOriginal, true)
+        let contentKalpa = await ContentApi.contentCreateFromUrl(content.urlOriginal, false)
         this.relatedContentLoading = null
         // await this.$wait(300)
         if (contentKalpa) {

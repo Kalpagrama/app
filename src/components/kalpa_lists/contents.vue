@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width.items-start.content-start.justify-center
   div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
-    //- bookmark editor
+    //- content editor
     q-dialog(
       v-model="contentCardEditorShow"
       :maximized="$q.screen.xs"
@@ -11,6 +11,17 @@
         :showBottomMenu="false"
         :contentOid="contentCardEditorContentOid"
         @close="contentCardEditorShow = false, contentCardEditorContentOid = null")
+    //- bookmark editor
+    q-dialog(
+      v-model="bookmarkEditorShow"
+      :full-width="$q.screen.xs"
+      :full-height="$q.screen.xs"
+      position="bottom"
+      :square="$q.screen.xs"
+      @hide="bookmarkSelected = null")
+      bookmark-editor(
+        :bookmark="bookmarkSelected"
+        @close="bookmarkEditorShow = false, bookmarkSelected = null")
     tab-list-feed(
       :scrollAreaHeight="scrollAreaHeight || $q.screen.height"
       :navHeaderText="useNavHeader ? $t('Contents') : ''"
@@ -25,7 +36,19 @@
       @pageId="pageId = $event"
     ).row.full-width
       template(v-slot:externalHeader)
-        widget-upload(@uploaded="bookmarkSelectHandle($event)").q-mt-sm
+        widget-upload(@uploaded="onUploadComplete($event)").q-mt-sm
+      template(v-slot:stickyHeaderTop)
+        div(:style=`{
+        maxWidth: $store.state.ui.pageWidth+'px',
+        maxHeight: '145px',
+        }`).row.full-width.text-grey-8.wrap.justify-start.scroll.q-px-sm
+          // add collection btn
+          q-chip(
+            v-for="(c,ci) in categories" :key="c.id"
+            clickable outline
+            :name="c.id" :label="c.name"
+            :color="categoryId===c.id ? 'green' : 'grey-8'"
+            @click="categoryId=c.id")
       template(v-slot:item=`{item:bookmark,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
         bookmark-list-item(
           :item="bookmark"
@@ -54,13 +77,13 @@ import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 import widgetUpload from 'src/pages/app/workspace/page_home/widget_upload/index.vue'
 import nodataGuard from 'src/components/kalpa_guard/nodata_guard'
 import { assert } from 'src/system/common/utils'
+import cloneDeep from 'lodash/cloneDeep'
 
 export default {
   name: 'listContents',
   props: {
     scrollAreaHeight: { type: Number },
     useNavHeader: {type: Boolean, default: true},
-    ddd: {type: Boolean, default: true},
     searchInputState: {type: String},
     mode: {type: String, default: 'edit'},
   },
@@ -73,18 +96,31 @@ export default {
   },
   data () {
     return {
+      categoryId: 'uploaded',
       pageId: 'video',
+      bookmarkSelected: null,
+      bookmarkEditorShow: false,
+      contentCardEditorContentOid: null,
       contentCardEditorShow: false,
-      searchString: '',
-      contentCardEditorContentOid: null
+      searchString: ''
     }
   },
   computed: {
+    categories () {
+      return [
+        // {id: 'collections', name: this.$t('Collections')},
+        {id: 'uploaded', name: this.$t('Загруженный'), rxCollectionEnum: RxCollectionEnum.WS_CONTENT, filter: {}},
+        {id: 'paid', name: this.$t('Платный'), rxCollectionEnum: RxCollectionEnum.WS_CONTENT, filter: {'payInfo.price': {$gt: 0}}},
+        {id: 'bought', name: this.$t('Купленный'), rxCollectionEnum: RxCollectionEnum.WS_CONTENT, filter: {'payInfo.paid': true}},
+        {id: 'bookmarked', name: this.$t('В закладках'), rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK, filter: {}}
+      ]
+    },
     pages () {
       return [
         // {id: 'collections', name: this.$t('Collections')},
         {id: 'video',
           name: this.$t('Video'),
+          type: 'VIDEO',
           nodataGuardParams: {
             icon: 'theaters',
             button: true,
@@ -95,6 +131,7 @@ export default {
           }},
         {id: 'book',
           name: this.$t('Books'),
+          type: 'BOOK',
           nodataGuardParams: {
             icon: 'menu_book',
             button: true,
@@ -105,6 +142,7 @@ export default {
           }},
         {id: 'image',
           name: this.$t('Images'),
+          type: 'IMAGE',
           nodataGuardParams: {
             icon: 'o_image',
             button: true,
@@ -121,19 +159,11 @@ export default {
     query () {
       let res = {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
+          rxCollectionEnum: this.categories.find(p => p.id === this.categoryId).rxCollectionEnum,
+          type: this.pages.find(p => p.id === this.pageId).type,
+          ...(this.categories.find(p => p.id === this.categoryId).filter)
         },
         sort: [{createdAt: 'desc'}]
-      }
-      // Get types
-      if (this.pageId === 'video') {
-        res.selector.type = 'VIDEO'
-      }
-      else if (this.pageId === 'book') {
-        res.selector.type = 'BOOK'
-      }
-      else if (this.pageId === 'image') {
-        res.selector.type = 'IMAGE'
       }
       // Search by name
       if (this.searchString.length > 0) {
@@ -144,36 +174,62 @@ export default {
     }
   },
   watch: {
-    '$route.params.pageId': {
+    '$route.query.pageId': {
       immediate: true,
       handler(to) {
         if (to) {
-          assert(to.in('video', 'book', 'image'))
+          assert(this.pages.find(p => p.id === to))
           this.pageId = to
         }
+      }
+    },
+    '$route.query.categoryId': {
+      immediate: true,
+      handler(to) {
+        if (to) {
+          assert(this.categories.find(p => p.id === to))
+          this.categoryId = to
+        }
+      }
+    },
+    pageId: {
+      immediate: true,
+      async handler(to) {
+        if (this.$route.query.pageId !== to) await this.$router.replace({ path: this.$route.path, query: {...this.$route.query, pageId: to, categoryId: this.categoryId }})
+      }
+    },
+    categoryId: {
+      immediate: true,
+      async handler(to) {
+        if (this.$route.query.categoryId !== to) await this.$router.replace({ path: this.$route.path, query: {...this.$route.query, categoryId: to, pageId: this.pageId }})
       }
     }
   },
   methods: {
-    bookmarkSelectHandle ({ contentKalpa, bookmark }) {
-      assert(bookmark)
-      this.$log('bookmarkSelectHandle', contentKalpa, bookmark)
+    onUploadComplete (contentKalpa) {
+      assert(contentKalpa)
+      this.$logT('onUploadComplete', cloneDeep(contentKalpa))
       if (this.mode === 'select') {
-        this.$emit('item', bookmark)
+        // this.$emit('item', bookmark)
       }
       else {
         if (contentKalpa && contentKalpa.contentAuthor && contentKalpa.contentAuthor.oid === this.$store.getters.currentUser.oid) {
-          this.contentCardEditorContentOid = bookmark.oid
+          this.contentCardEditorContentOid = contentKalpa.oid
           this.contentCardEditorShow = true
         } else {
-          this.$router.push('/content/' + bookmark.oid)
+          this.$router.push('/content/' + contentKalpa.oid)
         }
       }
     },
     bookmarkOptionsClickHandle (bookmark) {
       assert(bookmark && bookmark.oid)
-      this.contentCardEditorContentOid = bookmark.oid
-      this.contentCardEditorShow = true
+      if (this.categoryId.in('uploaded', 'paid')){
+        this.contentCardEditorContentOid = bookmark.oid
+        this.contentCardEditorShow = true
+      } else if (this.categoryId.in('bookmarked')){
+        this.bookmarkSelected = bookmark
+        this.bookmarkEditorShow = true
+      }
     }
   }
 }

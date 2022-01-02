@@ -28,9 +28,9 @@
     ).row.full-width
       template(v-slot:stickyHeaderTop)
         div(:style=`{
-          maxWidth: $store.state.ui.pageWidth+'px',
-          maxHeight: '145px',
-          }`).row.full-width.text-grey-8.wrap.justify-start.scroll.q-px-sm
+        maxWidth: $store.state.ui.pageWidth+'px',
+        maxHeight: '145px',
+        }`).row.full-width.text-grey-8.wrap.justify-start.scroll.q-px-sm
           // add collection btn
           add-collection-btn(v-model="collectionsModel")
           q-chip(
@@ -56,8 +56,7 @@
 </template>
 
 <script>
-import { RxCollectionEnum } from 'src/system/rxdb'
-
+import { getRxCollectionEnumFromId, RxCollectionEnum } from 'src/system/rxdb'
 import bookmarkListItem from 'src/components/bookmark/bookmark_list_item.vue'
 import bookmarkEditor from 'src/components/bookmark/bookmark_editor.vue'
 import nodataGuard from 'src/components/kalpa_guard/nodata_guard';
@@ -73,7 +72,7 @@ export default {
     searchString: { type: String, default: '' },
     mode: { type: String },
     wsSphereId: { type: String, default: '' },
-    pageFilter: { type: Object},
+    pageFilter: { type: Object }
   },
   components: {
     bookmarkListItem,
@@ -92,13 +91,13 @@ export default {
     }
   },
   computed: {
-    pages() {
+    pages () {
       return [
         { id: 'all', name: this.$t('All') },
         { id: 'nodes', name: this.$t('Nodes') },
         { id: 'joints', name: this.$t('Joints') },
         { id: 'blocks', name: this.$t('Blocks') },
-        { id: 'contents', name: this.$t('Contents') },
+        { id: 'contents', name: this.$t('Contents') }
       ].filter(p => !this?.pageFilter?.whiteList || this?.pageFilter?.whiteList.includes(p.id))
     },
     // запрос за элементами коллекции
@@ -147,7 +146,7 @@ export default {
     },
     getCollectionNameWithCnt (wsSphere) {
       if (wsSphere.id === 'all') return wsSphere.name
-      else return wsSphere.name + `(${wsSphere?.wsSphereItems?.length || 0})`
+      else return wsSphere.name + `(${(wsSphere?.wsSphereItems || []).filter(id => getRxCollectionEnumFromId(id) === RxCollectionEnum.WS_BOOKMARK).length})`
     },
     bookmarkSelectHandle (bookmark) {
       this.$log('bookmarkSelectHandle', bookmark)
@@ -171,7 +170,7 @@ export default {
         if (!this.searchString) this.searchInputShow = false
         if (this.itemActivePersist) this.$store.commit('ui/stateSet', ['pageIdCollections', to])
       }
-    },
+    }
   },
   async mounted () {
     let pageId, pageCollectionId
