@@ -109,8 +109,8 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
     q-file(ref="inputPreview" accept="video/*" @update:model-value="previewChanged" :style=`{display: 'none',}`)
     //- form
     div(:style=`{
-        paddingLeft: $q.screen.xs ? '0px' : '10px',
-        paddingRight: $q.screen.xs ? '0px' : '10px'
+        paddingLeft: $store.state.ui.isMobile ? '0px' : '10px',
+        paddingRight: $store.state.ui.isMobile ? '0px' : '10px'
   }`).row.full-width
       // progress
       q-linear-progress(v-if="progress" size='5px' :value="progress / 100" color="green-10").row.full-width.q-px-sm
