@@ -16,6 +16,7 @@ import debounce from 'lodash/debounce'
 import throttle from 'lodash/throttle'
 import { assert } from 'src/system/common/utils'
 import { notify } from 'src/boot/notify'
+import cloneDeep from 'lodash/cloneDeep';
 
 const contentful = require('contentful')
 
@@ -130,7 +131,9 @@ export default boot(async ({ app, router: VueRouter, store, ssrContext, urlPath,
       app.config.globalProperties.$getRef = function (refName) {
          assert(this.$refs)
          let ref = this.$refs[refName] // тут иногда элемент, а иногда - массив (если элемент используется вместе с v-for)
-         return ref && ref[0] ? ref[0] : ref
+         if (ref && ref[0]) return ref[0]
+         else if (ref && Array.isArray(ref) && !ref.length) return null
+         else return ref
       }
 
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
