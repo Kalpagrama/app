@@ -35,8 +35,8 @@ video(
   :muted="muted"
   :velocity="velocity"
   :style=`{
-  objectFit: 'contain'
-}`
+      objectFit: 'contain'
+   }`
   @click="videoClick"
   @loadeddata="videoLoadeddata"
   @timeupdate="videoTimeupdate"
@@ -236,7 +236,6 @@ export default {
       }
     },
     playerCreate (type) {
-      // alert('playerCreate' + type)
       this.$log('playerCreate', type)
       if (type === 'player-youtube') {
         const me = new window.MediaElementPlayer(this.$refs.videoRef, {

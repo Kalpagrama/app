@@ -135,7 +135,7 @@ import pageNodeEditor from '../node_editor/index.vue'
 import pageDrafts from './page_drafts/index.vue'
 import pageInfo from '../page_info_root/index.vue'
 import figuresControls from 'src/components/content_player/player_video/player_pult/figures_controls.vue'
-import {assert} from '../../../../system/common/utils';
+import {assert} from 'src/system/common/utils';
 
 export default {
   name: 'layoutVideo',

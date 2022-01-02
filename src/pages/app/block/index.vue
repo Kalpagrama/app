@@ -59,7 +59,7 @@ kalpa-layout()
                     page-comments(v-if="commentsOpened" :item="block")
                 q-separator
                 q-expansion-item(v-model="similarOpened" group="somegroup" icon="grid_view" :label="$t('Similar')" dark default-opened=false).col-12
-                  page-similar(v-if="similarOpened" :node="block")
+                  page-similar(v-if="similarOpened" :item="block")
                 q-separator
 </template>
 
@@ -67,8 +67,8 @@ kalpa-layout()
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import navMobile from 'src/components/kalpa_menu_mobile/nav_mobile.vue'
-import pageComments from 'src/components/kalpa_item/item_extended/node_extended/page_comments';
-import pageSimilar from 'src/components/kalpa_item/item_extended/node_extended/page_similar';
+import pageComments from 'src/components/kalpa_item/item_extended/page_comments';
+import pageSimilar from 'src/components/kalpa_item/item_extended/page_similar';
 import { assert } from 'src/system/common/utils'
 
 export default {

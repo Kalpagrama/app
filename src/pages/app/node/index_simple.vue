@@ -54,7 +54,7 @@ kalpa-layout()
                     page-comments(:item="node")
                 q-separator
                 q-expansion-item(group="somegroup" icon="grid_view" :label="$t('Similar')" dark default-opened=false).col-12
-                  page-similar(:node="node")
+                  page-similar(:item="node")
                 q-separator
               //page-joints(
               //  :node="node"
