@@ -125,6 +125,16 @@ export default {
     },
     pages () {
       return [
+        { id: 'contents',
+          name: this.$t('Контент'),
+          nodataGuardParams: {
+            icon: 'select_all',
+            button: true,
+            message: this.$t('Опубликованный контент отобразится здесь'),
+            buttonName: this.$t('Добавить'),
+            title: this.$t('Здесь пока ничего нет'),
+            clickPath: '/workspace',
+          }},
         { id: 'nodes',
           name: this.$t('Nodes'),
           nodataGuardParams: {
