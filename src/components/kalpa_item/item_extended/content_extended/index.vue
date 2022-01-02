@@ -1,13 +1,14 @@
 <template lang="pug">
 .row.full-width.items-start.content-start.justify-center
-  q-spinner-dots(v-if="!state.node" color="green" size="60px").fixed-center
-  div(v-if="state.node").row.full-width
+  q-spinner-dots(v-if="!content" color="green" size="60px").fixed-center
+  div(v-else).row.full-width
+    // header
     div(v-if="!$q.screen.lt.md").row.full-width.justify-center.b-30
       div(
         :style=`{ borderRadius: '10px'}`).row.full-width.items-center.content-center.q-pa-sm.b-30
         q-btn(@click="$routerKalpa.back()" flat round color="white" icon="west" no-caps)
         .col
-        h1.text-white.text-bold {{$t('Смысловое ядро')}}
+        h1.text-white.text-bold {{$t('Контент')}}
         .col
         //- tutorial
         q-btn(
@@ -16,15 +17,6 @@
         //q-btn(
         //  @click="$store.commit('ui/stateSet', ['kalpaTutorial', {id: 'node_first', useIntro: false, useProfileEditor: false}])"
         //  round flat color="white" icon="fas fa-info")
-    q-dialog(
-      v-model="itemEditorShow"
-      :maximized="false"
-      position="standard")
-      item-editor(
-        :item="pageId==='images' ? newNodeSameEssence : newNodeSameImage"
-        :lockName="pageId==='images'"
-        :publish="true"
-        @close="setNode($event? $event.oid : node.oid), itemEditorShow=false")
     // образ
     //q-btn(v-if="!$q.screen.lt.md" @click="$routerKalpa.back()" flat round color="white" icon="west" no-caps :style=`{position: 'absolute', zIndex: 100}`)
     div(:style=`{position: 'relative'}`).row.full-width
@@ -155,18 +147,13 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import pageSimilar from '../page_similar/index.vue'
 import pageComments from '../page_comments/index.vue'
 import pageDescription from '../page_description/index.vue'
-import pageEssences from './page_essences/index.vue'
-import pageImages from './page_images/index.vue'
-import pageEssence from './page_essence/index.vue'
-import pageImage from './page_image/index.vue'
 import navMobile from 'src/components/kalpa_menu_mobile/nav_mobile.vue'
-import widgetImages from './widget_images/index.vue'
 
 import { assert } from 'src/system/common/utils'
 import cloneDeep from 'lodash/cloneDeep'
 
 export default {
-  name: 'nodeExtended',
+  name: 'contentExtended',
   props: {
     oid: {
       type: String,
@@ -175,213 +162,32 @@ export default {
     showActions: { default: true },
     showAuthor: { default: true },
     showComments: { default: true },
-    showImages: { default: true },
+    showEssences: { default: true },
     showSimilar: { default: true }
   },
-  emits: ['oid', 'pageId'],
   components: {
     pageSimilar,
     pageComments,
     navMobile,
     pageDescription,
-    pageEssences,
-    pageImages,
-    pageEssence,
-    pageImage,
-    widgetImages
   },
   data () {
     return {
-      state: {
-        node: null,
-        essenceOid: null, // oid смысла обычно === node.sphereFromName.oid (либо = одной из сфер)
-        imagesNodesRes: null,
-        imagesNodes: [], // ядра с той же сутью(список образов)
-        imagesNodesInProgress: false,
-        essencesNodesRes: null,
-        essencesNodes: [], // ядра с тем же образом(список сутей)
-        essencesNodesInProgress: false,
-        essencesNodesIndx: -1,
-        essencesNodesIndxPage: -1,
-        imageActive: true // главный образ играется
-      },
-      itemEditorShow: false,
+      content: null,
       pageId: null, // description|comments|essences
       bottomHeight: 0, // сколько места под образом
       imageMaxHeight: 0 // максимальная высота образа
     }
   },
   computed: {
-    newNodeSameImage () {
-      // this.$log('resetNewNode ')
-      assert(this.state.node)
-      let node = cloneDeep(this.state.node)
-      node.name = ''
-      node.description = ''
-      // node.spheres = []
-      return node
-    },
-    newNodeSameEssence () {
-      // this.$log('resetNewNode ')
-      assert(this.state.node)
-      let node = cloneDeep(this.state.node)
-      node.items = []
-      // node.spheres = []
-      return node
-    },
-    essenceRight () {
-      if (this.essencesNodesIndx >= 0) return this.state.essencesNodes.slice(this.essencesNodesIndx + 1, this.state.essencesNodes.length)
-      return []
-    },
-    essenceLeft () {
-      if (this.essencesNodesIndx >= 0) return this.state.essencesNodes.slice(0, this.essencesNodesIndx)
-      return []
-    },
-    essencesNodesIndx () {
-      return this.state.essencesNodes.findIndex(item => item.oid === this.state?.node?.oid)
-    },
-    imagesNodesIndx () {
-      return this.state.imagesNodes.findIndex(item => item.oid === this.state?.node?.oid)
-    },
-    compositionOid () {
-      return this.state?.node?.items[0].oid || null
-    },
-    essenceOid () {
-      return this.state?.node?.sphereFromName.oid
-    }
   },
   watch: {
-    itemEditorShow (to) {
-      if (to) this.state.imageActive = false
-      else this.state.imageActive = true
-    },
-    'state.essencesNodesIndx': {
-      handler (to, from) {
-        // this.$log('state.essencesNodesIndx TO', to)
-        if (to >= 0) {
-          assert(this.state.essencesNodes[to])
-          this.setNode(this.state.essencesNodes[to].oid, true)
-        }
-      }
-    },
-    'state.essencesNodesIndxPage': {
-      handler (to, from) {
-        if (to >= 1) {
-          assert(this.state.essencesNodes[to - 1])
-          this.setNode(this.state.essencesNodes[to - 1].oid, true)
-        }
-      }
-    },
-    essencesNodesIndx (to, from) {
-      this.state.essencesNodesIndx = to
-      this.state.essencesNodesIndxPage = to + 1
-    },
-    'state.imagesNodesRes.items': {
-      deep: true,
-      handler (to, from) {
-        if (to) {
-          // this.$log('imagesNodesRes changed', this.state?.node?.oid, cloneDeep(itemsRes.items))
-          let res = [...to]
-          if (!res.find(item => item.oid === this.state.node.oid)) res = [this.state.node, ...res]
-          let indx = res.findIndex(item => item.oid === this.state.node.oid)
-          assert(indx >= 0)
-          res.splice(indx, 1, this.state.node) // ядро уже заполнено (чтобы не дергался плер (он уже начал его проигрывать, а потом загрузились imagesNodesRes))
-          this.state.imagesNodes.splice(0, this.state.imagesNodes.length, ...res)
-          // this.$log('this.state.imagesNodes=', cloneDeep(this.state.imagesNodes))
-        }
-      }
-    },
-    'state.essencesNodesRes.items': {
-      deep: true,
-      handler (to, from) {
-        if (to) {
-          // this.$log('essenceNodesRes changed', this.state?.node?.oid, cloneDeep(itemsRes.items))
-          let res = [...to]
-          if (!res.find(item => item.oid === this.state.node.oid)) res = [this.state.node, ...res]
-          let indx = res.findIndex(item => item.oid === this.state.node.oid)
-          assert(indx >= 0)
-          res.splice(indx, 1, this.state.node) // ядро уже заполнено (чтобы не дергался плер (он уже начал его проигрывать, а потом загрузились imagesNodesRes))
-          this.state.essencesNodes.splice(0, this.state.essencesNodes.length, ...res)
-          // this.$log('this.state.essencesNodes=', cloneDeep(this.state.essencesNodes))
-        }
-      }
-    },
-    compositionOid: { // изменилась композиция
-      async handler (to, from) {
-        // this.$log('compositionOid to=', to)
-        // this.state.essencesNodesRes = null
-        if (to) {
-          // this.state.essencesNodes = [this.state.node] -- не надо. иначе суть дергается при смене образа
-          assert(this.state.node)
-          this.state.essencesNodesInProgress = true
-          this.state.essencesNodesRes = await this.$rxdb.find({
-            selector: {
-              rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-              objectTypeEnum: { $in: ['NODE'] },
-              oidSphere: to,
-              sortStrategy: 'ESSENTIALLY' // 'ACTIVITY', // AGE
-            },
-            populateObjects: false
-          })
-          this.state.essencesNodesInProgress = false
-        }
-      }
-    },
-    'state.essenceOid': { // изменилась главная суть. ищем образы на эту суть
-      async handler (to, from) {
-        // this.$log('essenceOid to=', to)
-        // this.state.imagesNodesRes = null
-        if (to) {
-          // this.state.imagesNodes = [this.state.node] -- не надо. иначе образы дергается 2 раза при смене сути
-          this.state.imagesNodesInProgress = true
-          this.state.imagesNodesRes = await this.$rxdb.find({
-            selector: {
-              rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-              objectTypeEnum: { $in: ['NODE'] },
-              oidSphere: to,
-              name: this.state.node.name, // не  берем ядра, у которых другая главная суть (например, эта суть в сферах)
-              sortStrategy: 'ESSENTIALLY' // 'ACTIVITY', // AGE
-            },
-            populateObjects: false
-          })
-          this.state.imagesNodesInProgress = false
-        }
-      }
-    },
-    'state.node.oid': {
-      async handler (to, from) {
-        this.$log('node.oid to=', to)
-        // this.pageId = null
-        this.state.imageActive = true
-        if (to) this.$emit('oid', to)
-      }
-    },
-    oid: {
-      immediate: true,
-      async handler (to, from) {
-        await this.setNode(to, true)
-      }
-    },
-    pageId (to) {
-      this.$emit('pageId', to)
-    }
   },
   methods: {
-    async setNode (oid, canChangeMainEssence = true) {
-      // this.$log('setNode', canChangeMainEssence, this.state?.node?.oid, oid)
-      if (oid && oid !== this.state?.node?.oid) {
-        this.state.node = await this.$rxdb.get(RxCollectionEnum.OBJ, oid)
-        if (canChangeMainEssence) this.state.essenceOid = this.state.node.sphereFromName.oid
-        else {
-          // образы на суть необязательно находятся в ядрах с таким же именем, но у них тогда обязательно должна быть такая сфера
-          assert(this.state.essenceOid)
-          assert(this.state.essenceOid === this.state.node.sphereFromName.oid || this.state.node.spheres.find(s => s.oid === this.state.essenceOid))
-        }
-      }
-    }
   },
   async mounted () {
-    this.$log('mounted')
+    this.$log('mounted', this.oid)
+    this.content = this.$rxdb.get(RxCollectionEnum.OBJ, this.oid)
   },
   beforeUnmount () {
     this.$log('beforeDestroy')
