@@ -79,6 +79,7 @@ module.exports = configure(function (ctx) {
             'Notify',
             'Screen',
             'AppVisibility',
+            'AppFullscreen',
             'Dialog',
             'Loading'
          ]

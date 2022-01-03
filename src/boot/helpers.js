@@ -3,6 +3,8 @@ import { EventApi } from 'src/api/event'
 import { assert } from 'src/system/common/utils'
 import differenceWith from 'lodash/differenceWith'
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { Platform, Screen } from 'quasar'
+import { computed, reactive } from 'vue'
 
 // node rate meta
 const rateMeta = [
@@ -94,4 +96,13 @@ export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath
         }
      }
   }
+
+  app.config.globalProperties.$screenProps = reactive({
+     isDesktop: computed(() => Screen.width >= 768),
+     isMobile: computed(() => Screen.width < 768),
+     isMobileLarge: computed(() => Screen.width < 768 && Screen.width >= 601),
+     isMobileNormal: computed(() => Screen.width < 601 && Screen.width >= 321),
+     isMobileTiny: computed(() => Screen.width < 321),
+     isHorizontal: computed(() => (Platform.is.mobile || Platform.is.capacitor) && Screen.width > Screen.height),
+  })
 })

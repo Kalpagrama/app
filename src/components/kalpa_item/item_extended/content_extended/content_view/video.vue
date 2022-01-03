@@ -1,7 +1,7 @@
 // образы на суть
 <template lang="pug">
-div(:style=`{ width: '400px', height: '300px'}`).row.full-width
-  .column.fit
+.row
+  .column.fit.relative-position
     player-default(
       :contentKalpa="content"
       @player="player = $event, $emit('player', $event)").fit.bg-black

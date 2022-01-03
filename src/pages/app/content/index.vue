@@ -1,11 +1,11 @@
 <template lang="pug">
-//component(
-//  v-if="contentKalpa"
-//  :is="'layout-'+layoutId"
-//  :key="contentKalpa.oid"
-//  :contentKalpa="contentKalpa"
-//  :draftId="$route.query.draftId")
-content-extended(:oid="oid")
+component(
+  v-if="contentKalpa"
+  :is="'layout-'+layoutId"
+  :key="contentKalpa.oid"
+  :contentKalpa="contentKalpa"
+  :draftId="$route.query.draftId")
+//content-extended(:oid="oid")
 </template>
 
 <script>

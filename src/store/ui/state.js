@@ -1,4 +1,3 @@
-import { Screen } from 'quasar'
 export default {
   initialized: false,
   // viewport
@@ -14,11 +13,11 @@ export default {
   pageWidthMedi: 600,
   pageWidthMaxi: 800,
   pageMinWidthDesktop: 768,
-  isDesktop: Screen.width >= 768,
-  isMobile: Screen.width < 768,
-  isMobileLarge: Screen.width < 768 && Screen.width >= 601,
-  isMobileNormal: Screen.width < 601 && Screen.width >= 321,
-  isMobileTiny: Screen.width < 321,
+  // isDesktop: Screen.width >= 768,
+  // isMobile: Screen.width < 768,
+  // isMobileLarge: Screen.width < 768 && Screen.width >= 601,
+  // isMobileNormal: Screen.width < 601 && Screen.width >= 321,
+  // isMobileTiny: Screen.width < 321,
   // user
   userTyping: false,
   userScrolling: false,
