@@ -146,15 +146,15 @@
       .row.full-width.justify-start
         small.text-grey-8.q-pb-xs.q-px-xs {{$t('похожие ядра')}}
       //small.text-grey.text-center.text-italic.q-px-xs "{{state.node.name.substring(0, 22)}}{{state.node.name.length>22 ? '...': ''}}"
-      page-similar(:node="state.node")
+      page-similar(:item="state.node")
 </template>
 
 <script>
 
 import { RxCollectionEnum } from 'src/system/rxdb'
-import pageSimilar from './page_similar/index.vue'
-import pageComments from './page_comments/index.vue'
-import pageDescription from './page_description/index.vue'
+import pageSimilar from '../page_similar/index.vue'
+import pageComments from '../page_comments/index.vue'
+import pageDescription from '../page_description/index.vue'
 import pageEssences from './page_essences/index.vue'
 import pageImages from './page_images/index.vue'
 import pageEssence from './page_essence/index.vue'

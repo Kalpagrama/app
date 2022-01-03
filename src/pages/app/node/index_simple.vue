@@ -54,7 +54,7 @@ kalpa-layout()
                     page-comments(:item="node")
                 q-separator
                 q-expansion-item(group="somegroup" icon="grid_view" :label="$t('Similar')" dark default-opened=false).col-12
-                  page-similar(:node="node")
+                  page-similar(:item="node")
                 q-separator
               //page-joints(
               //  :node="node"
@@ -69,8 +69,8 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import navMobile from './nav_mobile.vue'
 import widgetJoints from 'src/components/kalpa_item/item_extended/node_extended/widget_joints/index.vue'
 import pageJoints from 'src/components/kalpa_item/item_extended/node_extended/page_joints/index.vue'
-import pageSimilar from 'src/components/kalpa_item/item_extended/node_extended/page_similar/index.vue'
-import pageComments from 'src/components/kalpa_item/item_extended/node_extended/page_comments/index.vue'
+import pageSimilar from 'src/components/kalpa_item/item_extended/page_similar/index.vue'
+import pageComments from 'src/components/kalpa_item/item_extended/page_comments/index.vue'
 
 export default {
   name: 'pageApp_node',

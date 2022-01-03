@@ -26,7 +26,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 export default {
   name: 'pageSimilar',
   props: {
-    node: {type: Object},
+    item: {type: Object},
     types: {type: Array, default: ['NODE', 'JOINT', 'BLOCK']},
   },
   data () {
@@ -39,7 +39,7 @@ export default {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
           objectTypeEnum: { $in: this.types },
-          oidSphere: this.node.oid,
+          oidSphere: this.item.oid,
           deep: 5,
           sortStrategy: 'HOT' // 'ACTIVITY', // AGE
         },

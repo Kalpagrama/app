@@ -70,21 +70,21 @@ div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`)
           //    page-comments(:item="block")
           //q-separator
           //q-expansion-item(group="somegroup" icon="grid_view" :label="$t('Similar')" dark default-opened=false).col-12
-          //  page-similar(:node="block")
+          //  page-similar(:item="block")
           //q-separator
         page-comments(v-if="pageId === 'comments'" :item="item")
         //page-nodes(v-if="pageId === 'nodes'" :sphere="item" :height="700")
         item-description(v-if="pageId === 'description'" :item="item" :height="700")
         //page-joints(v-if="pageId === 'joints'" :sphere="item" :height="700")
-        page-similar(v-if="pageId === 'similar'" :node="item" :types="['VIDEO', 'BOOKS', 'IMAGE']")
+        page-similar(v-if="pageId === 'similar'" :item="item" :types="['VIDEO', 'BOOKS', 'IMAGE']")
 </template>
 
 <script>
-import pageComments from 'src/components/kalpa_item/item_extended/node_extended/page_comments'
+import pageComments from 'src/components/kalpa_item/item_extended/page_comments'
 import itemDescription from 'src/components/kalpa_item/item_card/viewer/item_description.vue'
 // import pageNodes from 'src/pages/app/sphere/page_nodes/index.vue'
 // import pageJoints from 'src/pages/app/sphere/page_joints/index.vue'
-import pageSimilar from 'src/components/kalpa_item/item_extended/node_extended/page_similar'
+import pageSimilar from 'src/components/kalpa_item/item_extended/page_similar'
 import {ContentApi} from 'src/api/content';
 
 export default {

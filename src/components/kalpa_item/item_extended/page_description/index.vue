@@ -4,8 +4,8 @@
   .col
   q-btn(round flat color="white" icon="clear" @click="$emit('close')")
   .row.full-width
-    //span.text-white {{node.description}}
-    div(v-html="node.description").text-grey
+    //span.text-white {{item.description}}
+    div(v-html="item.description").text-grey
 </template>
 
 <script>
@@ -16,7 +16,7 @@ export default {
   name: 'pageDescription',
   components: {
   },
-  props: ['node', 'height'],
+  props: ['item', 'height'],
   data () {
     return {
     }

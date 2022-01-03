@@ -233,13 +233,13 @@
         //      //    page-comments(:node="block")
         //      //q-separator
         //      //q-expansion-item(group="somegroup" icon="grid_view" :label="$t('Similar')" dark default-opened=false).col-12
-        //      //  page-similar(:node="block")
+        //      //  page-similar(:item="block")
         //      //q-separator
         //    page-comments(v-if="pageId === 'comments'" :item="item")
         //    page-nodes(v-if="pageId === 'nodes'" :sphere="item" :height="700")
         //    item-description(v-if="pageId === 'description'" :item="item" :height="700")
         //    //page-joints(v-if="pageId === 'joints'" :sphere="item" :height="700")
-        //    //page-similar(v-if="pageId === 'similar'" :node="item" :types="['VIDEO', 'BOOKS', 'IMAGE']")
+        //    //page-similar(v-if="pageId === 'similar'" :item="item" :types="['VIDEO', 'BOOKS', 'IMAGE']")
       //.row
       //  q-btn(
       //    no-caps
@@ -253,15 +253,15 @@
 <script>
 import {ContentApi} from 'src/api/content'
 import contentPlayer from 'src/components/content_player'
-import pageComments from 'src/components/kalpa_item/item_extended/node_extended/page_comments';
+import pageComments from 'src/components/kalpa_item/item_extended/page_comments';
 import pageDescription from 'src/components/kalpa_item/item_card/viewer/video/page_description.vue'
-import pageSimilar from 'src/components/kalpa_item/item_extended/node_extended/page_similar';
+import pageSimilar from 'src/components/kalpa_item/item_extended/page_similar';
 import listFeedCustomHorizontalPPV from 'src/components/list_feed/list_feed_horizontal_custom_ppv.vue'
 import pageNodes from 'src/pages/app/content/layout_video/page_nodes'
-import {RxCollectionEnum} from '../../../../system/rxdb';
-import {assert} from '../../../../system/common/utils';
-import {ObjectApi} from '../../../../api/object';
-import {UserApi} from '../../../../api/user';
+import {RxCollectionEnum} from 'src/system/rxdb';
+import {assert} from 'src/system/common/utils';
+import {ObjectApi} from 'src/api/object';
+import {UserApi} from 'src/api/user';
 
 export default {
   name: 'typeVideo',

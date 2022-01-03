@@ -5,12 +5,13 @@ component(
   :key="contentKalpa.oid"
   :contentKalpa="contentKalpa"
   :draftId="$route.query.draftId")
+//content-extended(:oid="oid")
 </template>
 
 <script>
 import { ObjectApi } from 'src/api/object'
 import { RxCollectionEnum } from 'src/system/rxdb'
-
+import contentExtended from 'src/components/kalpa_item/item_extended/content_extended'
 import layoutDefault from './layout_default/index.vue'
 import layoutVideo from './layout_video/index.vue'
 import layoutImage from './layout_image/index.vue'
@@ -20,6 +21,7 @@ export default {
   name: 'pageApp_content',
   props: ['oid'],
   components: {
+    contentExtended,
     layoutDefault,
     layoutVideo,
     layoutImage,
