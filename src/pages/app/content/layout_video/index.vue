@@ -129,11 +129,11 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import contentPlayer from 'src/components/content_player/index.vue'
 import navBottom from 'src/components/kalpa_menu_mobile/nav_bottom.vue'
-import pageNodes from './page_nodes/index.vue'
+import pageNodes from 'src/components/kalpa_item/item_extended/content_extended/page_nodes/video'
 import pageNode from './page_node/index.vue'
 import pageNodeEditor from '../node_editor/index.vue'
-import pageDrafts from './page_drafts/index.vue'
-import pageInfo from '../page_info_root/index.vue'
+import pageDrafts from 'src/components/kalpa_item/item_extended/content_extended/page_drafts/video'
+import pageInfo from 'src/components/kalpa_item/item_extended/content_extended/page_info'
 import figuresControls from 'src/components/content_player/player_video/player_pult/figures_controls.vue'
 import {assert} from 'src/system/common/utils';
 

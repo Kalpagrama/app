@@ -93,9 +93,9 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import contentPlayer from 'src/components/content_player/index.vue'
 
-import pageNodes from './page_nodes/index.vue'
-import pageDrafts from './page_drafts/index.vue'
-import pageInfo from '../page_info_root/index.vue'
+import pageNodes from 'src/components/kalpa_item/item_extended/content_extended/page_nodes/image'
+import pageDrafts from 'src/components/kalpa_item/item_extended/content_extended/page_drafts/image'
+import pageInfo from 'src/components/kalpa_item/item_extended/content_extended/page_info'
 import navBottom from 'src/components/kalpa_menu_mobile/nav_bottom.vue'
 
 import nodeEditor from 'src/pages/app/content/node_creator/node_editor/index.vue'

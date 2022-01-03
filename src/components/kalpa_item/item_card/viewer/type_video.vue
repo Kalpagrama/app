@@ -257,7 +257,7 @@ import pageComments from 'src/components/kalpa_item/item_extended/page_comments'
 import pageDescription from 'src/components/kalpa_item/item_card/viewer/video/page_description.vue'
 import pageSimilar from 'src/components/kalpa_item/item_extended/page_similar';
 import listFeedCustomHorizontalPPV from 'src/components/list_feed/list_feed_horizontal_custom_ppv.vue'
-import pageNodes from 'src/pages/app/content/layout_video/page_nodes'
+import pageNodes from 'src/components/kalpa_item/item_extended/content_extended/page_nodes/video'
 import {RxCollectionEnum} from 'src/system/rxdb';
 import {assert} from 'src/system/common/utils';
 import {ObjectApi} from 'src/api/object';
