@@ -1,10 +1,10 @@
 <template lang="pug">
 div(
-  @click.self="onClick, player.playing ? player.pause():player.play()"
+  @click.self="onClick"
   @mousemove="onMouseMove"
   @mouseout="onMouseOut"
   @mouseover="onMouseOver"
-).row.fit.bg-10.br
+).row.fit.bg-10
   transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(v-if="isOverlayShow"
       :style=`{
@@ -13,24 +13,31 @@ div(
         background: 'rgba(0,0,0,0.3)',
       }`
     ).row.full-width.items-center.content-center.justify-center
-      .row.fit.relative-position.bg.items-center.content-center.justify-center
-        .row.full-width.items-center.content-center.justify-center
+      .row.fit.relative-position.items-center.content-center.justify-center
+        div(@click.self="player.playing ? player.pause():player.play()").row.fit.items-center.content-center.justify-center
           q-icon(:name="player.playing ? 'pause' : 'play_arrow'" color="white" size="70px" @click="player.playing ? player.pause():player.play()")
-        .row.full-width.absolute-top-left.q-pa-sm
-          .row.cursor-pointer
-            .row.items-center.content-center.justify-center.q-pr-sm
-              img(
-                :src="item.author.thumbUrl"
-                :style=`{height:'50px', width: '50px', objectFit: 'cover', borderRadius: '50px'}`
-              )
-            .col
-              .row.full-width
-                span.text-white.text-subtitle1.ellipsis {{ item.name }}
-              .row.full-width
-                small.text-white.text-bold.ellipsis {{ item.author.name }}
-          .col
-          .row.q-pa-sm
-            q-icon(name="more_vert" color="white" size="sm")
+        .row.full-width.absolute-top-left.no-pointer-events.no-wrap
+          div(:style=`{minHeight: '100px'}`).row.full-width.relative-position
+            div(v-show="item.contentProvider === 'YOUTUBE'"
+              :style=`{
+                height: '100%', zIndex: 0,
+                background: 'linear-gradient(180deg, rgba(0,0,0,1) 60px, rgba(0,0,0,0) 100%)',
+            }`).row.full-width.absolute-top.no-pointer-events.no-wrap
+            div(:style=`{zIndex: 10}`).row.full-width.q-pa-sm
+              div(:style=`{maxWidth: '80vw'}`).row.non-selectable
+                .row.items-start.content-start.justify-center.q-pr-sm
+                  img(
+                    :src="item.author.thumbUrl"
+                    :style=`{height:'50px', width: '50px', objectFit: 'cover', borderRadius: '50px'}`
+                  )
+                .row.col.items-start.content-start.justify-center
+                  .row.full-width
+                    span(:style=`{fontSize: fontSize + 'px'}`).text-white.ellipsis {{ item.name }}
+                  .row.full-width
+                    small(:style=`{fontSize: fontSize - 2 + 'px'}`).text-white.ellipsis {{ item.author.name }}
+              .col
+              .row.q-pa-sm.all-pointer-events
+                q-icon(name="more_vert" color="white" size="sm")
 </template>
 
 <script>
@@ -46,6 +53,12 @@ export default {
     }
   },
   // emits: ['play', 'pause'],
+  computed: {
+    fontSize() {
+      if (!this.$screenProps.isMobile) return 16
+      else return 13
+    },
+  },
   methods: {
     onClick () {
       this.isOverlayShow = true
@@ -67,7 +80,7 @@ export default {
       if (this.timerMouseOut) clearTimeout(this.timerMouseOut)
       this.timerMouseOut = setTimeout(() => {
         this.updateState()
-      }, 2000)
+      }, 0)
     },
     onMouseMove () {
       this.lastMouseMove = Date.now()

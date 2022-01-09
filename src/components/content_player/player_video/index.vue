@@ -6,7 +6,7 @@
       @player="player = $event, $emit('player', $event)")
       template(v-slot:externalOverlay)
         //- Tint bottom - on pause and desktops only and youtube
-        transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        transition(appear leave-active-class="animated fadeOut")
           div(
             v-if="player && !player.playing && player.playerType === 'player-youtube' && $q.screen.width > 480"
             v-show="options.showTint"
