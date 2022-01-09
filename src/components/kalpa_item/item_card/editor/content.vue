@@ -3,14 +3,14 @@ div(
   :style=`{
 position: 'fixed',
 borderRadius: '10px',
-paddingTop: $q.screen.xs ? '0px' : '10px',
-paddingBottom: $q.screen.xs ? '0px' : '0px'
+// paddingBottom: $screenProps.isMobile ? '0px' : '0px'
 // paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)'
 }`
 ).relative-position.row.full-width.b-40
   // header
-  div(:style=`{}`
+  div(:style=`{paddingTop: $screenProps.isMobile ? '0px' : '10px',}`
   ).row.full-width.justify-center.content-end.items-end.q-pb-xs
+    q-resize-observer(@resize="bodyHeight = $q.screen.height - ($event.height + bottomHeight)")
     .text-white.text-subtitle2 {{$t('Сведения о контенте')}}
     //q-btn(round flat color="white" icon="clear" v-close-popup)
   div(v-if="!contentCopy" :style=`{minHeight: '400px'}`).row.fit.items-center.justify-center.content-center
@@ -18,95 +18,22 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
   // body
   div(v-if="contentCopy"
     :style=`{
-    maxHeight: !$q.screen.xs ? ($q.screen.height*70/100)+'px' : $q.screen.height+'px',
+    maxHeight: !$screenProps.isMobile ? ($q.screen.height*70/100)+'px' : bodyHeight+'px',
     overflow: "auto"
-}`).row.full-width
+    }`).row.full-width.br
     //- tabs
     .row.full-width
-      q-tabs(
-        v-model="pageId"
-        :breakpoint="500" switch-indicator
-      no-caps dense size="xs"
-        active-color="green"
-      ).full-width.text-grey-8
-        q-tab(
-          v-for="(p,pi) in pages" :key="p.id"
-          :name="p.id" :label="p.name")
-      //- tab panels
-      q-tab-panels(
-        v-model="pageId"
-        :swipeable="$q.platform.is.mobile || true"
-        :animated="$q.platform.is.mobile || true"
-        :style=`{}`).full-width.b-40
-        q-tab-panel(
-          v-for="(p,pi) in pages" :key="p.id" :name="p.id").row.items-start.content-start.justify-start.q-pa-none
-          div(v-if="pageId === 'cover'").row.full-width.items-start.content-start.justify-center
-            div(:style=`{height: $q.screen.width > 320 ? "240px" : "200px",}`).relative-position.row.items-center.content-center.justify-center.no-scroll
-              div(:style=`{height: $q.screen.width > 320 ? "200px" : "160px", width: $q.screen.width}`).relative-position.row.items-center.content-center.justify-center
-                div(:style=`{height: $q.screen.width > 320 ? "200px" : "160px", width: "350px",}`).relative-position.row.items-center.content-center.justify-center
-                  img(
-                    :src="contentCopy.thumbUrl"
-                    draggable="false"
-                    :style=`{
-                  maxHeight: '100%',
-                  maxWidth: '100%',
-                  objectFit: 'contain',
-                  borderRadius: '20px',
-                }`)
-                div(flat dense no-caps color="white" :style=`{position: "absolute"}` @click="$refs.inputThumb.pickFiles()").fit.br-20
-              .row.full-width.items-start.content-start.justify-center
-                q-btn(
-                  @click="$refs.inputThumb.pickFiles()"
-                  flat no-caps color="grey"
-                  :ripple="false"
-                  :disable="!content || content.uploadStage === 'BLANK'"
-                  :label="$t('Изменить')"
-                  :style=`{}`)
-          div(v-if="pageId === 'preview'").row.full-width.items-start.content-start.justify-center
-            div(:style=`{height: $q.screen.width > 320 ? "240px" : "200px",}`).relative-position.row.full-width.items-start.content-start.justify-center.no-scroll
-              div(:style=`{height: $q.screen.width > 320 ? "200px" : "160px", width: $q.screen.width > 320 ? "350px" : "300px"}`).relative-position.row.items-start.content-start.justify-center
-                video(v-if="rangeModel || previewUrl"
-                  ref="video"
-                  autoplay
-                  controls
-                  :playsinline="true"
-                  :src="rangeModel ? contentUrl : previewUrl"
-                  :style=`{maxHeight: $q.screen.width > 320 ? "200px" : "160px",}`
-                ).full-width.br-20
-                q-btn(v-if="!rangeModel && !previewUrl"
-                  @click="$refs.inputPreview.pickFiles()"
-                  flat no-caps color="green" stack
-                  :disable="!content || content.uploadStage === 'BLANK'"
-                  :label="$t('Загрузить')"
-                  icon="add"
-                  :style=`{
-                    border: '2px solid rgb(60,60,60)'
-                }`).fit.br-20
-              .row.full-width.items-start.content-start.justify-center
-                q-btn(v-if="content && !previewUrl && !rangeModel"
-                  flat no-caps color="green-8"
-                  :disable="!content || content.uploadStage === 'BLANK'"
-                  :label="$t('Выделить диапазон')"
-                  @click="rangeModel = {min: 0, max: Math.min(60 * 5, content.duration / 2)}")
-                div(v-if="rangeModel").row.full-width
-                  q-range(
-                    v-model="rangeModel"
-                    :min="0"
-                    :max="content.duration"
-                    :step="1"
-                    :left-label-value="rangeModel.min + $t('сек')"
-                    :right-label-value="rangeModel.max + $t('сек')"
-                    label-always
-                    :color="rangeModel.max - rangeModel.min < maxPreviewDur ? 'green-8' : 'red-8'").col.q-mx-md
-                  q-btn(flat no-caps color="green-8" :label="$t('Отмена')" @click="rangeModel = null")
-                q-btn(v-if="previewUrl"
-                  @click="previewDelete"
-                  flat no-caps color="red"
-                  :ripple="false"
-                  :label="$t('Удалить')"
-                  :style=`{}`)
-    q-file(ref="inputThumb" accept="image/*" @update:model-value="thumbChanged" :style=`{display: 'none',}`)
-    q-file(ref="inputPreview" accept="video/*" @update:model-value="previewChanged" :style=`{display: 'none',}`)
+      component(:is="'preview-tabs-' + content.__typename"
+        :content="content"
+        :contentCopy="contentCopy"
+        :previewUrl="previewUrl"
+        :contentUrl="contentUrl"
+        :rangeModel="rangeModel"
+        @previewDelete="previewDelete"
+        @thumbChanged="thumbChanged"
+        @previewChanged="previewChanged"
+        @rangeModelChanged="rangeModel = $event"
+      )
     //- form
     div(:style=`{
         paddingLeft: $screenProps.isMobile ? '0px' : '10px',
@@ -222,7 +149,8 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
                 .row.content-center.items-center
                   q-icon(name="fas fa-ruble-sign" color="grey-5")
   // buttons
-  .row.full-width.justify-end.content-center.items-center.q-pt-sm.q-pb-xs.q-px-sm.q-mb-xs
+  .row.full-width.justify-end.content-center.items-center.q-pt-sm.q-pb-xs.q-px-sm
+    q-resize-observer(@resize="bottomHeight = $event.height")
     .row
       q-btn(v-if="$store.getters.currentUser.profile.role.in('MODERATOR', 'ADMIN')"
         no-caps :ripple="false" color="grey" round
@@ -231,8 +159,8 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
         @click="contentDelete")
         q-tooltip(dense dark) {{$t('Удалить контент')}}
     .col
-    q-btn(outline no-caps color="red" :label="$t('Cancel')" v-close-popup).q-mr-sm
-    q-btn(outline no-caps color="green" :loading="loading" :label="$t('Save')" @click="save")
+    q-btn(outline no-caps color="red" :label="$t('Cancel')" v-close-popup).q-mr-sm.q-mb-xs
+    q-btn(outline no-caps color="green" :loading="loading" :label="$t('Save')" @click="save").q-mb-xs
     slot(v-if="showBottomMenu" name="bottomMenu")
       div(v-if="showBottomMenu").row.full-width
         div(:style=`{
@@ -259,6 +187,9 @@ import { objectTypeName, objectUrl } from 'src/system/common/object_info.js';
 import differenceWith from 'lodash/differenceWith'
 import editSpheres from 'src/pages/app/content/node_editor/edit_spheres.vue'
 import paidUsers from 'src/components/kalpa_lists/paid_users.vue'
+import previewTabsVideo from 'src/components/kalpa_item/item_card/editor/previewTabsVideo.vue';
+import previewTabsBook from 'src/components/kalpa_item/item_card/editor/previewTabsBook.vue';
+import previewTabsImage from 'src/components/kalpa_item/item_card/editor/previewTabsImage.vue';
 import cloneDeep from 'lodash/cloneDeep'
 import { assert } from 'src/system/common/utils.js';
 import { ObjectApi } from 'src/api/object.js';
@@ -273,7 +204,10 @@ export default {
   },
   components: {
     paidUsers,
-    editSpheres
+    editSpheres,
+    previewTabsVideo,
+    previewTabsBook,
+    previewTabsImage
   },
   data () {
     return {
@@ -285,13 +219,15 @@ export default {
       contentCopy: null,
       loading: false,
       paidUsersListShow: false,
-      pageId: 'cover',
-      pages: [
-        { id: 'cover', name: this.$t('Обложка') },
-        { id: 'preview', name: this.$t('Превью') }],
+      // pageId: 'cover',
+      // pages: [
+      //   { id: 'cover', name: this.$t('Обложка') },
+      //   { id: 'preview', name: this.$t('Превью') }],
       rangeModel: null,
       maxPreviewDur: 20 * 60,
-      progress: 0
+      progress: 0,
+      bodyHeight: 500,
+      bottomHeight: 100
     }
   },
   computed: {
@@ -351,22 +287,6 @@ export default {
         // if (this.bookmark) this.bookmark.name = this.content.name
         // if (this.bookmark) this.bookmark.thumbUrl = this.content.thumbUrl
         await this.$nextTick()
-      }
-    },
-    'rangeModel.min': {
-      async handler (to) {
-        if (this.$refs.video){
-          this.$refs.video.currentTime = to
-          this.$refs.video.pause()
-        }
-      }
-    },
-    'rangeModel.max': {
-      async handler (to) {
-        if (this.$refs.video){
-          this.$refs.video.currentTime = to
-          this.$refs.video.pause()
-        }
       }
     },
   },
@@ -430,7 +350,7 @@ export default {
       }
     },
     async thumbChanged (file) {
-      this.$log('thumbChanged', file)
+      this.$logT('thumbChanged', file)
       this.contentCopy.thumbUrl = URL.createObjectURL(file)
       this.fileThumb = file
     },
