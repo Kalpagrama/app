@@ -37,9 +37,6 @@
             v-if="item.type === 'VIDEO'"
             @player="playerReady=true"
             :contentKalpa="item"
-            :isActive="true"
-            :isVisible="true"
-            :isMini="false"
             :style=`{zIndex: 100}`
           ).fit.absolute-top
           div(:style=`{pointerEvents: 'none', background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 35%)', zIndex: 110}`).fit.absolute-bottom

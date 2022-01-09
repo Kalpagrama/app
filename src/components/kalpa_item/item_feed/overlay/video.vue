@@ -4,33 +4,27 @@ div(
   @mousemove="onMouseMove"
   @mouseout="onMouseOut"
   @mouseover="onMouseOver"
-).row.fit.bg-10.br
+).row.fit.bg-10
   transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(v-if="isOverlayShow"
-      :style=`{
-        position: 'absolute', zIndex: 20, bottom: '0px',
-        height: '100%',
-        background: 'rgba(0,0,0,0.3)',
-      }`
-    ).row.full-width.items-center.content-center.justify-center
-      .row.fit.relative-position.bg.items-center.content-center.justify-center
-        .row.full-width.items-center.content-center.justify-center
-          q-icon(:name="player.playing ? 'pause' : 'play_arrow'" color="white" size="70px" @click="player.playing ? player.pause():player.play()")
-        .row.full-width.absolute-top-left.q-pa-sm
-          .row.cursor-pointer
-            .row.items-center.content-center.justify-center.q-pr-sm
-              img(
-                :src="item.author.thumbUrl"
-                :style=`{height:'50px', width: '50px', objectFit: 'cover', borderRadius: '50px'}`
-              )
-            .col
-              .row.full-width
-                span.text-white.text-subtitle1.ellipsis {{ item.name }}
-              .row.full-width
-                small.text-white.text-bold.ellipsis {{ item.author.name }}
+    div(v-if="isOverlayShow" :style=`{ background: 'rgba(0,0,0,0.7)'}`).row.fit.absolute-bottom.items-center.content-center.justify-center
+      .row.full-width.items-center.content-center.justify-center
+        q-icon(:name="player.playing ? 'pause' : 'play_arrow'" color="white" size="70px" @click="player.playing ? player.pause():player.play()")
+      .row.full-width.absolute-top-left.q-pa-sm
+        .row.cursor-pointer
+          .row.items-center.content-center.justify-center.q-pr-sm
+            img(
+              :src="item.author.thumbUrl"
+              :style=`{height:'50px', width: '50px', objectFit: 'cover', borderRadius: '50px'}`
+            )
           .col
-          .row.q-pa-sm
-            q-icon(name="more_vert" color="white" size="sm")
+            .row.full-width
+              span.text-white.text-subtitle1.ellipsis {{ item.name }}
+            .row.full-width
+              small.text-white.text-bold.ellipsis {{ item.author.name }}
+        .col
+        .row.q-pa-sm
+          q-icon(name="more_vert" color="white" size="sm")
+      q-btn(round flat dense :icon="player.isFullscreen ? 'fullscreen_exit': 'fullscreen'" color="grey-5" @click="player.setState('isFullscreen', !player.isFullscreen)").absolute-bottom-right.z-max
 </template>
 
 <script>

@@ -18,7 +18,7 @@
     // контент
     div(:class=`{ 'fixed-center': mode === 'fullscreen'}`).row.full-width.relative-position
       q-resize-observer(@resize="bottomHeight = $q.screen.height - $event.height")
-      content-view(:content="content" :mode="mode" :style=`{ height: contentMaxHeight + 'px'}`).row.full-width
+      content-view(:content="content" :mode="mode" :style=`{ height: contentMaxHeight + 'px'}` @player="player=$event").row.full-width
         // платный контент
       div(v-if="content.payInfo.price").row.full-width.q-pb-xs.q-px-xs
         .row.col
@@ -36,7 +36,6 @@
                 q-input(v-model="promoCode", autofocus, borderless dark :placeholder="$t('Введите промокод')" @keyup.enter="sendPromoCode(promoCode)").col.full-width
                 q-btn(v-close-popup round flat :color="promoCode ? 'green' : null", icon="done", :disable="!promoCode" @click="sendPromoCode(promoCode)")
                 kalpa-pay(:item="content" @success="")
-      q-btn(round flat dense :icon="mode === 'fullscreen' ? 'fullscreen_exit': 'fullscreen'" color="grey-5" @click="fullscreenClick").absolute-bottom-right.z-top
     bottom-info(v-if="mode !== 'fullscreen'" :content="content" :author="author" :bottomHeight="bottomHeight")
 </template>
 
@@ -60,6 +59,7 @@ export default {
     return {
       content: null,
       author: null,
+      player: null,
       mode: 'contentCard', // fullscreenEditor | fullscreen | contentCard
       bottomHeight: 0, // сколько места под образом
       showDialog: false
@@ -81,6 +81,13 @@ export default {
       async handler(to) {
         this.content = await this.$rxdb.get(RxCollectionEnum.OBJ, this.oid)
         this.author = await this.$rxdb.get(RxCollectionEnum.OBJ, this.content.author.oid)
+      }
+    },
+    'player.isFullscreen': {
+      immediate: true,
+      async handler(to) {
+        if (to && !this.mode.in('fullscreen', 'fullscreenEditor')) this.mode = 'fullscreen'
+        else if (!to) this.mode = 'contentCard'
       }
     },
     'content.payInfo.paid': {
@@ -108,12 +115,7 @@ export default {
       }
     }
   },
-  methods: {
-    fullscreenClick () {
-      if (this.mode === 'fullscreen') this.mode = 'contentCard'
-      else this.mode = 'fullscreen'
-    }
-  },
+  methods: {},
   async mounted () {
     this.$logT('mounted', this.oid)
     this.$logT('mounted2', this.content)

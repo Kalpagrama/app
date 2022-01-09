@@ -62,9 +62,6 @@ export default {
   components: {itemOverlay},
   props: {
     contentKalpa: { type: Object, required: true },
-    isVisible: { type: Boolean, default: true },
-    isActive: { type: Boolean, default: true },
-    isMini: { type: Boolean, default: false },
     options: {
       type: Object,
       default () {
@@ -88,7 +85,8 @@ export default {
       clusters: [],
       figureFocused: null,
       velocity: 1.0,
-      nodePlaying: null
+      nodePlaying: null,
+      isFullscreen: false
     }
   },
   computed: {

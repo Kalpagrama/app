@@ -80,7 +80,7 @@ q-layout(
           ).row.full-width.items-start.content-start
             p.text-white Находите смыслы и создавайте смысловые ядра, Пришло озарение ? Создайте ядро и поделитесь своим пониманием с другими. Смысловое ядро - это смысл найденный во фрагменте из видеоролика, книги или аудио, который вы опубликовали в Кальпаграме. Если вы не хотите делать найденный смысл общедоступным - вы просто сохраняете его в заметки.
             .row.full-width
-              q-btn( flat icon="fas fa-play" color='white'
+              q-btn( flat icon="play_arrow" color='white'
                 @click="nodeVideoShow = true"
                 :style=`{
                   width: '50px',

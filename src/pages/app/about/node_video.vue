@@ -30,9 +30,6 @@
         // contentSource: 'YOUTUBE',
         contentProvider: 'YOUTUBE',
       }`
-      :isActive="false"
-      :isVisible="true"
-      :isMini="false"
       :options=`{
         mode: 'feed',
         footerOverlay: true,

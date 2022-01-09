@@ -18,9 +18,6 @@
       v-if="item.type === 'VIDEO'"
       @player="playerReady"
       :contentKalpa="item"
-      :isActive="true"
-      :isVisible="true"
-      :isMini="false"
       :style=`{
       position: 'absolute', zIndex: 100, top: '0px',
     }`

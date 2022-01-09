@@ -35,9 +35,6 @@ div(
     type: 'VIDEO',
     // contentSource: 'KALPA',
   }`
-    :isActive="isActive"
-    :isVisible="isVisible"
-    :isMini="isMini"
     :options="options"
     :styles="styles"
     :style=`{

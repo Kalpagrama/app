@@ -2,32 +2,12 @@
 <template lang="pug">
 .column
   .col.relative-position
-    player-default(:contentKalpa="content" @player="playerReady").bg-black.bg-black
-      template(v-slot:externalOverlay)
-        transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-          div(
-            v-if="player && !player.playing && player.playerType === 'player-youtube' && $q.screen.width > 480"
-            :style=`{
-            position: 'absolute', zIndex: 10, bottom: '0px',
-            height: '100%',
-            background: 'linear-gradient(0deg, rgba(0,0,0,1) 200px, rgba(0,0,0,0) 100%)',
-          }`
-            @click.self="player.play()"
-          ).row.full-width.items-center.content-center.justify-center
-            q-btn(
-              round flat color="white"
-              :style=`{
-              width: '150px',
-              height: '150px',
-              borderRadius: '50%',
-            }`
-              @click="player.play()")
-              q-icon(name="fas fa-play" color="white" size="100px").q-ml-md
+    content-player( @player="playerReady" :contentKalpa="content" :options="{showTint: true}").bg-black
     // кнопки управления образом(когда редактор фрагмента закрыт) (replay pause loop)
     div(v-if="mode === 'fullscreen' && pageId === 'node-editor' && $screenProps.isMobile").row.full-width.absolute-bottom.justify-center
       figures-controls( :player="player" :contentKalpa="content" :style=`{background: 'rgba(20,20,20,0.5)', borderRadius: '10px'}`)
     //- Desktop editor
-    div(v-if="mode === 'fullscreen' && $screenProps.isDesktop && pageId !== 'node-editor'").row.full-width.absolute-bottom.justify-center
+    div(v-if="mode === 'fullscreen' && $screenProps.isDesktop && pageId !== 'node-editor'").row.full-width.absolute-bottom.justify-center.br
       transition(appear enter-active-class="animated fadeIn " leave-active-class="animated fadeOut")
         div(v-if="player && player.duration > 0" :style=`{ maxWidth: 600+'px', background: 'rgba(35,35,35,0.7)', borderRadius: '20px'}`).row.full-width
           page-node-editor(
@@ -64,7 +44,8 @@
 
 <script>
 
-import playerDefault from 'src/components/content_player/player_video/player_default/index.vue'
+// import playerDefault from 'src/components/content_player/player_video/player_default/index.vue'
+import contentPlayer from 'src/components/content_player/index.vue'
 import figuresControls from 'src/components/content_player/player_video/player_pult/figures_controls.vue'
 import { assert } from 'src/system/common/utils'
 import { RxCollectionEnum } from 'src/system/rxdb'
@@ -73,7 +54,7 @@ import pageNodeEditor from '../node_editor/video'
 
 export default {
   name: 'pageContentVideo',
-  components: { playerDefault, figuresControls, playerPult, pageNodeEditor},
+  components: { contentPlayer, figuresControls, playerPult, pageNodeEditor},
   props: ['content', 'mode', 'isActive'],
   emits: ['player'],
   data () {

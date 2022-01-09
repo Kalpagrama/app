@@ -23,8 +23,6 @@ export default {
   },
   props: {
     contentKalpa: {type: Object, required: true},
-    isActive: {type: Boolean},
-    isVisible: {type: Boolean},
     options: {type: Object},
   },
   data () {
