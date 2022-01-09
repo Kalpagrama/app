@@ -152,7 +152,7 @@
 <script>
 
 import { RxCollectionEnum } from 'src/system/rxdb'
-import pageSimilar from '../page_similar/index.vue'
+import pageSimilar from 'src/components/kalpa_item/item_extended/page_similar'
 import pageComments from '../page_comments/index.vue'
 import pageDescription from '../page_description/index.vue'
 import pageEssences from './page_essences/index.vue'

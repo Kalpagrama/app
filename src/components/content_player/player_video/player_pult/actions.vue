@@ -26,7 +26,7 @@ div(
           :offset="[10, 10]"
           transition-show="jump-left"
           transition-hide="jump-up"
-        ) {{$t('- 5 сек')}}
+        ) -5{{$t('сек')}}
       q-btn(
         @click="player.playing ? player.pause() : player.play()"
         round flat color="white").col
@@ -42,7 +42,7 @@ div(
           :offset="[10, 10]"
           transition-show="jump-right"
           transition-hide="jump-up"
-        ) {{$t('+ 5 сек')}}
+        ) +5{{$t('сек')}}
   //- controls for figures
   figures-controls(
     v-if="player.nodeMode === 'edit'"

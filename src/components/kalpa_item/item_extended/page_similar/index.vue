@@ -1,51 +1,31 @@
 <template lang="pug">
-.row.full-width.items-start.content-start.justify-center
-  div(:style=`{ maxWidth: $store.state.ui.pageWidth+'px',}`).row.full-width.items-start.content-start
-    //.row.full-width.items-start.content-start.text-h6.text-bold.text-white {{$t('Similar')}}
-    tab-list-feed(
-      :type="'customPPV'"
-      :scrollAreaHeight="0"
-      :query="query"
-      :itemHeightApprox="500"
-      :itemActivePersist="false").row.full-width
-      template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
-        item-feed(
-          :itemShortOrFull="item"
-          :itemState="itemState"
-          :itemIndex="itemIndex"
-          :isActive="isActive"
-          :isVisible="isVisible"
-          :isPreload="isPreload"
-          :scrolling="scrolling"
-          :showActions="false").q-pb-md
+component(:is="componentName", :item="item" :types="types")
 </template>
 
 <script>
-import { RxCollectionEnum } from 'src/system/rxdb'
-
+import { ObjectTypeEnum } from 'src/system/common/enums'
+import kalpa from './kalpa'
+import youtube from './youtube'
 export default {
   name: 'pageSimilar',
   props: {
     item: {type: Object},
-    types: {type: Array, default: ['NODE', 'JOINT', 'BLOCK']},
   },
-  data () {
-    return {
-    }
+  components: {
+    kalpa,
+    youtube,
   },
   computed: {
-    query () {
-      return {
-        selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
-          objectTypeEnum: { $in: this.types },
-          oidSphere: this.item.oid,
-          deep: 5,
-          sortStrategy: 'HOT' // 'ACTIVITY', // AGE
-        },
-        populateObjects: false,
-      }
+    componentName () {
+      if (this.item.type === ObjectTypeEnum.VIDEO && this.item.contentProvider === 'YOUTUBE') return 'youtube'
+      else return 'kalpa'
     },
-  },
+    types() {
+      if (this.item.type === ObjectTypeEnum.VIDEO) return [ObjectTypeEnum.VIDEO, ObjectTypeEnum.BOOK, ObjectTypeEnum.IMAGE]
+      else if (this.item.type === ObjectTypeEnum.BOOK) return [ObjectTypeEnum.VIDEO, ObjectTypeEnum.BOOK, ObjectTypeEnum.IMAGE]
+      else if (this.item.type === ObjectTypeEnum.IMAGE) return [ObjectTypeEnum.VIDEO, ObjectTypeEnum.BOOK, ObjectTypeEnum.IMAGE]
+      else return ['NODE', 'JOINT', 'BLOCK']
+    }
+  }
 }
 </script>
