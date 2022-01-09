@@ -17,9 +17,9 @@ q-tab-panels(
   q-tab-panel(
     v-for="(p,pi) in pages" :key="p.id" :name="p.id").row.items-start.content-start.justify-start.q-pa-none
     div(v-if="pageId === 'cover'").row.full-width.items-start.content-start.justify-center
-      div(:style=`{height: !$store.state.ui.isMobileTiny ? "240px" : "200px",}`).relative-position.row.items-center.content-center.justify-center.no-scroll
-        div(:style=`{height: !$store.state.ui.isMobileTiny ? "200px" : "160px", width: $q.screen.width}`).relative-position.row.items-center.content-center.justify-center
-          div(:style=`{height: !$store.state.ui.isMobileTiny ? "200px" : "160px", width: "350px",}`).relative-position.row.items-center.content-center.justify-center
+      div(:style=`{height: !$screenProps.isMobileTiny ? "240px" : "200px",}`).relative-position.row.items-center.content-center.justify-center.no-scroll
+        div(:style=`{height: !$screenProps.isMobileTiny ? "200px" : "160px", width: $q.screen.width}`).relative-position.row.items-center.content-center.justify-center
+          div(:style=`{height: !$screenProps.isMobileTiny ? "200px" : "160px", width: "350px",}`).relative-position.row.items-center.content-center.justify-center
             img(
               :src="contentCopy.thumbUrl"
               draggable="false"
@@ -39,15 +39,15 @@ q-tab-panels(
             :label="$t('Изменить')"
             :style=`{}`)
     div(v-if="pageId === 'preview'").row.full-width.items-start.content-start.justify-center
-      div(:style=`{height: !$store.state.ui.isMobileTiny ? "240px" : "200px",}`).relative-position.row.full-width.items-start.content-start.justify-center.no-scroll
-        div(:style=`{height: !$store.state.ui.isMobileTiny ? "200px" : "160px", width: !$store.state.ui.isMobileTiny ? "350px" : "300px"}`).relative-position.row.items-start.content-start.justify-center
+      div(:style=`{height: !$screenProps.isMobileTiny ? "240px" : "200px",}`).relative-position.row.full-width.items-start.content-start.justify-center.no-scroll
+        div(:style=`{height: !$screenProps.isMobileTiny ? "200px" : "160px", width: !$screenProps.isMobileTiny ? "350px" : "300px"}`).relative-position.row.items-start.content-start.justify-center
           video(v-if="rangeModel || previewUrl"
             ref="video"
             autoplay
             controls
             :playsinline="true"
             :src="rangeModel ? contentUrl : previewUrl"
-            :style=`{maxHeight: !$store.state.ui.isMobileTiny ? "200px" : "160px",}`
+            :style=`{maxHeight: !$screenProps.isMobileTiny ? "200px" : "160px",}`
           ).full-width.br-20
           q-btn(v-if="!rangeModel && !previewUrl"
             @click="$refs.inputPreview.pickFiles()"

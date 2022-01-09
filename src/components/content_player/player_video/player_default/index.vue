@@ -43,6 +43,9 @@ video(
   @pause="videoPaused"
   @play="videoPlaying"
 ).fit
+.row.fit.absolute-center
+  slot(name="externalOverlay" )
+item-overlay(:item="contentKalpa" :player="thiz").row.fit.absolute-center
 </template>
 
 <script>
@@ -51,10 +54,12 @@ import { ContentApi } from 'src/api/content'
 import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'
 import { debounceIntervalItem } from 'src/system/rxdb/reactive'
+import itemOverlay from 'src/components/kalpa_item/item_feed/overlay'
 import { reactive } from 'vue'
 
 export default {
   name: 'playerDefault',
+  components: {itemOverlay},
   props: {
     contentKalpa: { type: Object, required: true },
     isVisible: { type: Boolean, default: true },
@@ -71,6 +76,7 @@ export default {
   data () {
     return {
       events: null,
+      thiz: this,
       player_: null,
       playing: false,
       playingCount: 0,

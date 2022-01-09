@@ -3,14 +3,14 @@ div(
   :style=`{
 position: 'fixed',
 borderRadius: '10px',
-paddingTop: $q.screen.xs ? '0px' : '10px',
-paddingBottom: $q.screen.xs ? '0px' : '0px'
+// paddingBottom: $screenProps.isMobile ? '0px' : '0px'
 // paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)'
 }`
 ).relative-position.row.full-width.b-40
   // header
-  div(:style=`{}`
+  div(:style=`{paddingTop: $screenProps.isMobile ? '0px' : '10px',}`
   ).row.full-width.justify-center.content-end.items-end.q-pb-xs
+    q-resize-observer(@resize="bodyHeight = $q.screen.height - ($event.height + bottomHeight)")
     .text-white.text-subtitle2 {{$t('Сведения о контенте')}}
     //q-btn(round flat color="white" icon="clear" v-close-popup)
   div(v-if="!contentCopy" :style=`{minHeight: '400px'}`).row.fit.items-center.justify-center.content-center
@@ -18,9 +18,9 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
   // body
   div(v-if="contentCopy"
     :style=`{
-    maxHeight: !$q.screen.xs ? ($q.screen.height*70/100)+'px' : $q.screen.height+'px',
+    maxHeight: !$screenProps.isMobile ? ($q.screen.height*70/100)+'px' : bodyHeight+'px',
     overflow: "auto"
-}`).row.full-width
+    }`).row.full-width.br
     //- tabs
     .row.full-width
       component(:is="'preview-tabs-' + content.__typename"
@@ -149,7 +149,8 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
                 .row.content-center.items-center
                   q-icon(name="fas fa-ruble-sign" color="grey-5")
   // buttons
-  .row.full-width.justify-end.content-center.items-center.q-pt-sm.q-pb-xs.q-px-sm.q-mb-xs
+  .row.full-width.justify-end.content-center.items-center.q-pt-sm.q-pb-xs.q-px-sm
+    q-resize-observer(@resize="bottomHeight = $event.height")
     .row
       q-btn(v-if="$store.getters.currentUser.profile.role.in('MODERATOR', 'ADMIN')"
         no-caps :ripple="false" color="grey" round
@@ -158,8 +159,8 @@ paddingBottom: $q.screen.xs ? '0px' : '0px'
         @click="contentDelete")
         q-tooltip(dense dark) {{$t('Удалить контент')}}
     .col
-    q-btn(outline no-caps color="red" :label="$t('Cancel')" v-close-popup).q-mr-sm
-    q-btn(outline no-caps color="green" :loading="loading" :label="$t('Save')" @click="save")
+    q-btn(outline no-caps color="red" :label="$t('Cancel')" v-close-popup).q-mr-sm.q-mb-xs
+    q-btn(outline no-caps color="green" :loading="loading" :label="$t('Save')" @click="save").q-mb-xs
     slot(v-if="showBottomMenu" name="bottomMenu")
       div(v-if="showBottomMenu").row.full-width
         div(:style=`{
@@ -224,7 +225,9 @@ export default {
       //   { id: 'preview', name: this.$t('Превью') }],
       rangeModel: null,
       maxPreviewDur: 20 * 60,
-      progress: 0
+      progress: 0,
+      bodyHeight: 500,
+      bottomHeight: 100
     }
   },
   computed: {

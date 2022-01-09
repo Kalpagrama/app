@@ -4,6 +4,29 @@
     player-default(
       v-bind="$props"
       @player="player = $event, $emit('player', $event)")
+      template(v-slot:externalOverlay)
+        //- Tint bottom - on pause and desktops only and youtube
+        transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+          div(
+            v-if="player && !player.playing && player.playerType === 'player-youtube' && $q.screen.width > 480"
+            v-show="options.showTint"
+            :style=`{
+            position: 'absolute', zIndex: 10, bottom: '0px',
+            height: '100%',
+            background: 'linear-gradient(0deg, rgba(0,0,0,1) 200px, rgba(0,0,0,0) 100%)',
+          }`
+            @click.self="player.play()"
+          ).row.full-width.items-center.content-center.justify-center
+            q-btn(
+              v-show="false && options.showPlayBtn"
+              round flat color="white"
+              :style=`{
+              width: '150px',
+              height: '150px',
+              borderRadius: '50%',
+            }`
+              @click="player.play()")
+              q-icon(name="fas fa-play" color="white" size="100px").q-ml-md
     .row.full-width.absolute-bottom.justify-center
       slot(name="video-footer")
     //- Pult
@@ -52,29 +75,6 @@
     //        }`
     //        ).row.full-width
     //        slot(name="pult-footer")
-    //- Tint bottom - on pause and desktops only and youtube
-    transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      div(
-        v-if="player && !player.playing && player.playerType === 'player-youtube' && $q.screen.width > 480"
-        v-show="options.showTint"
-        :style=`{
-        position: 'absolute', zIndex: 10, bottom: '0px',
-        height: '100%',
-        background: 'linear-gradient(0deg, rgba(0,0,0,1) 200px, rgba(0,0,0,0) 100%)',
-      }`
-        @click.self="player.play()"
-      ).row.full-width.items-center.content-center.justify-center
-        q-btn(
-          v-show="options.showPlayBtn"
-          round flat color="white"
-          :style=`{
-          width: '150px',
-          height: '150px',
-          borderRadius: '50%',
-        }`
-          @click="player.play()")
-          q-icon(name="fas fa-play" color="white" size="100px").q-ml-md
-
   //- footer
   .row.full-width.justify-center
     div(:style=`{maxWidth: 600+'px'}`).row.full-width
