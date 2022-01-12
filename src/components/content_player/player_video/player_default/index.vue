@@ -1,51 +1,37 @@
 <style lang="sass">
-iframe[id$="_youtube_iframe"]
-  width: 100%
-  height: 100%
-// z-index: 100
-// border-radius: 10px
-// overflow: hidden
-// pointer-events: none
-// @media (min-width: 900px)
-//   iframe[id$="_youtube_iframe"]
-//     width: 1000%
-//     height: 1000%
-//     min-width: 1000%
-//     min-height: 1000%
-//     z-index: 100
-//     border-radius: 10px
-//     overflow: hidden
-//     transform: scale(0.1)
-//     transform-origin: top left
-//     pointer-events: none
-.mejs__overlay
-  width: 100% !important
-  height: 100% !important
-  display: none !important
+//iframe[id$="_youtube_iframe"]
+//  width: 100%
+//  height: 100%
+//#videoRef12345
+//  width: 100%
+//  height: 100%
 </style>
 
 <template lang="pug">
-video(
-  ref="videoRef"
-  type="video/youtube"
-  :src="url"
-  :playsinline="true"
-  :autoplay="true"
-  :loop="true"
-  :muted="muted"
-  :velocity="velocity"
-  :style=`{
-      objectFit: 'contain'
-   }`
-  @click="videoClick"
-  @loadeddata="videoLoadeddata"
-  @timeupdate="videoTimeupdate"
-  @pause="videoPaused"
-  @play="videoPlaying"
-).fit
-.row.fit.absolute-center
-  slot(name="externalOverlay" )
-item-overlay(:item="contentKalpa" :player="thiz").row.fit.absolute-center
+.row.full-width
+  video(
+    id="videoRef12345"
+    ref="videoRef"
+    :src="url"
+    :playsinline="true"
+    :autoplay="true"
+    :loop="true"
+    :muted="muted"
+    :velocity="velocity"
+    :style=`{
+        // objectFit: 'contain',
+        maxHeight: options.maxHeight+'px',
+     }`
+    @click="videoClick"
+    @loadeddata="videoLoadeddata"
+    @timeupdate="videoTimeupdate"
+    @pause="videoPaused"
+    @play="videoPlaying"
+  ).row.full-width
+  .row.fit.absolute
+    slot(name="externalOverlay" )
+  .row.fit.absolute
+    item-overlay(:item="contentKalpa" :player="thiz")
 </template>
 
 <script>
@@ -55,7 +41,6 @@ import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'
 import { debounceIntervalItem } from 'src/system/rxdb/reactive'
 import itemOverlay from 'src/components/kalpa_item/item_feed/overlay'
-import { reactive } from 'vue'
 
 export default {
   name: 'playerDefault',
@@ -193,7 +178,6 @@ export default {
       }
     },
     videoLoadeddata (e) {
-      // this.$log('videoLoadeddata', e)
       if (this.playerType === 'player-youtube') {
         this.duration = this.player_.duration
       } else if (this.playerType === 'player-kalpa') {
@@ -242,14 +226,14 @@ export default {
     playerCreate (type) {
       this.$log('playerCreate', type)
       if (type === 'player-youtube') {
-        const me = new window.MediaElementPlayer(this.$refs.videoRef, {
+        const mejs = new window.MediaElementPlayer(this.$refs.videoRef, {
           loop: true,
           muted: this.muted,
           autoplay: true,
           controls: true,
           features: [],
-          // enableAutosize: true,
-          // stretching: 'fill',
+          // enableAutosize: false,
+          stretching: 'responsive',
           pauseOtherPlayers: false,
           clickToPlayPause: true,
           // plugins: ['youtube'],

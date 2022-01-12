@@ -7586,12 +7586,13 @@ media-typer@0.3.0:
   resolved "https://registry.yarnpkg.com/media-typer/-/media-typer-0.3.0.tgz#8710d7af0aa626f8fffa1ce00168545263255748"
   integrity sha1-hxDXrwqmJvj/+hzgAWhUUmMlV0g=
 
-mediaelement@^4.2.14:
-  version "4.2.17"
-  resolved "https://registry.yarnpkg.com/mediaelement/-/mediaelement-4.2.17.tgz#6a12a0f0149f2cc0051274fe64a6b7fcab4f4734"
-  integrity sha512-v+NcqaylHNPFbpfPwlyw8/LnKcuSyYlWaMcUvB+zBzP9jkVvHmVl63JebGOC3Zmimh4dRq6vzXlbda4e5jT4VQ==
+mediaelement@^5.0.4:
+  version "5.0.4"
+  resolved "https://registry.yarnpkg.com/mediaelement/-/mediaelement-5.0.4.tgz#0a14e5e3d0c7568a7a99bd126c9ae3eff9bb5693"
+  integrity sha512-hq/BJrXdTvooQZ2qSMfHKLA0q3ZDcNuHKl3eKWLdX4apoCPx+/9I+OytTr0SrlSyYr9JHUFC1FgLmxEr/RxXXg==
   dependencies:
     global "^4.3.1"
+    svg4everybody "^2.1.9"
 
 memfs@^3.1.2, memfs@^3.2.2:
   version "3.4.1"
@@ -10347,6 +10348,11 @@ supports-preserve-symlinks-flag@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
+
+svg4everybody@^2.1.9:
+  version "2.1.9"
+  resolved "https://registry.yarnpkg.com/svg4everybody/-/svg4everybody-2.1.9.tgz#5bd9f6defc133859a044646d4743fabc28db7e2d"
+  integrity sha1-W9n23vwTOFmgRGRtR0P6vCjbfi0=
 
 svgo@^2.7.0:
   version "2.8.0"

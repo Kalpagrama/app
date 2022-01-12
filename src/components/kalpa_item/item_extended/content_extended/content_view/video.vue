@@ -1,8 +1,8 @@
 // образы на суть
 <template lang="pug">
-.column
-  .col.relative-position
-    content-player( @player="playerReady" :contentKalpa="content" :options="{showTint: true}").bg-black
+.column.full-width
+  .col.full-width.relative-position
+    content-player( @player="playerReady" :contentKalpa="content" :options="{showTint: true, maxHeight: mode.in('fullscreen','fullscreenEditor')?$q.screen.height:$q.screen.height/1.3}").full-width.bg-black
     // кнопки управления образом(когда редактор фрагмента закрыт) (replay pause loop)
     div(v-if="mode === 'fullscreen' && pageId === 'node-editor' && $screenProps.isMobile").row.full-width.absolute-bottom.justify-center
       figures-controls( :player="player" :contentKalpa="content" :style=`{background: 'rgba(20,20,20,0.5)', borderRadius: '10px'}`)

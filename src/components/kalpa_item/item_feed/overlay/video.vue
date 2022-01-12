@@ -4,7 +4,7 @@ div(
   @mousemove="onMouseMove"
   @mouseout="onMouseOut"
   @mouseover="onMouseOver"
-).row.fit.bg-10
+).row.full-width.bg-10
   transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(v-if="isOverlayShow" :style=`{ background: 'rgba(0,0,0,0.7)'}`).row.fit.absolute-bottom.items-center.content-center.justify-center
       .row.full-width.items-center.content-center.justify-center

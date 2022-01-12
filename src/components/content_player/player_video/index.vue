@@ -1,5 +1,5 @@
 <template lang="pug">
-.column.fit
+.column.full-width
   div(:style=`{position: 'relative',}`).col.full-width
     player-default(
       v-bind="$props"

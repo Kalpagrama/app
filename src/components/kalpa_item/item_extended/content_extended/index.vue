@@ -18,7 +18,7 @@
     // контент
     div(:class=`{ 'fixed-center': mode === 'fullscreen'}`).row.full-width.relative-position
       q-resize-observer(@resize="bottomHeight = $q.screen.height - $event.height")
-      content-view(:content="content" :mode="mode" :style=`{ height: contentMaxHeight + 'px'}` @player="player=$event").row.full-width
+      content-view(:content="content" :mode="mode" @player="player=$event").row.full-width
         // платный контент
       div(v-if="content.payInfo.price").row.full-width.q-pb-xs.q-px-xs
         .row.col
