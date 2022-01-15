@@ -2,9 +2,9 @@
 .row.full-width
   // полоса
   div(ref="bar" :style=`{ height: '30px'}` v-touch-pan.mouse.prevent="tintOnPan" @click="tintClick").row.full-width.relative-position
-    //- clusters
-    clusters(v-if="player.clusters.length" v-bind="$props")
     div(:style=`{ height: '12px', pointerEvents: 'none'}`).row.full-width.absolute-center.b-70.br-5.op-60
+      //- clusters
+      clusters(v-if="player.clusters.length" v-bind="$props" :style=`{ pointerEvents: 'none'}`).br-5
       // fragment selected
       div(
         v-if="player.node && player.nodeMode === 'edit'"
@@ -20,7 +20,9 @@
         }`
       ).row.bg-green-8.br-5.op-50
       //- currentTime
-      div(:style=`{ position: 'absolute', left: (player.currentTime/player.duration)*100+'%', height: '100%', width: '2px', pointerEvents: 'none'}`).row.bg-green-8.br-5
+      div(
+        :style=`{ position: 'absolute', left: (player.currentTime/player.duration)*100+'%', height: '100%', width: '2px', pointerEvents: 'none'}`
+        ).row.bg-green-8.br-5
   //- time bar + actions
   .row.full-width.content-center.items-center.q-pb-sm
     q-btn( round flat :color="player.muted ? 'red' : 'white'" :icon="player.muted ? 'volume_off' : 'volume_up'" @click="player.mutedToggle()")

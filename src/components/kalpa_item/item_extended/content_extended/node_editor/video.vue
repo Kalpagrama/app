@@ -221,7 +221,6 @@ export default {
         this.nodeSaving = false
         this.player.setState('node', null)
         this.player.setState('nodeMode', null)
-        this.$emit('pageId', null)
         this.$notify('success', this.$t('Заметка сохранена'))
       }
       catch (e) {
@@ -240,7 +239,6 @@ export default {
         await this.node.remove(true)
         this.player.setState('node', null)
         this.player.setState('nodeMode', null)
-        this.$emit('pageId', null)
         this.$log('nodeDeleteAction done')
         this.nodeDeleting = false
       }
@@ -294,7 +292,6 @@ export default {
         }
         this.player.setState('nodeMode', 'focus')
         this.player.setState('node', nodeCreating)
-        // this.$emit('pageId', null)
         // save content bookmark to "all" collection
         await this.contentBookmarkSave()
         // ---
@@ -307,7 +304,6 @@ export default {
         // where to wait for the progress of node creating ?
         // here ?
         // this.$emit('node', nodeCreating)
-        this.$emit('pageId', null)
       }
       catch (e) {
         this.$log('nodePublish error', e)

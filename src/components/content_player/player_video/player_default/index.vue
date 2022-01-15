@@ -2,6 +2,7 @@
 iframe[id$="_youtube_iframe"]
   width: 100%
   height: 100%
+
 #videoRef12345
   width: 100%
   height: 100%
@@ -25,10 +26,15 @@ div(:style=`{height: videoHeight+'px'}`).row.full-width
     @pause="videoPaused"
     @play="videoPlaying"
   ).row.full-width
+  // затемнение для ютуба on pause and desktops only and youtube
   .row.fit.absolute
-    slot(name="externalOverlay")
+    transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      div( v-if="!playing && playerType === 'player-youtube'"
+        :style=`{ background: 'linear-gradient(0deg, rgba(0,0,0,1) 200px, rgba(0,0,0,0) 100%)'}`
+      ).row.full-width
+  // оверлэй для видео
   .row.fit.absolute
-    item-overlay(:item="contentKalpa" :player="thiz").z-top
+    item-overlay(:item="contentKalpa" :player="thiz" :style=`{zIndex: 100}`)
 </template>
 
 <script>
@@ -42,7 +48,7 @@ import { ObjectTypeEnum } from 'src/system/common/enums'
 
 export default {
   name: 'playerDefault',
-  components: {itemOverlay},
+  components: { itemOverlay },
   props: {
     contentKalpa: { type: Object, required: true },
     options: {
@@ -75,14 +81,14 @@ export default {
     }
   },
   computed: {
-    fullscreen() {
+    fullscreen () {
       return this.isFullscreen || this.nodeMode === 'edit' || this.node
     },
-    seekTime() {
+    seekTime () {
       assert(this.duration)
       return Math.max(5, Math.min(Math.floor(this.duration * 0.05 / 10) * 10, 60))
     },
-    videoHeight() {
+    videoHeight () {
       // return this.$q.screen.height
       // // eslint-disable-next-line no-unreachable
       if (!this.pageWidth || !this.contentKalpa.height || !this.contentKalpa.width) return this.options.maxHeight * 1.5 || 400
@@ -175,7 +181,9 @@ export default {
       // this.$log('setCurrentTime', t)
       this.currentTimeFreeze = true
       clearTimeout(this.currentTimeFreezeTimer)
-      this.currentTimeFreezeTimer = setTimeout(() => { this.currentTimeFreeze = false }, 2000)
+      this.currentTimeFreezeTimer = setTimeout(() => {
+        this.currentTimeFreeze = false
+      }, 2000)
       if (this.playerType === 'player-youtube') {
         this.currentTime = t
         this.player_.setCurrentTime(t)
@@ -268,8 +276,7 @@ export default {
             // this.$emit('error', mediaElement)
           }
         })
-      }
-      else if (type === 'player-kalpa') {
+      } else if (type === 'player-kalpa') {
         //
       }
       // Add events bus for every player
@@ -287,12 +294,12 @@ export default {
     },
     // выделить фрагмент и создать ядро(покажется редактор)
     fragmentSelect () {
-      if (this.$store.getters.isGuest) this.$store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы создать ядро, войдите в аккаунт'}])
+      if (this.$store.getters.isGuest) this.$store.commit('ui/stateSet', ['authGuard', { message: 'Чтобы создать ядро, войдите в аккаунт' }])
       else {
         // Create node input
         let start = Math.max(0, this.currentTime - 15)
         let end = Math.min(start + 30, this.duration)
-        let figures = [{t: start, points: []}, {t: end, points: []}]
+        let figures = [{ t: start, points: [] }, { t: end, points: [] }]
         let nodeInput = {
           name: '',
           category: null,
@@ -310,12 +317,12 @@ export default {
                 {
                   id: Date.now().toString(),
                   contentOid: this.contentKalpa.oid,
-                  figuresAbsolute: figures,
-                },
+                  figuresAbsolute: figures
+                }
               ],
-              operation: { items: null, operations: null, type: 'CONCAT'},
-              type: ObjectTypeEnum.COMPOSITION,
-            },
+              operation: { items: null, operations: null, type: 'CONCAT' },
+              type: ObjectTypeEnum.COMPOSITION
+            }
           ]
         }
         this.setState('node', nodeInput)

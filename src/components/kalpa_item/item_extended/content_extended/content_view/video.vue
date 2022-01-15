@@ -12,28 +12,19 @@
     ).row.full-width
     content-player(
       :contentKalpa="content"
-      :options="{showTint: true, maxHeight: fullscreen ? $q.screen.height-editorHeight:$q.screen.height/1.3}"
+      :options="{maxHeight: fullscreen ? $q.screen.height-editorHeight:$q.screen.height/1.3}"
       @player="playerReady"
       ).row.full-width
       q-resize-observer(@resize="contentHeight = $event.height")
     //// кнопки управления образом(когда редактор фрагмента закрыт) (replay pause loop)
-    //div(v-if="fullscreen && pageId === 'node-editor' && $screenProps.isMobile").row.full-width.justify-center
+    //div(v-if="fullscreen && $screenProps.isMobile").row.full-width.justify-center
     //  figures-controls( :player="player" :contentKalpa="content" :style=`{background: 'rgba(20,20,20,0.5)', borderRadius: '10px'}`)
-    div(v-if="fullscreen && pageId !== 'node-editor'").row.full-width.justify-center
+    .row.full-width.justify-center
       transition(appear enter-active-class="animated fadeIn " leave-active-class="animated fadeOut")
         div(v-if="player && player.duration > 0" :style=`{ maxWidth: 600+'px', background: 'rgba(35,35,35,0.7)', borderRadius: '20px'}`).row.full-width
           q-resize-observer(@resize="editorHeight = $event.height")
-          page-node-editor(
-            v-if="player && player.node && player.nodeMode === 'edit'"
-            :contentKalpa="content"
-            :player="player"
-            :style=`{
-              minHeight: [null,'node','node-editor'].includes(pageId) ? '0px' : '500px',
-              maxHeight: 500+'px',
-              borderRadius: '10px',
-              overflow: 'hidden',
-            }`
-            @node="nodeFocused")
+          page-node-editor(v-if="player && player.node && player.nodeMode === 'edit'"
+            :contentKalpa="content" :player="player" @node="nodeFocused").br-10
 </template>
 
 <script>
@@ -53,7 +44,6 @@ export default {
   data () {
     return {
       player: null,
-      pageId: null,
       autocompleteName: '',
       contentHeight: 0,
       editorHeight: 0,
@@ -79,30 +69,9 @@ export default {
       return res
     }
   },
-  watch: {
-    'player.nodeMode': {
-      handler (to, from) {
-        if (to && to === 'edit') {
-          this.pageId = null
-        }
-      }
-    }
-    // 'player.figures': {
-    //   deep: true,
-    //   immediate: true,
-    //   handler (to, from) {
-    //     this.$log('player.figures TO', to)
-    //     if (to && !from) {
-    //       this.pageId = null
-    //       // this.pageId = 'node-editor'
-    //     }
-    //   }
-    // }
-  },
   methods: {
     nodeFocused (node) {
       this.$log('nodeFocused', node)
-      this.pageId = null
       this.player.setState('node', node)
       this.player.setState('nodeMode', 'focus')
     },
