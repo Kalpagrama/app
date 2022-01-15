@@ -1,0 +1,73 @@
+<template lang="pug">
+.row.full-width
+  // полоса
+  div(ref="bar" :style=`{ height: '30px'}` v-touch-pan.mouse.prevent="tintOnPan" @click="tintClick").row.full-width.relative-position
+    //- clusters
+    clusters(v-if="player.clusters.length" v-bind="$props")
+    div(:style=`{ height: '12px', pointerEvents: 'none'}`).row.full-width.absolute-center.b-70.br-5.op-60
+      // fragment selected
+      div(
+        v-if="player.node && player.nodeMode === 'edit'"
+        :style=`{
+          position: 'absolute',
+          top: '-2px',
+          left: (player.figures[0].t/player.duration)*100+'%',
+          width: ((player.figures[1].t-player.figures[0].t)/player.duration)*100+'%',
+          height: 'calc(100% + 4px)',
+          border: '1px solid ' + $getPaletteColor('green-5'),
+          borderRadius: '2px',
+          pointerEvents: 'none',
+        }`
+      ).row.bg-green-8.br-5.op-50
+      //- currentTime
+      div(:style=`{ position: 'absolute', left: (player.currentTime/player.duration)*100+'%', height: '100%', width: '2px', pointerEvents: 'none'}`).row.bg-green-8.br-5
+  //- time bar + actions
+  .row.full-width.content-center.items-center.q-pb-sm
+    q-btn( round flat :color="player.muted ? 'red' : 'white'" :icon="player.muted ? 'volume_off' : 'volume_up'" @click="player.mutedToggle()")
+    small.text-grey-2 {{ $time(player.currentTime) }} / {{ $time(player.duration) }}
+    figures-controls(v-if="player.node" :player="player" :contentKalpa="contentKalpa")
+    .col
+    q-btn( v-if="player.nodeMode !== 'edit'" dense round flat color="green" icon="add_circle_outline" @click="player.fragmentSelect()")
+    q-btn( v-else dense round flat color="red" icon="clear" @click="player.fragmentClear()")
+    q-btn(dense round flat :icon="player.fullscreen ? 'fullscreen_exit': 'fullscreen'" color="grey-5" @click="player.setState('isFullscreen', !player.fullscreen), player.fragmentClear()")
+</template>
+
+<script>
+import clusters from './clusters.vue'
+import figuresControls from 'src/components/content_player/player_video/player_pult/figures_controls.vue'
+
+export default {
+  name: 'playerPultOverlay',
+  props: ['player', 'contentKalpa', 'options'],
+  components: { clusters, figuresControls },
+  computed: {},
+  watch: {},
+  methods: {
+    tintClick (e) {
+      // this.$log('tintClick', e)
+      let left = e.layerX
+      let width = e.target.clientWidth
+      this.$log({left, width})
+      let zoomPercent = left / width
+      let t = zoomPercent * this.player.duration
+      this.$log('t', t)
+      this.player.setCurrentTime(t)
+    },
+    tintOnPan (e) {
+      let tintRect = this.$refs['bar'].getBoundingClientRect()
+      let left = e.position.left - tintRect.left
+      let width = tintRect.width
+      if (left < 0 || left > width) {
+        this.$log('left < 0 || left > width !')
+        return
+      }
+      let t = left / width * this.player.duration
+      this.player.setCurrentTime(t)
+    },
+  },
+  // created () {},
+  mounted () {
+    this.$log('mounted')
+  }
+}
+</script>

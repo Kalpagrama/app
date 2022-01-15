@@ -5,24 +5,6 @@
   //- bar
   div(:style=`{ paddingLeft: barWrapperPaddingX+'px', paddingRight: barWrapperPaddingX+'px' }`).row.full-width
     div(:style=`{height: heightWrapper+'px'}`).row.full-width.relative-position
-      //- time bar
-      div(
-        v-if="player && player.duration"
-        :class=`{
-          'q-px-sm': !zoomed,
-          'q-px-lg': zoomed,
-        }`
-        :style=`{
-          position: 'absolute', zIndex: 200,
-          bottom: '-4px',
-          //- left: '22px',
-          userSelect: 'none',
-          pointerEvents: 'none',
-          //- fontSize: '9px',
-        }`
-        ).row.full-width.justify-between.text-grey-2
-        small {{ $time(player.currentTime) }}
-        small {{ $time(player.duration) }}
       //- middle currentTime
       //- v-if="true || zoomWrapperScrolling"
       transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
@@ -36,7 +18,7 @@
             height: heightBar+'px',
             pointerEvents: 'none',
           }`
-          ).row.bg-red
+          ).row.bg-green-10
       //- scroll
       div(
         ref="zoom-wrapper"
@@ -193,23 +175,18 @@
             ).row
   //- footer: actions
   figures-actions(v-if="player && player.figures && player.nodeMode === 'edit'" v-bind="$props")
-  .row.full-width
-    actions(v-if="player" v-bind="$props").col
-    slot(name="actions-right")
 </template>
 
 <script>
-import actions from './actions.vue'
 import clusters from './clusters.vue'
 import figuresActions from './figures_actions.vue'
 import figuresEditor from './figures_editor.vue'
 import nodeFocused from './node_focused.vue'
 
 export default {
-  name: 'playerPult',
+  name: 'fragmentEditor',
   props: ['player', 'contentKalpa', 'options'],
   components: {
-    actions,
     clusters,
     figuresActions,
     figuresEditor,
@@ -217,7 +194,7 @@ export default {
   },
   data () {
     return {
-      barWrapperPaddingX: 16,
+      barWrapperPaddingX: 5,
       width: 0,
       height: 0,
       heightBar: 20,
@@ -333,6 +310,7 @@ export default {
       }
     },
     'player.nodeMode': {
+      immediate: true,
       handler (to, from) {
         if (to === 'edit') {
           this.$nextTick(() => {
@@ -352,31 +330,6 @@ export default {
         }
       }
     },
-    // 'player.figures': {
-    //   immediate: true,
-    //   async handler (to, from) {
-    //     this.$log('player.figures TO', to)
-    //     // figures created
-    //     if (to && !from) {
-    //       if (this.player.nodeMode !== 'edit') return
-    //       this.$nextTick(() => {
-    //         this.zoomIn()
-    //       })
-    //       this.$gsap.to(this, 0.5, {
-    //         heightBar: this.heightBarMax,
-    //         heightWrapper: this.heightWrapperMax,
-    //       })
-    //     }
-    //     // figures destroyed
-    //     if (to === null && from) {
-    //       this.zoomOut()
-    //       this.$gsap.to(this, 0.5, {
-    //         heightBar: this.heightBarMin,
-    //         heightWrapper: this.heightWrapperMin,
-    //       })
-    //     }
-    //   }
-    // },
     zoomed: {
       // immediate: true,
       handler (to, from) {

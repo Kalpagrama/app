@@ -1,19 +1,31 @@
-// образы на суть
 <template lang="pug">
-.column.full-width
-  .col.full-width.relative-position
-    content-player( @player="playerReady" :contentKalpa="content" :options="{showTint: true, maxHeight: mode.in('fullscreen','fullscreenEditor')?$q.screen.height:$q.screen.height/1.3}").full-width.bg-black
-    // кнопки управления образом(когда редактор фрагмента закрыт) (replay pause loop)
-    div(v-if="mode === 'fullscreen' && pageId === 'node-editor' && $screenProps.isMobile").row.full-width.absolute-bottom.justify-center
-      figures-controls( :player="player" :contentKalpa="content" :style=`{background: 'rgba(20,20,20,0.5)', borderRadius: '10px'}`)
-    //- Desktop editor
-    div(v-if="mode === 'fullscreen' && $screenProps.isDesktop && pageId !== 'node-editor'").row.full-width.absolute-bottom.justify-center.br
+.row.full-width
+  div(
+    :style=`{ height: fullscreen ? $q.screen.height+'px':'auto'}`
+    :class=`{
+         'content-center': !player || player.nodeMode !== 'edit',
+         'content-start': player && player.nodeMode === 'edit',
+         'items-center': !player || player.nodeMode !== 'edit',
+         'items-start': player && player.nodeMode === 'edit',
+         'bg-black': !player || player.nodeMode !== 'edit',
+     }`
+    ).row.full-width
+    content-player(
+      :contentKalpa="content"
+      :options="{showTint: true, maxHeight: fullscreen ? $q.screen.height-editorHeight:$q.screen.height/1.3}"
+      @player="playerReady"
+      ).row.full-width
+      q-resize-observer(@resize="contentHeight = $event.height")
+    //// кнопки управления образом(когда редактор фрагмента закрыт) (replay pause loop)
+    //div(v-if="fullscreen && pageId === 'node-editor' && $screenProps.isMobile").row.full-width.justify-center
+    //  figures-controls( :player="player" :contentKalpa="content" :style=`{background: 'rgba(20,20,20,0.5)', borderRadius: '10px'}`)
+    div(v-if="fullscreen && pageId !== 'node-editor'").row.full-width.justify-center
       transition(appear enter-active-class="animated fadeIn " leave-active-class="animated fadeOut")
         div(v-if="player && player.duration > 0" :style=`{ maxWidth: 600+'px', background: 'rgba(35,35,35,0.7)', borderRadius: '20px'}`).row.full-width
+          q-resize-observer(@resize="editorHeight = $event.height")
           page-node-editor(
             v-if="player && player.node && player.nodeMode === 'edit'"
             :contentKalpa="content"
-            :topScreenHeight="topScreenHeight"
             :player="player"
             :style=`{
               minHeight: [null,'node','node-editor'].includes(pageId) ? '0px' : '500px',
@@ -22,24 +34,6 @@
               overflow: 'hidden',
             }`
             @node="nodeFocused")
-            q-resize-observer(@resize="editorHeight = $event.height")
-          player-pult(:player="player" :contentKalpa="content").z-top
-  //- Mobile editor
-  div(v-if="mode === 'fullscreen' && player && $screenProps.isMobile").full-width.justify-center
-    .row.full-width
-      q-resize-observer(@resize="editorHeight = $event.height")
-      player-pult(v-if="pageId !== 'node-editor'" :player="player" :contentKalpa="content").z-top
-      page-node-editor( v-else :contentKalpa="content" :topScreenHeight="topScreenHeight" :player="player" :style=`{height: $q.screen.height-50-contentHeight+'px',}` @node="nodeFocused").full-width
-      q-btn( v-if="pageId !== 'node-editor' && player.nodeMode === 'edit'" flat color="green" no-caps :label="$t('Next')" @click="pageId = 'node-editor'").full-width
-      q-btn( v-if="pageId === 'node-editor' && player.nodeMode === 'edit'" flat color="green" no-caps :label="$t('Edit fragment')" @click="pageId = null").full-width
-      div(
-        :style=`{position: 'relative'}`).row.full-width
-        q-resize-observer(@resize="footerHeight = $event.height")
-        //- Mobile button overlay
-        div(
-          v-if="player.nodeMode === 'edit' && $q.screen.lt.md"
-          :style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.fit.bg-black.q-px-md
-        //kalpa-menu-mobile(:styles=`{background: 'rgba(50,50,50,0)',}`)
 </template>
 
 <script>
@@ -49,13 +43,12 @@ import contentPlayer from 'src/components/content_player/index.vue'
 import figuresControls from 'src/components/content_player/player_video/player_pult/figures_controls.vue'
 import { assert } from 'src/system/common/utils'
 import { RxCollectionEnum } from 'src/system/rxdb'
-import playerPult from 'src/components/content_player/player_video/player_pult'
 import pageNodeEditor from '../node_editor/video'
 
 export default {
   name: 'pageContentVideo',
-  components: { contentPlayer, figuresControls, playerPult, pageNodeEditor},
-  props: ['content', 'mode', 'isActive'],
+  components: { contentPlayer, figuresControls, pageNodeEditor},
+  props: ['content', 'isActive'],
   emits: ['player'],
   data () {
     return {
@@ -68,23 +61,8 @@ export default {
     }
   },
   computed: {
-    topScreenHeight () {
-      // this.$logT('this.$q.screen.height', this.$q.screen.height)
-      // this.$logT('this.editorHeight', this.editorHeight)
-      // this.$logT('this.footerHeight', this.footerHeight)
-      assert(this.$q.screen.height - this.editorHeight - this.footerHeight > 0)
-      // this.$logT('topScreenHeight', this.$q.screen.height - this.editorHeight - this.footerHeight)
-      return this.$q.screen.height - this.editorHeight - this.footerHeight
-    },
-    contentHeightMin () {
-      let tW = this.content.thumbWidth
-      let tH = this.content.thumbHeight
-      let sW = this.$q.screen.width
-      let sH = (sW * tH) / tW
-      let sHMax = this.$q.screen.height / 3
-      let sHMin = 150
-      // return sH
-      return Math.max(sHMin, Math.min(sH, sHMax))
+    fullscreen() {
+      return this.player && this.player.fullscreen
     },
     queryClusters () {
       let res = {
@@ -102,16 +80,6 @@ export default {
     }
   },
   watch: {
-    pageId: {
-      handler (to, from) {
-        if (to) {
-          this.$gsap.to(this, 0.3, {contentHeight: this.contentHeightMin})
-        }
-        else {
-          this.$gsap.to(this, 0.3, {contentHeight: this.$q.screen.height})
-        }
-      }
-    },
     'player.nodeMode': {
       handler (to, from) {
         if (to && to === 'edit') {
@@ -189,7 +157,6 @@ export default {
   },
   created () {
     this.$log('created')
-    this.contentHeight = this.$q.screen.height
   },
   async mounted () {
     this.$log('mounted')

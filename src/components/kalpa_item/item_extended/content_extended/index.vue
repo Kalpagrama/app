@@ -4,7 +4,7 @@
   q-spinner-dots(v-if="!content" color="green" size="60px").fixed-center
   div(v-else).row.full-width
     // header
-    div(v-if="mode !== 'fullscreen' && $screenProps.isMobile").row.full-width.justify-center.b-30
+    div(v-if="!fullscreen && $screenProps.isMobile").row.full-width.justify-center.b-30
       div(
         :style=`{ borderRadius: '10px'}`).row.full-width.items-center.content-center.q-pa-sm.b-30
         q-btn(@click="$routerKalpa.back()" flat round color="white" icon="west" no-caps)
@@ -16,9 +16,9 @@
           @click=""
           round flat color="white" icon="fas fa-info" :style=`{opacity:'0'}`)
     // контент
-    div(:class=`{ 'fixed-center': mode === 'fullscreen'}`).row.full-width.relative-position
+    .row.full-width.relative-position
       q-resize-observer(@resize="bottomHeight = $q.screen.height - $event.height")
-      content-view(:content="content" :mode="mode" @player="player=$event").row.full-width
+      content-view(:content="content" @player="player=$event").row.full-width
         // платный контент
       div(v-if="content.payInfo.price").row.full-width.q-pb-xs.q-px-xs
         .row.col
@@ -36,7 +36,7 @@
                 q-input(v-model="promoCode", autofocus, borderless dark :placeholder="$t('Введите промокод')" @keyup.enter="sendPromoCode(promoCode)").col.full-width
                 q-btn(v-close-popup round flat :color="promoCode ? 'green' : null", icon="done", :disable="!promoCode" @click="sendPromoCode(promoCode)")
                 kalpa-pay(:item="content" @success="")
-    bottom-info(v-if="mode !== 'fullscreen'" :content="content" :author="author" :bottomHeight="bottomHeight")
+    bottom-info(v-if="!fullscreen" :content="content" :author="author" :bottomHeight="bottomHeight")
 </template>
 
 <script>
@@ -60,18 +60,20 @@ export default {
       content: null,
       author: null,
       player: null,
-      mode: 'contentCard', // fullscreenEditor | fullscreen | contentCard
       bottomHeight: 0, // сколько места под образом
       showDialog: false
     }
   },
   computed: {
+    fullscreen() {
+      return this.player && this.player.fullscreen
+    },
     paid () { // оплачено
       if (!this.content.payInfo.price || this.content.author.oid === this.$store.getters.currentUser.oid) return true // если контент бесплатный либо я - автор
       return this.content.payInfo.paid
     },
     contentMaxHeight () {
-      if (this.mode.in('fullscreen', 'editor')) return this.$q.screen.height
+      if (this.fullscreen) return this.$q.screen.height
       else return this.$q.screen.height / 2
     }
   },
@@ -81,13 +83,6 @@ export default {
       async handler(to) {
         this.content = await this.$rxdb.get(RxCollectionEnum.OBJ, this.oid)
         this.author = await this.$rxdb.get(RxCollectionEnum.OBJ, this.content.author.oid)
-      }
-    },
-    'player.isFullscreen': {
-      immediate: true,
-      async handler(to) {
-        if (to && !this.mode.in('fullscreen', 'fullscreenEditor')) this.mode = 'fullscreen'
-        else if (!to) this.mode = 'contentCard'
       }
     },
     'content.payInfo.paid': {
@@ -101,14 +96,14 @@ export default {
     },
     '$screenProps.isHorizontal': { // перевернули телефон на бок
       handler (to) {
-        this.mode = to ? 'fullscreen' : 'contentCard'
+        if (this.player) this.player.setState('isFullscreen', to)
       }
     },
-    mode: {
+    fullscreen: {
       immediate: true,
       async handler (to, from) {
         try { // генерит ошибку, если действие вызвано на пользователем
-          if (to === 'fullscreen') await this.$q.fullscreen.request()
+          if (to) await this.$q.fullscreen.request()
           else if (from) await this.$q.fullscreen.exit()
         } catch (err) {
         }

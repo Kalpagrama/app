@@ -22,8 +22,8 @@ div(
       q-resize-observer(@resize="compositionHeight = $event.height, compositionWidth = $event.width")
     //- NAME: dynamic link/ dynamic fontSize
     slot(name="name")
-    sphere-hints(v-if="!lockName && toolTipFilterName" :padding="true" :name="toolTipFilterName" :maxHeight="compositionHeight", :maxWidth="compositionWidth", @click="node.name = $event")
-    sphere-hints(v-if="toolTipFilterSphere" :padding="true" :name="toolTipFilterSphere" :maxHeight="compositionHeight", :maxWidth="compositionWidth", @click="$refs.editSpheres.sphereAdd($event)").q-pa-sm
+    sphere-hints(v-if="!lockName && toolTipFilterName" :padding="true" :name="toolTipFilterName", :maxWidth="compositionWidth", @click="node.name = $event")
+    sphere-hints(v-if="toolTipFilterSphere" :padding="true" :name="toolTipFilterSphere", :maxWidth="compositionWidth", @click="$refs.editSpheres.sphereAdd($event)").q-pa-sm
     q-input(
       v-if="showName"
       v-model="node.name"

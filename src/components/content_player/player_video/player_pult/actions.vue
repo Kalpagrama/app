@@ -18,15 +18,15 @@ div(
     ).col-6
     .row.full-width.justify-between
       q-btn(
-        @click="player.forward(false)"
-        round flat  color="white" icon="replay_5").col
+        @click="player.seek(-player.seekTime)"
+        round flat  color="white" icon="navigate_before").col
         q-tooltip(
           anchor="center left"
           self="center right"
           :offset="[10, 10]"
           transition-show="jump-left"
           transition-hide="jump-up"
-        ) -5{{$t('сек')}}
+        ) -{{player.seekTime}}{{$t('сек')}}
       q-btn(
         @click="player.playing ? player.pause() : player.play()"
         round flat color="white").col
@@ -34,15 +34,15 @@ div(
           size="34px"
           :name="player.playing ? 'pause' : 'play_arrow'")
       q-btn(
-        @click="player.forward(true)"
-        round flat  color="white" icon="forward_5").col
+        @click="player.seek(player.seekTime)"
+        round flat  color="white" icon="navigate_next").col
         q-tooltip(
           anchor="center right"
           self="center left"
           :offset="[10, 10]"
           transition-show="jump-right"
           transition-hide="jump-up"
-        ) +5{{$t('сек')}}
+        ) +{{player.seekTime}}{{$t('сек')}}
   //- controls for figures
   figures-controls(
     v-if="player.nodeMode === 'edit'"
@@ -70,6 +70,7 @@ div(
 <script>
 import figuresControls from './figures_controls.vue'
 import { ObjectTypeEnum } from 'src/system/common/enums'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'playerPult__actions',

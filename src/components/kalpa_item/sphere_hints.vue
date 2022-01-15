@@ -6,9 +6,9 @@
 </style>
 
 <template lang="pug">
-.row.full-width
+div(ref="menu").row.full-width
   q-menu(v-model="showTooltip" no-focus auto-close anchor="top middle" :offset="offset" self="bottom middle" dark).transparent.no-shadow
-    div(:style=`{height: maxHeight + 'px', width: maxWidth + 'px'}` :class=`{'q-pa-xs': padding}`).row.content-end
+    div(:style=`{height: height + 'px', width: maxWidth + 'px'}` :class=`{'q-pa-xs': padding}`).row.content-end
       transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
         div(v-if="spheresAutocomplete.length && name && selectedSphereName !== name" :style=`{maxHeight: '100%', maxWidth: '100%',backgroundColor: "rgba(35,35,35,0.8)"}`).row.full-width.scroll-y.br-10.q-pa-sm
           span(v-for="(s,si) in spheresAutocomplete" :key="s.id" @click="selectedSphereName=s.name, $emit('click', s.name)"
@@ -18,6 +18,8 @@
 <script>
 import debounce from 'lodash/debounce'
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { scroll } from 'quasar'
+const { getScrollTarget, getVerticalScrollPosition, setVerticalScrollPosition, getScrollHeight } = scroll
 
 export default {
   name: 'sphereHints',
@@ -27,7 +29,8 @@ export default {
     return {
       showTooltip: true,
       spheresAutocomplete: [],
-      selectedSphereName: null
+      selectedSphereName: null,
+      top: 0,
     }
   },
   watch: {
@@ -40,7 +43,16 @@ export default {
       }
     }
   },
+  computed: {
+    height() {
+      return Math.max(Math.min(this.maxHeight || this.top - 10, this.top - 10), 0)
+    }
+  },
   methods: {
+    updateTop() {
+      this.top = this.$getRef('menu') ? this.$getRef('menu').getBoundingClientRect().top : 200
+      this.$logT('this.top=', this.top)
+    },
     fillSpheresAutoComplete(name) {
       if (!this.fillSpheresAutoCompleteDebounced){
         this.fillSpheresAutoCompleteDebounced = debounce(async (name) => {
@@ -63,9 +75,14 @@ export default {
   },
   mounted () {
     // this.$logT('mounted', this.maxHeight)
+    this.updateTop()
+    this.scrollTarget = getScrollTarget(this.$getRef('menu'))
+    this.scrollTarget.addEventListener('scroll', this.updateTop)
+    this.scrollTarget.addEventListener('resize', this.updateTop)
   },
   unmounted() {
-    // this.$logT('unmounted', this.name)
+    this.scrollTarget.removeEventListener('scroll', this.updateTop)
+    this.scrollTarget.removeEventListener('resize', this.updateTop)
   }
 }
 </script>

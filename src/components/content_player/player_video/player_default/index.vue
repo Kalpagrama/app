@@ -1,14 +1,15 @@
 <style lang="sass">
-//iframe[id$="_youtube_iframe"]
-//  width: 100%
-//  height: 100%
-//#videoRef12345
-//  width: 100%
-//  height: 100%
+iframe[id$="_youtube_iframe"]
+  width: 100%
+  height: 100%
+#videoRef12345
+  width: 100%
+  height: 100%
 </style>
 
 <template lang="pug">
-.row.full-width
+div(:style=`{height: videoHeight+'px'}`).row.full-width
+  q-resize-observer(@resize="pageWidth = $event.width")
   video(
     id="videoRef12345"
     ref="videoRef"
@@ -18,10 +19,6 @@
     :loop="true"
     :muted="muted"
     :velocity="velocity"
-    :style=`{
-        // objectFit: 'contain',
-        maxHeight: options.maxHeight+'px',
-     }`
     @click="videoClick"
     @loadeddata="videoLoadeddata"
     @timeupdate="videoTimeupdate"
@@ -29,18 +26,19 @@
     @play="videoPlaying"
   ).row.full-width
   .row.fit.absolute
-    slot(name="externalOverlay" )
+    slot(name="externalOverlay")
   .row.fit.absolute
-    item-overlay(:item="contentKalpa" :player="thiz")
+    item-overlay(:item="contentKalpa" :player="thiz").z-top
 </template>
 
 <script>
-import { assert } from 'src/system/common/utils'
 import { ContentApi } from 'src/api/content'
 import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'
 import { debounceIntervalItem } from 'src/system/rxdb/reactive'
 import itemOverlay from 'src/components/kalpa_item/item_feed/overlay'
+import { assert } from 'src/system/common/utils'
+import { ObjectTypeEnum } from 'src/system/common/enums'
 
 export default {
   name: 'playerDefault',
@@ -57,6 +55,7 @@ export default {
   emits: ['player', 'error'],
   data () {
     return {
+      pageWidth: null,
       events: null,
       thiz: this,
       player_: null,
@@ -65,18 +64,35 @@ export default {
       muted: false,
       duration: 0,
       currentTime: 0,
+      currentTimeFreeze: false,
       node: null,
       nodeMode: null,
       clusters: [],
       figureFocused: null,
       velocity: 1.0,
       nodePlaying: null,
-      isFullscreen: false
+      isFullscreen: null
     }
   },
   computed: {
+    fullscreen() {
+      return this.isFullscreen || this.nodeMode === 'edit' || this.node
+    },
+    seekTime() {
+      assert(this.duration)
+      return Math.max(5, Math.min(Math.floor(this.duration * 0.05 / 10) * 10, 60))
+    },
+    videoHeight() {
+      // return this.$q.screen.height
+      // // eslint-disable-next-line no-unreachable
+      if (!this.pageWidth || !this.contentKalpa.height || !this.contentKalpa.width) return this.options.maxHeight * 1.5 || 400
+      let ratio = this.contentKalpa.width / this.contentKalpa.height
+      let maxHeight = this.pageWidth / ratio
+      this.$logT('videoHeight=', Math.min(maxHeight, this.options.maxHeight))
+      return Math.min(maxHeight, this.options.maxHeight)
+    },
     url () {
-      // this.$log('url computed=', ContentApi.urlSelect(this.contentKalpa))
+      // this.$logT('url computed=', ContentApi.urlSelect(this.contentKalpa))
       return ContentApi.urlSelect(this.contentKalpa)
     },
     // Dynamic player depends on contentKalpa.url
@@ -145,19 +161,21 @@ export default {
         }
       }
     },
-    forward (next) {
-      this.$log('forward', next)
+    seek (offset) {
+      this.$logT('seek', offset)
+      assert(typeof offset === 'number')
       this.node = null
       this.nodeMode = null
       let t = this.currentTime
-      if (next) t += 5
-      else t -= 5
-      if (t < 0) t = 0
-      if (t > this.duration) t = this.duration
+      t += offset
+      t = Math.max(0, Math.min(this.duration, t))
       this.setCurrentTime(t)
     },
     setCurrentTime (t) {
       // this.$log('setCurrentTime', t)
+      this.currentTimeFreeze = true
+      clearTimeout(this.currentTimeFreezeTimer)
+      this.currentTimeFreezeTimer = setTimeout(() => { this.currentTimeFreeze = false }, 2000)
       if (this.playerType === 'player-youtube') {
         this.currentTime = t
         this.player_.setCurrentTime(t)
@@ -198,11 +216,11 @@ export default {
     videoTimeupdate (e) {
       // this.$log('videoTimeupdate', e)
       if (this.playerType === 'player-youtube') {
-        this.currentTime = this.player_.currentTime
+        if (!this.currentTimeFreeze) this.currentTime = this.player_.currentTime
         this.duration = this.player_.duration
       } else if (this.playerType === 'player-kalpa') {
         if (this.$refs.videoRef) {
-          this.currentTime = this.$refs.videoRef.currentTime
+          if (!this.currentTimeFreeze) this.currentTime = this.$refs.videoRef.currentTime
           this.duration = this.$refs.videoRef.duration
         }
       }
@@ -233,12 +251,12 @@ export default {
           controls: true,
           features: [],
           // enableAutosize: false,
-          stretching: 'responsive',
+          stretching: 'fill',
           pauseOtherPlayers: false,
           clickToPlayPause: true,
           // plugins: ['youtube'],
           success: async (mediaElement, originalNode, instance) => {
-            this.$log('playerCreate done')
+            // this.$logT('playerCreate done', mediaElement)
             this.player_ = mediaElement
             this.player_.addEventListener('loadeddata', this.videoLoadeddata)
             this.player_.addEventListener('timeupdate', this.videoTimeupdate)
@@ -266,6 +284,47 @@ export default {
           if (this.$refs.videoRef) this.$refs.videoRef.dispatchEvent(new CustomEvent(event, { detail: val }))
         }
       }
+    },
+    // выделить фрагмент и создать ядро(покажется редактор)
+    fragmentSelect () {
+      if (this.$store.getters.isGuest) this.$store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы создать ядро, войдите в аккаунт'}])
+      else {
+        // Create node input
+        let start = Math.max(0, this.currentTime - 15)
+        let end = Math.min(start + 30, this.duration)
+        let figures = [{t: start, points: []}, {t: end, points: []}]
+        let nodeInput = {
+          name: '',
+          category: null,
+          spheres: [],
+          layout: 'HORIZONTAL',
+          vertices: [],
+          items: [
+            {
+              id: Date.now().toString(),
+              thumbUrl: this.contentKalpa.thumbUrl,
+              thumbHeight: this.contentKalpa.thumbHeight,
+              thumbWidth: this.contentKalpa.thumbWidth,
+              outputType: 'VIDEO',
+              layers: [
+                {
+                  id: Date.now().toString(),
+                  contentOid: this.contentKalpa.oid,
+                  figuresAbsolute: figures,
+                },
+              ],
+              operation: { items: null, operations: null, type: 'CONCAT'},
+              type: ObjectTypeEnum.COMPOSITION,
+            },
+          ]
+        }
+        this.setState('node', nodeInput)
+        this.setState('nodeMode', 'edit')
+      }
+    },
+    fragmentClear () {
+      this.setState('node', null)
+      this.setState('nodeMode', null)
     }
   },
   mounted () {
