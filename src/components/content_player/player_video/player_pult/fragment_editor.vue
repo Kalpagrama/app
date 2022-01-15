@@ -1,426 +1,158 @@
 <template lang="pug">
-.row.full-width.items-start.content-start.relative-position
-  //- player.nodeFocused
-  node-focused( v-if="player && player.node && player.nodeMode === 'focus'" :player="player" :contentKalpa="contentKalpa")
-  //- bar
-  div(:style=`{ paddingLeft: barWrapperPaddingX+'px', paddingRight: barWrapperPaddingX+'px' }`).row.full-width
-    div(:style=`{height: heightWrapper+'px'}`).row.full-width.relative-position
-      //- middle currentTime
-      //- v-if="true || zoomWrapperScrolling"
-      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+.row.full-width.relative-position
+  // middle currentTime
+  div(
+    :style=`{
+      position: 'absolute',
+      left: 'calc(50% + 0px)',
+      top: '9px',
+      width: '2px',
+      height: heightBar+'px',
+      pointerEvents: 'none',
+    }`
+    ).row.bg-green-10
+  // bar
+  //- scroll
+  div(ref="scroll-bar" @scroll="scrollBarOnScroll").row.full-width.scroll.scroll-disable.q-py-sm.br
+    q-resize-observer(@resize="scrollBarWidth = $event.width")
+    .row.no-wrap
+      //- left padding
+      div(
+        :style=`{
+          width: leftRightMarginWidth+'px',
+          minWidth: leftRightMarginWidth+'px',
+          height: heightBar+'px',
+          pointerEvents: 'none',
+        }`
+        ).row
+      //- middle wrapper
+      div(
+        ref="minutes-wrapper"
+        accessKey="minutes-wrapper"
+        v-touch-pan.left.right.mouse="minutesWrapperDrag"
+        @click="minutesWrapperClick"
+        :style=`{
+          position: 'relative',
+          height: heightBar+'px',
+          overflow: 'visible',
+        }`
+        ).row.no-wrap
+        q-resize-observer(@resize="totalBarWidth = $event.width")
+        //- figures editor
+        figures-editor(
+          v-if="player && player.figures && player.nodeMode === 'edit'"
+          :player="player"
+          :convert="convertPxToTime"
+          @first="skipCurrentTimeChange = true, figureEditing = true"
+          @final="skipCurrentTimeChange = false, figureEditing = false").fit.absolute.z-top
+        //- minutes
         div(
-          v-if="zoomed"
+          v-for="(m,mi) in minuteSectorCount" :key="mi"
           :style=`{
-            position: 'absolute', zIndex: 200,
-            left: 'calc(50% + 0px)',
-            width: '2px',
-            top: (heightWrapper-heightBar)/2+'px',
-            height: heightBar+'px',
+            zIndex: 101+mi,
+            height: '100%',
+            width: getSectorWidth(mi)+'px',
+            minWidth: getSectorWidth(mi)+'px',
+            borderLeft: (mi !== 0 ) ? '1px solid rgb(200,200,200,0.1)' : 'none',
+            pointerEvents: 'none',
+            overflow: 'hidden',
+          }`
+          ).row
+          small(
+            :style=`{
+              fontSize: '8px',
+              marginLeft: mi === 0 ? '8px' : '4px',
+            }`).text-grey-6 {{ mi < 60 ? mi + 'm' : $time(mi * 60, true) }}
+        //- background
+        div(
+          :style=`{
+            position: 'absolute', zIndex: 100,
+            borderRadius: '10px',
+            opacity: 0.8,
             pointerEvents: 'none',
           }`
-          ).row.bg-green-10
-      //- scroll
+          ).row.fit.b-50
+      //- right padding
       div(
-        ref="zoom-wrapper"
-        @scroll="zoomWrapperOnScroll"
-        @mousemove="zoomWrapperMousemove"
-        :class=`{
-          //- br: zoomWrapperScrolling
-        }`
         :style=`{
-          position: 'absolute', zIndex: 100,
-          overflowY: 'hidden',
-          overflowX: figureEditing ? 'hidden !important' : 'auto',
+          width: leftRightMarginWidth+'px',
+          minWidth: leftRightMarginWidth+'px',
+          height: heightBar+'px',
+          pointerEvents: 'none',
         }`
-        ).row.fit.items-center.content-center.scroll.scroll-disable.q-py-sm
-        q-resize-observer(@resize="zoomWrapperOnResize")
-        .row.no-wrap
-          //- left padding
-          div(
-            @click="zoomed = false"
-            :style=`{
-              width: leftRightMarginWidth+'px',
-              minWidth: leftRightMarginWidth+'px',
-              height: heightBar+'px',
-              pointerEvents: 'none',
-            }`
-            ).row
-          //- middle wrapper
-          //- @mousemove="minutesWrapperMousemove"
-          div(
-            ref="minutes-wrapper"
-            accessKey="minutes-wrapper"
-            v-touch-pan.left.right.mouse="minutesWrapperDrag"
-            @click="minutesWrapperClick"
-            :style=`{
-              position: 'relative',
-              height: heightBar+'px',
-              overflow: 'visible',
-            }`
-            ).row.no-wrap
-            //- tint
-            div(
-              v-if="!zoomed"
-              @click="tintClick"
-              accessKey="minutes-wrapper-tint"
-              v-touch-pan.mouse.prevent="tintOnPan"
-              :style=`{
-                position: 'absolute', zIndex: 3000,
-              }`
-              ).row.fit
-            //- node focused
-            div(
-              v-if="!zoomed && player.node && ['focus', 'pick'].includes(player.nodeMode)"
-              :style=`{
-                position: 'absolute', zIndex: 3000,
-                top: '-2px',
-                left: (player.figures[0].t/player.duration)*100+'%',
-                width: ((player.figures[1].t-player.figures[0].t)/player.duration)*100+'%',
-                height: 'calc(100% + 4px)',
-                border: '2px solid rgb(76,175,79)',
-                borderRadius: '2px',
-                background: 'rgba(76,175,79,0.5)',
-                pointerEvents: 'none',
-              }`
-              ).row
-            //- figures editor
-            transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-              figures-editor(
-                v-if="player && player.figures && player.nodeMode === 'edit'"
-                :player="player"
-                :convert="convertPxToTime"
-                @first="zoomWorking = true, figureEditing = true"
-                @final="zoomWorking = false, figureEditing = false").fit.absolute.z-top
-            //- clusters
-            clusters(
-              v-if="player.clusters.length > 0 && zoomed !== true"
-              v-bind="$props")
-            //- currentTime
-            //- v-if="true || !zoomWrapperScrolling"
-            transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-              div(
-                v-if="!zoomed"
-                :style=`{
-                  position: 'absolute', zIndex: 2000,
-                  left: (player.currentTime/player.duration)*100+'%',
-                  height: '100%',
-                  width: '2px',
-                  pointerEvents: 'none',
-                }`
-                ).row.bg-red
-            //- currentTime hover percent
-            div(
-              v-if="!zoomed && currentTimeHoverPercent && $q.screen.gt.sm"
-              :style=`{
-                position: 'absolute', zIndex: 2001,
-                top: '-14px',
-                left: currentTimeHoverPercent+'%',
-                height: '14px',
-                //- width: '50px',
-              }`).row.items-center.content-center
-              small.text-white {{ $time(currentTimeHoverTime) }}
-              //- small.text-white {{ currentTimeHoverPercent }}
-            //- currentTime hover line
-            div(
-              v-if="!zoomed && currentTimeHoverPercent && $q.screen.gt.sm"
-              :style=`{
-                position: 'absolute', zIndex: 2000,
-                left: currentTimeHoverPercent+'%',
-                height: '100%',
-                width: '2px',
-                pointerEvents: 'none',
-                opacity: 0.6,
-              }`
-              ).row.bg-red
-            //- minutes
-            div(
-              v-for="(m,mi) in minCount" :key="mi"
-              :style=`{
-                zIndex: 101+mi,
-                //- height: heightBar+'px',
-                height: '100%',
-                width: (mi === minCount-1) ? minWidth*minDelta+'px' : minWidth+'px',
-                minWidth: (mi === minCount-1) ? minWidth*minDelta+'px' : minWidth+'px',
-                //- borderLeft: (minWidthMin < 40 && mi !== 0) ?  : '1px solid rgb(200,200,200,0.1)' : 'none',
-                borderLeft: (mi !== 0 && (minWidthMin > 20 || zoomed)) ? '1px solid rgb(200,200,200,0.1)' : 'none',
-                pointerEvents: 'none',
-                overflow: 'hidden',
-              }`
-              ).row
-              small(
-                v-if="zoomed ? true : minWidthMin > 30"
-                :style=`{
-                  fontSize: '8px',
-                  marginLeft: mi === 0 ? '8px' : '4px',
-                }`).text-grey-6 {{ mi < 60 ? mi + 'm' : $time(mi * 60, true) }}
-            //- background
-            //- @mouseleave="currentTimeHoverPercent = null"
-            div(
-              :style=`{
-                position: 'absolute', zIndex: 100,
-                borderRadius: '10px',
-                opacity: 0.8,
-                pointerEvents: 'none',
-              }`
-              ).row.fit.b-50
-          //- right padding
-          div(
-            @click="zoomed = false"
-            :style=`{
-              width: leftRightMarginWidth+'px',
-              minWidth: leftRightMarginWidth+'px',
-              height: heightBar+'px',
-              pointerEvents: 'none',
-            }`
-            ).row
-  //- footer: actions
-  figures-actions(v-if="player && player.figures && player.nodeMode === 'edit'" v-bind="$props")
+        ).row
+  // actions
+  figures-actions(v-bind="$props")
 </template>
 
 <script>
-import clusters from './clusters.vue'
 import figuresActions from './figures_actions.vue'
 import figuresEditor from './figures_editor.vue'
 import nodeFocused from './node_focused.vue'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'fragmentEditor',
   props: ['player', 'contentKalpa', 'options'],
   components: {
-    clusters,
     figuresActions,
     figuresEditor,
     nodeFocused,
   },
   data () {
     return {
-      barWrapperPaddingX: 5,
-      width: 0,
-      height: 0,
-      heightBar: 20,
-      heightBarMin: 20,
-      heightBarMax: 40,
-      heightWrapper: 50,
-      heightWrapperMin: 60,
-      heightWrapperMax: 90,
-      minWidth: 0,
-      zoomed: null,
-      zoomWorking: false,
-      zoomPercent: null,
-      zoomWrapperScrollingTimer: null,
-      zoomWrapperScrolling: false,
-      zoomWrapperScrollingAuthor: null,
-      playerCurrentTimeTimer: null,
-      leftRightMarginWidth: 0,
-      tintPanning: false,
-      tintRect: null,
-      convertRect: null,
+      heightBar: 40,
+      skipCurrentTimeChange: false,
       figureEditing: false,
-      currentTimeHover: 0,
-      currentTimeHoverTimer: null,
-      currentTimeHoverTime: null,
-      currentTimeHoverPercent: null,
-      zoomWrapperMousemoveRect: null,
-      minutesWrapperDragging: false,
+      scrollBarWidth: 0,
+      totalBarWidth: 0,
     }
   },
   computed: {
-    minCount () {
+    minuteSectorCount () {
       return Math.ceil(this.player.duration / 60)
     },
-    minDelta () {
-      let p = this.player.duration % 60
-      return p / 60
+    minuteWidth () { // ширина минуты в пикселях
+      let minuteWidth = this.scrollBarWidth * 0.8 // минута должна быть чуть меньше экрана
+      if (minuteWidth * (this.player.duration / 60) < this.scrollBarWidth) { // если текущий размер минуты * число минут меньше ширины экрана - увеличиваем размер минуты так чтобы они занимали весь экран
+        minuteWidth = this.scrollBarWidth / (this.player.duration / 60)
+      }
+      return Math.ceil(minuteWidth)
     },
-    minWidthMin () {
-      let minWidthMin = this.width / this.minCount
-      let width = 0
-      for (let i = 0; i < this.minCount; i++) {
-        if (i + 1 === this.minCount) {
-          width += minWidthMin * this.minDelta
-        }
-        else {
-          width += minWidthMin
-        }
-      }
-      // this.$log('width/this.width', {width: width, 'this.width': this.width})
-      // if we got smaller then width...
-      if (width < this.width) {
-        return minWidthMin / (width / this.width)
-        // return minWidthMin
-      }
-      else {
-        return minWidthMin
-      }
+    scrollLeft () {
+      return (this.player.currentTime / this.player.duration) * this.scrollBarWidth
     },
-    minWidthMax () {
-      let minWidthMax = this.width * 0.8
-      let width = 0
-      for (let i = 0; i < this.minCount; i++) {
-        if (i + 1 === this.minCount) {
-          width += minWidthMax * this.minDelta
-        }
-        else {
-          width += minWidthMax
-        }
-      }
-      if (width < this.width) {
-        return this.minWidthMin
-      }
-      else {
-        return minWidthMax
-      }
-    },
-    minWidthTotal () {
-      let width = 0
-      for (let i = 0; i < this.minCount; i++) {
-        if (i + 1 === this.minCount) {
-          width += this.minWidthMin * this.minDelta
-        }
-        else {
-          width += this.minWidthMin
-        }
-      }
-      return width
-    },
-    duration () {
-      return this.player.duration
+    leftRightMarginWidth () {
+      return this.scrollBarWidth / 2
     }
   },
   watch: {
     'player.currentTime': {
       async handler (to, from) {
-        if (this.zoomWrapperScrolling) return
-        if (!this.zoomed) return
-        if (this.zoomWorking) return
+        if (this.skipCurrentTimeChange) return
         // this.$log('player.currentTime TO', to)
-        let ref = this.$refs['minutes-wrapper']
-        let {width} = ref.getBoundingClientRect()
-        let scrollLeft = (to / this.player.duration) * width
-        this.zoomWrapperScrollingAuthor = 'player'
-        // this.$refs['zoom-wrapper'].scrollLeft = scrollLeft
-        this.$gsap.to(this.$refs['zoom-wrapper'], 0.3, {scrollLeft: scrollLeft})
-        if (this.playerCurrentTimeTimer) {
-          clearTimeout(this.playerCurrentTimeTimer)
-          this.playerCurrentTimeTimer = null
-        }
-        this.playerCurrentTimeTimer = setTimeout(() => {
-          this.zoomWrapperScrollingAuthor = null
-        }, 300)
-      }
-    },
-    'player.nodeMode': {
-      immediate: true,
-      handler (to, from) {
-        if (to === 'edit') {
-          this.$nextTick(() => {
-            this.zoomIn()
-          })
-          this.$gsap.to(this, 0.5, {
-            heightBar: this.heightBarMax,
-            heightWrapper: this.heightWrapperMax,
-          })
-        }
-        else {
-          this.zoomOut()
-          this.$gsap.to(this, 0.5, {
-            heightBar: this.heightBarMin,
-            heightWrapper: this.heightWrapperMin,
-          })
-        }
-      }
-    },
-    zoomed: {
-      // immediate: true,
-      handler (to, from) {
-        this.$log('zoomed TO', to)
-        this.zoomWorking = true
-        if (to) this.width += 32
-        else this.width -= 32
-        this.$gsap.to(this, 0.5, {
-          barWrapperPaddingX: to ? 0 : 16,
-          leftRightMarginWidth: to ? this.width / 2 : 0,
-          minWidth: to ? this.minWidthMax : this.minWidthMin,
-          onComplete: async () => {
-            this.$log('zoomed onComplete')
-            // this.zoomWorking = false
-            // set scrollLeft finally...
-            await this.$wait(300)
-            let ref = this.$refs['minutes-wrapper']
-            let {width} = ref.getBoundingClientRect()
-            let scrollLeft = (this.zoomPercent * (width))
-            // this.$log('zoomed onUpdate scrollLeft', scrollLeft)
-            // this.$refs['zoom-wrapper'].scrollLeft = scrollLeft
-            // this.zoomWorking = false
-            this.$gsap.to(this.$refs['zoom-wrapper'], 0.5, {
-              scrollLeft: scrollLeft,
-              onComplete: () => {
-                this.player.play()
-                this.zoomWorking = false
-              }
-            })
-          },
-          onUpdate: () => {
-            if (!this.zoomPercent) return
-            this.$log('zoomed onUpdate')
-            let ref = this.$refs['minutes-wrapper']
-            let {width} = ref.getBoundingClientRect()
-            let scrollLeft = (this.zoomPercent * width)
-            // this.$log('zoomed onUpdate scrollLeft', scrollLeft)
-            this.$refs['zoom-wrapper'].scrollLeft = scrollLeft
-          }
-        })
-        // this.$gsap.to(this.$refs['zoom-wrapper'], 1, {
-        //   scrollLeft:
-        // })
+        let scrollLeft = (to / this.player.duration) * this.totalBarWidth
+        this.$gsap.to(this.$refs['scroll-bar'], 0.3, {scrollLeft: scrollLeft})
       }
     },
   },
   methods: {
-    zoomWrapperMousemove (e) {
-      // this.$log('zoomWrapperMouseMove', e)
-      let rect = this.$refs['minutes-wrapper'].getBoundingClientRect()
-      let y = e.clientY
-      let x = e.clientX
-      // this.$log({y, yMinutes})
-      if (y < rect.top || y > rect.bottom || x < rect.left || x > rect.right) {
-        this.currentTimeHoverPercent = null
-        this.currentTimeHoverTime = null
-      }
-      else {
-        this.currentTimeHoverPercent = (x - rect.left) / rect.width * 100
-        this.currentTimeHoverTime = ((x - rect.left) / rect.width) * this.player.duration
-      }
+    getSectorWidth(sectorIndx) {
+      assert(sectorIndx < this.minuteSectorCount)
+      let sectorSecondCnt = sectorIndx === this.minuteSectorCount - 1 ? this.player.duration % 60 : 60
+      assert(sectorSecondCnt <= 60)
+      return Math.floor((sectorSecondCnt / 60) * this.minuteWidth)
     },
     convertPxToTime (px, _width) {
-      // width (300px) ___ player.duration
-      // px                t
-      if (this.convertRect === null) {
-        this.convertRect = this.$refs['minutes-wrapper'].getBoundingClientRect()
-      }
-      let width = _width || this.convertRect.width
-      let t = (px * this.duration) / width
+      let width = _width || this.totalBarWidth
+      let t = (px * this.player.duration) / width
       return t
     },
-    zoomWrapperOnScroll (e) {
-      // this.$log('zoomWrapperOnScroll', this.zoomWrapperScrollingAuthor)
-      if (this.zoomWrapperScrollingTimer) {
-        clearTimeout(this.zoomWrapperScrollingTimer)
-        this.zoomWrapperScrollingTimer = null
-      }
-      else {
-        this.player.pause()
-      }
-      this.zoomWrapperScrolling = true
-      this.zoomWrapperScrollingTimer = setTimeout(() => {
-        this.figureEditing = false
-        this.zoomWrapperScrolling = false
-      }, 500)
+    scrollBarOnScroll (e) {
       // whos first?
-      if (this.zoomWorking) return
-      if (this.zoomWrapperScrollingAuthor === 'player') return
+      if (this.skipCurrentTimeChange) return
       // do stuff
-      let ref = this.$refs['zoom-wrapper']
+      let ref = this.$refs['scroll-bar']
       let scrollWidth = ref.scrollWidth - (this.leftRightMarginWidth * 2)
       let scrollLeft = ref.scrollLeft
       let t = (scrollLeft / scrollWidth) * this.player.duration
@@ -457,167 +189,61 @@ export default {
       //   if (t > this.player.figures[1].t) this.player.figures[1].t = t
       // }
     },
-    zoomWrapperOnPan (e) {},
-    async zoomIn () {
-      this.$log('zoomIn')
-      this.zoomWrapperScrollingAuthor = 'player'
-      this.player.pause()
-      this.zoomPercent = this.player.currentTime / this.duration
-      this.zoomed = true
-      // await this.$wait(500)
-      // this.zoomWrapperScrollingAuthor = null
-      // do someting to save currentPosition...
-      // need to save currentTime
-      // this.zoomWrapperScrollingAuthor = 'player'
-      await this.$wait(500)
-      this.zoomWrapperScrollingAuthor = null
-    },
-    async zoomOut () {
-      this.$log('zoomOut')
-      this.zoomed = false
-      this.player.pause()
-      // need to save currentTime
-      this.zoomWrapperScrollingAuthor = 'player'
-      await this.$wait(500)
-      this.zoomWrapperScrollingAuthor = null
-    },
     tintClick (e) {
       // this.$log('tintClick', e)
       let left = e.layerX
       let width = e.target.clientWidth
       this.$log({left, width})
-      this.zoomPercent = left / width
-      // this.zoomed = !this.zoomed
-      let t = this.zoomPercent * this.player.duration
+      let currentRelativePosition = left / width
+      let t = currentRelativePosition * this.player.duration
       this.$log('t', t)
       this.player.setCurrentTime(t)
     },
     tintOnPan (e) {
-      // this.$log('tintOnPan', e)
-      if (e.isFirst) {
-        this.$emit('started')
-        this.tintPanning = true
-      }
-      if (e.isFinal) {
-        this.$emit('ended')
-        this.tintPanning = false
-      }
       // get rect position...
-      if (this.tintRect === null) {
-        this.tintRect = this.$refs['minutes-wrapper'].getBoundingClientRect()
-        // this.tintRectLeft = rect.left
-      }
-      let left = e.position.left - this.tintRect.left
-      let width = this.tintRect.width
-      // this.$log('left/width', left, width)
+      let tintRect = this.$refs['minutes-wrapper'].getBoundingClientRect()
+      let left = e.position.left - tintRect.left
+      let width = this.totalBarWidth
       if (left < 0 || left > width) {
-        this.$log('left < 0 || left > width !')
+        this.$logT('left < 0 || left > width !')
         return
       }
-      let t = left / width * this.duration
-      this.currentTimeHoverPercent = (left / width) * 100
-      this.currentTimeHoverTime = (left / width) * this.player.duration
-      // this.$log('t', t)
+      let t = left / width * this.player.duration
       this.player.setCurrentTime(t)
-      // this.barClick({layerX: left, target: {clientWidth: width}})
-    },
-    zoomWrapperOnResize (e) {
-      // this.$log('zoomWrapperOnResize', e)
-      this.width = e.width
-      this.height = e.height
-      // this.minWidth = this.zoomed ? this.minWidthMax : this.minWidthMin
-      if (!this.zoomed) {
-        this.minWidth = this.minWidthMin
-      }
     },
     minutesWrapperDrag (e) {
       // this.$log('minutesWrapperDrag', e)
       if (this.figureEditing) return
-      if (e.isFirst) {
-        this.minutesWrapperDragging = true
-      }
-      if (e.isFinal) {
-        this.minutesWrapperDragging = false
-      }
       if (this.$q.platform.has.touch) return
-      this.$refs['zoom-wrapper'].scrollLeft -= e.delta.x
+      this.$refs['scroll-bar'].scrollLeft -= e.delta.x
     },
     minutesWrapperClick (e) {
       this.$log('minutesWrapperClick', e.target.accessKey)
-      // if (e.target.accessKey !== 'minutes-wrapper') return
       if (this.player.figureFocused !== null) this.player.setState('figureFocused', null)
-      if (e.target.accessKey === 'minutes-wrapper-tint') {
-        let left = e.layerX
-        let width = e.target.clientWidth
-        this.$log('minutesWrapperClick', {left, width})
-        // this.zoomPercent = left / width
-        // this.zoomed = !this.zoomed
-        let t = (left / width) * this.player.duration
-        this.$log('t', t)
-        // Handle outside click when nodeFocused
-        if (this.player.figures) {
-          // let figures = this.player.node.items[0].layers[0].figuresAbsolute
-          if (t < this.player.figures[0].t || t > this.player.figures[1].t) {
-            // Destroy nodeFocused
-            // alert('Destroy nodeFocused here...')
-            this.player.setState('node', null)
-            this.player.setState('nodeMode', null)
-            this.player.setCurrentTime(t)
-          }
+      let left = e.layerX
+      let width = e.target.clientWidth
+      this.$log({left, width})
+      let t = this.player.figures[0].t + ((left / width) * (this.player.figures[1].t - this.player.figures[0].t))
+      this.$log('t', t)
+      this.player.setCurrentTime(t)
+      // figures
+      if (!this.player.figures) return
+      if (t < this.player.figures[0].t) this.player.figures[0].t = t
+      if (t > this.player.figures[1].t) this.player.figures[1].t = t
+      // scroll
+      let scrollLeft = (t / this.player.duration) * this.totalBarWidth
+      this.skipCurrentTimeChange = true
+      this.$gsap.to(this.$refs['scroll-bar'], 0.3, {
+        scrollLeft: scrollLeft,
+        onComplete: () => {
+          this.skipCurrentTimeChange = false
         }
-        // this.player.setCurrentTime(t)
-        // if (!this.player.figures) return
-        // if (t < this.player.figures[0].t) this.player.figures[0].t = t
-        // if (t > this.player.figures[1].t) this.player.figures[1].t = t
-        // let ref = this.$refs['minutes-wrapper']
-        // let {width: widthMinutes} = ref.getBoundingClientRect()
-        // // let scrollLeft = (left / width) * this.width
-        // let scrollLeft = (t / this.player.duration) * widthMinutes
-        // this.zoomWorking = true
-        // this.$gsap.to(this.$refs['zoom-wrapper'], 0.3, {
-        //   scrollLeft: scrollLeft,
-        //   onComplete: () => {
-        //     this.zoomWorking = false
-        //   }
-        // })
-      }
-      if (e.target.accessKey === 'figures-wrapper') {
-        let left = e.layerX
-        let width = e.target.clientWidth
-        this.$log({left, width})
-        // this.zoomPercent = left / width
-        // this.zoomed = !this.zoomed
-        // time
-        let t = this.player.figures[0].t + ((left / width) * (this.player.figures[1].t - this.player.figures[0].t))
-        this.$log('t', t)
-        this.player.setCurrentTime(t)
-        // figures
-        if (!this.player.figures) return
-        if (t < this.player.figures[0].t) this.player.figures[0].t = t
-        if (t > this.player.figures[1].t) this.player.figures[1].t = t
-        // scroll
-        let ref = this.$refs['minutes-wrapper']
-        let {width: widthMinutes} = ref.getBoundingClientRect()
-        let scrollLeft = (t / this.player.duration) * widthMinutes
-        this.zoomWorking = true
-        this.$gsap.to(this.$refs['zoom-wrapper'], 0.3, {
-          scrollLeft: scrollLeft,
-          onComplete: () => {
-            this.zoomWorking = false
-          }
-        })
-      }
+      })
     }
   },
-  // created () {},
   mounted () {
     this.$log('mounted')
-    let rect = this.$refs['zoom-wrapper'].getBoundingClientRect()
-    // this.$log('mounted rect.width', rect.width)
-    this.width = rect.width
-    // this.$log('mounted this.width', this.width)
-    this.minWidth = this.minWidthMin
-    // this.$log('mounted', this.minWidth)
+    // this.scrollBarWidth = this.$refs['scroll-bar'].getBoundingClientRect().width
   }
 }
 </script>
