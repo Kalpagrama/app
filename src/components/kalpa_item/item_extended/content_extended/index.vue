@@ -36,7 +36,7 @@
                 q-input(v-model="promoCode", autofocus, borderless dark :placeholder="$t('Введите промокод')" @keyup.enter="sendPromoCode(promoCode)").col.full-width
                 q-btn(v-close-popup round flat :color="promoCode ? 'green' : null", icon="done", :disable="!promoCode" @click="sendPromoCode(promoCode)")
                 kalpa-pay(:item="content" @success="")
-    bottom-info(v-if="!fullscreen" :content="content" :author="author" :bottomHeight="bottomHeight")
+    bottom-info(v-if="!fullscreen" :content="content" :player="player" :author="author" :bottomHeight="bottomHeight")
 </template>
 
 <script>

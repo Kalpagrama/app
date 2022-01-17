@@ -12,6 +12,7 @@
         :item="content"
         :content="content"
         :contentKalpa="content"
+        :player="player"
         :height="bottomHeight"
         @close="pageId=null")
   // description expand btn
@@ -164,6 +165,7 @@ export default {
   name: 'contentInfo',
   props: {
     content: { type: Object },
+    player: { type: Object },
     author: { type: Object },
     bottomHeight: { type: Number },
     showActions: { default: true },
