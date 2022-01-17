@@ -33,6 +33,7 @@
           :mode="mode"
           :showMenuBtn="false"
           @item="bookmarkSelectHandle"
+          @options="bookmarkOptionsHandle"
         ).q-mb-sm
       template(v-slot:nodata)
         nodata-guard(
@@ -120,15 +121,13 @@ export default {
     }
   },
   methods: {
+    bookmarkOptionsHandle (bookmark) {
+      this.bookmarkSelected = bookmark
+      this.bookmarkEditorShow = true
+    },
     bookmarkSelectHandle (bookmark) {
       this.$log('bookmarkSelectHandle', bookmark)
-      if (this.mode === 'select') {
-        this.$emit('item', bookmark)
-      }
-      else {
-        this.bookmarkSelected = bookmark
-        this.bookmarkEditorShow = true
-      }
+      this.$emit('item', bookmark)
     }
   }
 }

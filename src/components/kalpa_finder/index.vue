@@ -44,8 +44,9 @@ div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-widith.q-px-sm
     :scrollAreaHeight="scrollAreaHeight"
     searchInputState="disabled"
     :searchString="searchString"
-    :pageFilter="pageFilter"
+    :tabFilter="filter.tabFilter"
     :itemActivePersist="itemActivePersist"
+    :routeTrack="false"
     mode="select"
     @item="$emit('item', $event)")
 </template>
@@ -56,6 +57,7 @@ import listCollections from 'src/components/kalpa_lists/collections.vue'
 import listSearchKalpa from 'src/components/kalpa_lists/search_kalpa.vue'
 import listContents from 'src/components/kalpa_lists/contents.vue'
 import listGif from './page_gif/index.vue'
+import { assert } from 'src/system/common/utils'
 
 export default {
   name: 'kalpaFinder',
@@ -64,11 +66,13 @@ export default {
       type: Number,
       required: true
     },
-    pageFilter: {
+    filter: {
       type: Object,
       default () {
         return {
-          whiteList: ['all', 'nodes', 'joints', 'blocks', 'contents', 'users', 'spheres']
+          // whiteList: ['all', 'nodes', 'joints', 'blocks', 'contents', 'users', 'spheres'],
+          pageFilter: {blackList: []},
+          tabFilter: {blackList: []}
         }
       }
     },
@@ -128,22 +132,15 @@ export default {
         { id: 'collections', name: this.$t('collections') },
         { id: 'search-kalpa', name: this.$t('Kalpagrama') },
         { id: 'gif', name: this.$t('Gif') }
-      ]
+      ].filter(p => !(this?.filter?.pageFilter?.blackList || []).includes(p.id))
     }
-  },
-  methods: {
-    // pagesFilter (pages) {
-    //   return pages.filter(p => {
-    //     // return p.id !== 'joints'
-    //     return !['joints', 'spheres'].includes(p.id)
-    //   })
-    // }
   },
   mounted () {
     this.$log('mounted scrollAreaHeight=', this.scrollAreaHeight)
+    assert(this.pages.length)
     let pageId
     if (this.itemActivePersist) pageId = this.pages.find(p => p.id === this.$store.state.ui.pageIdFinder)?.id
-    this.pageId = pageId || 'published'
+    this.pageId = pageId || this.pages[0].id
   }
 }
 </script>

@@ -16,15 +16,10 @@
       @player="playerReady"
       ).row.full-width
       q-resize-observer(@resize="contentHeight = $event.height")
-    //// кнопки управления образом(когда редактор фрагмента закрыт) (replay pause loop)
-    //div(v-if="player && player.isFullscreen && $screenProps.isMobile").row.full-width.justify-center
-    //  figures-controls( :player="player" :contentKalpa="content" :style=`{background: 'rgba(20,20,20,0.5)', borderRadius: '10px'}`)
     .row.full-width.justify-center
-      transition(appear enter-active-class="animated fadeIn " leave-active-class="animated fadeOut")
-        div(v-if="player && player.duration > 0" :style=`{ maxWidth: 600+'px', background: 'rgba(35,35,35,0.7)', borderRadius: '20px'}`).row.full-width
-          q-resize-observer(@resize="editorHeight = $event.height")
-          page-node-editor(v-if="player && player.node && player.nodeMode === 'edit'"
-            :contentKalpa="content" :player="player").br-10
+      //div(v-if="player && player.duration > 0" :style=`{ maxWidth: 600+'px', background: 'rgba(35,35,35,0.7)', borderRadius: '20px'}`).row.full-width
+      q-resize-observer(@resize="editorHeight = $event.height")
+      page-node-editor(v-if="player && player.duration > 0 && player.node && player.nodeMode === 'edit'" :contentKalpa="content" :player="player").row.full-width.br-10.b-35
 </template>
 
 <script>
@@ -34,7 +29,7 @@ import contentPlayer from 'src/components/content_player/index.vue'
 import figuresControls from 'src/components/content_player/player_video/player_pult/figures_controls.vue'
 import { assert } from 'src/system/common/utils'
 import { RxCollectionEnum } from 'src/system/rxdb'
-import pageNodeEditor from '../node_editor/video'
+import pageNodeEditor from 'src/components/kalpa_item/item_extended/content_extended/node_editor/video'
 
 export default {
   name: 'pageContentVideo',

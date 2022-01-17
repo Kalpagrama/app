@@ -9,7 +9,7 @@ iframe[id$="_youtube_iframe"]
 </style>
 
 <template lang="pug">
-div(:style=`{height: videoHeight+'px'}`).row.full-width
+div(:style=`{height: videoHeight+'px'}`).row.full-width.relative-position
   q-resize-observer(@resize="pageWidth = $event.width")
   video(
     id="videoRef12345"

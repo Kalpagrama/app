@@ -3,8 +3,7 @@
   q-resize-observer(@resize="editorHeight = $event.height, editorWidth = $event.width")
   sphere-hints(v-if="toolTipFilterName" :name="toolTipFilterName", :maxWidth="editorWidth", :offset="[5, 5]" @click="node.name = $event, showSpheres=true").z-max
   sphere-hints(v-if="toolTipFilterSphere" :name="toolTipFilterSphere", :maxWidth="editorWidth", :offset="[5, 5]" @click="$refs.editSpheres.sphereAdd($event)").z-max
-  div(
-    :style=`{maxWidth: 600+'px'}`).row.full-width
+  .row.full-width
     //- name
     .row.full-width.q-pa-sm.justify-center
       div(v-if="node" :style=`{height: '60px', backgroundColor: 'rgba(30,30,30,0.9)'}`).row.full-width.br-10

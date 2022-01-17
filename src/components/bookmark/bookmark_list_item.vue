@@ -61,7 +61,7 @@ div(
   q-btn(
     v-if="mode !== 'select' && showMenuBtn"
     round flat color="grey-8" icon="more_vert"
-    @click="$emit('item', item)"
+    @click="$emit('options', item)"
     ).q-mt-xs.q-mr-xs
 </template>
 

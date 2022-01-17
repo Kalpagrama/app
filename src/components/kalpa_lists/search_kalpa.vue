@@ -69,7 +69,7 @@ export default {
     searchString: { type: String, default: '' },
     searchInputState: { type: String},
     mode: { type: String },
-    pageFilter: { type: Object},
+    tabFilter: { type: Object, default: {blackList: []}}
   },
   data () {
     return {
@@ -94,7 +94,7 @@ export default {
         { id: 'contents', name: this.$t('Contents') },
         { id: 'users', name: this.$t('Users') },
         { id: 'spheres', name: this.$t('Spheres') }
-      ].filter(p => !this?.pageFilter?.whiteList || this?.pageFilter?.whiteList.includes(p.id))
+      ].filter(p => !(this?.tabFilter?.blackList || []).includes(p.id))
     },
     query () {
       let objectTypes
