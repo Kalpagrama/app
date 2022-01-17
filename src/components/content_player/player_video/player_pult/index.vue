@@ -1,27 +1,10 @@
 <template lang="pug">
-div(
-  :style=`{
-    position: 'relative'
-  }`
-  ).row.full-width.items-start.content-start
+.row.full-width.items-start.content-start.relative-position
   //- player.nodeFocused
-  node-focused(
-    v-if="player && player.node && player.nodeMode === 'focus'"
-    :player="player"
-    :contentKalpa="contentKalpa")
+  node-focused( v-if="player && player.node && player.nodeMode === 'focus'" :player="player" :contentKalpa="contentKalpa")
   //- bar
-  div(
-    :style=`{
-      paddingLeft: barWrapperPaddingX+'px',
-      paddingRight: barWrapperPaddingX+'px'
-    }`
-    ).row.full-width
-    div(
-      :style=`{
-        position: 'relative',
-        height: heightWrapper+'px',
-      }`
-      ).row.full-width
+  div(:style=`{ paddingLeft: barWrapperPaddingX+'px', paddingRight: barWrapperPaddingX+'px' }`).row.full-width
+    div(:style=`{height: heightWrapper+'px'}`).row.full-width.relative-position
       //- time bar
       div(
         v-if="player && player.duration"
@@ -209,12 +192,10 @@ div(
             }`
             ).row
   //- footer: actions
-  figures-actions(
-    v-if="player && player.figures && player.nodeMode === 'edit'"
-    v-bind="$props")
-  actions(
-    v-if="player"
-    v-bind="$props")
+  figures-actions(v-if="player && player.figures && player.nodeMode === 'edit'" v-bind="$props")
+  .row.full-width
+    actions(v-if="player" v-bind="$props").col
+    slot(name="actions-right")
 </template>
 
 <script>
@@ -647,7 +628,7 @@ export default {
         //   }
         // })
       }
-      if (e.target.accessKey === 'figures-wrapper') {
+      if (e.target.accessKey === 'figures-editor') {
         let left = e.layerX
         let width = e.target.clientWidth
         this.$log({left, width})

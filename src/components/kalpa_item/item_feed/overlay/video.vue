@@ -1,44 +1,56 @@
 <template lang="pug">
 div(
-  @click.self="onClick"
+  :style=`{background: isOverlayShow ? 'rgba(0,0,0,0.7)':'rgba(0,0,0,0)'}`
+  @click="onClick(), player.playing ? player.pause():player.play()"
   @mousemove="onMouseMove"
   @mouseout="onMouseOut"
   @mouseover="onMouseOver"
-).row.fit.bg-10
-  transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(v-if="isOverlayShow" :style=`{ background: 'rgba(0,0,0,0.7)'}`).row.fit.absolute-bottom.items-center.content-center.justify-center
-      .row.fit.relative-position.items-center.content-center.justify-center
-        div(@click.self="player.playing ? player.pause():player.play()").row.fit.items-center.content-center.justify-center
-          q-icon(:name="player.playing ? 'pause' : 'play_arrow'" color="white" size="70px" @click="player.playing ? player.pause():player.play()")
-        .row.full-width.absolute-top-left.no-pointer-events.no-wrap
-          div(:style=`{minHeight: '100px'}`).row.full-width.relative-position
-            div(v-show="item.contentProvider === 'YOUTUBE'"
-              :style=`{
-                height: '100%', zIndex: 0,
-                background: 'linear-gradient(180deg, rgba(0,0,0,1) 60px, rgba(0,0,0,0) 100%)',
-            }`).row.full-width.absolute-top.no-pointer-events.no-wrap
-            div(:style=`{zIndex: 10}`).row.full-width.q-pa-sm
-              div(:style=`{maxWidth: Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.8 +'px'}`).row.non-selectable
-                .row.items-start.content-start.justify-center.q-pr-sm
-                  img(
-                    :src="item.author.thumbUrl"
-                    :style=`{height:'50px', width: '50px', objectFit: 'cover', borderRadius: '50px'}`
-                  )
-                .row.col.items-start.content-start.justify-center
-                  .row.full-width
-                    span(:style=`{fontSize: fontSize + 'px'}`).text-white.ellipsis {{ item.name }}
-                  .row.full-width
-                    small(:style=`{fontSize: fontSize - 2 + 'px'}`).text-white.ellipsis {{ item.author.name }}
-              .col
-              .row.q-pa-sm.all-pointer-events
-                q-icon(name="more_vert" color="white" size="sm")
-      q-btn(round flat dense :icon="player.isFullscreen ? 'fullscreen_exit': 'fullscreen'" color="grey-5" @click="player.setState('isFullscreen', !player.isFullscreen)").absolute-bottom-right.z-max
+  ).row.full-width.bg-10
+  .column.full-width
+    // top
+    div(v-show="isOverlayShow").row.full-width.q-pa-xs
+      .row.full-width.cursor-pointer
+        .row.items-center.content-center.justify-center.q-pr-sm
+          img(
+            :src="item.author.thumbUrl"
+            :style=`{height:'50px', width: '50px', objectFit: 'cover', borderRadius: '50px'}`
+          )
+        .col
+          .row.full-width
+            span.text-white.text-subtitle1.ellipsis {{ item.name }}
+          .row.full-width
+            small.text-white.text-bold.ellipsis {{ item.author.name }}
+        .row.q-pa-sm
+          q-icon(name="more_vert" color="white" size="sm")
+    // middle
+    .row.col
+      .row.col-2
+        q-btn(flat :style=`{borderRadius: '0 50% 50% 0'}` @click="player.seek(-player.seekTime)").fit
+          q-tooltip(
+            anchor="center middle" self="center middle"
+            transition-show="jump-right"
+            transition-hide="jump-up"
+          ) +{{player.seekTime}}{{$t('сек')}}
+      .row.col.items-center.content-center.justify-center
+        q-icon(v-show="isOverlayShow" :name="player.playing ? 'pause' : 'play_arrow'" color="white" size="70px" @click="player.playing ? player.pause():player.play()")
+      .row.col-2
+        q-btn(flat :style=`{borderRadius: '50% 0 0 50%'}` @click="player.seek(player.seekTime)").fit
+          q-tooltip(
+            anchor="center middle" self="center middle"
+            transition-show="jump-right"
+            transition-hide="jump-up"
+          ) +{{player.seekTime}}{{$t('сек')}}
+    // bottom
+    div(v-show="isOverlayShow || player.nodeMode === 'edit'").row.full-width.q-px-sm
+      player-pult-overlay(:player="player" :contentKalpa="item")
 </template>
 
 <script>
+import playerPultOverlay from 'src/components/content_player/player_video/player_pult/pult_overlay'
 export default {
   name: 'videoOverlay',
   props: ['item', 'player'],
+  components: {playerPultOverlay},
   data () {
     return {
       isOverlayShow: false,
@@ -48,12 +60,6 @@ export default {
     }
   },
   // emits: ['play', 'pause'],
-  computed: {
-    fontSize() {
-      if (!this.$screenProps.isMobile) return 16
-      else return 13
-    },
-  },
   methods: {
     onClick () {
       this.isOverlayShow = true
@@ -65,17 +71,17 @@ export default {
       }, 2000)
     },
     onMouseOver () {
-      this.$logT('onMouseOver')
+      // this.$logT('onMouseOver')
       this.hasMouse = true
       this.updateState()
     },
     onMouseOut () {
-      this.$logT('onMouseOut')
+      // this.$logT('onMouseOut')
       this.hasMouse = false
       if (this.timerMouseOut) clearTimeout(this.timerMouseOut)
       this.timerMouseOut = setTimeout(() => {
         this.updateState()
-      }, 0)
+      }, 2000)
     },
     onMouseMove () {
       this.lastMouseMove = Date.now()
@@ -95,6 +101,9 @@ export default {
       }
       else this.isOverlayShow = false
     }
+  },
+  mounted () {
+    this.updateState()
   }
 }
 </script>

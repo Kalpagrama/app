@@ -68,7 +68,6 @@ div(
         page-node-editor(
           v-if="player.node && player.nodeMode === 'edit'"
           :contentKalpa="contentKalpa"
-          :topScreenHeight="topScreenHeight"
           :player="player"
           :style=`{
             borderRadius: '10px',
@@ -86,7 +85,6 @@ div(
           :contentKalpa="contentKalpa"
           :itemState="{}"
           :player="player"
-          :topScreenHeight="topScreenHeight"
           @node="nodeFocused"
           @draft="draftFocused"
           @pageId="pageIdChange"
@@ -162,14 +160,6 @@ export default {
     }
   },
   computed: {
-    topScreenHeight () {
-      // this.$logT('this.$q.screen.height', this.$q.screen.height)
-      // this.$logT('this.editorHeight', this.editorHeight)
-      // this.$logT('this.footerHeight', this.footerHeight)
-      assert(this.$q.screen.height - this.editorHeight - this.footerHeight > 0)
-      // this.$logT('topScreenHeight', this.$q.screen.height - this.editorHeight - this.footerHeight)
-      return this.$q.screen.height - this.editorHeight - this.footerHeight
-    },
     contentHeightMin () {
       let tW = this.contentKalpa.thumbWidth
       let tH = this.contentKalpa.thumbHeight

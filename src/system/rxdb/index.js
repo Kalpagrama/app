@@ -1,7 +1,8 @@
 import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb/plugins/core'
 import { getRxStorageLoki } from 'rxdb/plugins/lokijs'
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
-import { RxDBAjvValidatePlugin } from 'rxdb/plugins/ajv-validate'
+// import { RxDBAjvValidatePlugin } from 'rxdb/plugins/ajv-validate'
+// import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
 import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump'
 import { RxDBMigrationPlugin } from 'rxdb/plugins/migration'
 import { RxDBUpdatePlugin } from 'rxdb/plugins/update'
@@ -109,7 +110,8 @@ class RxDBWrapper {
       this.reactiveDocDbMemCache = new ReactiveDocDbMemCache()
 
       addRxPlugin(RxDBQueryBuilderPlugin)
-      addRxPlugin(RxDBAjvValidatePlugin)
+      // addRxPlugin(RxDBAjvValidatePlugin)
+      // addRxPlugin(RxDBValidatePlugin)
       addRxPlugin(RxDBJsonDumpPlugin)
       addRxPlugin(RxDBMigrationPlugin)
       addRxPlugin(RxDBUpdatePlugin);

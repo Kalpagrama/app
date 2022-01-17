@@ -1,16 +1,13 @@
 <template lang="pug">
 .row.full-width.items-between.justify-center
   q-resize-observer(@resize="editorHeight = $event.height, editorWidth = $event.width")
-  sphere-hints(v-if="toolTipFilterName" :name="toolTipFilterName" :maxHeight="!$q.screen.gt.sm ? topScreenHeight-10 : Math.max(topScreenHeight-300, 100)", :maxWidth="editorWidth", :offset="[5, 5]" @click="node.name = $event")
-  sphere-hints(v-if="toolTipFilterSphere" :name="toolTipFilterSphere" :maxHeight="!$q.screen.gt.sm ? topScreenHeight-10 : Math.max(topScreenHeight-300, 100)", :maxWidth="editorWidth", :offset="[5, 5]" @click="$refs.editSpheres.sphereAdd($event)")
-  //- ===
-  //- Desktop editor
+  sphere-hints(v-if="toolTipFilterName" :name="toolTipFilterName", :maxWidth="editorWidth", :offset="[5, 5]" @click="node.name = $event, showSpheres=true").z-max
+  sphere-hints(v-if="toolTipFilterSphere" :name="toolTipFilterSphere", :maxWidth="editorWidth", :offset="[5, 5]" @click="$refs.editSpheres.sphereAdd($event)").z-max
   div(
-    v-if="$q.screen.gt.sm"
     :style=`{maxWidth: 600+'px'}`).row.full-width
     //- name
     .row.full-width.q-pa-sm.justify-center
-      div(:style=`{height: '60px', backgroundColor: 'rgba(30,30,30,0.9)'}`).row.full-width.br-10
+      div(v-if="node" :style=`{height: '60px', backgroundColor: 'rgba(30,30,30,0.9)'}`).row.full-width.br-10
         q-input(
           v-model="node.name"
           borderless dark
@@ -32,15 +29,17 @@
             minHeight: '60px',
           }`
           ).full-width.relative-position
+          template(v-slot:after)
+            q-icon(name="done" :color="node.name ? 'green-8':'grey-5'" @click="showSpheres=true").q-pr-xs.cursor-pointer
           div(v-if="node.name").row.absolute-top-left.q-pt-xs.q-pl-md
             small.text-grey-6 {{$t('В чём смысл?')}}
     //- category and spheres
     transition(enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown")
-      edit-spheres(v-if="node.name.length > 0"
+      edit-spheres(v-if="showSpheres"
         ref="editSpheres"
         :sphereOwner="node"
         @toolTipFilter="toolTipFilterName = null, toolTipFilterSphere=$event"
-        ).q-px-md
+        ).q-px-sm
         template(v-slot:left)
           edit-category(
             :node="node"
@@ -50,129 +49,20 @@
             :style=`{
               borderRadius: '10px',
             }`)
-        template(v-slot:right)
-          .row
-            //- Delete from notes
-            q-btn(
-              v-if="node.wsItemType === 'WS_NODE'"
-              outline no-caps color="red"
-              :loading="nodeSaving"
-              :style=`{}`
-              @click="nodeDeleteAction()"
-              ).q-mr-sm
-              span {{$t('Удалить заметку')}}
-            //- Save to notes
-            q-btn(
-              v-if="node.wsItemType !== 'WS_NODE'"
-              outline no-caps color="white"
-              :loading="nodeSaving"
-              :style=`{}`
-              @click="nodeSaveAction()"
-              ).q-mr-sm
-              span {{$t('Сохранить как заметку')}}
-            //- Publish
-            q-btn(
-              color="green" no-caps
-              :loading="nodePublishing"
-              :style=`{
-                //- height: '50px',
-              }`
-              @click="nodePublish()"
-              )
-              span {{$t('Publish')}}
-  //- ===
-  //- Mobile editor
-  div(
-    v-else
-    :style=`{maxWidth: 600+'px',}`).row.fit.items-between.content-between
-    .row.full-width.items-start.content-start
-      div(
-        :style=`{
-          borderRadius: '0 0 10px 10px',
-          background: 'rgb(40,40,40)',
-        }`
-        ).row.full-width.items-start.content-start
-        ////- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-        //  node-spheres(
-        //    v-if="node.spheres.length > 0"
-        //    color="text-white"
-        //    :node="node"
-        //    :disabled="true"
-        //    @sphere="sphereDelete")
-        q-input(
-          v-model="node.name"
-          borderless dark
-          ref="nameInput"
-          type="textarea" autogrow
-          maxlength="108"
-          @keydown.enter.prevent.exact=""
-          :autofocus="true"
-          :placeholder="$t('В чём смысл?')"
-          :input-style=`{
-            paddingTop: '20px',
-            paddingBottom: '10px',
-            paddingLeft: '40px',
-            paddingRight: '40px',
-            textAlign: 'center',
-            fontWeight: 'bold',
-            fontSize: fontSize+'px',
-            lineHeight: 1.3,
-            minHeight: '60px',
-          }`
-          ).full-width
-      //- category and spheres
-      .row.full-width.q-pt-sm
-        transition(enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown")
-          edit-spheres(
-            v-if="node.name.length > 0"
-            ref="editSpheres"
-            :sphereOwner="node"
-            @toolTipFilter="toolTipFilterName = null, toolTipFilterSphere=$event"
-            ).q-px-md
-            template(v-slot:left)
-              edit-category(
-                v-if="node.name.length > 0"
-                :node="node"
-                :class=`{
-                  br: !node.category && categoryError,
-                }`
-                :style=`{
-                  borderRadius: '10px',
-                }`)
-            template(v-slot:right)
-              div(v-if="node.name.length > 0").row
-                //- Delete from notes
-                q-btn(
-                  v-if="node.wsItemType === 'WS_NODE'"
-                  outline no-caps color="red"
-                  :loading="nodeSaving"
-                  :style=`{}`
-                  @click="nodeDeleteAction()"
-                  ).q-mr-sm
-                  span {{$t('Delete draft')}}
-                //- Save to notes
-                q-btn(
-                  v-if="node.wsItemType !== 'WS_NODE'"
-                  outline no-caps color="white"
-                  :loading="nodeSaving"
-                  :style=`{}`
-                  @click="nodeSaveAction()"
-                  ).q-mr-sm
-                  span {{$t('Сохранить как заметку')}}
-    //- publish
-    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      div(
-        v-if="node.name.length > 0 && !$store.state.ui.userTyping"
-        ).row.full-width.q-pa-md
-        q-btn(
-          color="green" no-caps
-          :loading="nodePublishing"
-          :style=`{
-            height: '50px',
-          }`
-          @click="nodePublish()"
-          ).full-width
-          span {{$t('Publish')}}
+    fragment-editor(:player="player" :contentKalpa="contentKalpa")
+    // buttons
+    div(v-if="showSpheres && node").row.full-width
+      //- Delete from notes
+      q-btn( v-if="node.wsItemType === 'WS_NODE'"
+        outline no-caps color="red"  :loading="nodeSaving" :label="$t('Удалить заметку')"
+        @click="nodeDeleteAction()"
+      ).col.q-mr-sm
+      //- Save to notes
+      q-btn(v-if="node.wsItemType !== 'WS_NODE'"
+        outline no-caps color="white" :loading="nodeSaving" :label="$t('Сохранить заметку')" @click="nodeSaveAction()"
+      ).col.q-mr-sm
+      //- Publish
+      q-btn(color="green" no-caps :loading="nodePublishing" :label="$t('Publish')" @click="nodePublish()").col
 </template>
 
 <script>
@@ -180,6 +70,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import { ObjectCreateApi } from 'src/api/object_create'
 import { UserApi } from 'src/api/user'
 
+import fragmentEditor from 'src/components/content_player/player_video/player_pult/fragment_editor'
 import sphereHints from 'src/components/kalpa_item/sphere_hints.vue'
 import editSpheres from './edit_spheres.vue'
 import editCategory from './edit_category.vue'
@@ -188,17 +79,19 @@ import { ObjectTypeEnum } from 'src/system/common/enums'
 export default {
   name: 'nodeEditor',
   components: {
+    fragmentEditor,
     editSpheres,
     editCategory,
     sphereHints,
   },
-  props: ['player', 'contentKalpa', 'topScreenHeight'],
+  props: ['player', 'contentKalpa'],
   // emits: ['toolTipFilterName'],
   data () {
     return {
       nodePublishing: false,
       nodeDeleting: false,
       nodeSaving: false,
+      showSpheres: false,
       sphere: '',
       toolTipFilterName: '',
       toolTipFilterSphere: '',
@@ -328,7 +221,6 @@ export default {
         this.nodeSaving = false
         this.player.setState('node', null)
         this.player.setState('nodeMode', null)
-        this.$emit('pageId', null)
         this.$notify('success', this.$t('Заметка сохранена'))
       }
       catch (e) {
@@ -347,7 +239,6 @@ export default {
         await this.node.remove(true)
         this.player.setState('node', null)
         this.player.setState('nodeMode', null)
-        this.$emit('pageId', null)
         this.$log('nodeDeleteAction done')
         this.nodeDeleting = false
       }
@@ -401,7 +292,6 @@ export default {
         }
         this.player.setState('nodeMode', 'focus')
         this.player.setState('node', nodeCreating)
-        // this.$emit('pageId', null)
         // save content bookmark to "all" collection
         await this.contentBookmarkSave()
         // ---
@@ -414,7 +304,6 @@ export default {
         // where to wait for the progress of node creating ?
         // here ?
         // this.$emit('node', nodeCreating)
-        this.$emit('pageId', null)
       }
       catch (e) {
         this.$log('nodePublish error', e)

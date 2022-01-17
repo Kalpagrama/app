@@ -1,12 +1,12 @@
 <template lang="pug">
 .row.full-width.items-between.justify-center
   q-resize-observer(@resize="editorHeight = $event.height, editorWidth = $event.width")
-  sphere-hints(v-if="toolTipFilterName" :name="toolTipFilterName", :maxWidth="editorWidth", :offset="[5, 5]" @click="node.name = $event")
+  sphere-hints(v-if="toolTipFilterName" :name="toolTipFilterName", :maxWidth="editorWidth", :offset="[5, 5]" @click="node.name = $event, showSpheres=true")
   sphere-hints(v-if="toolTipFilterSphere" :name="toolTipFilterSphere", :maxWidth="editorWidth", :offset="[5, 5]" @click="$refs.editSpheres.sphereAdd($event)")
   //- ===
   //- Desktop editor
   div(
-    v-if="$q.screen.gt.sm"
+    v-if="$screenProps.isDesktop"
     :style=`{maxWidth: 600+'px'}`).row.full-width
     //- name
     .row.full-width.q-pa-sm.justify-center
@@ -32,15 +32,17 @@
             minHeight: '60px',
           }`
           ).full-width.relative-position
+          template(v-slot:after)
+            q-icon(name="done" :color="node.name ? 'green-8':'grey-5'" @click="showSpheres=true").q-pr-xs.cursor-pointer
           div(v-if="node.name").row.absolute-top-left.q-pt-xs.q-pl-md
             small.text-grey-6 {{$t('В чём смысл?')}}
     //- category and spheres
     transition(enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown")
-      edit-spheres(v-if="node.name.length > 0"
+      edit-spheres(v-if="showSpheres"
         ref="editSpheres"
         :sphereOwner="node"
         @toolTipFilter="toolTipFilterName = null, toolTipFilterSphere=$event"
-        ).q-px-md
+        ).q-px-sm
         template(v-slot:left)
           edit-category(
             :node="node"
@@ -86,93 +88,69 @@
     v-else
     :style=`{maxWidth: 600+'px',}`).row.fit.items-between.content-between
     .row.full-width.items-start.content-start
-      div(
-        :style=`{
-          borderRadius: '0 0 10px 10px',
-          background: 'rgb(40,40,40)',
+      q-input(
+        v-model="node.name"
+        borderless dark
+        ref="nameInput"
+        type="textarea" autogrow
+        maxlength="108"
+        @keydown.enter.prevent.exact=""
+        :autofocus="true"
+        :placeholder="$t('В чём смысл?')"
+        :input-style=`{
+          paddingTop: '10px',
+          paddingBottom: '10px',
+          paddingLeft: '40px',
+          paddingRight: '40px',
+          textAlign: 'center',
+          fontWeight: 'bold',
+          fontSize: fontSize+'px',
+          lineHeight: 1.3,
+          minHeight: '50px',
         }`
-        ).row.full-width.items-start.content-start
-        ////- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-        //  node-spheres(
-        //    v-if="node.spheres.length > 0"
-        //    color="text-white"
-        //    :node="node"
-        //    :disabled="true"
-        //    @sphere="sphereDelete")
-        q-input(
-          v-model="node.name"
-          borderless dark
-          ref="nameInput"
-          type="textarea" autogrow
-          maxlength="108"
-          @keydown.enter.prevent.exact=""
-          :autofocus="true"
-          :placeholder="$t('В чём смысл?')"
-          :input-style=`{
-            paddingTop: '20px',
-            paddingBottom: '10px',
-            paddingLeft: '40px',
-            paddingRight: '40px',
-            textAlign: 'center',
-            fontWeight: 'bold',
-            fontSize: fontSize+'px',
-            lineHeight: 1.3,
-            minHeight: '60px',
-          }`
-          ).full-width
+        ).full-width.b-30
+          template(v-slot:after)
+            q-icon(name="done" :color="node.name ? 'green-8':'grey-5'" @click="showSpheres=true").q-pr-xs.cursor-pointer
       //- category and spheres
-      .row.full-width.q-pt-sm
+      .row.full-width.b-30
         transition(enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown")
           edit-spheres(
-            v-if="node.name.length > 0"
+            v-if="showSpheres"
             ref="editSpheres"
             :sphereOwner="node"
             @toolTipFilter="toolTipFilterName = null, toolTipFilterSphere=$event"
-            ).q-px-md
+            )
             template(v-slot:left)
-              edit-category(
-                v-if="node.name.length > 0"
-                :node="node"
-                :class=`{
-                  br: !node.category && categoryError,
-                }`
-                :style=`{
-                  borderRadius: '10px',
-                }`)
+              edit-category(:node="node" :class=`{ br: !node.category && categoryError,}`)
             template(v-slot:right)
-              div(v-if="node.name.length > 0").row
-                //- Delete from notes
-                q-btn(
-                  v-if="node.wsItemType === 'WS_NODE'"
-                  outline no-caps color="red"
-                  :loading="nodeSaving"
-                  :style=`{}`
-                  @click="nodeDeleteAction()"
-                  ).q-mr-sm
-                  span {{$t('Delete draft')}}
-                //- Save to notes
-                q-btn(
-                  v-if="node.wsItemType !== 'WS_NODE'"
-                  outline no-caps color="white"
-                  :loading="nodeSaving"
-                  :style=`{}`
-                  @click="nodeSaveAction()"
-                  ).q-mr-sm
-                  span {{$t('Сохранить как заметку')}}
-    //- publish
-    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      div(
-        v-if="node.name.length > 0 && !$store.state.ui.userTyping"
-        ).row.full-width.q-pa-md
-        q-btn(
-          color="green" no-caps
-          :loading="nodePublishing"
-          :style=`{
-            height: '50px',
-          }`
-          @click="nodePublish()"
-          ).full-width
-          span {{$t('Publish')}}
+    //- publish/save
+    div(v-if="showSpheres").row.full-width.q-pt-md.b-30
+      //- Delete from notes
+      q-btn(
+        v-if="node.wsItemType === 'WS_NODE'"
+        outline no-caps color="red"
+        :loading="nodeSaving"
+        :label="$t('удалить черновик')"
+        @click="nodeDeleteAction()"
+      )
+      //- Save to notes
+      q-btn(
+        v-else
+        outline no-caps color="green-8"
+        :loading="nodeSaving"
+        :label="$t('Сохранить заметку')"
+        @click="nodeSaveAction()"
+      )
+      // publish
+      q-btn(
+        no-caps :outline="node.name && node.category"
+        :color="node.name && node.category ? 'green-8':'grey-5'"
+        :loading="nodePublishing"
+        :disable="!(node.name && node.category)"
+        :style=`{ height: '30px'}`
+        @click="nodePublish()"
+        ).col.q-ml-xs
+        span {{$t('Опубликовать')}}
 </template>
 
 <script>
@@ -199,6 +177,7 @@ export default {
       nodePublishing: false,
       nodeDeleting: false,
       nodeSaving: false,
+      showSpheres: false,
       sphere: '',
       toolTipFilterName: '',
       toolTipFilterSphere: '',

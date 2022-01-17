@@ -160,6 +160,8 @@ const videoFragment = gql`${objectFragment} ${objectShortFragment} ${ObjectShort
     urlRaw
     duration
     strips
+    width
+    height
 #    contentSource
     relatedContent
     subtitlesRus: subtitles(lang: RUS)

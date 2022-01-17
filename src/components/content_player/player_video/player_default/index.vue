@@ -2,64 +2,53 @@
 iframe[id$="_youtube_iframe"]
   width: 100%
   height: 100%
-// z-index: 100
-// border-radius: 10px
-// overflow: hidden
-// pointer-events: none
-// @media (min-width: 900px)
-//   iframe[id$="_youtube_iframe"]
-//     width: 1000%
-//     height: 1000%
-//     min-width: 1000%
-//     min-height: 1000%
-//     z-index: 100
-//     border-radius: 10px
-//     overflow: hidden
-//     transform: scale(0.1)
-//     transform-origin: top left
-//     pointer-events: none
-.mejs__overlay
-  width: 100% !important
-  height: 100% !important
-  display: none !important
+
+#videoRef12345
+  width: 100%
+  height: 100%
 </style>
 
 <template lang="pug">
-video(
-  ref="videoRef"
-  type="video/youtube"
-  :src="url"
-  :playsinline="true"
-  :autoplay="true"
-  :loop="true"
-  :muted="muted"
-  :velocity="velocity"
-  :style=`{
-      objectFit: 'contain'
-   }`
-  @click="videoClick"
-  @loadeddata="videoLoadeddata"
-  @timeupdate="videoTimeupdate"
-  @pause="videoPaused"
-  @play="videoPlaying"
-).fit
-.row.fit.absolute-center
-  slot(name="externalOverlay" )
-item-overlay(:item="contentKalpa" :player="thiz").row.fit.absolute-center
+div(:style=`{height: videoHeight+'px'}`).row.full-width
+  q-resize-observer(@resize="pageWidth = $event.width")
+  video(
+    id="videoRef12345"
+    ref="videoRef"
+    :src="url"
+    :playsinline="true"
+    :autoplay="true"
+    :loop="true"
+    :muted="muted"
+    :velocity="velocity"
+    @click="videoClick"
+    @loadeddata="videoLoadeddata"
+    @timeupdate="videoTimeupdate"
+    @pause="videoPaused"
+    @play="videoPlaying"
+  ).row.full-width
+  // затемнение для ютуба on pause and desktops only and youtube
+  .row.fit.absolute
+    transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      div( v-if="!playing && playerType === 'player-youtube'"
+        :style=`{ background: 'linear-gradient(0deg, rgba(0,0,0,1) 200px, rgba(0,0,0,0) 100%)'}`
+      ).row.full-width
+  // оверлэй для видео
+  .row.fit.absolute
+    item-overlay(:item="contentKalpa" :player="thiz" :style=`{zIndex: 100}`)
 </template>
 
 <script>
-import { assert } from 'src/system/common/utils'
 import { ContentApi } from 'src/api/content'
 import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'
 import { debounceIntervalItem } from 'src/system/rxdb/reactive'
 import itemOverlay from 'src/components/kalpa_item/item_feed/overlay'
-import { reactive } from 'vue'
+import { assert } from 'src/system/common/utils'
+import { ObjectTypeEnum } from 'src/system/common/enums'
 
 export default {
   name: 'playerDefault',
-  components: {itemOverlay},
+  components: { itemOverlay },
   props: {
     contentKalpa: { type: Object, required: true },
     options: {
@@ -72,6 +61,7 @@ export default {
   emits: ['player', 'error'],
   data () {
     return {
+      pageWidth: null,
       events: null,
       thiz: this,
       player_: null,
@@ -79,19 +69,37 @@ export default {
       playingCount: 0,
       muted: false,
       duration: 0,
+      currentTimeNative: 0,
       currentTime: 0,
+      currentTimeFreeze: false,
       node: null,
       nodeMode: null,
       clusters: [],
       figureFocused: null,
       velocity: 1.0,
       nodePlaying: null,
-      isFullscreen: false
+      isFullscreen: null
     }
   },
   computed: {
+    fullscreen () {
+      return this.isFullscreen || this.nodeMode === 'edit' || this.node
+    },
+    seekTime () {
+      assert(this.duration)
+      return Math.max(5, Math.min(Math.floor(this.duration * 0.05 / 10) * 10, 60))
+    },
+    videoHeight () {
+      // return this.$q.screen.height
+      // // eslint-disable-next-line no-unreachable
+      if (!this.pageWidth || !this.contentKalpa.height || !this.contentKalpa.width) return this.options.maxHeight * 1.5 || 400
+      let ratio = this.contentKalpa.width / this.contentKalpa.height
+      let maxHeight = this.pageWidth / ratio
+      this.$logT('videoHeight=', Math.min(maxHeight, this.options.maxHeight))
+      return Math.min(maxHeight, this.options.maxHeight)
+    },
     url () {
-      // this.$log('url computed=', ContentApi.urlSelect(this.contentKalpa))
+      // this.$logT('url computed=', ContentApi.urlSelect(this.contentKalpa))
       return ContentApi.urlSelect(this.contentKalpa)
     },
     // Dynamic player depends on contentKalpa.url
@@ -160,19 +168,23 @@ export default {
         }
       }
     },
-    forward (next) {
-      this.$log('forward', next)
+    seek (offset) {
+      this.$logT('seek', offset)
+      assert(typeof offset === 'number')
       this.node = null
       this.nodeMode = null
       let t = this.currentTime
-      if (next) t += 5
-      else t -= 5
-      if (t < 0) t = 0
-      if (t > this.duration) t = this.duration
+      t += offset
+      t = Math.max(0, Math.min(this.duration, t))
       this.setCurrentTime(t)
     },
     setCurrentTime (t) {
       // this.$log('setCurrentTime', t)
+      this.currentTimeFreeze = true
+      clearTimeout(this.currentTimeFreezeTimer)
+      this.currentTimeFreezeTimer = setTimeout(() => {
+        this.currentTimeFreeze = false
+      }, 1200)
       if (this.playerType === 'player-youtube') {
         this.currentTime = t
         this.player_.setCurrentTime(t)
@@ -193,7 +205,6 @@ export default {
       }
     },
     videoLoadeddata (e) {
-      // this.$log('videoLoadeddata', e)
       if (this.playerType === 'player-youtube') {
         this.duration = this.player_.duration
       } else if (this.playerType === 'player-kalpa') {
@@ -214,11 +225,13 @@ export default {
     videoTimeupdate (e) {
       // this.$log('videoTimeupdate', e)
       if (this.playerType === 'player-youtube') {
-        this.currentTime = this.player_.currentTime
+        this.currentTimeNative = this.player_.currentTime
+        if (!this.currentTimeFreeze) this.currentTime = this.player_.currentTime
         this.duration = this.player_.duration
       } else if (this.playerType === 'player-kalpa') {
         if (this.$refs.videoRef) {
-          this.currentTime = this.$refs.videoRef.currentTime
+          this.currentTimeNative = this.$refs.videoRef.currentTime
+          if (!this.currentTimeFreeze) this.currentTime = this.$refs.videoRef.currentTime
           this.duration = this.$refs.videoRef.duration
         }
       }
@@ -242,19 +255,19 @@ export default {
     playerCreate (type) {
       this.$log('playerCreate', type)
       if (type === 'player-youtube') {
-        const me = new window.MediaElementPlayer(this.$refs.videoRef, {
+        const mejs = new window.MediaElementPlayer(this.$refs.videoRef, {
           loop: true,
           muted: this.muted,
           autoplay: true,
           controls: true,
           features: [],
-          // enableAutosize: true,
-          // stretching: 'fill',
+          // enableAutosize: false,
+          stretching: 'fill',
           pauseOtherPlayers: false,
           clickToPlayPause: true,
           // plugins: ['youtube'],
           success: async (mediaElement, originalNode, instance) => {
-            this.$log('playerCreate done')
+            // this.$logT('playerCreate done', mediaElement)
             this.player_ = mediaElement
             this.player_.addEventListener('loadeddata', this.videoLoadeddata)
             this.player_.addEventListener('timeupdate', this.videoTimeupdate)
@@ -266,8 +279,7 @@ export default {
             // this.$emit('error', mediaElement)
           }
         })
-      }
-      else if (type === 'player-kalpa') {
+      } else if (type === 'player-kalpa') {
         //
       }
       // Add events bus for every player
@@ -282,6 +294,47 @@ export default {
           if (this.$refs.videoRef) this.$refs.videoRef.dispatchEvent(new CustomEvent(event, { detail: val }))
         }
       }
+    },
+    // выделить фрагмент и создать ядро(покажется редактор)
+    fragmentSelect () {
+      if (this.$store.getters.isGuest) this.$store.commit('ui/stateSet', ['authGuard', { message: 'Чтобы создать ядро, войдите в аккаунт' }])
+      else {
+        // Create node input
+        let start = Math.max(0, this.currentTime - 15)
+        let end = Math.min(start + 30, this.duration)
+        let figures = [{ t: start, points: [] }, { t: end, points: [] }]
+        let nodeInput = {
+          name: '',
+          category: null,
+          spheres: [],
+          layout: 'HORIZONTAL',
+          vertices: [],
+          items: [
+            {
+              id: Date.now().toString(),
+              thumbUrl: this.contentKalpa.thumbUrl,
+              thumbHeight: this.contentKalpa.thumbHeight,
+              thumbWidth: this.contentKalpa.thumbWidth,
+              outputType: 'VIDEO',
+              layers: [
+                {
+                  id: Date.now().toString(),
+                  contentOid: this.contentKalpa.oid,
+                  figuresAbsolute: figures
+                }
+              ],
+              operation: { items: null, operations: null, type: 'CONCAT' },
+              type: ObjectTypeEnum.COMPOSITION
+            }
+          ]
+        }
+        this.setState('node', nodeInput)
+        this.setState('nodeMode', 'edit')
+      }
+    },
+    fragmentClear () {
+      this.setState('node', null)
+      this.setState('nodeMode', null)
     }
   },
   mounted () {
