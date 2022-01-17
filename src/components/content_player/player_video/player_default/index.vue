@@ -86,7 +86,7 @@ export default {
       return this.isFullscreen || this.nodeMode === 'edit' || this.node
     },
     seekTime () {
-      assert(this.duration)
+      if (!this.duration) return 0
       return Math.max(5, Math.min(Math.floor(this.duration * 0.05 / 10) * 10, 60))
     },
     videoHeight () {
