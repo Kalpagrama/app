@@ -1,17 +1,8 @@
 <template lang="pug">
 // весь таймлайн
-.row.full-width.relative-position
-  // figure shape
-  //div(
-  //  :style=`{
-  //  left: 'calc(' + (this.player.figures[0].t/player.duration)*100+'% - 0px)',
-  //  width:'calc(' + ((this.player.figures[1].t-this.player.figures[0].t)/player.duration)*100+'% + 0px)',
-  //  top: '-2px',
-  //  height: 'calc(100% + 4px)',
-  //  }`
-  //).row.absolute.z-max.bb
+.row
   div(
-    accessKey="figures-wrapper"
+    accessKey="figures-editor"
     :style=`{
     left: 'calc(' + (this.player.figures[0].t/player.duration)*100+'% - 8px)',
     width:'calc(' + ((this.player.figures[1].t-this.player.figures[0].t)/player.duration)*100+'% + 16px)',

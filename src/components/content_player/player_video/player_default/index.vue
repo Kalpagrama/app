@@ -69,6 +69,7 @@ export default {
       playingCount: 0,
       muted: false,
       duration: 0,
+      currentTimeNative: 0,
       currentTime: 0,
       currentTimeFreeze: false,
       node: null,
@@ -183,7 +184,7 @@ export default {
       clearTimeout(this.currentTimeFreezeTimer)
       this.currentTimeFreezeTimer = setTimeout(() => {
         this.currentTimeFreeze = false
-      }, 2000)
+      }, 1200)
       if (this.playerType === 'player-youtube') {
         this.currentTime = t
         this.player_.setCurrentTime(t)
@@ -224,10 +225,12 @@ export default {
     videoTimeupdate (e) {
       // this.$log('videoTimeupdate', e)
       if (this.playerType === 'player-youtube') {
+        this.currentTimeNative = this.player_.currentTime
         if (!this.currentTimeFreeze) this.currentTime = this.player_.currentTime
         this.duration = this.player_.duration
       } else if (this.playerType === 'player-kalpa') {
         if (this.$refs.videoRef) {
+          this.currentTimeNative = this.$refs.videoRef.currentTime
           if (!this.currentTimeFreeze) this.currentTime = this.$refs.videoRef.currentTime
           this.duration = this.$refs.videoRef.duration
         }

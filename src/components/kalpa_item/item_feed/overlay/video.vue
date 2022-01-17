@@ -71,12 +71,12 @@ export default {
       }, 2000)
     },
     onMouseOver () {
-      this.$logT('onMouseOver')
+      // this.$logT('onMouseOver')
       this.hasMouse = true
       this.updateState()
     },
     onMouseOut () {
-      this.$logT('onMouseOut')
+      // this.$logT('onMouseOut')
       this.hasMouse = false
       if (this.timerMouseOut) clearTimeout(this.timerMouseOut)
       this.timerMouseOut = setTimeout(() => {
