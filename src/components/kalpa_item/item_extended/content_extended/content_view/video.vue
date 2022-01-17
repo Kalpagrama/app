@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width
   div(
-    :style=`{ height: fullscreen ? $q.screen.height+'px':'auto'}`
+    :style=`{ height: player && player.isFullscreen ? $q.screen.height+'px':'auto'}`
     :class=`{
          'content-center': !player || player.nodeMode !== 'edit',
          'content-start': player && player.nodeMode === 'edit',
@@ -12,12 +12,12 @@
     ).row.full-width
     content-player(
       :contentKalpa="content"
-      :options="{maxHeight: fullscreen ? $q.screen.height-editorHeight:$q.screen.height/1.3}"
+      :options="{maxHeight: player && player.isFullscreen ? $q.screen.height-editorHeight:$q.screen.height/1.3}"
       @player="playerReady"
       ).row.full-width
       q-resize-observer(@resize="contentHeight = $event.height")
     //// кнопки управления образом(когда редактор фрагмента закрыт) (replay pause loop)
-    //div(v-if="fullscreen && $screenProps.isMobile").row.full-width.justify-center
+    //div(v-if="player && player.isFullscreen && $screenProps.isMobile").row.full-width.justify-center
     //  figures-controls( :player="player" :contentKalpa="content" :style=`{background: 'rgba(20,20,20,0.5)', borderRadius: '10px'}`)
     .row.full-width.justify-center
       transition(appear enter-active-class="animated fadeIn " leave-active-class="animated fadeOut")
@@ -51,9 +51,6 @@ export default {
     }
   },
   computed: {
-    fullscreen() {
-      return this.player && this.player.fullscreen
-    },
     queryClusters () {
       let res = {
         selector: {

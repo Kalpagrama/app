@@ -1,7 +1,7 @@
 <template lang="pug">
 kalpa-layout()
   template(v-slot:footer)
-    kalpa-menu-mobile(v-if="$q.screen.lt.md || pageId==='images' || pageId==='essences'")
+    kalpa-menu-mobile(v-if="$screenProps.isMobile || pageId==='images' || pageId==='essences'")
       template(v-if="pageId==='essences' || pageId==='images'" v-slot:all)
         q-btn(v-if="pageId==='essences'"
           flat ripple=false icon="add" color="green" :label="$t('Добавить свой смысл')"

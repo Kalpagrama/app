@@ -9,7 +9,7 @@
     .row.no-wrap
       //- left padding
       div( :style=`{ width: scrollBarWidth / 2 +'px', pointerEvents: 'none'}`).row
-      //- middle wrapper
+      //- middle
       div(
         ref="total-bar"
         accessKey="total-bar"

@@ -56,10 +56,5 @@ export default {
       player: null
     }
   },
-  computed: {
-    fullscreen() {
-      return this.player && this.player.fullscreen
-    },
-  }
 }
 </script>

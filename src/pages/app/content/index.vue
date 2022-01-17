@@ -5,7 +5,20 @@
 //  :key="contentKalpa.oid"
 //  :contentKalpa="contentKalpa"
 //  :draftId="$route.query.draftId")
-content-extended(:oid="oid")
+// content-extended(:oid="oid")
+kalpa-layout()
+  template(v-slot:footer)
+    kalpa-menu-mobile(v-if="$screenProps.isMobile && !$store.state.ui.userTyping")
+      template(v-slot:left-button)
+        nav-mobile(
+          :pageId="pageId"
+          @pageId="pageIdChange")
+      template(v-slot:center)
+        .row.content-center
+          span.text-grey-7 {{$t('Страница контента')}}
+  template(v-slot:body)
+    .row.full-width.items-start.content-start.justify-center
+      content-extended(:oid="oid")
 </template>
 
 <script>
@@ -13,6 +26,7 @@ import { ObjectApi } from 'src/api/object'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import contentExtended from 'src/components/kalpa_item/item_extended/content_extended'
 import layoutDefault from './layout_default/index.vue'
+import navMobile from 'src/components/kalpa_menu_mobile/nav_mobile.vue'
 import layoutVideo from './layout_video/index.vue'
 import layoutImage from './layout_image/index.vue'
 import layoutBook from './layout_book/index.vue'
@@ -25,6 +39,7 @@ export default {
     contentExtended,
     layoutDefault,
     layoutVideo,
+    navMobile,
     layoutImage,
     layoutBook,
   },
@@ -84,13 +99,13 @@ export default {
     this.$log('created')
   },
   mounted () {
-    this.$log('mounted', this.oid)
+    // this.$log('mounted', this.oid)
     document.body.style.background = 'black'
-    this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
+    // this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
   },
   async beforeUnmount () {
     this.$log('beforeDestroy')
-    this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
+    // this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
     await this.updateStat(this.oid, this.startWatchDt)
   }
 }
