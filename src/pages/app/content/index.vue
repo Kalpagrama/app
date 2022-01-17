@@ -5,9 +5,10 @@
 //  :key="contentKalpa.oid"
 //  :contentKalpa="contentKalpa"
 //  :draftId="$route.query.draftId")
+// content-extended(:oid="oid")
 kalpa-layout()
   template(v-slot:footer)
-    kalpa-menu-mobile(v-if="false && $screenProps.isMobile && !$store.state.ui.userTyping")
+    kalpa-menu-mobile(v-if="$screenProps.isMobile && !$store.state.ui.userTyping")
       template(v-slot:left-button)
         nav-mobile(
           :pageId="pageId"
@@ -16,7 +17,7 @@ kalpa-layout()
         .row.content-center
           span.text-grey-7 {{$t('Страница контента')}}
   template(v-slot:body)
-    .row.full-width.justify-center
+    .row.full-width.items-start.content-start.justify-center
       content-extended(:oid="oid")
 </template>
 
@@ -100,11 +101,11 @@ export default {
   mounted () {
     // this.$log('mounted', this.oid)
     document.body.style.background = 'black'
-    this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
+    // this.$store.commit('ui/stateSet', ['desktopNavigationShow', false])
   },
   async beforeUnmount () {
     this.$log('beforeDestroy')
-    this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
+    // this.$store.commit('ui/stateSet', ['desktopNavigationShow', true])
     await this.updateStat(this.oid, this.startWatchDt)
   }
 }

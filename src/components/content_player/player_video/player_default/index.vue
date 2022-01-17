@@ -14,6 +14,7 @@ div(:style=`{height: videoHeight+'px'}`).row.full-width
   video(
     id="videoRef12345"
     ref="videoRef"
+    :height="videoHeight + 'px'"
     :src="url"
     :playsinline="true"
     :autoplay="true"
@@ -82,19 +83,19 @@ export default {
     }
   },
   computed: {
-    fullscreen () {
-      return this.isFullscreen || this.nodeMode === 'edit' || this.node
-    },
     seekTime () {
       assert(this.duration)
-      return Math.max(5, Math.min(Math.floor(this.duration * 0.05 / 10) * 10, 60))
+      return Math.max(5, Math.min(Math.floor(this.duration * 0.05 / 10) * 10, 15))
     },
     videoHeight () {
       // return this.$q.screen.height
       // // eslint-disable-next-line no-unreachable
-      if (!this.pageWidth || !this.contentKalpa.height || !this.contentKalpa.width) return this.options.maxHeight * 1.5 || 400
+      this.$logT('this.pageWidth=', this.pageWidth)
+      this.$logT('this.this.contentKalpa.height=', this.contentKalpa.height)
+      this.$logT('this.contentKalpa.width=', this.contentKalpa.width)
+      if (!this.pageWidth || !this.contentKalpa.height || !this.contentKalpa.width) return Math.min(this.$q.screen.height, this.options.maxHeight * 1.5 || 400)
       let ratio = this.contentKalpa.width / this.contentKalpa.height
-      let maxHeight = this.pageWidth / ratio
+      let maxHeight = Math.min(this.$q.screen.height, this.pageWidth / ratio)
       this.$logT('videoHeight=', Math.min(maxHeight, this.options.maxHeight))
       return Math.min(maxHeight, this.options.maxHeight)
     },
@@ -176,15 +177,17 @@ export default {
       let t = this.currentTime
       t += offset
       t = Math.max(0, Math.min(this.duration, t))
-      this.setCurrentTime(t)
+      this.setCurrentTime(t, true)
     },
-    setCurrentTime (t) {
+    setCurrentTime (t, freeze = false) {
       // this.$log('setCurrentTime', t)
-      this.currentTimeFreeze = true
-      clearTimeout(this.currentTimeFreezeTimer)
-      this.currentTimeFreezeTimer = setTimeout(() => {
-        this.currentTimeFreeze = false
-      }, 1200)
+      if (freeze) {
+        this.currentTimeFreeze = true
+        clearTimeout(this.currentTimeFreezeTimer)
+        this.currentTimeFreezeTimer = setTimeout(() => {
+          this.currentTimeFreeze = false
+        }, 1200)
+      }
       if (this.playerType === 'player-youtube') {
         this.currentTime = t
         this.player_.setCurrentTime(t)
@@ -262,7 +265,7 @@ export default {
           controls: true,
           features: [],
           // enableAutosize: false,
-          stretching: 'fill',
+          stretching: 'fill', // auto fill responsive
           pauseOtherPlayers: false,
           clickToPlayPause: true,
           // plugins: ['youtube'],

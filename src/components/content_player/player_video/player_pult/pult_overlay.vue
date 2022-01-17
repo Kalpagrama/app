@@ -31,7 +31,7 @@
     .col
     q-btn( v-if="player.nodeMode !== 'edit'" dense round flat color="green" icon="add_circle_outline" @click="player.fragmentSelect()")
     q-btn( v-else dense round flat color="red" icon="clear" @click="player.fragmentClear()")
-    q-btn(dense round flat :icon="player.fullscreen ? 'fullscreen_exit': 'fullscreen'" color="grey-5" @click="player.setState('isFullscreen', !player.fullscreen), player.fragmentClear()")
+    q-btn(dense round flat :icon="player.isFullscreen ? 'fullscreen_exit': 'fullscreen'" color="grey-5" @click="player.setState('isFullscreen', !player.isFullscreen), player.fragmentClear()")
 </template>
 
 <script>

@@ -1,10 +1,10 @@
 <template lang="pug">
-div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-start.content-start.justify-center.relative-position
+div(:style=`{maxWidth: !isFullscreen ? $store.state.ui.pageWidth+'px' : $q.screen.width + 'px'}`).row.full-width.items-start.content-start.justify-center.relative-position
   q-resize-observer(@resize="pageWidth = $event.width")
   q-spinner-dots(v-if="!content" color="green" size="60px").fixed-center
   div(v-else).row.full-width
     // header
-    div(v-if="!fullscreen && !$screenProps.isMobile").row.full-width.justify-center.b-30
+    div(v-if="!isFullscreen && !$screenProps.isMobile").row.full-width.justify-center.b-30
       div(
         :style=`{ borderRadius: '10px'}`).row.full-width.items-center.content-center.q-pa-sm.b-30
         q-btn(@click="$routerKalpa.back()" flat round color="white" icon="west" no-caps)
@@ -36,7 +36,7 @@ div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width.items-st
                 q-input(v-model="promoCode", autofocus, borderless dark :placeholder="$t('Введите промокод')" @keyup.enter="sendPromoCode(promoCode)").col.full-width
                 q-btn(v-close-popup round flat :color="promoCode ? 'green' : null", icon="done", :disable="!promoCode" @click="sendPromoCode(promoCode)")
                 kalpa-pay(:item="content" @success="")
-    bottom-info(v-if="!fullscreen" :content="content" :author="author" :pageWidth="pageWidth" :bottomHeight="bottomHeight")
+    bottom-info(v-if="!isFullscreen && !isEditor" :content="content" :author="author" :pageWidth="pageWidth" :bottomHeight="bottomHeight")
 </template>
 
 <script>
@@ -65,15 +65,18 @@ export default {
     }
   },
   computed: {
-    fullscreen() {
-      return this.player && this.player.fullscreen
+    isEditor() {
+      return this.player && this.player.nodeMode === 'edit'
+    },
+    isFullscreen() {
+      return this.player && this.player.isFullscreen
     },
     paid () { // оплачено
       if (!this.content.payInfo.price || this.content.author.oid === this.$store.getters.currentUser.oid) return true // если контент бесплатный либо я - автор
       return this.content.payInfo.paid
     },
     contentMaxHeight () {
-      if (this.fullscreen) return this.$q.screen.height
+      if (this.isFullscreen) return this.$q.screen.height
       else return this.$q.screen.height / 2
     }
   },
@@ -99,12 +102,13 @@ export default {
         if (this.player) this.player.setState('isFullscreen', to)
       }
     },
-    fullscreen: {
+    isFullscreen: {
       immediate: true,
       async handler (to, from) {
         try { // генерит ошибку, если действие вызвано на пользователем
+          this.$store.commit('ui/stateSet', ['desktopNavigationShow', !to])
           if (to) await this.$q.fullscreen.request()
-          else if (from) await this.$q.fullscreen.exit()
+          else if (from && this.$q.fullscreen.isActive) await this.$q.fullscreen.exit()
         } catch (err) {
         }
       }
