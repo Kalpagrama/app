@@ -114,10 +114,11 @@ export default {
     url: {
       async handler (to, from) {
         if (to) {
-          this.$log('url changed!!!', to)
-          await this.$wait(1000 + debounceIntervalItem) // нужно дать время чтобы изменные urlWithFormats сохранились в rxdb
-          this.$logW('before reload!')
-          this.$logW('skip reload! TODO проверить что все работает!') // TODO проверить что все работает
+          this.$logT('url changed!!!', to)
+          if (this.player_) this.player_.setSrc(to)
+          // await this.$wait(1000 + debounceIntervalItem) // нужно дать время чтобы изменные urlWithFormats сохранились в rxdb
+          // this.$logW('before reload!')
+          // this.$logW('skip reload! TODO проверить что все работает!') // TODO проверить что все работает
           // window.location.reload() // TODO reload излишен!
           return true
         }
