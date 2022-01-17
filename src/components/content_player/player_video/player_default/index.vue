@@ -88,15 +88,9 @@ export default {
       return Math.max(5, Math.min(Math.floor(this.duration * 0.05 / 10) * 10, 15))
     },
     videoHeight () {
-      // return this.$q.screen.height
-      // // eslint-disable-next-line no-unreachable
-      this.$logT('this.pageWidth=', this.pageWidth)
-      this.$logT('this.this.contentKalpa.height=', this.contentKalpa.height)
-      this.$logT('this.contentKalpa.width=', this.contentKalpa.width)
       if (!this.pageWidth || !this.contentKalpa.height || !this.contentKalpa.width) return Math.min(this.$q.screen.height, this.options.maxHeight * 1.5 || 400)
       let ratio = this.contentKalpa.width / this.contentKalpa.height
       let maxHeight = Math.min(this.$q.screen.height, this.pageWidth / ratio)
-      this.$logT('videoHeight=', Math.min(maxHeight, this.options.maxHeight))
       return Math.min(maxHeight, this.options.maxHeight)
     },
     url () {
@@ -341,13 +335,13 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logT('mounted')
     this.$nextTick(() => {
       this.playerCreate(this.playerType)
     })
   },
   beforeUnmount () {
-    this.$log('beforeDestroy')
+    this.$logT('beforeDestroy')
     if (this.playerType === 'player-youtube') {
       this.player_.removeEventListener('loadeddata', this.videoLoadeddata)
       this.player_.removeEventListener('timeupdate', this.videoTimeupdate)

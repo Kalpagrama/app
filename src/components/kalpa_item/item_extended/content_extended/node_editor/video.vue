@@ -85,7 +85,6 @@ export default {
     sphereHints,
   },
   props: ['player', 'contentKalpa'],
-  // emits: ['toolTipFilterName'],
   data () {
     return {
       nodePublishing: false,
@@ -297,13 +296,6 @@ export default {
         // ---
         // done
         this.nodePublishing = false
-        // ---
-        // kill player figures, it will destroy node editor
-        // this.player.setState('figures', null)
-        // ---
-        // where to wait for the progress of node creating ?
-        // here ?
-        // this.$emit('node', nodeCreating)
       }
       catch (e) {
         this.$log('nodePublish error', e)
@@ -323,8 +315,6 @@ export default {
       else {
         this.player.setState('node', null)
         this.player.setState('nodeMode', null)
-        // this.player.events.emit('figure-delete')
-        // this.player.setState('figureы', null)
       }
     },
   },

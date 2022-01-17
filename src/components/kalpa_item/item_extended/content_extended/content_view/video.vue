@@ -24,7 +24,7 @@
         div(v-if="player && player.duration > 0" :style=`{ maxWidth: 600+'px', background: 'rgba(35,35,35,0.7)', borderRadius: '20px'}`).row.full-width
           q-resize-observer(@resize="editorHeight = $event.height")
           page-node-editor(v-if="player && player.node && player.nodeMode === 'edit'"
-            :contentKalpa="content" :player="player" @node="nodeFocused").br-10
+            :contentKalpa="content" :player="player").br-10
 </template>
 
 <script>
@@ -67,11 +67,6 @@ export default {
     }
   },
   methods: {
-    nodeFocused (node) {
-      this.$log('nodeFocused', node)
-      this.player.setState('node', node)
-      this.player.setState('nodeMode', 'focus')
-    },
     async playerReady (player) {
       this.$log('playerReady', this.draft)
       this.player = player
