@@ -14,9 +14,6 @@ div(
     v-if="contentKalpa"
     @player="playerReady"
     :contentKalpa="contentKalpa"
-    :isActive="true"
-    :isVisible="true"
-    :isMini="false"
     :style=`{
       position: 'absolute', zIndex: 100, top: '0px',
     }`

@@ -67,8 +67,8 @@ kalpa-layout()
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import navMobile from 'src/components/kalpa_menu_mobile/nav_mobile.vue'
-import pageComments from 'src/components/kalpa_item/item_extended/page_comments';
-import pageSimilar from 'src/components/kalpa_item/item_extended/page_similar';
+import pageComments from 'src/components/kalpa_item/item_extended/page_comments'
+import pageSimilar from 'src/components/kalpa_item/item_extended/page_similar'
 import { assert } from 'src/system/common/utils'
 
 export default {

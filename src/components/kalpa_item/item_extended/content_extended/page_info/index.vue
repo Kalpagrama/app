@@ -179,7 +179,7 @@ import { openURL } from 'quasar'
 import { ContentApi } from 'src/api/content'
 import {assert} from 'src/system/common/utils'
 import {makeRoutePath} from 'src/system/common/common_func'
-import {RxCollectionEnum} from '../../../../system/rxdb';
+import {RxCollectionEnum} from 'src/system/rxdb';
 import { UserApi } from 'src/api/user'
 
 export default {

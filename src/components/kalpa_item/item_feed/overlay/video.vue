@@ -6,13 +6,7 @@ div(
   @mouseover="onMouseOver"
 ).row.fit.bg-10
   transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(v-if="isOverlayShow"
-      :style=`{
-        position: 'absolute', zIndex: 20, bottom: '0px',
-        height: '100%',
-        background: 'rgba(0,0,0,0.3)',
-      }`
-    ).row.full-width.items-center.content-center.justify-center
+    div(v-if="isOverlayShow" :style=`{ background: 'rgba(0,0,0,0.7)'}`).row.fit.absolute-bottom.items-center.content-center.justify-center
       .row.fit.relative-position.items-center.content-center.justify-center
         div(@click.self="player.playing ? player.pause():player.play()").row.fit.items-center.content-center.justify-center
           q-icon(:name="player.playing ? 'pause' : 'play_arrow'" color="white" size="70px" @click="player.playing ? player.pause():player.play()")
@@ -24,7 +18,7 @@ div(
                 background: 'linear-gradient(180deg, rgba(0,0,0,1) 60px, rgba(0,0,0,0) 100%)',
             }`).row.full-width.absolute-top.no-pointer-events.no-wrap
             div(:style=`{zIndex: 10}`).row.full-width.q-pa-sm
-              div(:style=`{maxWidth: '80vw'}`).row.non-selectable
+              div(:style=`{maxWidth: Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.8 +'px'}`).row.non-selectable
                 .row.items-start.content-start.justify-center.q-pr-sm
                   img(
                     :src="item.author.thumbUrl"
@@ -38,6 +32,7 @@ div(
               .col
               .row.q-pa-sm.all-pointer-events
                 q-icon(name="more_vert" color="white" size="sm")
+      q-btn(round flat dense :icon="player.isFullscreen ? 'fullscreen_exit': 'fullscreen'" color="grey-5" @click="player.setState('isFullscreen', !player.isFullscreen)").absolute-bottom-right.z-max
 </template>
 
 <script>

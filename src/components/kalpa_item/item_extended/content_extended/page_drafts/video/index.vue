@@ -15,7 +15,7 @@ page-drafts-root(
 </template>
 
 <script>
-import pageDraftsRoot from '../../page_drafts_root/index.vue'
+import pageDraftsRoot from 'src/components/kalpa_item/item_extended/content_extended/page_drafts'
 
 export default {
   name: 'pageDrafts',

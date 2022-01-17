@@ -33,7 +33,7 @@ page-nodes-root(
 </template>
 
 <script>
-import pageNodesRoot from '../../page_nodes_root/index.vue'
+import pageNodesRoot from 'src/components/kalpa_item/item_extended/content_extended/page_nodes'
 
 export default {
   name: 'pageNodes',

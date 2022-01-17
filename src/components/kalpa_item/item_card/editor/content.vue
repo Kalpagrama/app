@@ -20,7 +20,7 @@ borderRadius: '10px',
     :style=`{
     maxHeight: !$screenProps.isMobile ? ($q.screen.height*70/100)+'px' : bodyHeight+'px',
     overflow: "auto"
-    }`).row.full-width.br
+    }`).row.full-width
     //- tabs
     .row.full-width
       component(:is="'preview-tabs-' + content.__typename"

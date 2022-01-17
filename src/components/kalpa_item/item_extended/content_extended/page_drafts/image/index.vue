@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import pageNodesRoot from '../../page_nodes_root/index.vue'
+import pageNodesRoot from 'src/components/kalpa_item/item_extended/content_extended/page_nodes'
 import draftListItem from 'src/components/draft/draft_list_item.vue'
 import { RxCollectionEnum } from 'src/system/rxdb'
 

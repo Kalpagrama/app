@@ -8,7 +8,7 @@
 <template lang="pug">
 .row.full-width
   q-menu(v-model="showTooltip" no-focus auto-close anchor="top middle" :offset="offset" self="bottom middle" dark).transparent.no-shadow
-    div(:style=`{height: maxHeight + 'px', width: maxWidth + 'px'}` :class=`{'q-pa-xs': padding}`).row.content-end
+    div(:style=`{height: (maxHeight - 10) + 'px', width: (maxWidth - 20) + 'px'}` :class=`{'q-pa-xs': padding}`).row.content-end.br
       transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
         div(v-if="spheresAutocomplete.length && name && selectedSphereName !== name" :style=`{maxHeight: '100%', maxWidth: '100%',backgroundColor: "rgba(35,35,35,0.8)"}`).row.full-width.scroll-y.br-10.q-pa-sm
           span(v-for="(s,si) in spheresAutocomplete" :key="s.id" @click="selectedSphereName=s.name, $emit('click', s.name)"
