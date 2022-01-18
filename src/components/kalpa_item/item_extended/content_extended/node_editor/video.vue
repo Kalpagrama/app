@@ -1,3 +1,8 @@
+<style lang="sass" scoped>
+.container
+  transition: height .3s
+</style>
+
 <template lang="pug">
 .row.full-width.items-between.justify-center
   q-resize-observer(@resize="editorHeight = $event.height, editorWidth = $event.width")
@@ -29,40 +34,47 @@
             minHeight: '60px',
           }`
           ).full-width.relative-position
-          template(v-slot:after)
-            q-icon(name="done" :color="node.name ? 'green-8':'grey-5'" @click="showSpheres=true").q-pr-xs.cursor-pointer
+          //template(v-slot:after)
+          //  q-icon(name="done" :color="node.name ? 'green-8':'grey-5'" @click="showSpheres=true").q-pr-xs.cursor-pointer
           div(v-if="node.name").row.absolute-top-left.q-pt-xs.q-pl-md
             small.text-grey-6 {{$t('В чём смысл?')}}
     //- category and spheres
-    transition(enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown")
-      edit-spheres(v-if="showSpheres"
-        ref="editSpheres"
-        :sphereOwner="node"
-        @toolTipFilter="toolTipFilterName = null, toolTipFilterSphere=$event"
-        ).q-px-sm
-        template(v-slot:left)
-          edit-category(
-            :node="node"
-            :class=`{
-              br: !node.category && categoryError,
-            }`
-            :style=`{
-              borderRadius: '10px',
-            }`)
-    fragment-editor(:player="player" :contentKalpa="contentKalpa")
-    // buttons
-    div(v-if="showSpheres && node").row.full-width
-      //- Delete from notes
-      q-btn( v-if="node.wsItemType === 'WS_NODE'"
-        outline no-caps color="red"  :loading="nodeSaving" :label="$t('Удалить заметку')"
-        @click="nodeDeleteAction()"
-      ).col.q-mr-sm
-      //- Save to notes
-      q-btn(v-if="node.wsItemType !== 'WS_NODE'"
-        outline no-caps color="white" :loading="nodeSaving" :label="$t('Сохранить заметку')" @click="nodeSaveAction()"
-      ).col.q-mr-sm
-      //- Publish
-      q-btn(color="green" no-caps :loading="nodePublishing" :label="$t('Publish')" @click="nodePublish()").col
+    div(:style=`{minHeight: '110px', height: fragmentSphereHeight+'px', overflow:'hidden'}`).row.full-width.relative-position.container
+      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        div(v-if="showSpheres").row.full-width
+          q-resize-observer(@resize="sphereHeight = $event.height")
+          edit-spheres(v-if="showSpheres"
+            ref="editSpheres"
+            :sphereOwner="node"
+            @toolTipFilter="toolTipFilterName = null, toolTipFilterSphere=$event"
+            ).q-px-sm
+            template(v-slot:left)
+              edit-category(
+                :node="node"
+                :class=`{
+                  br: !node.category && categoryError,
+                }`
+                :style=`{
+                  borderRadius: '10px',
+                }`)
+          // buttons
+          div(v-if="showSpheres && node").row.full-width.q-px-sm
+            //- Delete from notes
+            q-btn( v-if="node.wsItemType === 'WS_NODE'"
+              outline no-caps color="red"  :loading="nodeSaving" :label="$t('Удалить заметку')"
+              @click="nodeDeleteAction()"
+            ).col.q-mr-sm
+            //- Save to notes
+            q-btn(v-if="node.wsItemType !== 'WS_NODE'"
+              outline no-caps color="white" :loading="nodeSaving" :label="$t('Сохранить заметку')" @click="nodeSaveAction()"
+            ).col.q-mr-sm
+            //- Publish
+            q-btn(color="green" no-caps :loading="nodePublishing" :label="$t('Publish')" @click="nodePublish()").col
+      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        fragment-editor(v-if="!showSpheres" :player="player" :contentKalpa="contentKalpa").absolute
+          q-resize-observer(@resize="fragmentHeight = $event.height")
+.row.full-width.justify-center.q-py-sm
+  q-btn(:label="showSpheres ? $t('Редактировать фрагмент') : $t('Далее')" color="green" no-caps flat @click="showSpheres=!showSpheres")
 </template>
 
 <script>
@@ -97,6 +109,8 @@ export default {
       toolTipFilterSphere: '',
       categoryError: false,
       editorHeight: 0,
+      sphereHeight: 0,
+      fragmentHeight: 0,
       editorWidth: 0,
     }
   },
@@ -107,6 +121,13 @@ export default {
       else if (l < 30) return 16
       else if (l < 40) return 14
       else return 12
+    },
+    fragmentSphereHeight () {
+      this.$logT('fragmentSphereHeight', this.fragmentSphereHeight)
+      this.$logT('sphereHeight', this.sphereHeight)
+      this.$logT('fragmentHeight', this.fragmentHeight)
+      if (this.showSpheres) return this.sphereHeight
+      else return this.fragmentHeight
     },
     node () {
       return this.player.node
