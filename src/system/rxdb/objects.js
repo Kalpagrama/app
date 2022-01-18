@@ -7,6 +7,7 @@ import { makeId, rxdb } from 'src/system/rxdb'
 import { RxCollectionEnum } from 'src/system/rxdb/common'
 import debounce from 'lodash/debounce'
 import cloneDeep from 'lodash/cloneDeep'
+import { ObjectTypeEnum } from 'src/system/common/enums'
 
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_OBJ)
 
@@ -333,7 +334,21 @@ class Objects {
                await updateRxDocPayload(makeId(RxCollectionEnum.OBJ, event.object.oid),
                   event.path, event.path ? event.value : event.objectFull,
                   false)
-            } else logD('event ignored! local already updated') // например, если это мы сами меняли (например, через ObjectApi.blockUpdate)
+            } else logT('event ignored! local already updated') // например, если это мы сами меняли (например, через ObjectApi.blockUpdate)
+
+            // найти и обновить ядра с этой композицией (сейчас ядра запрашиваются с композицией)
+            if (event.object.type === ObjectTypeEnum.COMPOSITION){
+               assert(event.relatedSphereOids)
+               for (let oid of event.relatedSphereOids) {
+                  let essence = await rxdb.get(RxCollectionEnum.OBJ, oid, {priority: -1}) // берем только те что есть в кэше ( с сервера не запрашиваем)
+                  if (essence) {
+                     assert(essence.type.in(ObjectTypeEnum.JOINT, ObjectTypeEnum.NODE))
+                     let index = essence.items.findIndex(c => c.oid === event.object.oid)
+                     assert(index >= 0)
+                     essence.updateExtended(`items.${index}${event.path ? '.' : ''}` + event.path, event.path ? event.value : event.objectFull, false)
+                  }
+               }
+            }
             break
          }
          case 'OBJECT_CREATED':
