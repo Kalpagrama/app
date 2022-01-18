@@ -34,7 +34,7 @@ export default {
   },
   watch: {},
   async created () {
-    this.$log('created')
+    this.$logT('created')
     assert(this.content)
   },
   beforeUnmount () {

@@ -34,6 +34,7 @@
           :itemIndex="itemIndex"
           :mode="mode"
           @item="bookmarkSelectHandle"
+          @options="bookmarkOptionsHandle"
         ).q-mb-sm
       template(v-slot:nodata)
         nodata-guard(
@@ -62,7 +63,7 @@ export default {
     searchInputState: { type: String },
     searchString: { type: String, default: '' },
     mode: { type: String },
-    pageFilter: { type: Object }
+    tabFilter: { type: Object, default: {blackList: []}}
   },
   components: {
     bookmarkListItem,
@@ -142,7 +143,7 @@ export default {
             title: this.$t('Здесь пока ничего нет'),
             clickPath: '/workspace/edit?mode=block',
           }},
-      ].filter(p => !this?.pageFilter?.whiteList || this?.pageFilter?.whiteList.includes(p.id))
+      ].filter(p => !(this?.tabFilter?.blackList || []).includes(p.id))
     },
     nodataGuardParams() {
       return this.pages.find(page => page.id === this.pageId).nodataGuardParams
@@ -171,14 +172,13 @@ export default {
     }
   },
   methods: {
+    bookmarkOptionsHandle (bookmark) {
+      this.bookmarkSelected = bookmark
+      this.bookmarkEditorShow = true
+    },
     bookmarkSelectHandle (bookmark) {
       this.$log('bookmarkSelectHandle', bookmark)
-      if (this.mode === 'select') {
-        this.$emit('item', bookmark)
-      } else {
-        this.bookmarkSelected = bookmark
-        this.bookmarkEditorShow = true
-      }
+      this.$emit('item', bookmark)
     }
   },
   mounted () {

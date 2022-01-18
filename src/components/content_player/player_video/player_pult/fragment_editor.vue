@@ -119,14 +119,14 @@ export default {
     totalBarWrapperClick (e) {
       this.$logT('totalBarWrapperClick', e.target.accessKey, e)
       if (this.player.figureFocused !== null) this.player.setState('figureFocused', null)
-      if (e.target.accessKey === 'figures-editor') {
+      if (e.target.accessKey === 'figures-editor-selected') {
         let left = e.layerX
         let width = e.target.clientWidth
         this.$log({left, width})
         let t = this.player.figures[0].t + ((left / width) * (this.player.figures[1].t - this.player.figures[0].t))
         this.$log('t', t)
         this.player.setCurrentTime(t)
-      } else {
+      } else if (e.target.accessKey === 'figures-editor-total') {
         let t = (e.layerX * this.player.duration) / this.totalBarWidth
         this.player.setCurrentTime(t)
         if (!this.player.figures) return

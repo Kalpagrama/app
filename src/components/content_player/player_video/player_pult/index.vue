@@ -628,7 +628,7 @@ export default {
         //   }
         // })
       }
-      if (e.target.accessKey === 'figures-editor') {
+      if (e.target.accessKey === 'figures-editor-selected') {
         let left = e.layerX
         let width = e.target.clientWidth
         this.$log({left, width})

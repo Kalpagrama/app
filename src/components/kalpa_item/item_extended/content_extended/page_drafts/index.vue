@@ -13,7 +13,7 @@
   div(:style=`{position: 'relative',}`).col.full-width.scroll
     guest-guard(
       v-if="$store.getters.isGuest")
-    nodata-guard(v-else-if="itemsRes.items<1"
+    nodata-guard(v-else-if="!itemsRes || !itemsRes.items.length"
       icon="filter_tilt_shift"
       :title="$t('Здесь пока ничего нет')"
       :message="$t('Всё что Вы сохраните в заметки появится здесь')"
@@ -33,8 +33,8 @@
         }`
         @click="$emit('draft', d)"
         ).row.full-width.items-center.content-center.q-pa-sm.note-item.q-mb-sm
-        small.text-white {{ d.name }}
         slot(name="draft" :draft="d")
+          small.text-white {{ d.name }}
 </template>
 
 <script>

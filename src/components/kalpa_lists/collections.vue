@@ -46,6 +46,7 @@
           :itemIndex="itemIndex"
           :mode="mode"
           @item="bookmarkSelectHandle"
+          @options="bookmarkOptionsHandle"
         ).q-mb-sm
       template(v-slot:nodata)
         nodata-guard(
@@ -72,7 +73,7 @@ export default {
     searchString: { type: String, default: '' },
     mode: { type: String },
     wsSphereId: { type: String, default: '' },
-    pageFilter: { type: Object }
+    tabFilter: { type: Object, default: {blackList: []}}
   },
   components: {
     bookmarkListItem,
@@ -98,7 +99,7 @@ export default {
         { id: 'joints', name: this.$t('Joints') },
         { id: 'blocks', name: this.$t('Blocks') },
         { id: 'contents', name: this.$t('Contents') }
-      ].filter(p => !this?.pageFilter?.whiteList || this?.pageFilter?.whiteList.includes(p.id))
+      ].filter(p => !(this?.tabFilter?.blackList || []).includes(p.id))
     },
     // запрос за элементами коллекции
     query () {
@@ -148,14 +149,13 @@ export default {
       if (wsSphere.id === 'all') return wsSphere.name
       else return wsSphere.name + `(${(wsSphere?.wsSphereItems || []).filter(id => getRxCollectionEnumFromId(id) === RxCollectionEnum.WS_BOOKMARK).length})`
     },
+    bookmarkOptionsHandle (bookmark) {
+      this.bookmarkSelected = bookmark
+      this.bookmarkEditorShow = true
+    },
     bookmarkSelectHandle (bookmark) {
       this.$log('bookmarkSelectHandle', bookmark)
-      if (this.mode === 'select') {
-        this.$emit('item', bookmark)
-      } else {
-        this.bookmarkSelected = bookmark
-        this.bookmarkEditorShow = true
-      }
+      this.$emit('item', bookmark)
     }
   },
   watch: {

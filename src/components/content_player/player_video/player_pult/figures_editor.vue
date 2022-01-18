@@ -1,8 +1,8 @@
 <template lang="pug">
 // весь таймлайн
-.row
+div(accessKey="figures-editor-total").row.full-width
   div(
-    accessKey="figures-editor"
+    accessKey="figures-editor-selected"
     :style=`{
     left: 'calc(' + (this.player.figures[0].t/player.duration)*100+'% - 8px)',
     width:'calc(' + ((this.player.figures[1].t-this.player.figures[0].t)/player.duration)*100+'% + 16px)',
@@ -12,7 +12,7 @@
     borderBottom: '2px solid '+borderColor,
     borderRight: '8px solid '+borderColor,
     borderLeft: '8px solid '+borderColor,
-    borderRadius: '3px',
+    borderRadius: '15px',
     }`
   ).row.absolute
     // guard
@@ -34,10 +34,10 @@
   div(
     v-touch-pan.left.right.prevent.mouse="pointDragLeft"
     :style=`{
-    top: '-10px',
-    left: 'calc('+(this.player.figures[0].t / this.player.duration) * 100+'% - 25px)',
-    width: '50px',
-    height: 'calc(100% + 20px)',
+    top: '-5px',
+    left: 'calc('+(this.player.figures[0].t / this.player.duration) * 100+'% - 20px)',
+    width: '30px',
+    height: 'calc(100% + 10px)',
     cursor: 'grabbing',
   }`
   ).row.absolute
@@ -45,10 +45,10 @@
   div(
     v-touch-pan.left.right.prevent.mouse="pointDragRight"
     :style=`{
-    top: '-10px',
-    left: 'calc('+(this.player.figures[1].t / this.player.duration) * 100+'% - 25px)',
-    width: '50px',
-    height: 'calc(100% + 20px)',
+    top: '-5px',
+    left: 'calc('+(this.player.figures[1].t / this.player.duration) * 100+'% - 10px)',
+    width: '30px',
+    height: 'calc(100% + 10px)',
     cursor: 'grabbing',
   }`
   ).row.absolute

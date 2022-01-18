@@ -7,12 +7,12 @@
       clusters(v-if="player.clusters.length" v-bind="$props" :style=`{ pointerEvents: 'none'}`).br-5
       // fragment selected
       div(
-        v-if="player.node && player.nodeMode === 'edit'"
+        v-if="figuresAbsolute"
         :style=`{
           position: 'absolute',
           top: '-2px',
-          left: (player.figures[0].t/player.duration)*100+'%',
-          width: ((player.figures[1].t-player.figures[0].t)/player.duration)*100+'%',
+          left: (figuresAbsolute[0].t/player.duration)*100+'%',
+          width: ((figuresAbsolute[1].t-figuresAbsolute[0].t)/player.duration)*100+'%',
           height: 'calc(100% + 4px)',
           border: '1px solid ' + $getPaletteColor('green-5'),
           borderRadius: '2px',
@@ -31,7 +31,7 @@
     .col
     q-btn( v-if="player.nodeMode !== 'edit'" dense round flat color="green" icon="add_circle_outline" @click="player.fragmentSelect()")
     q-btn( v-else dense round flat color="red" icon="clear" @click="player.fragmentClear()")
-    q-btn(dense round flat :icon="player.isFullscreen ? 'fullscreen_exit': 'fullscreen'" color="grey-5" @click="player.setState('isFullscreen', !player.isFullscreen), player.fragmentClear()")
+    q-btn(dense round flat :icon="player.isFullscreen ? 'fullscreen_exit': 'fullscreen'" color="grey-5" @click="player.setState('isFullscreen', !player.isFullscreen)")
 </template>
 
 <script>
@@ -42,7 +42,11 @@ export default {
   name: 'playerPultOverlay',
   props: ['player', 'contentKalpa', 'options'],
   components: { clusters, figuresControls },
-  computed: {},
+  computed: {
+    figuresAbsolute() {
+      return this.player?.node?.items[0]?.layers[0]?.figuresAbsolute || this.player.figures
+    }
+  },
   watch: {},
   methods: {
     tintClick (e) {

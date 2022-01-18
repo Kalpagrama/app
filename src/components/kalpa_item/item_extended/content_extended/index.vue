@@ -36,7 +36,7 @@ div(:style=`{maxWidth: !isFullscreen ? $store.state.ui.pageWidth+'px' : $q.scree
                 q-input(v-model="promoCode", autofocus, borderless dark :placeholder="$t('Введите промокод')" @keyup.enter="sendPromoCode(promoCode)").col.full-width
                 q-btn(v-close-popup round flat :color="promoCode ? 'green' : null", icon="done", :disable="!promoCode" @click="sendPromoCode(promoCode)")
                 kalpa-pay(:item="content" @success="")
-    bottom-info(v-if="!isFullscreen && !isEditor" :content="content" :author="author" :pageWidth="pageWidth" :bottomHeight="bottomHeight")
+    bottom-info(v-if="!isFullscreen && !isEditor" :content="content" :player="player" :author="author" :pageWidth="pageWidth" :bottomHeight="bottomHeight")
 </template>
 
 <script>

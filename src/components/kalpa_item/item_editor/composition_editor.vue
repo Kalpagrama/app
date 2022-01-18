@@ -7,6 +7,7 @@ div(:style=`{position: 'relative'}`).row.full-width
     :maximized="true")
     kalpa-finder(
       :height="$q.screen.height"
+      :filter="{pageFilter: {blackList: ['gif']}, tabFilter: {blackList: ['all', 'joints', 'blocks', 'users', 'spheres']}}"
       @item="onItemFound"
       @close="itemFinderShow_data = false"
     ).b-30
@@ -21,23 +22,23 @@ div(:style=`{position: 'relative'}`).row.full-width
         @composition="($event ? $set_deprecated(node.items, 0, $event) : $delete(node.items, 0)), itemEditorShow_data=false"
         @close="itemEditorShow_data=false"
         )
+  composition(
+    v-if="node.items[0] && node.items[0].oid"
+    :composition="node.items[0]"
+    :isVisible="isVisible"
+    :isActive="isActive"
+    :nodeOid="node.oid")
   item-preview(
-    v-if="node.items[0]"
+    v-else-if="node.items[0] && !node.items[0].oid"
     :item="node.items[0]"
     :isVisible="isVisible"
     :isActive="isActive"
     )
-  //composition(
-  //  v-if="node.items[0]"
-  //  :composition="node.items[0]"
-  //  :isVisible="isVisible"
-  //  :isActive="isActive"
-  //  :nodeOid="node.oid")
-  q-responsive(v-else-if="!node.items.length" :ratio="16/8").full-width
+  q-responsive(v-else :ratio="16/8").full-width
     q-btn(stack no-caps round outline icon="add" color="green" size="lg"
       :label="$t('pick element for node')"
       @click="itemFinderShow_data = true").fit
-  q-btn(v-if="node.items[0]" flat icon="close" color="red" :style=`{zIndex: 100}` @click="$delete(node.items, 0)").absolute-top-right
+  q-btn(v-if="node.items[0]" icon="close" color="red" :style=`{zIndex: 100}` @click="node.items = []").absolute-top-right
 </template>
 
 <script>
@@ -68,7 +69,7 @@ export default {
   },
   methods: {
     async onItemFound (item) {
-      this.$log('itemFound112', item)
+      this.$log('itemFound', item)
       this.itemFinderShow_data = false
       this.itemFound = item
       if (item.type === ObjectTypeEnum.NODE) {

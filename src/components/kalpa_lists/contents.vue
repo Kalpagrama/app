@@ -1,6 +1,6 @@
 <template lang="pug">
 .row.full-width.items-start.content-start.justify-center
-  div(:style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
+  div(v-if="pageId" :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
     //- content editor
     q-dialog(
       v-model="contentCardEditorShow"
@@ -55,7 +55,8 @@
           :itemState="itemState"
           :itemIndex="itemIndex"
           :mode="mode"
-          @item="bookmarkOptionsClickHandle"
+          @item="bookmarkSelectHandle"
+          @options="bookmarkOptionsClickHandle"
         ).q-mb-sm
       template(v-slot:nodata)
         nodata-guard(
@@ -86,6 +87,8 @@ export default {
     useNavHeader: {type: Boolean, default: true},
     searchInputState: {type: String},
     mode: {type: String, default: 'edit'},
+    routeTrack: {type: Boolean, default: true},
+    tabFilter: { type: Object, default: {blackList: []}}
   },
   components: {
     bookmarkListItem,
@@ -97,7 +100,7 @@ export default {
   data () {
     return {
       categoryId: 'uploaded',
-      pageId: 'video',
+      pageId: null,
       bookmarkSelected: null,
       bookmarkEditorShow: false,
       contentCardEditorContentOid: null,
@@ -151,7 +154,7 @@ export default {
             title: this.$t('Здесь пока ничего нет'),
             clickPath: '/workspace/edit?mode=upload',
           }},
-      ]
+      ].filter(p => !(this?.tabFilter?.blackList || []).includes(p.id))
     },
     nodataGuardParams() {
       return this.pages.find(page => page.id === this.pageId).nodataGuardParams
@@ -177,8 +180,9 @@ export default {
     '$route.query.pageId': {
       immediate: true,
       handler(to) {
-        if (to) {
-          assert(this.pages.find(p => p.id === to))
+        if (to && this.routeTrack) {
+          this.$logT('$route.query.pageId', this.$route.query)
+          assert(this.pages.find(p => p.id === to), to)
           this.pageId = to
         }
       }
@@ -186,7 +190,7 @@ export default {
     '$route.query.categoryId': {
       immediate: true,
       handler(to) {
-        if (to) {
+        if (to && this.routeTrack) {
           assert(this.categories.find(p => p.id === to))
           this.categoryId = to
         }
@@ -195,13 +199,13 @@ export default {
     pageId: {
       immediate: true,
       async handler(to) {
-        if (this.$route.query.pageId !== to) await this.$router.replace({ path: this.$route.path, query: {...this.$route.query, pageId: to, categoryId: this.categoryId }})
+        if (this.routeTrack && this.$route.query.pageId !== to) await this.$router.replace({ path: this.$route.path, query: {...this.$route.query, pageId: to, categoryId: this.categoryId }})
       }
     },
     categoryId: {
       immediate: true,
       async handler(to) {
-        if (this.$route.query.categoryId !== to) await this.$router.replace({ path: this.$route.path, query: {...this.$route.query, categoryId: to, pageId: this.pageId }})
+        if (this.routeTrack && this.$route.query.categoryId !== to) await this.$router.replace({ path: this.$route.path, query: {...this.$route.query, categoryId: to, pageId: this.pageId }})
       }
     }
   },
@@ -221,6 +225,10 @@ export default {
         }
       }
     },
+    bookmarkSelectHandle (bookmark) {
+      assert(bookmark && bookmark.oid)
+      this.$emit('item', bookmark)
+    },
     bookmarkOptionsClickHandle (bookmark) {
       assert(bookmark && bookmark.oid)
       if (this.categoryId.in('uploaded', 'paid')){
@@ -231,6 +239,10 @@ export default {
         this.bookmarkEditorShow = true
       }
     }
+  },
+  mounted () {
+    assert(this.pages[0].id)
+    this.pageId = this.pages[0].id
   }
 }
 </script>

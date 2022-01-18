@@ -9,7 +9,7 @@ iframe[id$="_youtube_iframe"]
 </style>
 
 <template lang="pug">
-div(:style=`{height: videoHeight+'px'}`).row.full-width
+div(:style=`{height: videoHeight+'px'}`).row.full-width.relative-position
   q-resize-observer(@resize="pageWidth = $event.width")
   video(
     id="videoRef12345"
@@ -84,19 +84,13 @@ export default {
   },
   computed: {
     seekTime () {
-      assert(this.duration)
+      if (!this.duration) return 0
       return Math.max(5, Math.min(Math.floor(this.duration * 0.05 / 10) * 10, 15))
     },
     videoHeight () {
-      // return this.$q.screen.height
-      // // eslint-disable-next-line no-unreachable
-      this.$logT('this.pageWidth=', this.pageWidth)
-      this.$logT('this.this.contentKalpa.height=', this.contentKalpa.height)
-      this.$logT('this.contentKalpa.width=', this.contentKalpa.width)
       if (!this.pageWidth || !this.contentKalpa.height || !this.contentKalpa.width) return Math.min(this.$q.screen.height, this.options.maxHeight * 1.5 || 400)
       let ratio = this.contentKalpa.width / this.contentKalpa.height
       let maxHeight = Math.min(this.$q.screen.height, this.pageWidth / ratio)
-      this.$logT('videoHeight=', Math.min(maxHeight, this.options.maxHeight))
       return Math.min(maxHeight, this.options.maxHeight)
     },
     url () {
@@ -120,10 +114,11 @@ export default {
     url: {
       async handler (to, from) {
         if (to) {
-          this.$log('url changed!!!', to)
-          await this.$wait(1000 + debounceIntervalItem) // нужно дать время чтобы изменные urlWithFormats сохранились в rxdb
-          this.$logW('before reload!')
-          this.$logW('skip reload! TODO проверить что все работает!') // TODO проверить что все работает
+          this.$logT('url changed!!!', to)
+          if (this.player_) this.player_.setSrc(to)
+          // await this.$wait(1000 + debounceIntervalItem) // нужно дать время чтобы изменные urlWithFormats сохранились в rxdb
+          // this.$logW('before reload!')
+          // this.$logW('skip reload! TODO проверить что все работает!') // TODO проверить что все работает
           // window.location.reload() // TODO reload излишен!
           return true
         }
@@ -341,13 +336,13 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logT('mounted')
     this.$nextTick(() => {
       this.playerCreate(this.playerType)
     })
   },
   beforeUnmount () {
-    this.$log('beforeDestroy')
+    this.$logT('beforeDestroy')
     if (this.playerType === 'player-youtube') {
       this.player_.removeEventListener('loadeddata', this.videoLoadeddata)
       this.player_.removeEventListener('timeupdate', this.videoTimeupdate)
