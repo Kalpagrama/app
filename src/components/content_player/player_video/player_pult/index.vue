@@ -1,3 +1,4 @@
+// DEPRECATED!!! см pult_overlay.vue + fragment_editor.vue
 <template lang="pug">
 .row.full-width.items-start.content-start.relative-position
   //- player.nodeFocused
