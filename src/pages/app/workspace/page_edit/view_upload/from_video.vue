@@ -35,7 +35,7 @@ import { ContentApi } from 'src/api/content'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { ObjectTypeEnum } from 'src/system/common/enums'
 import contentCardEditor from 'src/components/kalpa_item/item_card/editor/content.vue'
-import editSpheres from 'src/pages/app/content/node_editor/edit_spheres.vue'
+import editSpheres from 'src/components/kalpa_item/item_extended/content_extended/node_editor/edit_spheres.vue'
 import { assert } from 'src/system/common/utils'
 import cloneDeep from 'lodash/cloneDeep'
 

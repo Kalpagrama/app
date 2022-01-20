@@ -1,74 +1,70 @@
 <template lang="pug">
-div(
-  :style=`{
-  position: 'relative',
-  height: $q.screen.height+'px',
-}`
-).column.full-width
-  //- body
-  .col.full-width
-    div(
-      :style=`{
-      position: 'relative',
-    }`
-    ).row.fit.justify-center
-      div(
-        :style=`{
-        position: 'relative',
-        maxWidth: 650+'px',
-        overflow: 'hidden',
-      }`
-      ).row.fit
-        //- pages
-        transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-          div(
-            v-if="pageShow"
-            :style=`{
-            position: 'absolute', top: '0px', left: '0px', zIndex: 900,
-            background: 'rgba(30,30,30,0.98)',
-            borderRadius: '8px',
-          }`
-          ).row.fit
-            component(
-              :is="`page-${pageId}`"
-              :contentKalpa="content"
-              :player="player"
-              :style=`{
-            }`
-              @close="pageId = null")
-        //- node creator
-        transition(enter-active-class="animated slideInUp")
-          div(
-            v-if="nodeEditorShow"
-            :style=`{
-            position: 'absolute', zIndex: 1000, bottom: '50px',
-          }`
-          ).row.full-width
-            node-editor(
-              :showColor="true"
-              :player="player"
-              :contentKalpa="content"
-              :node="player.selectedDraft"
-              :style=`{border: '3px solid #222', borderRadius: '10px'}`
-            ).b-40
-        //- player
-        content-player(
-          @player="playerReady"
-          :contentKalpa="content"
+.row.full-width
+  div(v-if="!readerMode").row.full-width.justify-center
+    img(
+        :src="content.thumbUrl"
+        :style=`{height: $q.screen.height/2+'px', objectFit: 'contain',}`
+      ).full-width.br-10
+    q-btn(flat outline color="green-8" :label="$t('читать')" @click="readerMode=true")
+  div(v-else :style=`{height: options.maxHeight+'px'}`).row.full-width.relative-position
+    //- body
+    .row.fit
+      .row.fit.justify-center.relative-position
+        div(
           :style=`{
-          height: '100%',
+          position: 'relative',
+          maxWidth: 650+'px',
+          overflow: 'hidden',
         }`
-          :options=`{
-        }`
-          :styles=`{
-          height: '100%',
-        }`
-        ).full-width
-  //- footer
-  .row.full-width.justify-center
-    kalpa-menu-mobile(v-if="false && mode === 'fullscreen'" :style=`{background: 'rgba(50,50,50,0)',}`)
-      template(v-slot:all)
-        nav-bottom(:style=`{maxWidth: 650+'px'}` :pageId="pageId" @pageId="pageId = $event").row.full-width.justify-center
+        ).row.fit
+          //- pages
+          transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+            div(
+              v-if="pageShow"
+              :style=`{
+              position: 'absolute', top: '0px', left: '0px', zIndex: 900,
+              background: 'rgba(30,30,30,0.98)',
+              borderRadius: '8px',
+            }`
+            ).row.fit
+              component(
+                :is="`page-${pageId}`"
+                :contentKalpa="content"
+                :player="player"
+                :style=`{
+              }`
+                @close="pageId = null")
+          //- node creator
+          transition(enter-active-class="animated slideInUp")
+            div(
+              v-if="nodeEditorShow"
+              :style=`{
+              position: 'absolute', zIndex: 1000, bottom: '50px',
+            }`
+            ).row.full-width
+              node-editor(
+                :showColor="true"
+                :player="player"
+                :contentKalpa="content"
+                :node="player.selectedDraft"
+                :style=`{border: '3px solid #222', borderRadius: '10px'}`
+              ).b-40
+          //- player
+          content-player(
+            @player="playerReady"
+            :contentKalpa="content"
+            :style=`{
+              height: '100%',
+            }`
+            :styles=`{
+            height: '100%',
+          }`
+          ).full-width
+    //- footer
+    .row.full-width.justify-center
+      kalpa-menu-mobile(v-if="false" :style=`{background: 'rgba(50,50,50,0)',}`)
+        template(v-slot:all)
+          nav-bottom(:style=`{maxWidth: 650+'px'}` :pageId="pageId" @pageId="pageId = $event").row.full-width.justify-center
 </template>
 
 <script>
@@ -81,11 +77,11 @@ import pageDrafts from 'src/components/kalpa_item/item_extended/content_extended
 import pageInfo from 'src/components/kalpa_item/item_extended/content_extended/page_info'
 import navBottom from 'src/components/kalpa_menu_mobile/nav_bottom.vue'
 
-import nodeEditor from 'src/pages/app/content/node_creator/node_editor/index.vue'
+import nodeEditor from 'src/components/kalpa_item/item_extended/content_extended/node_editor/book/index.vue'
 import { assert } from 'src/system/common/utils'
 export default {
   name: 'pageContentBook',
-  props: ['content', 'mode', 'isActive'],
+  props: ['content', 'options'],
   components: {
     contentPlayer,
     pageNodes,
@@ -96,6 +92,7 @@ export default {
   },
   data () {
     return {
+      readerMode: false,
       player: null,
       pageId: null,
     }
@@ -112,6 +109,7 @@ export default {
     async playerReady (player) {
       this.$log('playerReady')
       this.player = player
+      // this.player.setState('isFullscreen', true)
       let nodeOid = this.$store.state.ui.nodeOnContent
       if (nodeOid) {
         // get node
@@ -121,6 +119,7 @@ export default {
         await this.player.showItem(node)
         this.player.setState('nodePlaying', node)
       }
+      this.$emit('player', player)
     },
   },
   mounted () {

@@ -10795,7 +10795,7 @@
           },
           {
             "name": "contentAuthor",
-            "description": "действительный автор контента(кто его создал)",
+            "description": "действительный автор контента(кто его создал и обладает правами на контент)",
             "args": [],
             "type": {
               "kind": "INTERFACE",
@@ -11359,7 +11359,7 @@
           },
           {
             "name": "contentAuthor",
-            "description": "действительный автор контента(кто его создал)",
+            "description": "действительный автор контента(кто его создал и обладает правами на конент)",
             "args": [],
             "type": {
               "kind": "INTERFACE",
@@ -14226,6 +14226,12 @@
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "INFO",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "possibleTypes": null
@@ -15127,6 +15133,26 @@
               "kind": "INTERFACE",
               "name": "Object",
               "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "relatedSphereOids",
+            "description": "на какие сферы попал объект (важно при обновлении композиции (тк она находится в ядрах))",
+            "args": [],
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "OID",
+                  "ofType": null
+                }
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null

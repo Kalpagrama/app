@@ -573,6 +573,7 @@ const eventFragment = gql`
       value
       objectFull{...objectFullFragment}
       matter {reason subscription}
+      relatedSphereOids
     }
     ... on EventGeneral{
       subject{... objectShortFragment}

@@ -185,7 +185,7 @@ borderRadius: '10px',
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { objectTypeName, objectUrl } from 'src/system/common/object_info.js';
 import differenceWith from 'lodash/differenceWith'
-import editSpheres from 'src/pages/app/content/node_editor/edit_spheres.vue'
+import editSpheres from 'src/components/kalpa_item/item_extended/content_extended/node_editor/edit_spheres.vue'
 import paidUsers from 'src/components/kalpa_lists/paid_users.vue'
 import previewTabsVideo from 'src/components/kalpa_item/item_card/editor/previewTabsVideo.vue';
 import previewTabsBook from 'src/components/kalpa_item/item_card/editor/previewTabsBook.vue';

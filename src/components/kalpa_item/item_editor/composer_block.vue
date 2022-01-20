@@ -90,8 +90,8 @@ position: 'relative',
 
 <script>
 
-import editSpheres from 'src/pages/app/content/node_editor/edit_spheres.vue'
-import editCategory from 'src/pages/app/content/node_editor/edit_category.vue'
+import editSpheres from 'src/components/kalpa_item/item_extended/content_extended/node_editor/edit_spheres.vue'
+import editCategory from 'src/components/kalpa_item/item_extended/content_extended/node_editor/edit_category.vue'
 import { ObjectCreateApi } from 'src/api/object_create'
 
 export default {

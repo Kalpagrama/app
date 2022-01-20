@@ -25,11 +25,7 @@ kalpa-layout()
 import { ObjectApi } from 'src/api/object'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import contentExtended from 'src/components/kalpa_item/item_extended/content_extended'
-import layoutDefault from './layout_default/index.vue'
 import navMobile from 'src/components/kalpa_menu_mobile/nav_mobile.vue'
-import layoutVideo from './layout_video/index.vue'
-import layoutImage from './layout_image/index.vue'
-import layoutBook from './layout_book/index.vue'
 import { assert } from 'src/system/common/utils'
 
 export default {
@@ -37,11 +33,7 @@ export default {
   props: ['oid'],
   components: {
     contentExtended,
-    layoutDefault,
-    layoutVideo,
     navMobile,
-    layoutImage,
-    layoutBook,
   },
   data () {
     return {

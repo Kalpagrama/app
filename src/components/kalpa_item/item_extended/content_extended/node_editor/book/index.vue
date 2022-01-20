@@ -1,15 +1,7 @@
 <template lang="pug">
 .row.full-width.justify-center
   //- figure editor of node
-  div(
-    :style=`{
-    // position: 'relative',
-    minHeight: '100px',
-    // maxWidth: '600px',
-    // background: background || 'rgba(30,30,30,0.8)',
-    // borderRadius: '20px',
-  }`
-  ).row.full-width.items-start.content-start
+  div(:style=`{ minHeight: '100px'}`).row.full-width.items-start.content-start
     //- figure
     div(
     ).row.full-width

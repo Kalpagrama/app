@@ -10,6 +10,7 @@
          'bg-black': !player || player.nodeMode !== 'edit',
      }`
     ).row.full-width
+    node-focused( v-if="player && player.node && player.nodeMode === 'focus'" :player="player" :contentKalpa="content")
     content-player(
       :contentKalpa="content"
       :options="{maxHeight: player && player.isFullscreen ? $q.screen.height-editorHeight:$q.screen.height/1.3}"
@@ -30,10 +31,11 @@ import figuresControls from 'src/components/content_player/player_video/player_p
 import { assert } from 'src/system/common/utils'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import pageNodeEditor from 'src/components/kalpa_item/item_extended/content_extended/node_editor/video'
+import nodeFocused from 'src/components/content_player/player_video/player_pult/node_focused.vue'
 
 export default {
   name: 'pageContentVideo',
-  components: { contentPlayer, figuresControls, pageNodeEditor},
+  components: { contentPlayer, figuresControls, pageNodeEditor, nodeFocused},
   props: ['content', 'isActive'],
   emits: ['player'],
   data () {

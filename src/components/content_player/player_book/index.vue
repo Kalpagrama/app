@@ -6,44 +6,14 @@ iframe
 </style>
 
 <template lang="pug">
-div(
-  :style=`{
-  position: 'relative',
-  height: '100%',
-  overflow: 'hidden',
-}`
-).column.full-width
-  player-node(:node="selectedEssence" @close="selectedEssence = null")
+div( :style=`{height: '100%',overflow: 'hidden'}`).column.full-width.relative-position
+  player-node(:node="selectedEssence" @close="selectedEssence = null").br
   //- fictive/invisible input for emit/on/off events with native html element events
   input(v-model="name" ref="nameInput" :style=`{display: 'none'}`)
   //- figure editor + audioplayer
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(
-      v-if="true"
-      :style=`{
-      position: 'absolute', zIndex: 1000,
-      bottom: '80px',
-    }`
-    ).row.full-width.justify-center
+    div(:style=`{ position: 'absolute', zIndex: 1000,bottom: '80px'}`).row.full-width.justify-center
       slot(name="tint-bar" :tintFocused="true")
-      //- (currentSelection && !audioPlayer.audio)
-      //div(
-      //  v-if="currentSelection && !selectedDraft"
-      //  :style=`{
-      //  width: '200px',
-      //  borderRadius: '20px',
-      //  background: 'rgba(30,30,30,0.8)',
-      //}`
-      //).row.items-center.content-center.q-pa-md
-      //  //- q-btn(round flat color="green" icon="play_arrow" @click="nextAudio(0, true)")
-      //  .col
-      //  q-btn(round flat color="orange" icon="lens" @click="createColorNodeDraft('orange')")
-      //  q-btn(round flat color="red" icon="lens" @click="createColorNodeDraft('red')")
-      //  q-btn(round flat color="green" icon="lens" @click="createColorNodeDraft('green')")
-      //  q-btn(round flat color='blue' icon="lens" @click="createColorNodeDraft('blue')")
-      //  .col
-      //  //- q-btn(round flat color="white" icon="keyboard_arrow_left" @click="updateSelection(null, null, -1)")
-      //  //- q-btn(round flat color="white" icon="keyboard_arrow_right" @click="updateSelection(null, null, 1)")
   //- table of contents
   transition(enter-active-class="animated slideInLeft" leave-active-class="animated slideOutLeft")
     player-toc(
@@ -61,22 +31,11 @@ div(
     :style=`{zIndex: 1000, width: '70%'}`
   ).absolute-center
     player-settings(:settings="settings" @close="settingsShow = false" :style=`{borderRadius: '20px'}`).b-40
-  //- body book area wrapper
-  div(
-    :style=`{
-    position: 'relative',
-    borderRadius: '10px',
-    border: '3px solid #222',
-    overflow: 'hidden',
-    // background: '#f3e8d2',
-  }`).col.full-width
+  //- book wrapper
+  div(:style=`{ border: '3px solid #222',overflow: 'hidden'}`).col.full-width.relative-position.br-10
     q-resize-observer(@resize="onResize" :debounce="300")
     //- book area
-    div(
-      ref="book-area"
-      :style=`{
-      borderRadius: '0 0 10px 10px'
-    }`).row.fit
+    div(ref="book-area").row.fit
   // progress
   q-linear-progress(size='5px' :value="progressValue / 100" color="green-10").row.full-width.q-px-sm
   //- footer
@@ -103,8 +62,6 @@ import { assert } from 'src/system/common/utils'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { getChapterIdFromCfi, getTocIdFromCfi } from 'src/system/rxdb/common'
 import { ContentApi } from 'src/api/content'
-import cloneDeep from 'lodash/cloneDeep'
-
 import playerToc from './player_toc.vue'
 import playerSettings from './player_settings.vue'
 import playerNode from './player_node.vue'
@@ -422,7 +379,7 @@ export default {
       }
     },
     async showAllDraftsForCurrentLocation () {
-      this.$log('showAllDraftsForCurrentLocation start')
+      this.$logD('showAllDraftsForCurrentLocation start')
       let currentLocation = await this.rendition.currentLocation()
       let chapterId = getChapterIdFromCfi(currentLocation.start.cfi)
       let tocId = getTocIdFromCfi(currentLocation.start.cfi)
@@ -436,7 +393,7 @@ export default {
         })
         // массив изменился (скорей всего создали новое ядро и оно добавилось в массив) - нарисуем заново
         this.$watch('findDraftsRes.items', async (newVal, oldVal) => {
-          // this.$log('showAllDraftsForCurrentLocation items changed', oldVal.length, newVal.length)
+          this.$logD('showAllDraftsForCurrentLocation items changed', oldVal.length, newVal.length)
           // this.clearSelection() // иначе при добавлении нового ядра, новое выделение исчезнет после клика мышкой (см addEventListener('mouseup' ...))
           await this.showAllDraftsForCurrentLocation() // выделим заново
         }, {
@@ -454,15 +411,16 @@ export default {
       }
       this.tmpDraftEpubCfis = []
       for (let draft of this.findDraftsRes.items) {
-        this.$logD('draft item=', draft)
+        // this.$logD('draft item=', draft)
         let { name, items, color } = draft
         color = color || 'grey'
         let draftEpubCfi = items[0].layers[0].figuresAbsolute[0].epubCfi
         assert(draftEpubCfi, '!draftEpubCfi')
         this.tmpDraftEpubCfis.push(draftEpubCfi)
-        let draftChapterId = getChapterIdFromCfi(draftEpubCfi)
+        let draftChapterId = draft?.meta?.chapterId || getChapterIdFromCfi(draftEpubCfi)
         let draftTocId = getTocIdFromCfi(draftEpubCfi) || ''
         if (chapterId === draftChapterId /* && draftTocId === (tocId || draftTocId) */) {
+          // this.$logT('annotations.highlight')
           this.rendition.annotations.remove(draftEpubCfi, 'highlight') // если такая уже есть - удалим
           this.rendition.annotations.highlight(draftEpubCfi, { draft }, async (e) => {
             this.$log('draft highlight clicked', draft)
@@ -483,9 +441,11 @@ export default {
     },
     // делаем черновик из текущего выделения
     async createColorNodeDraft (color, cfiRange, temporary = true) {
-      this.$log('createColorNodeDraft')
+      this.$logD('createColorNodeDraft')
       assert(cfiRange, 'bad cfiRange')
       let range = await this.book.getRange(cfiRange)
+      let currentLocation = await this.rendition.currentLocation()
+      let chapterId = getChapterIdFromCfi(currentLocation.start.cfi)
       let nodeInput = {
         name: '',
         thumbUrl: this.contentKalpa.thumbUrl,
@@ -500,7 +460,8 @@ export default {
         spheres: [],
         category: 'FUN',
         temporary,
-        color
+        color,
+        meta: {chapterId}
       }
       let nodeSaved = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       await this.updateSelection(color)
@@ -623,7 +584,7 @@ export default {
       // })
       // on selection, close on mouseup or touchend...
       this.rendition.on('selected', async (cfiRange, contents) => {
-        this.$log('selected', cfiRange, contents)
+        this.$logD('selected', cfiRange, contents)
         this.selectedDraft = null // сбросим. чтобы убрать окно редактирования ядра
         this.cfiRangeSelectInProgress = cfiRange // запомним тут. Обработаем в mouseup
         // let range = await this.book.getRange(cfiRange)
@@ -645,17 +606,17 @@ export default {
           // this.clearSelection() // удалим предыдущее выделение (может быть только 1 выделенный кусок)
           // выполняем через пол секунды тк mouseup срабатывает раньше чем this.rendition.on('selected'...
           this.$wait(300).then(async () => {
-            this.$log('completeSelection ')
+            // this.$logT('completeSelection ')
             if (this.cfiRangeSelectInProgress) { // закончим выделение
               // this.makeSelection(this.cfiRangeSelectInProgress, 'black', '0.3')
               this.selectedDraft = await this.createColorNodeDraft('orange', this.cfiRangeSelectInProgress)
               this.cfiRangeSelectInProgress = null
-              if (this.contentsWindowSelection) this.contentsWindowSelection.removeAllRanges();
+              if (this.contentsWindowSelection && !this.$q.platform.is.mobile) this.contentsWindowSelection.removeAllRanges();
             }
           })
         }
         iframe.document.documentElement.addEventListener('mouseup', async (ev) => {
-          this.$log('mouseup', ev)
+          // this.$logT('mouseup', ev)
           completeSelection()
         })
 

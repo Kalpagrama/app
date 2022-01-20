@@ -4,7 +4,8 @@ div(:style=`{maxWidth: !isFullscreen ? $store.state.ui.pageWidth+'px' : $q.scree
   q-spinner-dots(v-if="!content" color="green" size="60px").fixed-center
   div(v-else).row.full-width
     // header
-    div(v-if="!isFullscreen && !$screenProps.isMobile").row.full-width.justify-center.b-30
+    div(v-if="!isFullscreen").row.full-width.justify-center.b-30
+      q-resize-observer(@resize="headerHeight = $event.height")
       div(
         :style=`{ borderRadius: '10px'}`).row.full-width.items-center.content-center.q-pa-sm.b-30
         q-btn(@click="$routerKalpa.back()" flat round color="white" icon="west" no-caps)
@@ -18,7 +19,7 @@ div(:style=`{maxWidth: !isFullscreen ? $store.state.ui.pageWidth+'px' : $q.scree
     // контент
     div(:class="$screenProps.isMobile ? '' : 'br-15'" :style=`{overflow: 'hidden'}`).row.full-width.relative-position
       q-resize-observer(@resize="bottomHeight = $q.screen.height - $event.height")
-      content-view(:content="content" @player="player=$event").row.full-width
+      content-view(:content="content" :options=`{maxHeight: $q.screen.height - headerHeight}` @player="player=$event").row.full-width
         // платный контент
       div(v-if="content.payInfo.price").row.full-width.q-pb-xs.q-px-xs
         .row.col
@@ -60,6 +61,7 @@ export default {
       content: null,
       author: null,
       player: null,
+      headerHeight: 0,
       bottomHeight: 0, // сколько места под образом
       showDialog: false
     }
