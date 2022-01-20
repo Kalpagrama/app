@@ -10,7 +10,6 @@ div(
     span.text-bold.text-grey-5 {{ categoryLabel }}
   //- TODO styling the select component... maybe the fallback to native from quasar
   select(
-    v-if="true || $q.platform.is.mobile"
     ref="categoryInput"
     @change="categoryChanged"
     :style=`{
@@ -20,7 +19,7 @@ div(
     ).fit
     option(disabled selected value) -- {{$t('Выберите категорию')}} --
     option(
-      v-for="(c,ci) in categories" :key="ci"
+      v-for="(c,ci) in categories" :key="c.value"
       :value="c.value"
       @click="categorySet(c,ci)"
       )
@@ -58,14 +57,15 @@ export default {
     },
   },
   methods: {
-    categoryChanged (e) {
+    async categoryChanged (e) {
       this.$log('categoryChanged', e)
-      this.categorySet({value: e.target.value})
+      await this.categorySet({value: e.target.value})
     },
-    categorySet (c) {
-      this.$log('categorySet', c)
-      // this.node.category = c.value
-      this.$set_deprecated(this.node, 'category', c.value)
+    async categorySet (c) {
+      this.$logT('categorySet', c)
+      this.node.category = c.value
+      // this.$set_deprecated(this.node, 'category', c.value)
+      await this.$rxdb.updateCategoryOrder(c.value)
     },
   }
 }

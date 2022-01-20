@@ -224,7 +224,7 @@ export default {
         }],
         vertices: [],
         spheres: [],
-        category: 'FUN',
+        // category: 'FUN',
         temporary: true,
       }
       let nodeSaved = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)

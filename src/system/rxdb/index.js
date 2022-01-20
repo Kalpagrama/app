@@ -21,18 +21,17 @@ import { Cache } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
 import { Event } from 'src/system/rxdb/event'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
-import { Lists, makeListCacheId } from 'src/system/rxdb/lists'
-import { getReactive, ReactiveDocFactory, ReactiveListWithPaginationFactory } from 'src/system/rxdb/reactive'
+import { Lists } from 'src/system/rxdb/lists'
+import { getReactive, ReactiveListWithPaginationFactory } from 'src/system/rxdb/reactive'
 import { mutexGlobal } from 'src/system/rxdb/mutex_global'
 import { MutexLocal } from 'src/system/rxdb/mutex_local'
-import { cacheSchema, schemaKeyValue } from 'src/system/rxdb/schemas'
+import { schemaKeyValue } from 'src/system/rxdb/schemas'
 import cloneDeep from 'lodash/cloneDeep'
 import LruCache from 'lru-cache'
 import { GqlQueries } from 'src/system/rxdb/gql_query'
 import { deleteIndexedDb, setSyncEventStorageValue, systemInit } from 'src/system/services'
 import { reactive } from 'vue'
 import { Platform } from 'quasar'
-import { wait } from 'src/system/common/common_func'
 
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB)
 
@@ -125,7 +124,7 @@ class RxDBWrapper {
       this.lists = new Lists()
       this.event = new Event()
       this.gqlQueries = new GqlQueries()
-      this.currentState = reactive({ currentUser: null, currentSettings: null })
+      this.currentState = reactive({ currentUser: null, currentSettings: null, categoryOrder: [] })
       this.processStoreEvent = async (eventKey) => {
          // одна из вкладок пересоздала rxdb либо выполнила rxdb.setAuthUser. Надо обновить
          if (this.created) {
@@ -326,6 +325,7 @@ class RxDBWrapper {
          this.currentState.currentSettings = settings
          this.getCurrentSettings = () => this.currentState.currentSettings
          this.hasCurrentSettings = true
+         this.getCategoryOrder = () => this.currentState.categoryOrder
 
          logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } finally {
@@ -694,6 +694,19 @@ class RxDBWrapper {
    async hideObjectOrSource (oid, authorOid) {
       assert(this.created, 'cant find! !this.created')
       await this.lists.hideObjectOrSource(oid, authorOid)
+   }
+
+   // обновить порядок категорий (последние - вверху)
+   async updateCategoryOrder (categoryType) {
+      assert(categoryType)
+      let order = await this.get(RxCollectionEnum.META, 'categoryOrder') || '[]'
+      order = JSON.parse(order)
+      let index = order.indexOf(categoryType)
+      if (index !== -1) order.splice(index, 1)
+      order.unshift(categoryType)
+      await this.set(RxCollectionEnum.META, { id: 'categoryOrder', valueString: JSON.stringify(order) })
+      this.currentState.categoryOrder = order
+      // logT('categoryOrder=', order)
    }
 }
 
