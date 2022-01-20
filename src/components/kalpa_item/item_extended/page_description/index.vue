@@ -17,7 +17,7 @@ export default {
   name: 'pageDescription',
   components: {
   },
-  props: ['item', 'height'],
+  props: ['item', 'height', 'player'],
   data () {
     return {
     }

@@ -1,150 +1,135 @@
 <template lang="pug">
 .row.full-width.relative-position
   //transition(appear enter-active-class="animated slideInUp" leave-active-class="animated fadeOut")
-  div(
-    v-if="pageId"
-    :style=`{
-        position: 'relative',
-        borderRadius: '20px 20px 0 0',
-        height: bottomHeight + 'px',
-      }`).row.full-width.b-30.absolute-top
+  div(v-if="pageId"
+    :style=`{ borderRadius: '20px 20px 0 0', height: bottomHeight + 'px'}`).row.full-width.b-30.absolute-top
     component(:is="'page-' + pageId"
       :item="content"
       :content="content"
       :contentKalpa="content"
-        :player="player"
+      :player="player"
       :height="bottomHeight"
       @close="pageId=null")
-  // description expand btn
-  div(v-if="!pageId").row.full-width
-    // Название
-    div(@click="pageId='description'").row.full-width.items-center.content-center.wrap.q-pt-xs.q-pl-sm.cursor-pointer
-      //q-icon(name="select_all" color="white" size="36px").q-mr-sm
-      .row.col
-        span(:style=`{lineHeight: 1.2, fontSize: '15px'}`).text-white.text-bold.full-width {{ content.name }}
-        //small(:style=`{lineHeight: 1.2}`).text-grey.full-width {{$t('Ознакомительный фрагмент')}}
-      q-btn(v-if="true" round flat dense icon="expand_more" color="grey-5" @click="pageId='description'" :style=`{zIndex: '100'}`)
-        q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Описание')}}
-    // menu bar
-    .row.full-width.content-center.items-center
-      small(size="sm").row.items-center.text-grey-7.text-italic.q-pl-sm {{content.countStat.countViews}} {{$getNoun(content.countStat.countViews,$t('просмотр'),$t('просмотра'),$t('просмотров'))}}
-      .col
-      kalpa-save(:item="content" dense :isActive="true" inactiveColor="white" color="grey-2").q-pl-md
-      kalpa-share(:item="content" :itemState="{}" :isActive="true" inactiveColor="white" color="grey-2" :headerText="$t('Share')")
-    // origin
-    .row.full-width.items-center.content-center.q-px-sm
-      q-btn(v-if="content.urlOriginal"
-        @click="goOriginal"
-        align="left"
-        outline color="grey-3" no-caps
-      :style=`{fontSize: '15px'}`)
-        //- span.text-bold.text-grey-3 {{ 'Go to original' }}
-        span.text-bold.text-grey-3 {{ $t('Источник') }}
-        //- handle youtube
-        q-icon(
-          v-if="content.contentProvider === 'YOUTUBE'"
-          name="fab fa-youtube" color="red" size="30px").q-mx-sm
-        q-icon(
-          v-if="content.contentProvider === 'INSTAGRAM'"
-          name="fab fa-instagram" color="red" size="30px").q-mx-sm
-        q-icon(
-          v-if="content.contentProvider === 'CUSTOM_URL'"
-          name="public" color="grey-3" size="30px").q-mx-sm
-        span(
-          v-if="content.contentProvider === 'YOUTUBE'"
-        ).text-bold.text-grey-3 YouTube
-        span(
-          v-if="content.contentProvider === 'INSTAGRAM'"
-        ).text-bold.text-grey-3 Instagram
-        span(
-          v-if="content.contentProvider === 'CUSTOM_URL'"
-        ).text-bold.text-grey-3 {{ $t('интернет') }}
-    div(v-if="content.contentProvider !== 'YOUTUBE' && content.contentProvider !== 'INSTAGRAM'").row.q-py-md
-      q-btn(:to="'/user/'+content.author.oid" size="sm" round flat no-caps padding="none" :style=`{zIndex: '100'}`).q-px-sm
-        q-avatar(:size="'30px'" :style=`{position:'relative', overflow: 'hidden'}`).q-mr-xs
-          //img(:src="content.author.thumbUrl" :to="'/user/'+content.author.oid")
-          img(:src="content.author.thumbUrl" :to="'/user/'+content.author.oid")
-          div(:style=`{background: 'rgba(0,0,0,0.4)', zIndex: '50'}`).fit.absolute
-        .column.items-start
-          span(:style=`{fontSize: '12px'}`).text-grey-5 {{content.author.name}}
-          small(v-if="author" :style=`{marginTop: '-4px', fontSize: '10px'}`).text-grey-7.text-italic {{author.countStat.countSubscriptions}} {{$getNoun(author.countStat.countSubscriptions.length,$t('подписчик'),$t('подписчика'),$t('подписчиков'))}}
-      q-btn(
-        v-if="content.author.oid !== $store.getters.currentUser.oid"
-        flat :no-caps="following ? true : false" size="sm" :color="!following ? 'green-8' : 'grey-7'" :label="following ? $t('Вы подписаны') : $t('Follow')"
-        @click="followingToggle()"
-      ).q-ml-lg
-    // сферы
-    div(v-if="content.spheres.length > 0").row.full-width.q-pt-sm
-      .row.full-width.col
-        //q-icon(v-else name="fas fa-plus" size="10px" color="green" :style=`{right: '-14px', top: '5px'}`).absolute-top-right
-        // spheres
-        div(:style=`{minHeight: '32px'}`).row.full-width.content-start
-          span.text-grey-5.q-pl-md {{ $t('Сферы') }}
-          essence-spheres(:sphereOwner="content" :itemState="itemState")
-    //// author + essence + spheres + comments + images
-    //div(v-if="showAuthor").row.full-width.justify-between.q-px-sm
-    //  q-btn(:to="'/user/'+content.author.oid" size="sm" round flat no-caps padding="none" :style=`{zIndex: '100'}`).q-pr-sm
-    //    q-avatar(:size="'25px'" :style=`{position:'relative', overflow: 'hidden'}`).q-mr-xs
-    //      //img(:src="content.author.thumbUrl" :to="'/user/'+content.author.oid")
-    //      img(:src="content.author.thumbUrl" :to="'/user/'+content.author.oid")
-    //      div(:style=`{background: 'rgba(0,0,0,0.4)', zIndex: '50'}`).fit.absolute
-    //    .column.items-start
-    //      span.text-grey-5 {{content.author.name}}
-    //      small(v-if="author" :style=`{marginTop: '-7px'}`).text-grey-7.text-italic {{author.countStat.countSubscribers}} {{$getNoun(author.countStat.countSubscriptions.length, $t('подписчик'), $t('подписчика'), $t('подписчиков'))}}
-    //  //q-btn(round flat padding="none" no-caps=false size="sm" color="green-8" :label="$t('подписаться')").col
-    // drafts
-    .row.full-width.items-center.q-px-sm
-      span(@click="pageId='drafts-' + content.type.toLowerCase()").text-grey-5.q-py-sm.q-pl-sm.cursor-pointer {{$t('Мои заметки на этом контенте')}}
-      q-icon(@click="pageId='nodes-' + content.type.toLowerCase()" dense name="expand_more" color="grey-5"  size="14px").cursor-pointer
-    // popular nodes
-    .row.full-width.items-center.q-px-sm
-      span(@click="pageId='nodes-' + content.type.toLowerCase()").text-grey-5.q-py-sm.q-pl-sm.cursor-pointer {{$t('Популярные смыслы')}}
-      span(@click="pageId='nodes-' + content.type.toLowerCase()").text-grey-8.q-pl-xs.cursor-pointer {{ content.countStat.countNodes }}
-      q-icon(@click="pageId='nodes-' + content.type.toLowerCase()" dense name="expand_more" color="grey-5"  size="14px").cursor-pointer
-      list-feed-custom-horizontalPPV(v-if="pageWidth && content.countStat.countNodes > 0"
-        ref="listFeed"
-        :scrollAreaWidth="pageWidth"
-        :scrollAreaHeight="120"
-        :query="queryNodesPopular"
-        :itemWidthApprox="120*1.618"
-        :itemHeightApprox="120"
-        :itemActivePersist="itemActivePersist"
-        @count="$emit('count', $event)"
-        @items="$emit('items', $event)")
-        template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload,scrolling}`)
-          item-feed(
-            :itemShortOrFull="item"
-            :itemState="itemState"
-            :itemIndex="itemIndex"
-            :isActive="isActive"
-            :isVisible="isVisible"
-            :isPreload="isPreload"
-            :scrolling="scrolling"
-            :layout="'card-tiny'"
-            :showContext="false"
-            :height="120").q-px-xs
-    // comments
-    div(v-if="!pageId" :style=`{border: '1px solid rgb(50,50,50)', overflow: 'hidden'}` @click="pageId='comments'").row.full-width.q-mt-md.br-10.cursor-pointer
+  div(v-else).row.full-width
+    // description expand btn
+    .row.full-width
+      // Название
+      div(@click="pageId='description'").row.full-width.items-center.content-center.wrap.q-pt-xs.q-pl-sm.cursor-pointer
+        //q-icon(name="select_all" color="white" size="36px").q-mr-sm
+        .row.col
+          span(:style=`{lineHeight: 1.2, fontSize: '15px'}`).text-white.text-bold.full-width {{ content.name }}
+          //small(:style=`{lineHeight: 1.2}`).text-grey.full-width {{$t('Ознакомительный фрагмент')}}
+        q-btn(v-if="true" round flat dense icon="expand_more" color="grey-5" @click="pageId='description'" :style=`{zIndex: '100'}`)
+          q-tooltip(v-if="$q.platform.is.desktop" dense dark) {{$t('Описание')}}
+      // menu bar
+      .row.full-width.content-center.items-center
+        small(size="sm").row.items-center.text-grey-7.text-italic.q-pl-sm {{content.countStat.countViews}} {{$getNoun(content.countStat.countViews,$t('просмотр'),$t('просмотра'),$t('просмотров'))}}
+        .col
+        kalpa-save(:item="content" dense :isActive="true" inactiveColor="white" color="grey-2").q-pl-md
+        kalpa-share(:item="content" :itemState="{}" :isActive="true" inactiveColor="white" color="grey-2" :headerText="$t('Share')")
+      // origin
+      .row.full-width.items-center.content-center.q-px-sm
+        q-btn(v-if="content.urlOriginal"
+          @click="goOriginal"
+          align="left"
+          outline color="grey-3" no-caps
+        :style=`{fontSize: '15px'}`)
+          //- span.text-bold.text-grey-3 {{ 'Go to original' }}
+          span.text-bold.text-grey-3 {{ $t('Источник') }}
+          //- handle youtube
+          q-icon(
+            v-if="content.contentProvider === 'YOUTUBE'"
+            name="fab fa-youtube" color="red" size="30px").q-mx-sm
+          q-icon(
+            v-if="content.contentProvider === 'INSTAGRAM'"
+            name="fab fa-instagram" color="red" size="30px").q-mx-sm
+          q-icon(
+            v-if="content.contentProvider === 'CUSTOM_URL'"
+            name="public" color="grey-3" size="30px").q-mx-sm
+          span(
+            v-if="content.contentProvider === 'YOUTUBE'"
+          ).text-bold.text-grey-3 YouTube
+          span(
+            v-if="content.contentProvider === 'INSTAGRAM'"
+          ).text-bold.text-grey-3 Instagram
+          span(
+            v-if="content.contentProvider === 'CUSTOM_URL'"
+          ).text-bold.text-grey-3 {{ $t('интернет') }}
+      div(v-if="content.contentProvider !== 'YOUTUBE' && content.contentProvider !== 'INSTAGRAM'").row.q-py-md
+        q-btn(:to="'/user/'+content.author.oid" size="sm" round flat no-caps padding="none" :style=`{zIndex: '100'}`).q-px-sm
+          q-avatar(:size="'30px'" :style=`{position:'relative', overflow: 'hidden'}`).q-mr-xs
+            //img(:src="content.author.thumbUrl" :to="'/user/'+content.author.oid")
+            img(:src="content.author.thumbUrl" :to="'/user/'+content.author.oid")
+            div(:style=`{background: 'rgba(0,0,0,0.4)', zIndex: '50'}`).fit.absolute
+          .column.items-start
+            span(:style=`{fontSize: '12px'}`).text-grey-5 {{content.author.name}}
+            small(v-if="author" :style=`{marginTop: '-4px', fontSize: '10px'}`).text-grey-7.text-italic {{author.countStat.countSubscriptions}} {{$getNoun(author.countStat.countSubscriptions.length,$t('подписчик'),$t('подписчика'),$t('подписчиков'))}}
+        q-btn(
+          v-if="content.author.oid !== $store.getters.currentUser.oid"
+          flat :no-caps="following ? true : false" size="sm" :color="!following ? 'green-8' : 'grey-7'" :label="following ? $t('Вы подписаны') : $t('Follow')"
+          @click="followingToggle()"
+        ).q-ml-lg
+      // сферы
+      div(v-if="content.spheres.length > 0").row.full-width.q-pt-sm
+        .row.full-width.col
+          //q-icon(v-else name="fas fa-plus" size="10px" color="green" :style=`{right: '-14px', top: '5px'}`).absolute-top-right
+          // spheres
+          div(:style=`{minHeight: '32px'}`).row.full-width.content-start
+            span.text-grey-5.q-pl-md {{ $t('Сферы') }}
+            essence-spheres(:sphereOwner="content" :itemState="itemState")
+      // drafts
+      .row.full-width.items-center.q-px-sm
+        span(@click="pageId='drafts-' + content.type.toLowerCase()").text-grey-5.q-py-sm.q-pl-sm.cursor-pointer {{$t('Мои заметки на этом контенте')}}
+        q-icon(@click="pageId='nodes-' + content.type.toLowerCase()" dense name="expand_more" color="grey-5"  size="14px").cursor-pointer
+      // popular nodes
+      .row.full-width.items-center.q-px-sm
+        span(@click="pageId='nodes-' + content.type.toLowerCase()").text-grey-5.q-py-sm.q-pl-sm.cursor-pointer {{$t('Популярные смыслы')}}
+        span(@click="pageId='nodes-' + content.type.toLowerCase()").text-grey-8.q-pl-xs.cursor-pointer {{ content.countStat.countNodes }}
+        q-icon(@click="pageId='nodes-' + content.type.toLowerCase()" dense name="expand_more" color="grey-5"  size="14px").cursor-pointer
+        list-feed-custom-horizontalPPV(v-if="pageWidth && content.countStat.countNodes > 0"
+          ref="listFeed"
+          :scrollAreaWidth="pageWidth"
+          :scrollAreaHeight="120"
+          :query="queryNodesPopular"
+          :itemWidthApprox="120*1.618"
+          :itemHeightApprox="120"
+          :itemActivePersist="itemActivePersist"
+          @count="$emit('count', $event)"
+          @items="$emit('items', $event)")
+          template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload,scrolling}`)
+            item-feed(
+              :itemShortOrFull="item"
+              :itemState="itemState"
+              :itemIndex="itemIndex"
+              :isActive="isActive"
+              :isVisible="isVisible"
+              :isPreload="isPreload"
+              :scrolling="scrolling"
+              :layout="'card-tiny'"
+              :showContext="false"
+              :height="120").q-px-xs
       // comments
-      div(v-if="showComments").row.full-width.items-center.content-center.q-py-sm
-        div(@click="pageId='comments'").row.cursor-pointer.row.full-width.items-center
-          // div(:style=`{height: '1px', background: 'rgb(40,40,40)'}`).full-width
-          span.text-grey-5.q-px-sm {{$t('Comments')}}
-          span.text-grey-8 {{content.countStat.countComments}}
-          .col
-          q-btn(round flat dense :icon="pageId ? 'expand_less' : 'expand_more'" color="grey-5" :style=`{zIndex: '100'}`  @click="pageId='comments'")
-          div(v-if="content.commentStat.topComment").row.full-width.items-center
-            q-avatar(:size="'25px'" :style=`{position:'relative', overflow: 'hidden'}`).q-mx-xs.q-mb-xs
-              img(:src="content.commentStat.topComment.author.thumbUrl" :to="'/user/'+content.commentStat.topComment.author.oid")
-              div(:style=`{background: 'rgba(0,0,0,0.4)', zIndex: '50'}`).fit.absolute
-            .col.content-center.q-px-xs
-              small.text-grey.text-weight-thin.text-italic.q-pr-md {{content.commentStat.topComment.text.substring(0, 77)}}{{content.commentStat.topComment.text.length>77?'...':''}}
-  // похожие
-  div(v-if="!pageId && showSimilar").row.full-width.q-pt-lg
-    .row.full-width.justify-start
-      small.text-grey-8.q-pb-xs.q-px-xs {{$t('похожее')}}
-    //small.text-grey.text-center.text-italic.q-px-xs "{{content.name.substring(0, 22)}}{{content.name.length>22 ? '...': ''}}"
-    page-similar(:item="content")
+      div(v-if="!pageId" :style=`{border: '1px solid rgb(50,50,50)', overflow: 'hidden'}` @click="pageId='comments'").row.full-width.q-mt-md.br-10.cursor-pointer
+        // comments
+        div(v-if="showComments").row.full-width.items-center.content-center.q-py-sm
+          div(@click="pageId='comments'").row.cursor-pointer.row.full-width.items-center
+            // div(:style=`{height: '1px', background: 'rgb(40,40,40)'}`).full-width
+            span.text-grey-5.q-px-sm {{$t('Comments')}}
+            span.text-grey-8 {{content.countStat.countComments}}
+            .col
+            q-btn(round flat dense :icon="pageId ? 'expand_less' : 'expand_more'" color="grey-5" :style=`{zIndex: '100'}`  @click="pageId='comments'")
+            div(v-if="content.commentStat.topComment").row.full-width.items-center
+              q-avatar(:size="'25px'" :style=`{position:'relative', overflow: 'hidden'}`).q-mx-xs.q-mb-xs
+                img(:src="content.commentStat.topComment.author.thumbUrl" :to="'/user/'+content.commentStat.topComment.author.oid")
+                div(:style=`{background: 'rgba(0,0,0,0.4)', zIndex: '50'}`).fit.absolute
+              .col.content-center.q-px-xs
+                small.text-grey.text-weight-thin.text-italic.q-pr-md {{content.commentStat.topComment.text.substring(0, 77)}}{{content.commentStat.topComment.text.length>77?'...':''}}
+    // похожие
+    div(v-if="showSimilar").row.full-width.q-pt-lg
+      .row.full-width.justify-start
+        small.text-grey-8.q-pb-xs.q-px-xs {{$t('похожее')}}
+      //small.text-grey.text-center.text-italic.q-px-xs "{{content.name.substring(0, 22)}}{{content.name.length>22 ? '...': ''}}"
+      page-similar(:item="content")
 </template>
 
 <script>
@@ -158,7 +143,7 @@ import essenceSpheres from 'src/components/essence/essence_spheres'
 import pageDescription from '../page_description/index.vue'
 import listFeedCustomHorizontalPPV from 'src/components/list_feed/list_feed_horizontal_custom_ppv.vue'
 import pageSimilar from 'src/components/kalpa_item/item_extended/page_similar'
-import pageComments from '../page_comments/index.vue'
+import pageComments from 'src/components/kalpa_item/item_extended/page_comments/index.vue'
 import { openURL } from 'quasar'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { assert } from 'src/system/common/utils'

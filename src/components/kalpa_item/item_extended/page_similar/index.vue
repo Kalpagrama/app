@@ -10,6 +10,7 @@ export default {
   name: 'pageSimilar',
   props: {
     item: {type: Object},
+    player: {type: Object}
   },
   components: {
     kalpa,

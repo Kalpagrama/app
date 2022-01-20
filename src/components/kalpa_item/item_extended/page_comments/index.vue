@@ -47,7 +47,7 @@ export default {
   components: {
     commentItem,
   },
-  props: ['item', 'height'],
+  props: ['item', 'height', 'player'],
   data () {
     return {
       comment: '',
