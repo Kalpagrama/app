@@ -36,7 +36,7 @@ export default {
   },
   computed: {
     categories () {
-      return this.$store.getters.nodeCategories.reduce((acc, val) => {
+      return this.$store.getters.nodeCategoriesOrdered.reduce((acc, val) => {
         if (val.type !== 'ALL') {
           acc.push({
             value: val.type,
