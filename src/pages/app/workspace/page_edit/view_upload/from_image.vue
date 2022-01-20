@@ -124,7 +124,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import { ContentApi } from 'src/api/content'
 import { UserApi } from 'src/api/user'
 
-import nodeEditor from 'src/pages/app/content/node_creator/node_editor/index.vue'
+import nodeEditor from 'src/components/kalpa_item/item_extended/content_extended/node_editor/book/index.vue'
 import { assert } from 'src/system/common/utils'
 import { ObjectTypeEnum } from 'src/system/common/enums'
 

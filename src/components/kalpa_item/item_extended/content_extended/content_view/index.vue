@@ -16,7 +16,7 @@ import image from './image'
 export default {
   name: 'pageContent',
   components: {video, book, image},
-  props: ['content', 'mode', 'isActive'],
+  props: ['content', 'options'],
   data () {
     return {
     }

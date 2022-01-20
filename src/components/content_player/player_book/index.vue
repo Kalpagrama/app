@@ -6,44 +6,14 @@ iframe
 </style>
 
 <template lang="pug">
-div(
-  :style=`{
-  position: 'relative',
-  height: '100%',
-  overflow: 'hidden',
-}`
-).column.full-width
-  player-node(:node="selectedEssence" @close="selectedEssence = null")
+div( :style=`{height: '100%',overflow: 'hidden'}`).column.full-width.relative-position
+  player-node(:node="selectedEssence" @close="selectedEssence = null").br
   //- fictive/invisible input for emit/on/off events with native html element events
   input(v-model="name" ref="nameInput" :style=`{display: 'none'}`)
   //- figure editor + audioplayer
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(
-      v-if="true"
-      :style=`{
-      position: 'absolute', zIndex: 1000,
-      bottom: '80px',
-    }`
-    ).row.full-width.justify-center
+    div(:style=`{ position: 'absolute', zIndex: 1000,bottom: '80px'}`).row.full-width.justify-center
       slot(name="tint-bar" :tintFocused="true")
-      //- (currentSelection && !audioPlayer.audio)
-      //div(
-      //  v-if="currentSelection && !selectedDraft"
-      //  :style=`{
-      //  width: '200px',
-      //  borderRadius: '20px',
-      //  background: 'rgba(30,30,30,0.8)',
-      //}`
-      //).row.items-center.content-center.q-pa-md
-      //  //- q-btn(round flat color="green" icon="play_arrow" @click="nextAudio(0, true)")
-      //  .col
-      //  q-btn(round flat color="orange" icon="lens" @click="createColorNodeDraft('orange')")
-      //  q-btn(round flat color="red" icon="lens" @click="createColorNodeDraft('red')")
-      //  q-btn(round flat color="green" icon="lens" @click="createColorNodeDraft('green')")
-      //  q-btn(round flat color='blue' icon="lens" @click="createColorNodeDraft('blue')")
-      //  .col
-      //  //- q-btn(round flat color="white" icon="keyboard_arrow_left" @click="updateSelection(null, null, -1)")
-      //  //- q-btn(round flat color="white" icon="keyboard_arrow_right" @click="updateSelection(null, null, 1)")
   //- table of contents
   transition(enter-active-class="animated slideInLeft" leave-active-class="animated slideOutLeft")
     player-toc(
@@ -62,21 +32,10 @@ div(
   ).absolute-center
     player-settings(:settings="settings" @close="settingsShow = false" :style=`{borderRadius: '20px'}`).b-40
   //- body book area wrapper
-  div(
-    :style=`{
-    position: 'relative',
-    borderRadius: '10px',
-    border: '3px solid #222',
-    overflow: 'hidden',
-    // background: '#f3e8d2',
-  }`).col.full-width
+  div(:style=`{ border: '3px solid #222',overflow: 'hidden'}`).col.full-width.relative-position.br-10
     q-resize-observer(@resize="onResize" :debounce="300")
     //- book area
-    div(
-      ref="book-area"
-      :style=`{
-      borderRadius: '0 0 10px 10px'
-    }`).row.fit
+    div(ref="book-area").row.fit
   // progress
   q-linear-progress(size='5px' :value="progressValue / 100" color="green-10").row.full-width.q-px-sm
   //- footer
@@ -121,6 +80,7 @@ export default {
       type: Object,
       required: true
     },
+    options: {type: Object, default: {}},
     themes: {
       type: Object,
       required: true,
