@@ -379,7 +379,7 @@ export default {
       }
     },
     async showAllDraftsForCurrentLocation () {
-      this.$logT('showAllDraftsForCurrentLocation start')
+      this.$logD('showAllDraftsForCurrentLocation start')
       let currentLocation = await this.rendition.currentLocation()
       let chapterId = getChapterIdFromCfi(currentLocation.start.cfi)
       let tocId = getTocIdFromCfi(currentLocation.start.cfi)
@@ -393,7 +393,7 @@ export default {
         })
         // массив изменился (скорей всего создали новое ядро и оно добавилось в массив) - нарисуем заново
         this.$watch('findDraftsRes.items', async (newVal, oldVal) => {
-          this.$logT('showAllDraftsForCurrentLocation items changed', oldVal.length, newVal.length)
+          this.$logD('showAllDraftsForCurrentLocation items changed', oldVal.length, newVal.length)
           // this.clearSelection() // иначе при добавлении нового ядра, новое выделение исчезнет после клика мышкой (см addEventListener('mouseup' ...))
           await this.showAllDraftsForCurrentLocation() // выделим заново
         }, {
@@ -419,9 +419,8 @@ export default {
         this.tmpDraftEpubCfis.push(draftEpubCfi)
         let draftChapterId = draft?.meta?.chapterId || getChapterIdFromCfi(draftEpubCfi)
         let draftTocId = getTocIdFromCfi(draftEpubCfi) || ''
-        this.$logT('select draft.', chapterId, draftChapterId, draftEpubCfi)
         if (chapterId === draftChapterId /* && draftTocId === (tocId || draftTocId) */) {
-          this.$logT('annotations.highlight')
+          // this.$logT('annotations.highlight')
           this.rendition.annotations.remove(draftEpubCfi, 'highlight') // если такая уже есть - удалим
           this.rendition.annotations.highlight(draftEpubCfi, { draft }, async (e) => {
             this.$log('draft highlight clicked', draft)
@@ -442,7 +441,7 @@ export default {
     },
     // делаем черновик из текущего выделения
     async createColorNodeDraft (color, cfiRange, temporary = true) {
-      this.$logT('createColorNodeDraft')
+      this.$logD('createColorNodeDraft')
       assert(cfiRange, 'bad cfiRange')
       let range = await this.book.getRange(cfiRange)
       let currentLocation = await this.rendition.currentLocation()
@@ -585,7 +584,7 @@ export default {
       // })
       // on selection, close on mouseup or touchend...
       this.rendition.on('selected', async (cfiRange, contents) => {
-        this.$logT('selected', cfiRange, contents)
+        this.$logD('selected', cfiRange, contents)
         this.selectedDraft = null // сбросим. чтобы убрать окно редактирования ядра
         this.cfiRangeSelectInProgress = cfiRange // запомним тут. Обработаем в mouseup
         // let range = await this.book.getRange(cfiRange)
@@ -607,7 +606,7 @@ export default {
           // this.clearSelection() // удалим предыдущее выделение (может быть только 1 выделенный кусок)
           // выполняем через пол секунды тк mouseup срабатывает раньше чем this.rendition.on('selected'...
           this.$wait(300).then(async () => {
-            this.$logT('completeSelection ')
+            // this.$logT('completeSelection ')
             if (this.cfiRangeSelectInProgress) { // закончим выделение
               // this.makeSelection(this.cfiRangeSelectInProgress, 'black', '0.3')
               this.selectedDraft = await this.createColorNodeDraft('orange', this.cfiRangeSelectInProgress)
@@ -617,7 +616,7 @@ export default {
           })
         }
         iframe.document.documentElement.addEventListener('mouseup', async (ev) => {
-          this.$logT('mouseup', ev)
+          // this.$logT('mouseup', ev)
           completeSelection()
         })
 
