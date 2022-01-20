@@ -30,7 +30,7 @@ div(:style=`{height: videoHeight+'px'}`).row.full-width.relative-position
   // затемнение для ютуба on pause and desktops only and youtube
   .row.fit.absolute
     transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      div( v-if="!playing && playerType === 'player-youtube' && $screenProps.isMobile"
+      div( v-if="!playing && playerType === 'player-youtube' && !$screenProps.isMobile"
         :style=`{ background: 'linear-gradient(0deg, rgba(0,0,0,1) 200px, rgba(0,0,0,0) 100%)'}`
       ).row.full-width
   // оверлэй для видео

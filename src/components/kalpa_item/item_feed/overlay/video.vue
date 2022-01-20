@@ -81,7 +81,7 @@ export default {
       if (this.timerMouseOut) clearTimeout(this.timerMouseOut)
       this.timerMouseOut = setTimeout(() => {
         this.updateState()
-      }, 2000)
+      }, 0)
     },
     onMouseMove () {
       this.lastMouseMove = Date.now()

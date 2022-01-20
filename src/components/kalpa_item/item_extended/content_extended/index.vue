@@ -17,7 +17,7 @@ div(:style=`{maxWidth: !isFullscreen ? $store.state.ui.pageWidth+'px' : $q.scree
           @click=""
           round flat color="white" icon="fas fa-info" :style=`{opacity:'0'}`)
     // контент
-    .row.full-width.relative-position
+    div(:class="$screenProps.isMobile ? '' : 'br-15'" :style=`{overflow: 'hidden'}`).row.full-width.relative-position
       q-resize-observer(@resize="bottomHeight = $q.screen.height - $event.height")
       content-view(:content="content" :options=`{maxHeight: $q.screen.height - headerHeight}` @player="player=$event").row.full-width
         // платный контент

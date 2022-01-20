@@ -1,7 +1,12 @@
+<style lang="sass" scoped>
+.container
+  transition: height .3s
+</style>
+
 <template lang="pug">
 .row.full-width.items-between.justify-center
   q-resize-observer(@resize="editorHeight = $event.height, editorWidth = $event.width")
-  sphere-hints(v-if="toolTipFilterName" :name="toolTipFilterName", :maxWidth="editorWidth", :offset="[5, 5]" @click="node.name = $event, showSpheres=true").z-max
+  sphere-hints(v-if="toolTipFilterName" :name="toolTipFilterName", :maxWidth="editorWidth", :offset="[5, 5]" @click="node.name = $event").z-max
   sphere-hints(v-if="toolTipFilterSphere" :name="toolTipFilterSphere", :maxWidth="editorWidth", :offset="[5, 5]" @click="$refs.editSpheres.sphereAdd($event)").z-max
   .row.full-width
     //- name
@@ -28,40 +33,52 @@
             minHeight: '60px',
           }`
           ).full-width.relative-position
-          template(v-slot:after)
-            q-icon(name="done" :color="node.name ? 'green-8':'grey-5'" @click="showSpheres=true").q-pr-xs.cursor-pointer
+          //template(v-slot:after)
+          //  q-icon(name="done" :color="node.name ? 'green-8':'grey-5'" @click="showSpheres=true").q-pr-xs.cursor-pointer
           div(v-if="node.name").row.absolute-top-left.q-pt-xs.q-pl-md
             small.text-grey-6 {{$t('В чём смысл?')}}
     //- category and spheres
-    transition(enter-active-class="animated fadeInUp" leave-active-class="animated fadeOutDown")
-      edit-spheres(v-if="showSpheres"
-        ref="editSpheres"
-        :sphereOwner="node"
-        @toolTipFilter="toolTipFilterName = null, toolTipFilterSphere=$event"
-        ).q-px-sm
-        template(v-slot:left)
-          edit-category(
-            :node="node"
-            :class=`{
-              br: !node.category && categoryError,
-            }`
-            :style=`{
-              borderRadius: '10px',
-            }`)
-    fragment-editor(:player="player" :contentKalpa="contentKalpa")
-    // buttons
-    div(v-if="showSpheres && node").row.full-width
-      //- Delete from notes
-      q-btn( v-if="node.wsItemType === 'WS_NODE'"
-        outline no-caps color="red"  :loading="nodeSaving" :label="$t('Удалить заметку')"
-        @click="nodeDeleteAction()"
-      ).col.q-mr-sm
-      //- Save to notes
-      q-btn(v-if="node.wsItemType !== 'WS_NODE'"
-        outline no-caps color="white" :loading="nodeSaving" :label="$t('Сохранить заметку')" @click="nodeSaveAction()"
-      ).col.q-mr-sm
-      //- Publish
-      q-btn(color="green" no-caps :loading="nodePublishing" :label="$t('Publish')" @click="nodePublish()").col
+    div(:style=`{minHeight: '100px', overflow:'hidden'}`).row.full-width.relative-position.container
+      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        div(v-if="showSpheres").row.full-width
+          edit-spheres(v-if="showSpheres"
+            ref="editSpheres"
+            :sphereOwner="node"
+            @toolTipFilter="toolTipFilterName = null, toolTipFilterSphere=$event"
+            ).q-px-sm
+            template(v-slot:left)
+              edit-category(
+                :node="node"
+                :class=`{
+                  br: !node.category && categoryError,
+                }`
+                :style=`{
+                  borderRadius: '10px',
+                }`)
+      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        fragment-editor(v-if="!showSpheres" :player="player" :contentKalpa="contentKalpa").absolute
+    .row.full-width
+      .col
+      div(:class="$screenProps.isMobile ? 'col-12' : 'col-8'").q-pa-sm
+        transition(enter-active-class="animated fadeInDown" leave-active-class="animated fadeOutUp")
+          // buttons
+          div(v-if="node.name").row.full-width
+            // - Next
+            q-btn(:label="showSpheres ? $t('Редактировать') : $t('Далее')" color="green" no-caps flat @click="showSpheres=!showSpheres").q-mr-sm.col
+            //- Delete from notes
+            q-btn( v-if="node.wsItemType === 'WS_NODE'"
+              outline no-caps color="red"  :loading="nodeSaving" :label="$t('Удалить заметку')"
+              @click="nodeDeleteAction()"
+            ).col.no-wrap
+            //- Save to notes
+            q-btn(v-if="node.wsItemType !== 'WS_NODE'"
+              outline no-caps color="white" :loading="nodeSaving" :label="$t('Сохранить заметку')" @click="nodeSaveAction()"
+            ).col.no-wrap
+        div(:style=`{overflow:'hidden'}`).row.full-width
+          transition(enter-active-class="animated fadeInDown" leave-active-class="animated fadeOutUp")
+            //- Publish
+            q-btn(v-if="showSpheres" color="green" no-caps :loading="nodePublishing" :label="$t('Publish')" @click="nodePublish()").col.q-mt-sm
+      .col
 </template>
 
 <script>
