@@ -85,7 +85,7 @@ export default {
         let blockInput = {
           name: '',
           spheres: [],
-          category: 'FUN',
+          // category: 'FUN',
           temporary: true,
           graph: { nodes: [], joints: [], selectedItem: null }
         }

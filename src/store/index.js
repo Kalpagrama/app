@@ -36,8 +36,19 @@ export default store(function (/* { ssrContext } */) {
          nodeCategories: (state, getters, rootState, rootGetters) => {
             assert(rxdb.getCurrentUser && rxdb.getCurrentUser())
             assert(rxdb.getCurrentSettings && rxdb.getCurrentSettings())
+            assert(rxdb.getCategoryOrder && rxdb.getCategoryOrder())
             // if (!currentUser || !currentSettings) return []
-            return rxdb.getCurrentSettings().nodeCategories.filter(c => c.lang === rxdb.getCurrentUser().profile.lang)
+            // logT('nodeCategories', rxdb.getCategoryOrder(), rxdb.getCurrentSettings().nodeCategories)
+            return rxdb.getCurrentSettings().nodeCategories
+               .filter(c => c.lang === rxdb.getCurrentUser().profile.lang)
+               .sort((left, right) => {
+                  let leftSortedIndx = rxdb.getCategoryOrder().indexOf(left.type)
+                  let rightSortedIndx = rxdb.getCategoryOrder().indexOf(right.type)
+                  if (leftSortedIndx >= 0 && rightSortedIndx >= 0) return leftSortedIndx < rightSortedIndx ? -1 : 1
+                  if (leftSortedIndx >= 0) return -1
+                  if (rightSortedIndx >= 0) return 1
+                  return -1
+               })
          }
       }
    })

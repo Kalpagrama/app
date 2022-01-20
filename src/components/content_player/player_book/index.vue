@@ -458,7 +458,7 @@ export default {
         }],
         vertices: [],
         spheres: [],
-        category: 'FUN',
+        // category: 'FUN',
         temporary,
         color,
         meta: {chapterId}

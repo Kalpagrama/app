@@ -208,7 +208,7 @@ export default {
         items: [],
         vertices: ['ASSOCIATIVE', 'ASSOCIATIVE'],
         spheres: [],
-        category: 'FUN',
+        // category: 'FUN',
       },
       itemEditing: null,
       editorsPaddingTop: 0,

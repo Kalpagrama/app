@@ -1,6 +1,8 @@
 <template lang="pug">
 .row.full-width.items-start.content-start.q-pl-sm
-  edit-category(:node="sphereOwner")
+  edit-category(:node="sphereOwner" :class=`{
+      // br: !node.category && categoryError
+   }`).br-10
   div(
     @click="sphereDelete(si)"
     v-for="(s,si) in sphereOwner.spheres" :key="si"
@@ -28,7 +30,7 @@
 </template>
 
 <script>
-import editCategory from './edit_category.vue'
+import editCategory from 'src/components/kalpa_item/item_extended/content_extended/node_editor/edit_category.vue'
 
 export default {
   name: 'spheresEditorOnline',

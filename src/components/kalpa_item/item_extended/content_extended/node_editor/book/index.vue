@@ -43,7 +43,6 @@ export default {
           items: [],
           vertices: [],
           spheres: [],
-          category: 'FUN',
           temporary: true
         }
       }

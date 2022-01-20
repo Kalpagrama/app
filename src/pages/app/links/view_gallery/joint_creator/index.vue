@@ -171,7 +171,7 @@ export default {
         items: [],
         vertices: ['ASSOCIATIVE', 'ASSOCIATIVE'],
         spheres: [],
-        category: 'FUN',
+        // category: 'FUN',
       },
       publishing: false,
       verticesPairsShow: false,
