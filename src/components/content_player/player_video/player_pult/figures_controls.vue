@@ -16,6 +16,11 @@
       round flat color="white"
       ).col
       q-icon(name="replay" size="26px")
+      q-tooltip(
+        anchor="center left" self="center right" :offset="[5, 5]"
+        transition-show="jump-right"
+        transition-hide="jump-up"
+      ) {{$t('С начала')}}
     q-btn(
       @click="player.playing ? player.pause() : player.play()"
       round flat color="white"
@@ -33,6 +38,11 @@
         :class=`{
           'rotating': isLooping,
         }`)
+      q-tooltip(
+        anchor="center right" self="center left" :offset="[5, 5]"
+        transition-show="jump-right"
+        transition-hide="jump-up"
+      ) {{$t('Зациклить')}}
 </template>
 
 <script>

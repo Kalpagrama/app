@@ -6,7 +6,7 @@
 <template lang="pug">
 .row.full-width.items-between.justify-center
   q-resize-observer(@resize="editorHeight = $event.height, editorWidth = $event.width")
-  sphere-hints(v-if="toolTipFilterName" :name="toolTipFilterName", :maxWidth="editorWidth", :offset="[5, 5]" @click="node.name = $event, showSpheres=true").z-max
+  sphere-hints(v-if="toolTipFilterName" :name="toolTipFilterName", :maxWidth="editorWidth", :offset="[5, 5]" @click="node.name = $event").z-max
   sphere-hints(v-if="toolTipFilterSphere" :name="toolTipFilterSphere", :maxWidth="editorWidth", :offset="[5, 5]" @click="$refs.editSpheres.sphereAdd($event)").z-max
   .row.full-width
     //- name
@@ -38,10 +38,9 @@
           div(v-if="node.name").row.absolute-top-left.q-pt-xs.q-pl-md
             small.text-grey-6 {{$t('В чём смысл?')}}
     //- category and spheres
-    div(:style=`{minHeight: '110px', height: fragmentSphereHeight+'px', overflow:'hidden'}`).row.full-width.relative-position.container
+    div(:style=`{minHeight: '100px', overflow:'hidden'}`).row.full-width.relative-position.container
       transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
         div(v-if="showSpheres").row.full-width
-          q-resize-observer(@resize="sphereHeight = $event.height")
           edit-spheres(v-if="showSpheres"
             ref="editSpheres"
             :sphereOwner="node"
@@ -56,24 +55,30 @@
                 :style=`{
                   borderRadius: '10px',
                 }`)
+      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        fragment-editor(v-if="!showSpheres" :player="player" :contentKalpa="contentKalpa").absolute
+    .row.full-width
+      .col
+      div(:class="$screenProps.isMobile ? 'col-12' : 'col-8'").q-pa-sm
+        transition(enter-active-class="animated fadeInDown" leave-active-class="animated fadeOutUp")
           // buttons
-          div(v-if="showSpheres && node").row.full-width.q-px-sm
+          div(v-if="node.name").row.full-width
+            // - Next
+            q-btn(:label="showSpheres ? $t('Редактировать') : $t('Далее')" color="green" no-caps flat @click="showSpheres=!showSpheres").q-mr-sm.col
             //- Delete from notes
             q-btn( v-if="node.wsItemType === 'WS_NODE'"
               outline no-caps color="red"  :loading="nodeSaving" :label="$t('Удалить заметку')"
               @click="nodeDeleteAction()"
-            ).col.q-mr-sm
+            ).col.no-wrap
             //- Save to notes
             q-btn(v-if="node.wsItemType !== 'WS_NODE'"
               outline no-caps color="white" :loading="nodeSaving" :label="$t('Сохранить заметку')" @click="nodeSaveAction()"
-            ).col.q-mr-sm
+            ).col.no-wrap
+        div(:style=`{overflow:'hidden'}`).row.full-width
+          transition(enter-active-class="animated fadeInDown" leave-active-class="animated fadeOutUp")
             //- Publish
-            q-btn(color="green" no-caps :loading="nodePublishing" :label="$t('Publish')" @click="nodePublish()").col
-      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-        fragment-editor(v-if="!showSpheres" :player="player" :contentKalpa="contentKalpa").absolute
-          q-resize-observer(@resize="fragmentHeight = $event.height")
-.row.full-width.justify-center.q-py-sm
-  q-btn(:label="showSpheres ? $t('Редактировать фрагмент') : $t('Далее')" color="green" no-caps flat @click="showSpheres=!showSpheres")
+            q-btn(v-if="showSpheres" color="green" no-caps :loading="nodePublishing" :label="$t('Publish')" @click="nodePublish()").col.q-mt-sm
+      .col
 </template>
 
 <script>
@@ -107,8 +112,6 @@ export default {
       toolTipFilterSphere: '',
       categoryError: false,
       editorHeight: 0,
-      sphereHeight: 0,
-      fragmentHeight: 0,
       editorWidth: 0,
     }
   },
@@ -119,13 +122,6 @@ export default {
       else if (l < 30) return 16
       else if (l < 40) return 14
       else return 12
-    },
-    fragmentSphereHeight () {
-      this.$logT('fragmentSphereHeight', this.fragmentSphereHeight)
-      this.$logT('sphereHeight', this.sphereHeight)
-      this.$logT('fragmentHeight', this.fragmentHeight)
-      if (this.showSpheres) return this.sphereHeight
-      else return this.fragmentHeight
     },
     node () {
       return this.player.node
