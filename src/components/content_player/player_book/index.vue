@@ -31,7 +31,7 @@ div( :style=`{height: '100%',overflow: 'hidden'}`).column.full-width.relative-po
     :style=`{zIndex: 1000, width: '70%'}`
   ).absolute-center
     player-settings(:settings="settings" @close="settingsShow = false" :style=`{borderRadius: '20px'}`).b-40
-  //- body book area wrapper
+  //- book wrapper
   div(:style=`{ border: '3px solid #222',overflow: 'hidden'}`).col.full-width.relative-position.br-10
     q-resize-observer(@resize="onResize" :debounce="300")
     //- book area
@@ -62,8 +62,6 @@ import { assert } from 'src/system/common/utils'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { getChapterIdFromCfi, getTocIdFromCfi } from 'src/system/rxdb/common'
 import { ContentApi } from 'src/api/content'
-import cloneDeep from 'lodash/cloneDeep'
-
 import playerToc from './player_toc.vue'
 import playerSettings from './player_settings.vue'
 import playerNode from './player_node.vue'
@@ -80,7 +78,6 @@ export default {
       type: Object,
       required: true
     },
-    options: {type: Object, default: {}},
     themes: {
       type: Object,
       required: true,
@@ -382,7 +379,7 @@ export default {
       }
     },
     async showAllDraftsForCurrentLocation () {
-      this.$log('showAllDraftsForCurrentLocation start')
+      this.$logT('showAllDraftsForCurrentLocation start')
       let currentLocation = await this.rendition.currentLocation()
       let chapterId = getChapterIdFromCfi(currentLocation.start.cfi)
       let tocId = getTocIdFromCfi(currentLocation.start.cfi)
@@ -396,7 +393,7 @@ export default {
         })
         // массив изменился (скорей всего создали новое ядро и оно добавилось в массив) - нарисуем заново
         this.$watch('findDraftsRes.items', async (newVal, oldVal) => {
-          // this.$log('showAllDraftsForCurrentLocation items changed', oldVal.length, newVal.length)
+          this.$logT('showAllDraftsForCurrentLocation items changed', oldVal.length, newVal.length)
           // this.clearSelection() // иначе при добавлении нового ядра, новое выделение исчезнет после клика мышкой (см addEventListener('mouseup' ...))
           await this.showAllDraftsForCurrentLocation() // выделим заново
         }, {
@@ -414,15 +411,17 @@ export default {
       }
       this.tmpDraftEpubCfis = []
       for (let draft of this.findDraftsRes.items) {
-        this.$logD('draft item=', draft)
+        // this.$logD('draft item=', draft)
         let { name, items, color } = draft
         color = color || 'grey'
         let draftEpubCfi = items[0].layers[0].figuresAbsolute[0].epubCfi
         assert(draftEpubCfi, '!draftEpubCfi')
         this.tmpDraftEpubCfis.push(draftEpubCfi)
-        let draftChapterId = getChapterIdFromCfi(draftEpubCfi)
+        let draftChapterId = draft?.meta?.chapterId || getChapterIdFromCfi(draftEpubCfi)
         let draftTocId = getTocIdFromCfi(draftEpubCfi) || ''
+        this.$logT('select draft.', chapterId, draftChapterId, draftEpubCfi)
         if (chapterId === draftChapterId /* && draftTocId === (tocId || draftTocId) */) {
+          this.$logT('annotations.highlight')
           this.rendition.annotations.remove(draftEpubCfi, 'highlight') // если такая уже есть - удалим
           this.rendition.annotations.highlight(draftEpubCfi, { draft }, async (e) => {
             this.$log('draft highlight clicked', draft)
@@ -443,9 +442,11 @@ export default {
     },
     // делаем черновик из текущего выделения
     async createColorNodeDraft (color, cfiRange, temporary = true) {
-      this.$log('createColorNodeDraft')
+      this.$logT('createColorNodeDraft')
       assert(cfiRange, 'bad cfiRange')
       let range = await this.book.getRange(cfiRange)
+      let currentLocation = await this.rendition.currentLocation()
+      let chapterId = getChapterIdFromCfi(currentLocation.start.cfi)
       let nodeInput = {
         name: '',
         thumbUrl: this.contentKalpa.thumbUrl,
@@ -460,7 +461,8 @@ export default {
         spheres: [],
         category: 'FUN',
         temporary,
-        color
+        color,
+        meta: {chapterId}
       }
       let nodeSaved = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       await this.updateSelection(color)
@@ -583,7 +585,7 @@ export default {
       // })
       // on selection, close on mouseup or touchend...
       this.rendition.on('selected', async (cfiRange, contents) => {
-        this.$log('selected', cfiRange, contents)
+        this.$logT('selected', cfiRange, contents)
         this.selectedDraft = null // сбросим. чтобы убрать окно редактирования ядра
         this.cfiRangeSelectInProgress = cfiRange // запомним тут. Обработаем в mouseup
         // let range = await this.book.getRange(cfiRange)
@@ -605,17 +607,17 @@ export default {
           // this.clearSelection() // удалим предыдущее выделение (может быть только 1 выделенный кусок)
           // выполняем через пол секунды тк mouseup срабатывает раньше чем this.rendition.on('selected'...
           this.$wait(300).then(async () => {
-            this.$log('completeSelection ')
+            this.$logT('completeSelection ')
             if (this.cfiRangeSelectInProgress) { // закончим выделение
               // this.makeSelection(this.cfiRangeSelectInProgress, 'black', '0.3')
               this.selectedDraft = await this.createColorNodeDraft('orange', this.cfiRangeSelectInProgress)
               this.cfiRangeSelectInProgress = null
-              if (this.contentsWindowSelection) this.contentsWindowSelection.removeAllRanges();
+              if (this.contentsWindowSelection && !this.$q.platform.is.mobile) this.contentsWindowSelection.removeAllRanges();
             }
           })
         }
         iframe.document.documentElement.addEventListener('mouseup', async (ev) => {
-          this.$log('mouseup', ev)
+          this.$logT('mouseup', ev)
           completeSelection()
         })
 
