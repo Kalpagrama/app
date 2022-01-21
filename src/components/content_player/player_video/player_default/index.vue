@@ -112,6 +112,12 @@ export default {
     }
   },
   watch: {
+    node(to){
+      if (!to) this.nodeMode = null
+    },
+    nodeMode(to){
+      if (!to) this.node = null
+    },
     muted: {
       handler(to) {
         if (this.playerType === 'player-youtube') {
