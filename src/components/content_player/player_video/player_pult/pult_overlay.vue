@@ -2,7 +2,7 @@
 .row.full-width
   // полоса
   div(ref="bar" :style=`{ height: '30px'}` v-touch-pan.mouse.prevent="tintOnPan" @click="tintClick").row.full-width.relative-position
-    div(:style=`{ height: '12px', pointerEvents: 'none'}`).row.full-width.absolute-center.b-70.br-5.op-60
+    div(:style=`{ height: '12px', pointerEvents: 'none'}`).row.full-width.absolute-bottom.b-70.br-5.op-60
       //- clusters
       clusters(v-if="player.clusters.length" v-bind="$props" :style=`{ pointerEvents: 'none'}`).br-5
       // fragment selected
@@ -24,8 +24,8 @@
         :style=`{ position: 'absolute', left: (player.currentTime/player.duration)*100+'%', height: '100%', width: '2px', pointerEvents: 'none'}`
         ).row.bg-green-8.br-5
   //- time bar + actions
-  .row.full-width.content-center.items-center.q-pb-sm.no-wrap
-    q-btn( round flat :color="player.muted ? 'red' : 'white'" :icon="player.muted ? 'volume_off' : 'volume_up'" @click="player.mutedToggle()")
+  .row.full-width.content-center.items-center.no-wrap
+    q-btn( dense round flat :color="player.muted ? 'red' : 'white'" :icon="player.muted ? 'volume_off' : 'volume_up'" @click="player.mutedToggle()")
     small(v-if="$screenProps.isMobile && player.nodeMode === 'edit'").text-grey-2 {{ $time(player.currentTime) }}
     small(v-else).text-grey-2 {{ $time(player.currentTime) }} / {{ $time(player.duration) }}
     .col

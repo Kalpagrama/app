@@ -13,7 +13,7 @@
   .row.full-width.justify-between
     q-btn(
       @click="figureRefresh()"
-      round flat color="white"
+      round dense flat color="white"
       ).col
       q-icon(name="replay" size="26px")
       q-tooltip(
@@ -23,14 +23,14 @@
       ) {{$t('С начала')}}
     q-btn(
       @click="player.playing ? player.pause() : player.play()"
-      round flat color="white"
+      round dense flat color="white"
       ).col
       q-icon(
         size="34px"
         :name="player.playing ? 'pause' : 'play_arrow'")
     q-btn(
       @click="isLooping = !isLooping"
-      round flat
+      round dense flat
       :color="isLooping ? 'green' : 'white'").col
       q-icon(
         name="loop"
