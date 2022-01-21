@@ -38,6 +38,8 @@ let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnu
 // in the browser, we want to persist data in IndexedDB, so we use the indexeddb adapter.
 const LokiIncrementalIndexedDBAdapter = require('lokijs/src/incremental-indexeddb-adapter');
 
+const rxdbVer = 2
+
 const purgePeriod = 1000 * 60 * 60 * 24 // раз в сутки очищать бд от мертвых строк
 const defaultCacheSize = 10 * 1024 * 1024 // кэш реактивных объектов
 if (defaultCacheSize < 10 * 1024 * 1024) logW('TODO увеличить rxDbMemCache до 10 МБ после тестирования')
@@ -68,7 +70,7 @@ function makeId (rxCollectionEnum, rawId, params = null) {
    return rxCollectionEnum + '::' + rawId + '::' + JSON.stringify(params)
 }
 
-// кээширование объектов перед rxDb (rxDb  очень медленная) (PS уже неактуально (используется LokiJS)) - можно перейти на rxdb
+// кээширование объектов перед rxDb (rxDb  очень медленная) (PS уже неактуально (используется LokiJS)) - todo можно перейти чисто на rxdb!
 class ReactiveDocDbMemCache {
    constructor () {
       this.cacheLru = new LruCache({
@@ -237,7 +239,16 @@ class RxDBWrapper {
                // pouchSettings: { revs_limit: 1 }
             })
          }
-         if (!this.db.meta) await this.db.addCollections({ meta: { schema: schemaKeyValue } })
+         if (!this.db.meta) {
+            await this.db.addCollections({
+               meta: {
+                  schema: schemaKeyValue,
+                  migrationStrategies: {
+                     1: oldDoc => oldDoc,
+                  }
+               }
+            })
+         }
 
          this.reactiveDocDbMemCache.reset()
          await this.workspace.create(this.db, store)
@@ -247,10 +258,11 @@ class RxDBWrapper {
          await this.event.create(this.workspace, this.objects, this.lists, this.cache)
          await this.gqlQueries.create(this.cache)
          if (!(await this.get(RxCollectionEnum.META, 'rxdbCreateDate', { beforeCreate: true }))) { // эта вкладка первой инициализироваля rxdb
-            await this.set(RxCollectionEnum.META, {
-               id: 'rxdbCreateDate',
-               valueString: Date.now().toString()
-            }, { beforeCreate: true })
+            await this.set(RxCollectionEnum.META, { id: 'rxdbCreateDate', value: Date.now() }, { beforeCreate: true })
+            await this.set(RxCollectionEnum.META, { id: 'rxdbVer', value: rxdbVer }, { beforeCreate: true })
+         } else {
+            let currentDataVer = await this.get(RxCollectionEnum.META, 'rxdbVer', { beforeCreate: true }) || 0
+            if (currentDataVer < rxdbVer) throw new Error(`Rxdb data created in outdated version! currentDataVer=${currentDataVer}, rxdbVer=${rxdbVer}`)
          }
          this.created = true // до setCurrentUser_internal
          logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
@@ -335,7 +347,7 @@ class RxDBWrapper {
 
    async getAuthUser () {
       assert(this.created, '!created')
-      let authUser = JSON.parse(await this.get(RxCollectionEnum.META, 'authUser') || 'null') // данные запоминаются после первого успешного setAuthUser на одной из вкладок
+      let authUser = await this.get(RxCollectionEnum.META, 'authUser') // данные запоминаются после первого успешного setAuthUser на одной из вкладок
       return authUser
    }
 
@@ -349,7 +361,7 @@ class RxDBWrapper {
       assert(userOid || dummyUser, '!userOid || dummyUser')
       try {
          await this.lock('setAuthUser')
-         await this.set(RxCollectionEnum.META, { id: 'authUser', valueString: JSON.stringify({ userOid, dummyUser }) })
+         await this.set(RxCollectionEnum.META, { id: 'authUser', value: { userOid, dummyUser } })
          setSyncEventStorageValue('k_rxdb_set_auth_user', Date.now().toString()) // сообщаем другим вкладкам
          logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } finally {
@@ -658,10 +670,10 @@ class RxDBWrapper {
          let id = makeId(rxCollectionEnum, data.oid)
          rxDoc = await this.cache.set(id, data, actualAge, notEvict)
       } else if (rxCollectionEnum === RxCollectionEnum.META) {
-         assert(data.id && data.valueString, 'bad data' + JSON.stringify(data))
+         assert(data.id && data.value !== undefined, 'bad data:' + JSON.stringify(data))
          rxDoc = await rxdbOperationProxyExec(this.db.meta, 'atomicUpsert', {
             id: makeId(rxCollectionEnum, data.id),
-            valueString: data.valueString
+            meta_data: { value: data.value }
          })
       } else {
          throw new Error('bad collection' + rxCollectionEnum)
@@ -699,12 +711,11 @@ class RxDBWrapper {
    // обновить порядок категорий (последние - вверху)
    async updateCategoryOrder (categoryType) {
       assert(categoryType)
-      let order = await this.get(RxCollectionEnum.META, 'categoryOrder') || '[]'
-      order = JSON.parse(order)
+      let order = await this.get(RxCollectionEnum.META, 'categoryOrder') || []
       let index = order.indexOf(categoryType)
       if (index !== -1) order.splice(index, 1)
       order.unshift(categoryType)
-      await this.set(RxCollectionEnum.META, { id: 'categoryOrder', valueString: JSON.stringify(order) })
+      await this.set(RxCollectionEnum.META, { id: 'categoryOrder', value: order })
       this.currentState.categoryOrder = order
       // logT('categoryOrder=', order)
    }

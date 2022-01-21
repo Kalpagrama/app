@@ -105,7 +105,7 @@ class ReactiveDocFactory {
       // logD('ReactiveDocFactory::constructor', rxDoc.id)
       if (rxDoc.wsItemType) this.itemType = 'wsItem'
       else if (rxDoc.cached) this.itemType = 'object'
-      else if (rxDoc.valueString) this.itemType = 'meta'
+      else if (rxDoc.meta_data) this.itemType = 'meta'
       else throw new Error('bad itemType')
       if (rxDoc.reactiveItemHolderMaster) {
          this.getReactive = rxDoc.reactiveItemHolderMaster.getReactive
@@ -135,7 +135,7 @@ class ReactiveDocFactory {
                      reactiveDoc.cached.data.hasChanges = reactiveDoc.cached.data.hasChanges || false
                      return reactiveDoc.cached.data // cacheSchema
                   case 'meta':
-                     return reactiveDoc.valueString // schemaKeyValue
+                     return reactiveDoc.meta_data.value // schemaKeyValue
                   default:
                      throw new Error('bad itemType: ' + this.itemType)
                }
@@ -155,8 +155,7 @@ class ReactiveDocFactory {
                      fullPath = `cached.data${payloadPath ? '.' + payloadPath : ''}`
                      break
                   case 'meta':
-                     assert(typeof value === 'string')
-                     fullPath = 'valueString'
+                     fullPath = `meta_data.value${payloadPath ? '.' + payloadPath : ''}`
                      break
                   default:
                      throw new Error('bad itemType: ' + this.itemType)
@@ -170,7 +169,8 @@ class ReactiveDocFactory {
                } else logE(`cant find prop ${fullPath} in object`, reactiveDoc)
             }
 
-            if (typeof payload === 'object') {
+            // снабжаем объект дополнительными методами
+            if (this.itemType.in('wsItem', 'object')) {
                payload.updateExtended = async (path, valueOrFunc, debouncedSave = true, synchro = true) => {
                   await updateRxDocPayload(this.rxDoc, path, valueOrFunc, debouncedSave, synchro)
                }
@@ -277,6 +277,7 @@ class ReactiveDocFactory {
 
    reactiveSubscribe () {
       const f = this.reactiveSubscribe
+      if (this.itemType === 'meta') return // Todo в принципе можно и для meta (сейчас отключено тк везде старый код принудительно вызывает rxdb.set(RxCollectionEnum.META, ...))
       if (this.itemUnsubscribeFunc) return
       // !!! нельзя ставить flush: 'sync' - жуткие тормоза при обновлении массивов
       this.itemUnsubscribeFunc = watch(() => this.vm.reactiveData, async (newVal, oldVal) => {
@@ -310,6 +311,7 @@ class ReactiveDocFactory {
             }
             this.debouncedItemSaveFunc = debounce(this.itemSaveFunc, debounceIntervalItem, { maxWait: 8888 })
          }
+
          if (this.getDebouncedSave()) {
             // logD(f, 'reactiveItem changed (rxDoc will change via debounce later)')
             this.debouncedItemSaveFunc(this.getSynchro())

@@ -34,18 +34,14 @@ function getMangoQueryFromId (id) {
 // класс для запроса списков
 class Lists {
    static async getBlackLists () {
-      let blackLists = await rxdb.get(RxCollectionEnum.META, 'blackLists')
-      if (blackLists) blackLists = JSON.parse(blackLists)
-      else blackLists = { blackListObjectOids: [], blackListAuthorOids: [] }
+      let blackLists = (await rxdb.get(RxCollectionEnum.META, 'blackLists')) || { blackListObjectOids: [], blackListAuthorOids: [] }
       assert(blackLists && blackLists.blackListObjectOids && blackLists.blackListAuthorOids, 'bad blackLists')
       return blackLists
    }
 
    // то мы можем запросить сферу до того как объект будет на нее помещен
    static async getObjectsWithRelatedSpheres () {
-      let objectsWithRelatedSpheres = await rxdb.get(RxCollectionEnum.META, 'objectsWithRelatedSpheres')
-      if (objectsWithRelatedSpheres) objectsWithRelatedSpheres = JSON.parse(objectsWithRelatedSpheres)
-      else objectsWithRelatedSpheres = []
+      let objectsWithRelatedSpheres = (await rxdb.get(RxCollectionEnum.META, 'objectsWithRelatedSpheres')) || []
       assert(objectsWithRelatedSpheres && Array.isArray(objectsWithRelatedSpheres), 'bad objectsWithRelatedSpheres')
       return objectsWithRelatedSpheres
    }
@@ -117,10 +113,7 @@ class Lists {
          }
          // удаляем из списка те, что добавились в ленты
          objectsWithRelatedSpheres = objectsWithRelatedSpheres.filter(item => !processedOids.includes(item.oid))
-         await rxdb.set(RxCollectionEnum.META, {
-            id: 'objectsWithRelatedSpheres',
-            valueString: JSON.stringify(objectsWithRelatedSpheres)
-         })
+         await rxdb.set(RxCollectionEnum.META, { id: 'objectsWithRelatedSpheres', value: objectsWithRelatedSpheres })
       }
       return rxDoc
    }
@@ -133,7 +126,7 @@ class Lists {
       let blackLists = await Lists.getBlackLists()
       if (oid && !blackLists.blackListObjectOids.includes(oid)) blackLists.blackListObjectOids.push(oid)
       else if (authorOid && !blackLists.blackListAuthorOids.includes(authorOid)) blackLists.blackListAuthorOids.push(authorOid)
-      await rxdb.set(RxCollectionEnum.META, { id: 'blackLists', valueString: JSON.stringify(blackLists) })
+      await rxdb.set(RxCollectionEnum.META, { id: 'blackLists', value: blackLists })
 
       let rxDocs = await Lists.cache.find({
          selector: {
@@ -343,10 +336,7 @@ class Lists {
       let objectsWithRelatedSpheres = await Lists.getObjectsWithRelatedSpheres()
       objectsWithRelatedSpheres.splice(10, objectsWithRelatedSpheres.length) // не более 10 последних
       objectsWithRelatedSpheres.push({ type, relatedSphereOids, oid: object.oid, name: object.name })
-      await rxdb.set(RxCollectionEnum.META, {
-         id: 'objectsWithRelatedSpheres',
-         valueString: JSON.stringify(objectsWithRelatedSpheres)
-      })
+      await rxdb.set(RxCollectionEnum.META, { id: 'objectsWithRelatedSpheres', value: objectsWithRelatedSpheres })
       // добавим на все сферы (relatedSphereOids)
       let rxDocs = await Lists.cache.find({
          selector: {

@@ -6,11 +6,11 @@ let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnu
 export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath, redirect }) => {
    // всегда запускается первым boot-модулем
    logT('boot::start')
-   if (localStorage.getItem('k_rxdb_create_date')) {
-      // alert('версия БД несовместима.')
-      await systemHardReset()
-      throw new Error('db incompatible!')
-   }
+   // if (localStorage.getItem('k_rxdb_version') && parseInt(localStorage.getItem('k_rxdb_version')) < 2) {
+   //    // alert('версия БД несовместима.')
+   //    await systemHardReset()
+   //    throw new Error('db incompatible!')
+   // }
    logT('boot::start localStorage=', localStorage)
 
    if (localStorage.getItem('k_launch_start')) {

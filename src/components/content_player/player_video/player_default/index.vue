@@ -46,6 +46,7 @@ import { debounceIntervalItem } from 'src/system/rxdb/reactive'
 import itemOverlay from 'src/components/kalpa_item/item_feed/overlay'
 import { assert } from 'src/system/common/utils'
 import { ObjectTypeEnum } from 'src/system/common/enums'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'playerDefault',
@@ -68,7 +69,7 @@ export default {
       player_: null,
       playing: false,
       playingCount: 0,
-      muted: !localStorage.getItem('k_sound'),
+      muted: true,
       duration: 0,
       currentTimeNative: 0,
       currentTime: 0,
@@ -113,17 +114,14 @@ export default {
   watch: {
     muted: {
       handler(to) {
-        if (!to) {
-          localStorage.setItem('k_sound', 'on')
-        } else {
-          localStorage.removeItem('k_sound')
-        }
         if (this.playerType === 'player-youtube') {
           this.$logT('muted changed!', !!to, this.player_)
-          this.player_.setMuted(!!to)
+          if (this.player_) this.player_.setMuted(!!to)
         } else if (this.playerType === 'player-kalpa') {
           this.$refs.videoRef.muted = !!to
         }
+        this.$rxdb.set(RxCollectionEnum.META, {id: 'sound_muted', value: to})
+            .catch(err => this.$logE('err on mutedToggle', err))
       }
     },
     url: {
@@ -218,12 +216,7 @@ export default {
         }
       }
       // Loaded!
-      // this.$nextTick(() => {
-      //   this.$emit('player', this)
-      //   if (localStorage.getItem('k_sound')) {
-      //     this.mutedToggle(false)
-      //   }
-      // })
+      this.$nextTick(() => this.$emit('player', this))
     },
     videoTimeupdate (e) {
       // this.$log('videoTimeupdate', e)
@@ -340,8 +333,9 @@ export default {
       this.setState('nodeMode', null)
     }
   },
-  mounted () {
+  async mounted () {
     this.$logT('mounted')
+    this.muted = await this.$rxdb.get(RxCollectionEnum.META, 'sound_muted')
     this.$nextTick(() => {
       this.playerCreate(this.playerType)
     })
