@@ -25,7 +25,7 @@ div(
     // middle
     .row.col
       .row.col-2
-        q-btn(flat :style=`{borderRadius: '0 50% 50% 0'}` @click="player.seek(-player.seekTime)").fit
+        q-btn(flat :style=`{borderRadius: '0 50% 50% 0'}` @click.stop="player.seek(-player.seekTime)").fit
           q-tooltip(
             anchor="center middle" self="center middle"
             transition-show="jump-right"
@@ -34,7 +34,7 @@ div(
       .row.col.items-center.content-center.justify-center
         q-icon(v-show="isOverlayShow" :name="player.playing ? 'pause' : 'play_arrow'" color="white" size="70px" @click="player.playing ? player.pause():player.play()")
       .row.col-2
-        q-btn(flat :style=`{borderRadius: '50% 0 0 50%'}` @click="player.seek(player.seekTime)").fit
+        q-btn(flat :style=`{borderRadius: '50% 0 0 50%'}` @click.stop="player.seek(player.seekTime)").fit
           q-tooltip(
             anchor="center middle" self="center middle"
             transition-show="jump-right"
