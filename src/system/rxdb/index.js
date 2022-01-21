@@ -261,7 +261,7 @@ class RxDBWrapper {
             await this.set(RxCollectionEnum.META, { id: 'rxdbCreateDate', value: Date.now() }, { beforeCreate: true })
             await this.set(RxCollectionEnum.META, { id: 'rxdbVer', value: rxdbVer }, { beforeCreate: true })
          } else {
-            let currentDataVer = await this.get(RxCollectionEnum.META, 'rxdbVer') || 0
+            let currentDataVer = await this.get(RxCollectionEnum.META, 'rxdbVer', { beforeCreate: true }) || 0
             if (currentDataVer < rxdbVer) throw new Error(`Rxdb data created in outdated version! currentDataVer=${currentDataVer}, rxdbVer=${rxdbVer}`)
          }
          this.created = true // до setCurrentUser_internal
@@ -670,10 +670,10 @@ class RxDBWrapper {
          let id = makeId(rxCollectionEnum, data.oid)
          rxDoc = await this.cache.set(id, data, actualAge, notEvict)
       } else if (rxCollectionEnum === RxCollectionEnum.META) {
-         assert(data.id && data.value, 'bad data:' + JSON.stringify(data))
+         assert(data.id && data.value !== undefined, 'bad data:' + JSON.stringify(data))
          rxDoc = await rxdbOperationProxyExec(this.db.meta, 'atomicUpsert', {
             id: makeId(rxCollectionEnum, data.id),
-            meta_data: { value: data.value || null }
+            meta_data: { value: data.value }
          })
       } else {
          throw new Error('bad collection' + rxCollectionEnum)

@@ -61,6 +61,7 @@ div(:style=`{ position: 'absolute', zIndex: 10}`).row.fit.items-start.content-st
 import { ContentApi } from 'src/api/content'
 import { assert } from 'src/system/common/utils'
 import { reactive } from 'vue'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'fromVideo',
@@ -171,9 +172,9 @@ export default {
       if (this.options.playBackState === 'paused') this.pause()
       // else if (this.options.playBackState === 'playing') this.play()
     },
-    videoClick (e) {
+    async videoClick (e) {
       // this.$log('videoClick', e)
-      if (e.target.muted && localStorage.getItem('k_sound') && !this.muted) {
+      if (e.target.muted && !(await this.$rxdb.get(RxCollectionEnum.META, 'sound_muted')) && !this.muted) {
         e.target.muted = false
       } else {
         // if (e.target.paused) e.target.play()
@@ -218,13 +219,9 @@ export default {
     mutedToggle () {
       this.$logT('mutedToggle')
       if (this.$refs.videoRef) {
-        if (this.$refs.videoRef.muted) {
-          localStorage.setItem('k_sound', 'on')
-        } else {
-          localStorage.removeItem('k_sound')
-        }
         this.$refs.videoRef.muted = !this.$refs.videoRef.muted
         this.data.player.muted = !this.data.player.muted
+        this.$rxdb.set(RxCollectionEnum.META, {id: 'sound_muted', value: !!this.$refs.videoRef.muted}).catch(err => this.$logE('err on mutedToggle', err))
       }
     },
     setCurrentTime (t) {
@@ -233,7 +230,7 @@ export default {
         this.$refs.videoRef = t + this.urlMeta[0].t
       }
     },
-    videoTimeupdate (e) {
+    async videoTimeupdate (e) {
       // this.$log('videoTimeupdate', e)
       this.data.currentTime = e.target.currentTime
       if (this.data.player) {
@@ -256,7 +253,7 @@ export default {
           currentTime: e.target.currentTime - this.urlMeta[0].t
         }
       }
-      if (localStorage.getItem('k_sound') && this.$q.platform.is.desktop && !this.muted) {
+      if (!(await this.$rxdb.get(RxCollectionEnum.META, 'sound_muted')) && this.$q.platform.is.desktop && !this.muted) {
         e.target.muted = false
         this.data.player.muted = false
       }

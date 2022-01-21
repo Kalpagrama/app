@@ -170,7 +170,7 @@ class ReactiveDocFactory {
             }
 
             // снабжаем объект дополнительными методами
-            if (typeof payload === 'object') {
+            if (this.itemType.in('wsItem', 'object')) {
                payload.updateExtended = async (path, valueOrFunc, debouncedSave = true, synchro = true) => {
                   await updateRxDocPayload(this.rxDoc, path, valueOrFunc, debouncedSave, synchro)
                }
