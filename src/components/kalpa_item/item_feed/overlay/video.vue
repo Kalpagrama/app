@@ -42,7 +42,7 @@ div(
           ) +{{player.seekTime}}{{$t('сек')}}
     // bottom
     div(v-show="isOverlayShow || (player.nodeMode && player.nodeMode.in('edit', 'focus'))" @click.stop="").row.full-width.q-px-sm
-      player-pult-overlay(:player="player" :contentKalpa="item")
+      player-pult-overlay(:player="player" :contentKalpa="item" @touchPan="onClick()")
 </template>
 
 <script>

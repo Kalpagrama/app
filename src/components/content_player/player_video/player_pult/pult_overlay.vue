@@ -72,6 +72,7 @@ import figuresControls from 'src/components/content_player/player_video/player_p
 export default {
   name: 'playerPultOverlay',
   props: ['player', 'contentKalpa', 'options'],
+  emits: ['touchPan'],
   components: { clusters, figuresControls },
   data () {
     return {
@@ -108,6 +109,7 @@ export default {
       this.currentTimeHoverPercent = (left / width) * 100
       this.currentTimeHoverTime = (left / width) * this.player.duration
       this.player.setCurrentTime(t)
+      this.$emit('touchPan') // чтобы при проматывании не скрывался pult_overlay
       // this.$logT('tintOnPan', this.currentTimeHoverPercent, this.currentTimeHoverTime)
     },
     tintMouseout(e) {
