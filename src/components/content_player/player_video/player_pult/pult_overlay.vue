@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width
   // полоса таймлайн
-  div(ref="bar" :style=`{ height: '30px'}` v-touch-pan.mouse.prevent="tintOnPan" @click="tintClick").row.full-width.relative-position
+  div(ref="bar" :style=`{ height: '30px'}` v-touch-pan.mouse.prevent="tintOnPan" @mouseout="tintMouseout" @mousemove="tintMousemove" @click="tintClick").row.full-width.relative-position
     div(:style=`{ height: '12px', pointerEvents: 'none'}`).row.full-width.absolute-center.br-5.b-70.op-60
       //- clusters
       clusters(v-if="player.clusters.length" v-bind="$props" :style=`{ pointerEvents: 'none'}`).br-5
@@ -20,9 +20,26 @@
         }`
       ).row.bg-green-8.br-5.op-90
       //- currentTime
+      div(:style=`{ position: 'absolute', left: (player.currentTime/player.duration)*100+'%', height: '100%', width: '2px', pointerEvents: 'none'}`).row.bg-green-10.br-5
+      //- currentTime hover
+      div(v-if="currentTimeHoverPercent && $screenProps.isDesktop"
+        :style=`{
+                position: 'absolute',
+                top: '-14px',
+                left: currentTimeHoverPercent+'%',
+                height: '14px',
+              }`).row.items-center.content-center
+        small.text-green-8 {{ $time(currentTimeHoverTime) }}
       div(
-        :style=`{ position: 'absolute', left: (player.currentTime/player.duration)*100+'%', height: '100%', width: '2px', pointerEvents: 'none'}`
-        ).row.bg-green-10.br-5
+        v-if="currentTimeHoverPercent && $q.screen.gt.sm"
+        :style=`{
+            position: 'absolute',
+            left: currentTimeHoverPercent+'%',
+            height: '100%',
+            width: '2px',
+            pointerEvents: 'none',
+          }`
+      ).row.bg-green-8
   //- time bar + actions
   .row.full-width.content-center.items-center.q-pb-sm.no-wrap
     q-btn( round flat :color="player.muted ? 'red' : 'white'" :icon="player.muted ? 'volume_off' : 'volume_up'" @click="player.mutedToggle()")
@@ -56,6 +73,12 @@ export default {
   name: 'playerPultOverlay',
   props: ['player', 'contentKalpa', 'options'],
   components: { clusters, figuresControls },
+  data () {
+    return {
+      currentTimeHoverTime: null,
+      currentTimeHoverPercent: null,
+    }
+  },
   computed: {
     figuresAbsolute() {
       return this.player?.node?.items[0]?.layers[0]?.figuresAbsolute || this.player.figures
@@ -73,7 +96,7 @@ export default {
       this.$log('t', t)
       this.player.setCurrentTime(t)
     },
-    tintOnPan (e) {
+    tintOnPan (e) { // перетаскивание  playhead
       let tintRect = this.$refs['bar'].getBoundingClientRect()
       let left = e.position.left - tintRect.left
       let width = tintRect.width
@@ -82,7 +105,30 @@ export default {
         return
       }
       let t = left / width * this.player.duration
+      this.currentTimeHoverPercent = (left / width) * 100
+      this.currentTimeHoverTime = (left / width) * this.player.duration
       this.player.setCurrentTime(t)
+      // this.$logT('tintOnPan', this.currentTimeHoverPercent, this.currentTimeHoverTime)
+    },
+    tintMouseout(e) {
+      this.currentTimeHoverPercent = null
+      this.currentTimeHoverTime = null
+    },
+    tintMousemove (e) {
+      // this.$logT('tintMousemove', e)
+      let rect = this.$refs['bar'].getBoundingClientRect()
+      let y = e.clientY
+      let x = e.clientX
+      // this.$log({y, yMinutes})
+      if (y < rect.top || y > rect.bottom || x < rect.left || x > rect.right) {
+        this.currentTimeHoverPercent = null
+        this.currentTimeHoverTime = null
+      }
+      else {
+        this.currentTimeHoverPercent = (x - rect.left) / rect.width * 100
+        this.currentTimeHoverTime = ((x - rect.left) / rect.width) * this.player.duration
+      }
+      // this.$logT('tintMousemove', this.currentTimeHoverPercent, this.currentTimeHoverTime)
     },
   },
   // created () {},
