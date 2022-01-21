@@ -119,7 +119,7 @@ class Cache {
          let lruDumpDoc = await rxdbOperationProxyExec(this.db.meta, 'findOne', 'lruDump')
          if (lruDumpDoc) {
             logD(f, 'восстанавливаем Lru')
-            let lruDump = JSON.parse(lruDumpDoc.valueString)
+            let lruDump = lruDumpDoc.meta_data.value
             this.cacheLru.load(lruDump)
          }
          this.debouncedDumpLru = debounce(async () => {
@@ -132,10 +132,10 @@ class Cache {
             // eslint-disable-next-line no-unreachable
             const t1 = performance.now()
             let lruDump = this.cacheLru.dump()
-            let lruDumpStr = JSON.stringify(lruDump)
+            // let lruDumpStr = JSON.stringify(lruDump)
             await rxdbOperationProxyExec(this.db.meta, 'atomicUpsert', {
                id: 'lruDump',
-               valueString: lruDumpStr
+               meta_data: {value: lruDump}
             })
             logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
          }, debounceIntervalDumpLru, { maxWait: 60 * 1000 })

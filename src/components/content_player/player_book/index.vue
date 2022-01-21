@@ -189,7 +189,7 @@ export default {
         this.$log('settings=', to)
         assert(to.fontSize && to.fontSize >= 50 && to.fontSize <= 200)
         this.rendition.themes.fontSize(to.fontSize + '%')
-        await rxdb.set(RxCollectionEnum.META, { id: 'playerBookSettings', valueString: JSON.stringify(this.settings) })
+        await rxdb.set(RxCollectionEnum.META, { id: 'playerBookSettings', value: this.settings })
       }
     },
     progressValue (val) {
@@ -570,7 +570,7 @@ export default {
       })
       this.registerThemes()
       this.setTheme(this.theme)
-      this.settings = JSON.parse(await rxdb.get(RxCollectionEnum.META, 'playerBookSettings')) || { fontSize: 100 }
+      this.settings = (await rxdb.get(RxCollectionEnum.META, 'playerBookSettings')) || { fontSize: 100 }
       // this.setFontSize(200)
       // this.rendition.themes.default({
       //   '::selection': {

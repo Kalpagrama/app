@@ -1,6 +1,6 @@
 export const schemaKeyValue = {
   title: 'schemaKeyValue',
-  version: 0,
+  version: 1,
   primaryKey: 'id',
   description: 'schemaKeyValue',
   type: 'object',
@@ -9,11 +9,11 @@ export const schemaKeyValue = {
       type: 'string',
       primary: true
     },
-    valueString: {
-      type: 'string'
+    meta_data: {
+      type: 'object'
     }
   },
-  required: ['id', 'valueString']
+  required: ['id', 'meta_data']
 }
 
 export const wsSchemaItem = {

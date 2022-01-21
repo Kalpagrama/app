@@ -243,7 +243,7 @@ class Workspace {
          const t1 = performance.now()
          assert(this.reactiveUser && this.reactiveUser.wsRevision >= 0, '!wsRevision')
          let wsFetchDate = await rxdb.get(RxCollectionEnum.META, 'wsFetchDate')
-         let wsRevisionLocal = parseInt(await rxdb.get(RxCollectionEnum.META, 'wsRevision')) || -1
+         let wsRevisionLocal = (await rxdb.get(RxCollectionEnum.META, 'wsRevision')) || -1
          let wsVersionLocal = await rxdb.get(RxCollectionEnum.META, 'wsVersion') || Date.now()
          //  reactiveUser.wsRevision - ревизия мастерской по мнению сервера (меняется в processEvent и при первой загрузке приложения)
          //  reactiveUser.wsVersion - версия мастерской (меняется сервером после пересоздания мастерской)
@@ -295,14 +295,14 @@ class Workspace {
             logT('try atomicUpsert outdated', outdatedItems.length)
             for (let outdated of outdatedItems) await rxdbOperationProxyExec(this.db.ws_items, 'atomicUpsert', outdated)
             logT('atomicUpsert complete')
-            await rxdb.set(RxCollectionEnum.META, { id: 'wsFetchDate', valueString: (new Date()).toISOString() })
-            await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsServer.rev.toString() })
-            await rxdb.set(RxCollectionEnum.META, { id: 'wsVersion', valueString: wsServer.ver.toString() })
+            await rxdb.set(RxCollectionEnum.META, { id: 'wsFetchDate', value: Date.now() })
+            await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', value: wsServer.rev })
+            await rxdb.set(RxCollectionEnum.META, { id: 'wsVersion', value: wsServer.ver })
             this.reactiveUser.wsRevision = wsServer.rev // ревизия по мнению сервера
             this.reactiveUser.wsVersion = wsServer.ver // версия мастерской по мнению сервера
             logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
          }
-         await rxdb.set(RxCollectionEnum.META, { id: 'wsSynchroDate', valueString: (new Date()).toISOString() })
+         await rxdb.set(RxCollectionEnum.META, { id: 'wsSynchroDate', value: Date.now() })
       }
       const clearTrash = async () => {
          await rxdbOperationProxy(this.db.ws_items, 'find', {
@@ -323,7 +323,7 @@ class Workspace {
       // заполняем с сервера (если еще не заполено)
       await synchronizeWsWhole()
       let unsavedItems = (await rxdbOperationProxyExec(this.db.ws_changes, 'find')).map(rxDoc => cloneDeep(rxDoc.toJSON())) // убираем реактивность
-      let wsRevisionLocal = parseInt(await rxdb.get(RxCollectionEnum.META, 'wsRevision')) || -1
+      let wsRevisionLocal = (await rxdb.get(RxCollectionEnum.META, 'wsRevision')) || -1
       let wsVersionLocal = await rxdb.get(RxCollectionEnum.META, 'wsVersion') || Date.now()
       let operations = []
       // todo - по идее это избыточно (processEvent не завязан на этот список) - убрать после презентации
@@ -386,7 +386,7 @@ class Workspace {
       try {
          await this.lock('rxdb::ws::processEvent')
          itemServer.hasChanges = false
-         let wsRevisionLocal = parseInt(await rxdb.get(RxCollectionEnum.META, 'wsRevision')) || 0 // версия локальной мастерской
+         let wsRevisionLocal = (await rxdb.get(RxCollectionEnum.META, 'wsRevision')) || 0 // версия локальной мастерской
          await this.reactiveUser.updateExtended('wsRevision', wsRevisionServer, false) // версия мастерской по мнению сервера (сохраняем в this.reactiveUser.wsRevision - нужно для synchronizeWsWhole)
          if (wsRevisionLocal !== wsRevisionServer && wsRevisionLocal + 1 !== wsRevisionServer) { // мы пропустили некоторые изменения надо синхронизировать всю мастерскую (synchronizeWsWhole)
             logW(f, `WS expired! wsRevisionLocal=${wsRevisionLocal} wsRevisionServer=${wsRevisionServer}`)
@@ -416,7 +416,7 @@ class Workspace {
             await reactiveItem.updateExtended('rev', itemServer.rev, false, false) // ревизию назначает сервер. это изменение не попадает в ws_changes (synchro = false)
          }
          // все пришедшие изменения применены. Актуализируем версию локальной мастерской (см synchronizeWsWhole)
-         await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsRevisionServer.toString() })
+         await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', value: wsRevisionServer })
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       } finally {
          this.release()
@@ -493,9 +493,8 @@ class Workspace {
             resultRxDoc = await rxdbOperationProxyExec(this.db.ws_items, 'atomicUpsert', itemCopy)
          }
          { // если синхронизация давно не делалась - форсируем (нужно для кейса, когда мастерская была очищена из другой вкладки)
-            let wsSynchroDateStr = await rxdb.get(RxCollectionEnum.META, 'wsSynchroDate')
-            let wsSynchroDate = wsSynchroDateStr ? new Date(wsSynchroDateStr) : new Date(0)
-            if ((new Date()) - wsSynchroDate > synchroTimeDefault) {
+            let wsSynchroDate = await rxdb.get(RxCollectionEnum.META, 'wsSynchroDate') || 0
+            if (Date.now() - wsSynchroDate > synchroTimeDefault) {
                this.synchroLoopWaitObj.break()// форсировать синхронизацию (см synchroLoop)
             }
          }
