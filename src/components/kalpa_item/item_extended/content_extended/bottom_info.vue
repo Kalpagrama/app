@@ -80,7 +80,7 @@
       // drafts
       .row.full-width.items-center.q-px-sm
         span(@click="pageId='drafts-' + content.type.toLowerCase()").text-grey-5.q-py-sm.q-pl-sm.cursor-pointer {{$t('Мои заметки на этом контенте')}}
-        q-icon(@click="pageId='nodes-' + content.type.toLowerCase()" dense name="expand_more" color="grey-5"  size="14px").cursor-pointer
+        q-icon(@click="pageId='drafts-' + content.type.toLowerCase()" dense name="expand_more" color="grey-5"  size="14px").cursor-pointer
       // popular nodes
       .row.full-width.items-center.q-px-sm
         span(@click="pageId='nodes-' + content.type.toLowerCase()").text-grey-5.q-py-sm.q-pl-sm.cursor-pointer {{$t('Популярные смыслы')}}
