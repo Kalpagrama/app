@@ -10,7 +10,7 @@ page-nodes-root(
   :contentKalpa="contentKalpa"
   :player="player")
   template(v-slot:header)
-    .row.full-width.items-center.content-center.q-px-md
+    .row.full-width.items-center.content-center.q-pl-md.q-pt-sm
       span.text-white.text-bold {{$t('Смысловые ядра')}}
       .col
       q-btn(round flat color="white" icon="clear" @click="$emit('close')")
