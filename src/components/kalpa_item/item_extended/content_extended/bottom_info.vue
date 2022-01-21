@@ -100,6 +100,7 @@
             item-feed(
               :itemShortOrFull="item"
               :itemState="itemState"
+              :muted="true"
               :itemIndex="itemIndex"
               :isActive="isActive"
               :isVisible="isVisible"
