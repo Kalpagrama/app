@@ -215,6 +215,8 @@ export default {
           this.duration = this.$refs.videoRef.duration
         }
       }
+      // Loaded!
+      this.$nextTick(() => this.$emit('player', this))
     },
     videoTimeupdate (e) {
       // this.$log('videoTimeupdate', e)
