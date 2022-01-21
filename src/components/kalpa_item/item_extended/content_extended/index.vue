@@ -114,6 +114,15 @@ export default {
         } catch (err) {
         }
       }
+    },
+    async player(to){
+      if (to) {
+        if (this.$route.query.draftId){
+          let draft = await this.$rxdb.get(RxCollectionEnum.WS_ANY, this.$route.query.draftId)
+          this.player.setState('node', draft)
+          this.player.setState('nodeMode', 'edit')
+        }
+      }
     }
   },
   methods: {},
