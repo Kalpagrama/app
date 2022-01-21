@@ -13,7 +13,7 @@
 
     content-player(
       :contentKalpa="content"
-      :options="{maxHeight: player && player.isFullscreen ? $q.screen.height-editorHeight:$q.screen.height/1.3}"
+      :options="{maxHeight: playerMaxHeight}"
       @player="playerReady"
       ).row.full-width
       q-resize-observer(@resize="contentHeight = $event.height")
@@ -49,6 +49,9 @@ export default {
     }
   },
   computed: {
+    playerMaxHeight() {
+      return this.player && this.player.isFullscreen ? this.$q.screen.height - this.editorHeight : this.$q.screen.height / 2
+    },
     queryClusters () {
       let res = {
         selector: {
