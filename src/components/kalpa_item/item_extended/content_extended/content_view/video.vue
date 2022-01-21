@@ -10,7 +10,7 @@
          'bg-black': !player || player.nodeMode !== 'edit',
      }`
     ).row.full-width
-    node-focused( v-if="player && player.node && player.nodeMode === 'focus'" :player="player" :contentKalpa="content")
+
     content-player(
       :contentKalpa="content"
       :options="{maxHeight: player && player.isFullscreen ? $q.screen.height-editorHeight:$q.screen.height/1.3}"
@@ -20,6 +20,7 @@
     .row.full-width.justify-center
       //div(v-if="player && player.duration > 0" :style=`{ maxWidth: 600+'px', background: 'rgba(35,35,35,0.7)', borderRadius: '20px'}`).row.full-width
       q-resize-observer(@resize="editorHeight = $event.height")
+      node-focused( v-if="player && player.node && player.nodeMode === 'focus'" :player="player" :contentKalpa="content")
       page-node-editor(v-if="player && player.duration > 0 && player.node && player.nodeMode === 'edit'" :contentKalpa="content" :player="player").row.full-width.br-10.b-35.q-mt-sm
 </template>
 

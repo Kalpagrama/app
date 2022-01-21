@@ -60,7 +60,7 @@ export default {
         if (this.player.figureFocused) {
           //
         }
-        // this.$log('player.currentTime TO', to)
+        // this.$logT('playerPult__figureControls::player.currentTime TO', to)
         if (to >= this.player.figures[1].t + 0.2) {
           if (this.isLooping) {
             this.player.setCurrentTime(this.player.figures[0].t)

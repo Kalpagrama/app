@@ -5,7 +5,7 @@ div(
   @mousemove="onMouseMove"
   @mouseout="onMouseOut"
   @mouseover="onMouseOver"
-  ).row.full-width.bg-10
+  ).row.full-width
   .column.full-width
     // top
     div(v-show="isOverlayShow").row.full-width.q-pa-xs
@@ -41,7 +41,7 @@ div(
             transition-hide="jump-up"
           ) +{{player.seekTime}}{{$t('сек')}}
     // bottom
-    div(v-show="isOverlayShow || player.nodeMode === 'edit'" @click.stop="").row.full-width.q-px-sm
+    div(v-show="isOverlayShow || (player.nodeMode && player.nodeMode.in('edit', 'focus'))" @click.stop="").row.full-width.q-px-sm
       player-pult-overlay(:player="player" :contentKalpa="item")
 </template>
 

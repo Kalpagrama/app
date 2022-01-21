@@ -194,6 +194,17 @@ export default {
       }
     }
   },
+  watch: {
+    immediate: true,
+    'player.nodeMode': {
+      handler(to) {
+        if (to === 'focus'){
+          assert(this.player.node)
+          this.pageId = 'nodes-' + this.content.type.toLowerCase()
+        }
+      }
+    }
+  },
   methods: {
     goOriginal () {
       this.$log('goOriginal')
