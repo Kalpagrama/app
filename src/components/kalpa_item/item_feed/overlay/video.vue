@@ -41,7 +41,7 @@ div(
             transition-hide="jump-up"
           ) +{{player.seekTime}}{{$t('сек')}}
     // bottom
-    div(v-show="isOverlayShow || player.nodeMode === 'edit'").row.full-width.q-px-sm
+    div(v-show="isOverlayShow || player.nodeMode === 'edit'" @click.stop="").row.full-width.q-px-sm
       player-pult-overlay(:player="player" :contentKalpa="item")
 </template>
 
