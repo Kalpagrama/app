@@ -4,7 +4,8 @@
   div(
     v-for="(cluster,clusterIndex) in player.clusters.filter(c => c.figuresAbsolute.length > 0)" :key="clusterIndex"
     :style=`{
-    position: 'absolute', zIndex: clusterIndex,
+    position: 'absolute',
+    // zIndex: clusterIndex,
     left: (cluster.figuresAbsolute[0].t/player.duration)*100+'%',
     width: ((cluster.figuresAbsolute[1].t-cluster.figuresAbsolute[0].t)/player.duration)*100+'%',
     height: '100%',

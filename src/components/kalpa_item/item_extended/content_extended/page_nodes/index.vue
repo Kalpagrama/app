@@ -11,8 +11,7 @@
         :query="query"
         :itemActivePersist="false"
         :style=`{
-          maxWidth: 600+'px',
-          //- marginBottom: '100px',
+          // maxWidth: 600+'px',
         }`
         @ready="listFeedReady")
         //- template(v-slot:prepend)

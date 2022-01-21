@@ -10,50 +10,26 @@ page-nodes-root(
   :contentKalpa="contentKalpa"
   :player="player")
   template(v-slot:header)
-    .row.full-width.items-center.content-center.q-px-md
+    .row.full-width.items-center.content-center.q-pl-md.q-pt-sm
       span.text-white.text-bold {{$t('Смысловые ядра')}}
       .col
       q-btn(round flat color="white" icon="clear" @click="$emit('close')")
   template(v-slot:item=`{item: node}`)
-    div(
-        v-if="node.items[0] && node.items[0].layers"
-        @click="nodeClick(node)"
-        :style=`{
-        }`
-        ).row.full-width.node.q-mb-sm.q-px-sm
-        div(
-          :style=`{
-            background: 'rgba(35,35,35,0.4)',
-            borderRadius: '10px',
-          }`
-          ).row.full-width
-          div(
-            :style=`{
-              background: 'rgba(40,40,40,0.4)',
-              borderRadius: '10px',
-            }`
-            ).row.full-width.items-start.content-start
-            img(
-              draggable="false"
-              :src="node.items[0].thumbUrl"
-              :style=`{
-                height: '50px',
-                borderRadius: '10px',
-              }`)
-            .col
-              .row.full-width.q-pa-sm
-                span.text-white {{ node.name }}
-                div(
-                  v-if="node.items[0] && node.items[0].layers"
-                  ).row.full-width
-                  small.text-grey-8 {{ $time(node.items[0].layers[0].figuresAbsolute[0].t) }}
-          //- selected
-          div(
-            v-if="nodeSelectedOid === node.oid"
-            ).row.full-width
-            q-btn(round flat color="white" icon="refresh" @click="nodeReplay(node)")
-            .col
-            q-btn(round flat color="white" icon="launch" @click="nodeLaunch(node)")
+    div(v-if="node.items[0] && node.items[0].layers" @click="nodeClick(node)").row.full-width.node.q-mb-sm
+        div(:style=`{border: nodeSelectedOid === node.oid ? '2px solid'+$getPaletteColor('green-8'):null}`).row.full-width.items-center.content-center.br-10.b-35
+          img(
+            draggable="false"
+            :src="node.items[0].thumbUrl"
+            :style=`{ height: '50px'}`).br-10
+          .col
+            .row.full-width.q-px-sm
+              span.text-white {{ node.name }}
+              div(
+                v-if="node.items[0] && node.items[0].layers"
+                ).row.full-width
+                small.text-grey-8 {{ $time(node.items[0].layers[0].figuresAbsolute[0].t) }}
+          q-btn(v-if="nodeSelectedOid === node.oid" round flat color="white" icon="launch" @click="nodeLaunch(node)")
+
 </template>
 
 <script>
@@ -65,30 +41,24 @@ export default {
   components: {
     pageNodesRoot,
   },
-  data () {
-    return {
-      nodeSelectedOid: null,
+  computed: {
+    nodeSelectedOid () {
+      return this?.player?.nodeMode === 'focus' ? this?.player?.node?.oid : null
     }
   },
   methods: {
-    nodeReplay (node) {
-      this.$log('nodeReplay')
-      this.player.setCurrentTime(node.items[0].layers[0].figuresAbsolute[0].t)
-      this.player.play()
-    },
     nodeClick (node) {
       this.$log('nodeClick', node)
-      // this.player.setState('node', node)
-      // this.player.setState('nodeMode', 'pick')
-      this.nodeSelectedOid = node.oid
-      this.nodeReplay(node)
-      // this.nodeLaunch(node)
+      this.player.setState('node', node)
+      this.player.setState('nodeMode', 'focus')
     },
-    nodeLaunch (node) {
+    async nodeLaunch (node) {
       this.$log('nodeLaunch', node)
-      // this.player.setState('nodeMode', 'focus')
-      this.$emit('node', node)
+      await this.$router.push('/node/' + node.oid)
     }
+  },
+  watch: {
+    //
   }
 }
 </script>

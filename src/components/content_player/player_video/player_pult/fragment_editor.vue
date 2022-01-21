@@ -134,16 +134,19 @@ export default {
         if (t > this.player.figures[1].t) this.player.figures[1].t = t
       }
     },
-    scrollGuard(whole = false) {
+    scrollGuard(force = false) {
       if (!this.ignoreScrollGuard && this.player.figures.length){
         let rangeStart = (this.scrollBarWidth / 2) + ((this.player.figures[0].t * this.totalBarWidth) / this.player.duration)
         let rangeEnd = (this.scrollBarWidth / 2) + ((this.player.figures[1].t * this.totalBarWidth) / this.player.duration)
         let screenStart = getHorizontalScrollPosition(this.$refs['scroll-bar'])
         let screenEnd = screenStart + this.scrollBarWidth
         let scrollLeft = -1
-        if (whole && (rangeStart >= screenEnd || rangeEnd <= screenStart)) scrollLeft = rangeStart - this.scrollBarWidth / 10
-        else if (rangeStart >= screenEnd) scrollLeft = rangeStart - this.scrollBarWidth
-        else if (rangeEnd <= screenStart) scrollLeft = rangeEnd
+        if (force) { // передвинуть выделенную область в центр
+          let rangeWidth = rangeEnd - rangeStart
+          scrollLeft = Math.max(0, rangeStart - (this.scrollBarWidth - rangeWidth) / 2)
+        }
+        else if (rangeStart >= screenEnd) scrollLeft = rangeStart - this.scrollBarWidth // передвинуть выделенную область чтобы было видно ее начало
+        else if (rangeEnd <= screenStart) scrollLeft = rangeEnd // передвинуть выделенную область чтобы было видно ее конец
         if (scrollLeft >= 0) {
           this.ignoreScrollGuard = true
           this.$gsap.to(this.$refs['scroll-bar'], 0.3, {

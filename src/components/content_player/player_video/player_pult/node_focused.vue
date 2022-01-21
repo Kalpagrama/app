@@ -56,9 +56,9 @@ div(
             @click="nodeShow = false"
             ).full-width.q-mt-sm
             span.text-bold {{$t('Back to watching')}}
-  q-btn(
-    @click="nodeRefresh()"
-    round flat color="white" icon="refresh")
+  //q-btn(
+  //  @click="nodeRefresh()"
+  //  round flat color="white" icon="refresh")
   div(
     @click="nodeLaunch()"
     ).col.cursor-pointer
@@ -146,11 +146,11 @@ export default {
       this.shareLink = makeRoutePath(this.player.node, true)
       await this.$systemUtils.writeToClipboard(this.shareLink, this.$t('Ссылка скопирована!'))
     },
-    nodeRefresh () {
-      this.$log('nodeRefresh')
-      this.player.setCurrentTime(this.start)
-      this.player.play()
-    },
+    // nodeRefresh () {
+    //   this.$log('nodeRefresh')
+    //   this.player.setCurrentTime(this.start)
+    //   this.player.play()
+    // },
     nodeLaunch () {
       this.$log('nodeLaunch')
       if (this.player.node.oid) {

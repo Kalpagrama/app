@@ -1,6 +1,6 @@
 <template lang="pug">
 .row.full-width
-  // полоса
+  // полоса таймлайн
   div(ref="bar" :style=`{ height: '30px'}` v-touch-pan.mouse.prevent="tintOnPan" @click="tintClick").row.full-width.relative-position
     div(:style=`{ height: '12px', pointerEvents: 'none'}`).row.full-width.absolute-bottom.b-70.br-5.op-60
       //- clusters
@@ -18,31 +18,33 @@
           borderRadius: '2px',
           pointerEvents: 'none',
         }`
-      ).row.bg-green-8.br-5.op-50
+      ).row.bg-green-8.br-5.op-90
       //- currentTime
       div(
         :style=`{ position: 'absolute', left: (player.currentTime/player.duration)*100+'%', height: '100%', width: '2px', pointerEvents: 'none'}`
-        ).row.bg-green-8.br-5
+        ).row.bg-green-10.br-5
   //- time bar + actions
-  .row.full-width.content-center.items-center.no-wrap
+  .row.full-width.content-center.items-center.no-wrap.q-py-xs
     q-btn( dense round flat :color="player.muted ? 'red' : 'white'" :icon="player.muted ? 'volume_off' : 'volume_up'" @click="player.mutedToggle()")
     small(v-if="$screenProps.isMobile && player.nodeMode === 'edit'").text-grey-2 {{ $time(player.currentTime) }}
     small(v-else).text-grey-2 {{ $time(player.currentTime) }} / {{ $time(player.duration) }}
     .col
     figures-controls(v-if="player.node" :player="player" :contentKalpa="contentKalpa").all-pointer-events
     .col
-    q-btn( v-if="player.nodeMode !== 'edit'" dense round flat color="green" icon="add_circle_outline" @click="player.fragmentSelect()")
-      q-tooltip(
-        anchor="center left" self="center right" :offset="[10, 10]"
-        transition-show="jump-right"
-        transition-hide="jump-up"
-      ) {{$t('Создать ядро')}}
-    q-btn( v-else dense round flat color="red" icon="clear" @click="player.fragmentClear()")
-      q-tooltip(
-        anchor="center left" self="center right" :offset="[10, 10]"
-        transition-show="jump-right"
-        transition-hide="jump-up"
-      ) {{$t('Закрыть')}}
+    // кнопка редактирования образа
+    div(v-if="player.nodeMode !== 'focus'").row
+      q-btn( v-if="player.nodeMode !== 'edit'" dense round flat color="green" icon="add_circle_outline" @click="player.fragmentSelect()")
+        q-tooltip(
+          anchor="center left" self="center right" :offset="[10, 10]"
+          transition-show="jump-right"
+          transition-hide="jump-up"
+        ) {{$t('Создать ядро')}}
+      q-btn( v-else dense round flat color="red" icon="clear" @click="player.fragmentClear()")
+        q-tooltip(
+          anchor="center left" self="center right" :offset="[10, 10]"
+          transition-show="jump-right"
+          transition-hide="jump-up"
+        ) {{$t('Закрыть')}}
     q-btn(dense round flat :icon="player.isFullscreen ? 'fullscreen_exit': 'fullscreen'" color="grey-5" @click="player.setState('isFullscreen', !player.isFullscreen)")
 </template>
 
