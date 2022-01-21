@@ -216,7 +216,7 @@ export default {
       }
     },
     mutedToggle () {
-      // this.$log('mutedToggle')
+      this.$logT('mutedToggle')
       if (this.$refs.videoRef) {
         if (this.$refs.videoRef.muted) {
           localStorage.setItem('k_sound', 'on')
