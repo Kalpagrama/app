@@ -67,7 +67,6 @@
     "idb-keyval": "^6.0.3",
     "lodash": "^4.17.21",
     "lru-cache": "^6.0.0",
-    "mediaelement": "^5.0.4",
     "pug": "^3.0.0",
     "quasar": "^2.4.4",
     "rxdb": "^11.1.0",
