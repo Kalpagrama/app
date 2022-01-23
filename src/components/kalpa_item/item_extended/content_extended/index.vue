@@ -109,6 +109,7 @@ export default {
       async handler (to, from) {
         try { // генерит ошибку, если действие вызвано на пользователем
           this.$store.commit('ui/stateSet', ['desktopNavigationShow', !to])
+          // eslint-disable-next-line no-constant-condition
           if (to) await this.$q.fullscreen.request()
           else if (from && this.$q.fullscreen.isActive) await this.$q.fullscreen.exit()
         } catch (err) {
