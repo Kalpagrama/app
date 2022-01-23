@@ -8,14 +8,14 @@
 // content-extended(:oid="oid")
 kalpa-layout()
   template(v-slot:footer)
-    kalpa-menu-mobile(v-if="$screenProps.isMobile && !$store.state.ui.userTyping")
-      template(v-slot:left-button)
-        nav-mobile(
-          :pageId="pageId"
-          @pageId="pageIdChange")
-      template(v-slot:center)
-        .row.content-center
-          span.text-grey-7 {{$t('Страница контента')}}
+    //kalpa-menu-mobile(v-if="$screenProps.isMobile && !$store.state.ui.userTyping")
+    //  template(v-slot:left-button)
+    //    nav-mobile(
+    //      :pageId="pageId"
+    //      @pageId="pageIdChange")
+    //  template(v-slot:center)
+    //    .row.content-center
+    //      span.text-grey-7 {{$t('Страница контента')}}
   template(v-slot:body)
     .row.full-width.items-start.content-start.justify-center
       content-extended(:oid="oid")
@@ -58,7 +58,7 @@ export default {
       async handler (to, from) {
         if (!to && this.contentKalpa && this.contentKalpa.payInfo.price && this.contentKalpa.author.oid !== this.$store.getters.currentUser.oid) {
           this.$logT('content is paid! goto short version...')
-          await this.$router.replace('/cover/' + this.contentKalpa.oid)
+          await this.$router.replace('/content/' + this.contentKalpa.oid)
         }
       }
     }

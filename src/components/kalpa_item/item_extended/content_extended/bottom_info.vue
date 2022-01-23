@@ -149,6 +149,7 @@ import { openURL } from 'quasar'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { assert } from 'src/system/common/utils'
 import cloneDeep from 'lodash/cloneDeep'
+import {UserApi} from '../../../../api/user';
 export default {
   name: 'contentInfo',
   props: {
@@ -178,6 +179,7 @@ export default {
   data () {
     return {
       pageId: null, // description|comments|essences
+      following: null,
     }
   },
   computed: {
@@ -218,6 +220,21 @@ export default {
         return ''
       }
     },
+    async followingToggle () {
+      this.$log('followingToggle')
+      let following = await UserApi.isSubscribed(this.author.oid)
+      if (following) {
+        this.following = false
+        await UserApi.unSubscribe(this.author.oid)
+      }
+      else {
+        this.following = true
+        await UserApi.subscribe(this.author.oid)
+      }
+      // TODO: handle await for real data from this query
+      // this.following = await UserApi.isSubscribed(this.user.oid)
+      // this.followingConfirmed = true
+    }
   }
 }
 </script>

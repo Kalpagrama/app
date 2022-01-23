@@ -17,11 +17,11 @@ div(:style=`{maxWidth: !isFullscreen ? $store.state.ui.pageWidth+'px' : $q.scree
           @click=""
           round flat color="white" icon="fas fa-info" :style=`{opacity:'0'}`)
     // контент
-    div(:class="$screenProps.isMobile ? '' : 'br-15'" :style=`{overflow: 'hidden'}`).row.full-width.relative-position
+    div(:class="$screenProps.isMobile ? '' : 'br-15'" :style=`{overflow: $screenProps.isMobile ? 'visible' : 'hidden'}`).row.full-width.relative-position
       q-resize-observer(@resize="bottomHeight = $q.screen.height - $event.height - headerHeight")
       content-view(:content="content" :options=`{maxHeight: $q.screen.height - headerHeight}` @player="player=$event").row.full-width
         // платный контент
-      div(v-if="content.payInfo.price").row.full-width.q-pb-xs.q-px-xs
+      div(v-if="content.payInfo.price").row.full-width.q-pa-xs.b-0
         .row.col
           small(v-if="!paid" :style=`{lineHeight: 1.2}`).text-grey.q-pt-xs.q-px-xs {{$t('Ознакомительный фрагмент')}}
         .row.q-mr-sm
