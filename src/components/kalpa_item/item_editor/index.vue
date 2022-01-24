@@ -1,77 +1,76 @@
 <template lang="pug">
-.row
-  //- content VIDEO
-  composer-video(
-    v-if="['VIDEO'].includes(item.type)"
-    :oid="item.oid"
-    :action="action"
-    :figures="null"
-    :height="$q.screen.height-0"
-    :fromComposition="false"
-    @composition="$emit('composition', $event), $emit('close')"
-    @close="$emit('composition', null), $emit('close')")
-  //- content BOOK
-  composer-book(
-    v-else-if="['BOOK'].includes(item.type)"
-    :oid="item.oid"
-    :action="action"
-    :figures="null"
-    :height="$q.screen.height-0"
-    @composition="$emit('composition', $event), $emit('close')"
-    @close="contetnClosed('BOOK')")
-  //- content IMAGE
-  composer-image(
-    v-else-if="['IMAGE'].includes(item.type)"
-    :oid="item.oid"
-    :action="action"
-    :figures="null"
-    :height="$q.screen.height-0"
-    @composition="$emit('composition', $event), $emit('close')"
-    @close="$emit('close')")
-  //- ===
-  //- composition VIDEO
-  composer-video(
-    v-else-if="item.type === 'COMPOSITION' && item.outputType === 'VIDEO'"
-    :oid="item.layers[0].contentOid"
-    :action="action"
-    :figures="item.layers[0].figuresAbsolute"
-    :height="$q.screen.height-0"
-    :fromComposition="true"
-    @composition="$emit('composition', $event), $emit('close')"
-    @close="$emit('close')")
-  //- composition BOOK
-  composer-book(
-    v-else-if="item.type === 'COMPOSITION' && item.outputType === 'BOOK'"
-    :oid="item.layers[0].contentOid"
-    :action="action"
-    :figures="item.layers[0].figuresAbsolute"
-    :height="$q.screen.height"
-    :fromComposition="true"
-    @composition="$emit('composition', $event), $emit('close')"
-    @close="$emit('close')")
-  //- composition AUDIO
-  composer-joint(
-    v-else-if="item.type === 'JOINT'"
-    :joint="item"
-    :action="action"
-    :publish="publish"
-    :height="$q.screen.height"
-    @close="$emit('close', $event)")
-  //- node
-  composer-node(
-    v-else-if="item.type === 'NODE'"
-    :item="item"
-    :isActive="true"
-    :isVisible="true"
-    :action="action"
-    :publish="publish"
-    :showActions="false"
-    :showAuthorAlways="true"
-    :showHeader="showHeader"
-    :lockName="lockName"
-    :showItems="showItems"
-    :height="$q.screen.height"
-    @close="$emit('close', $event)")
+//- content VIDEO
+composer-video(
+  v-if="['VIDEO'].includes(item.type)"
+  :oid="item.oid"
+  :action="action"
+  :figures="null"
+  :height="$q.screen.height-0"
+  :fromComposition="false"
+  @composition="$emit('composition', $event), $emit('close')"
+  @close="$emit('composition', null), $emit('close')")
+//- content BOOK
+composer-book(
+  v-else-if="['BOOK'].includes(item.type)"
+  :oid="item.oid"
+  :action="action"
+  :figures="null"
+  :height="$q.screen.height-0"
+  @composition="$emit('composition', $event), $emit('close')"
+  @close="contetnClosed('BOOK')")
+//- content IMAGE
+composer-image(
+  v-else-if="['IMAGE'].includes(item.type)"
+  :oid="item.oid"
+  :action="action"
+  :figures="null"
+  :height="$q.screen.height-0"
+  @composition="$emit('composition', $event), $emit('close')"
+  @close="$emit('close')")
+//- ===
+//- composition VIDEO
+composer-video(
+  v-else-if="item.type === 'COMPOSITION' && item.outputType === 'VIDEO'"
+  :oid="item.layers[0].contentOid"
+  :action="action"
+  :figures="item.layers[0].figuresAbsolute"
+  :height="$q.screen.height-0"
+  :fromComposition="true"
+  @composition="$emit('composition', $event), $emit('close')"
+  @close="$emit('close')")
+//- composition BOOK
+composer-book(
+  v-else-if="item.type === 'COMPOSITION' && item.outputType === 'BOOK'"
+  :oid="item.layers[0].contentOid"
+  :action="action"
+  :figures="item.layers[0].figuresAbsolute"
+  :height="$q.screen.height"
+  :fromComposition="true"
+  @composition="$emit('composition', $event), $emit('close')"
+  @close="$emit('close')")
+//- composition AUDIO
+composer-joint(
+  v-else-if="item.type === 'JOINT'"
+  :joint="item"
+  :action="action"
+  :publish="publish"
+  :height="$q.screen.height"
+  @close="$emit('close', $event)")
+//- node
+composer-node(
+  v-else-if="item.type === 'NODE'"
+  :item="item"
+  :isActive="true"
+  :isVisible="true"
+  :action="action"
+  :publish="publish"
+  :showActions="false"
+  :showAuthorAlways="true"
+  :showHeader="showHeader"
+  :lockName="lockName"
+  :showItems="showItems"
+  :height="$q.screen.height"
+  @close="$emit('close', $event)")
 </template>
 
 <script>

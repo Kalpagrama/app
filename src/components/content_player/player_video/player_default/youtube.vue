@@ -90,6 +90,7 @@ export default {
     }
   },
   created () {
+    // подсмотрено в npm vue3-youtube
     if (!window.onYouTubeIframeAPIReadyResolvers) {
       window.onYouTubeIframeAPIReadyResolvers = []
     }
