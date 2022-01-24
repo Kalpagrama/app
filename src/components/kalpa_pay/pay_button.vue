@@ -4,12 +4,12 @@ div(v-if="contentIsPaid").row
   slot(v-if="!formOnly" name="action" :start="start" :item="item")
     q-btn(
       v-if="!$slots.action"
-      round flat no-caps
-      :color="paid ? activeColor : inactiveColor"
-      icon="paid"
-      @click="showDialog = (!paid ? true : false)"
-      :loading="loading")
-      q-tooltip(dense dark) {{paid ? $t('Paid') : $t('Buy')}}
+      flat no-caps dense
+      :color="!paid ? activeColor : inactiveColor"
+      :label="buttonName"
+      @click="$store.getters.isGuest ? $store.commit('ui/stateSet', ['authGuard', {message: 'Чтобы перейти к оплате авторизуйтесь'}]) : showDialog = (!paid ? true : false)"
+      :loading="loading").q-mx-sm.q-px-sm
+      q-tooltip(v-if="buttonTooltip" dense dark) {{paid ? $t('Paid') : $t('Buy')}}
       q-dialog(
         v-model="showDialog"
         position="standard"
@@ -51,8 +51,11 @@ export default {
     item: { type: Object },
     isActive: { type: Boolean, default: true },
     formOnly: { type: Boolean, default: false },
+    buttonTooltip: { type: Boolean, default: false },
     inactiveColor: { type: String, default: 'grey-3' },
-    activeColor: { type: String, default: 'green' }
+    activeColor: { type: String, default: 'green' },
+    buttonName: { type: String, default: '' },
+    buttonIcon: { type: String, default: 'none' },
   },
   components: {
     payanywayForm

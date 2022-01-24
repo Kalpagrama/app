@@ -205,7 +205,17 @@ export default {
           this.pageId = 'nodes-' + this.content.type.toLowerCase()
         }
       }
-    }
+    },
+    author: {
+      immediate: true,
+      async handler (to, from) {
+        this.$log('user TO')
+        if (to) {
+          this.following = await UserApi.isSubscribed(to.oid)
+          this.followingConfirmed = true
+        }
+      }
+    },
   },
   methods: {
     goOriginal () {
