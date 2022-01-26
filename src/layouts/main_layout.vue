@@ -24,16 +24,12 @@ q-layout(
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="$screenProps.isDesktop && $store.state.ui.desktopNavigationShow"
-      :style=`{
-      position: 'fixed', zIndex: 3000, left: '0px', top: '0px',
-      maxWidth: ($q.screen.width - $store.state.ui.pageWidth) / 2 + 'px',
-    }`).row.fit.items-start.content-start.justify-end.q-pa-sm
+      :style=`{ maxWidth: ($q.screen.width - $store.state.ui.pageWidth) / 2 + 'px',}`
+      ).fixed-left.row.fit.items-start.content-start.justify-end.q-pa-xs.z-top
       kalpa-menu(
         :mini="($q.screen.width - $store.state.ui.pageWidth) / 2 < 280"
-        :style=`{
-        borderRadius: '10px',
-        maxWidth: ($q.screen.width - $store.state.ui.pageWidth) / 2 < 280 ? '60px' : '280px',
-      }`).fit
+        :style=`{ maxWidth: ($q.screen.width - $store.state.ui.pageWidth) / 2 < 280 ? '60px' : '280px'}`
+        ).fit.br-10
   //- mobile menu navigation
   //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     q-footer(v-if="$q.screen.lt.md && $store.state.ui.mobileNavigationShow")
