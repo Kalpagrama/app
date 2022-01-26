@@ -1,5 +1,5 @@
 <template lang="pug">
-div(id="player_youtube").row.fit
+div(id="player_youtube")
 </template>
 
 <script>

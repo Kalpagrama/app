@@ -5,7 +5,7 @@ div(:style=`{height: videoHeight+'px'}`).row.full-width.relative-position
     @loadeddata="videoLoadeddata"
     @timeupdate="videoTimeupdate"
     @pause="videoPaused"
-    @play="videoPlaying").row.full-width
+    @play="videoPlaying").row.fit
   video(v-else
     ref="videoRef"
     :src="url"
@@ -19,7 +19,7 @@ div(:style=`{height: videoHeight+'px'}`).row.full-width.relative-position
     @timeupdate="videoTimeupdate"
     @pause="videoPaused"
     @play="videoPlaying"
-  ).row.full-width
+  ).row.fit
   // затемнение для ютуба on pause and desktops only and youtube
   .row.fit.absolute
     transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")

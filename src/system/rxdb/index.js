@@ -262,7 +262,7 @@ class RxDBWrapper {
             await this.set(RxCollectionEnum.META, { id: 'rxdbVer', value: rxdbVer }, { beforeCreate: true })
          } else {
             let currentDataVer = await this.get(RxCollectionEnum.META, 'rxdbVer', { beforeCreate: true }) || 0
-            if (currentDataVer < rxdbVer) throw new Error(`Rxdb data created in outdated version! currentDataVer=${currentDataVer}, rxdbVer=${rxdbVer}`)
+            if (currentDataVer !== rxdbVer) throw new Error(`Rxdb data created in outdated version! currentDataVer=${currentDataVer}, rxdbVer=${rxdbVer}`)
          }
          this.created = true // до setCurrentUser_internal
          logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
