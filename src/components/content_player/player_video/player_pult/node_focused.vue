@@ -61,16 +61,16 @@ div(
   //  round flat color="white" icon="refresh")
   div(
     @click="nodeLaunch()"
-    ).col.cursor-pointer
+    ).row.col.cursor-pointer
     div(
       :style=`{
         textAlign: 'center'
       }`
       ).row.full-width.justify-center
-      h1(:style=`{pointerEvents: 'none'}`).text-white {{ player.node.name }}
+      span(:style=`{pointerEvents: 'none', fontSize: fontSize + 'px'}`).text-white {{ player.node.name }}
   q-btn(
     round flat color="red" icon="clear"
-    @click="player.setState('node', null)")
+    @click="player.setState('node', null)").absolute-bottom-right
 </template>
 
 <script>
@@ -93,7 +93,15 @@ export default {
     },
     end () {
       return this.player.figures[1].t
-    }
+    },
+    fontSize () {
+      let l = this.player.node.name.length
+      if (l < 20) return 22
+      else if (l < 30) return 20
+      else if (l < 40) return 16
+      else if (l >= 40) return 12
+      else return 14
+    },
   },
   watch: {
     nodeShow: {
