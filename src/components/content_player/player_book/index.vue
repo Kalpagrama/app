@@ -6,8 +6,8 @@ iframe
 </style>
 
 <template lang="pug">
-div( :style=`{height: '100%',overflow: 'hidden'}`).column.full-width.relative-position
-  player-node(:node="selectedEssence" @close="selectedEssence = null").br
+.column.fit.relative-position
+  player-node(:node="selectedEssence" @close="selectedEssence = null")
   //- fictive/invisible input for emit/on/off events with native html element events
   input(v-model="name" ref="nameInput" :style=`{display: 'none'}`)
   //- figure editor + audioplayer
@@ -207,7 +207,7 @@ export default {
       this.$set_deprecated(this, key, val)
     },
     onResize (e) {
-      this.$log('onResize', e)
+      this.$logT('onResize', {w: e.width, h: e.height})
       this.width = e.width
       this.height = e.height
       if (this.rendition) this.rendition.resize(this.width, this.height)

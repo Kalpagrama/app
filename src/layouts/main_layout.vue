@@ -23,7 +23,7 @@ q-layout(
       @close="kalpaInitialSetupShow = null")
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
-      v-if="$q.screen.gt.sm && $store.state.ui.desktopNavigationShow"
+      v-if="$screenProps.isDesktop && $store.state.ui.desktopNavigationShow"
       :style=`{
       position: 'fixed', zIndex: 3000, left: '0px', top: '0px',
       maxWidth: ($q.screen.width - $store.state.ui.pageWidth) / 2 + 'px',
