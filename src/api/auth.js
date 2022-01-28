@@ -7,6 +7,8 @@ import { rxdb } from 'src/system/rxdb'
 import { apiCall } from 'src/api'
 import { fragments } from 'src/api/fragments'
 import { EventApi } from 'src/api/event'
+import { LangEnum } from 'src/system/common/enums'
+import { getLocale } from 'src/boot/i18n'
 
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.AUTH)
 
@@ -187,8 +189,8 @@ class AuthApi {
          } = await apollo.clients.auth.query({
             query: gql`
                 ${fragments.dummyUserFragment}
-                query  ($userId: String, $forceSendConfirmation: Boolean, $masterToken: String){
-                    userIdentify(userId: $userId, forceSendConfirmation: $forceSendConfirmation, masterToken: $masterToken){
+                query  ($userId: String, $forceSendConfirmation: Boolean, $masterToken: String, $defaultLang: LangEnum){
+                    userIdentify(userId: $userId, forceSendConfirmation: $forceSendConfirmation, masterToken: $masterToken, defaultLang: $defaultLang){
                         userId
                         loginType
                         userExist
@@ -206,7 +208,8 @@ class AuthApi {
             variables: {
                userId: userId_,
                masterToken,
-               forceSendConfirmation
+               forceSendConfirmation,
+               defaultLang: getLocale()
             }
          })
          if (!token) { // сервер отверг userIdentify

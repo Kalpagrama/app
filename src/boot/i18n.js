@@ -4,13 +4,15 @@ import messages from 'src/i18n'
 
 let i18n
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
+import { LangEnum } from 'src/system/common/enums'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.BOOT)
 
-let setLocale, t
+let setLocale, getLocale, t
 
 export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath, redirect }) => {
    const f = { nameExtra: 'boot::i18n' }
    logD(f, 'start')
+   // alert('navigator.language=' + navigator.language)
    const t1 = performance.now()
    // https://vue-i18n.intlify.dev/guide/
    // https://github.com/intlify/vue-i18n-next
@@ -27,7 +29,10 @@ export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath
       messages
    })
    setLocale = locale => {
-      i18n.global.locale = locale
+      i18n.global.locale = locale || navigator.language
+   }
+   getLocale = () => {
+      return i18n.global.locale.in('ru-RU', 'RUS') ? LangEnum.RUS : LangEnum.ENG
    }
    t = i18n.global.t
    // Set i18n instance on app
@@ -35,4 +40,4 @@ export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath
    logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 })
 
-export { setLocale, t }
+export { setLocale, getLocale, t }

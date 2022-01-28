@@ -1370,6 +1370,22 @@
                 "defaultValue": null,
                 "isDeprecated": false,
                 "deprecationReason": null
+              },
+              {
+                "name": "defaultLang",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "ENUM",
+                    "name": "LangEnum",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
               }
             ],
             "type": {
@@ -12538,13 +12554,37 @@
             "deprecationReason": null
           },
           {
+            "name": "KINOUROKI",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "SYMPOSIUM",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
+            "name": "CRYPTO",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "PROGRAMMING",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "EDUCATION",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "PSYCHOLOGY",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -12557,6 +12597,12 @@
           },
           {
             "name": "LIFEHACK",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ECONOMICS",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
