@@ -11,7 +11,7 @@ import isEqual from 'lodash/isEqual'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { AuthApi } from 'src/api/auth'
-import { systemInit, systemReset } from 'src/system/services'
+import { systemHardReset, systemInit, systemReset } from 'src/system/services'
 import { EventApi } from 'src/api/event'
 import { wait } from 'src/system/common/common_func'
 
@@ -76,7 +76,7 @@ export default boot(async ({
                //       logE('AuthApi.logout error', err)
                //       window.location.reload()
                //    })
-               systemReset(true, true, true, true)
+               systemHardReset()
                // window.location.reload()
             }
          }
@@ -98,7 +98,7 @@ export default boot(async ({
             logE('gql network error ws', networkError)
             if (networkError.message === 'bad auth token!') {
                // alert('error on gql request2: ' + JSON.stringify(networkError))
-               systemReset(true, true, true, true)
+               systemHardReset()
                // window.location.reload()
             }
          }
@@ -165,8 +165,7 @@ export default boot(async ({
             createHttpLink({
                uri: linkAuth,
                fetch (uri, options) {
-                  // logD('authApollo::fetch', localStorage.getItem('k_token'))
-                  const token = localStorage.getItem('k_token')
+                  const token = rxdb.getAuthToken()
                   if (token) options.headers.Authorization = token
                   if (kDebug) options.headers['X-Kalpagrama-debug'] = 'k_debug'
                   return fetchFunc(uri, options)
@@ -183,7 +182,7 @@ export default boot(async ({
             createHttpLink({
                uri: linkApi,
                fetch (uri, options) {
-                  const token = localStorage.getItem('k_token')
+                  const token = rxdb.getAuthToken()
                   if (token) options.headers.Authorization = token
                   if (kDebug) options.headers['X-Kalpagrama-debug'] = 'k_debug'
                   return fetchFunc(uri, options)
@@ -206,7 +205,7 @@ export default boot(async ({
          reconnect: true,
          lazy: true,
          connectionParams: () => {
-            let token = localStorage.getItem('k_token')
+            let token = rxdb.getAuthToken()
             assert(token, '!token!!! сокеты включаем только когда уже открыта сессия!')
             return {
                Authorization: token,
@@ -222,7 +221,7 @@ export default boot(async ({
       //       reconnect: true,
       //       lazy: true,
       //       connectionParams: () => {
-      //          let token = localStorage.getItem('k_token')
+      //          let token = rxdb.getAuthToken()
       //          return {
       //             Authorization: token,
       //             'X-Kalpagrama-debug': kDebug ? 'k_debug' : ''
@@ -244,7 +243,7 @@ export default boot(async ({
             createUploadLink({
                uri: linkUpload,
                fetch (uri, options) {
-                  const token = localStorage.getItem('k_token')
+                  const token = rxdb.getAuthToken()
                   if (token) options.headers.Authorization = token
                   if (kDebug) options.headers['X-Kalpagrama-debug'] = 'k_debug'
                   return fetchFunc(uri, options)

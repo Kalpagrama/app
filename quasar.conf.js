@@ -18,8 +18,8 @@ const ESLintPlugin = require('eslint-webpack-plugin')
 const { configure } = require('quasar/wrappers')
 
 module.exports = configure(function (ctx) {
-   console.log('ctx = ', ctx)
-   console.log('process.env = ', process.env)
+   // console.log('ctx = ', ctx)
+   // console.log('process.env = ', process.env)
    return {
       // https://quasar.dev/quasar-cli/supporting-ts
       supportTS: false,
@@ -76,6 +76,7 @@ module.exports = configure(function (ctx) {
 
          // Quasar plugins
          plugins: [
+            'Meta',
             'Notify',
             'Screen',
             'AppVisibility',

@@ -1375,13 +1375,9 @@
                 "name": "defaultLang",
                 "description": null,
                 "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "ENUM",
-                    "name": "LangEnum",
-                    "ofType": null
-                  }
+                  "kind": "ENUM",
+                  "name": "LangEnum",
+                  "ofType": null
                 },
                 "defaultValue": null,
                 "isDeprecated": false,

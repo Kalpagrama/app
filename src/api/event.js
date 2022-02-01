@@ -109,7 +109,7 @@ class EventApi {
       const f = EventApi.init
       logD(f, 'start')
       const t1 = performance.now()
-      const kToken = localStorage.getItem('k_token')
+      const kToken = rxdb.getAuthToken()
       if (!kToken) {
          logT(f, 'session is not initialized! cancel EventApi::init!')
          return false

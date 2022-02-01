@@ -11,7 +11,7 @@ export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath
    //    await systemHardReset()
    //    throw new Error('db incompatible!')
    // }
-   logT('boot::start localStorage=', localStorage)
+   // logT('boot::start localStorage=', localStorage)
 
    if (localStorage.getItem('k_launch_start')) {
       // предыдущий запуск был неудачным

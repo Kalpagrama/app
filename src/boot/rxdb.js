@@ -12,9 +12,8 @@ export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath
       try {
          await rxdb.create(store)
       } catch (err) { // такое может быть если например, обновилась схема данных...
-         logE('err on rxdb create! try to reset')
-         await rxdb.reset(store)
-         logT('reset complete!')
+         logE('err on rxdb create! try to systemHardReset', err)
+         await systemHardReset()
       }
       app.config.globalProperties.$rxdb = rxdb
       logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)

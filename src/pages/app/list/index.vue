@@ -26,7 +26,7 @@ export default {
     listSearch,
   },
   created(){
-    this.$logW('CREATED', this.listName)
+    this.$logD('CREATED', this.listName)
   }
 }
 </script>

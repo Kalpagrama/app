@@ -6,6 +6,7 @@ import routes from './routes'
 import { t } from 'src/boot/i18n'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { AuthApi } from 'src/api/auth'
+import { rxdb } from 'src/system/rxdb'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.ROUTER)
 
 /*
@@ -45,7 +46,7 @@ export default route(function ({ app, store, ssrContext, urlPath, publicPath, re
     }
     if (to.query.masterToken) {
       console.log('clone session!', to.query.masterToken)
-      if (localStorage.getItem('k_token') !== to.query.masterToken) { // userIdentify на сервере аннулирует текущую сессию
+      if (rxdb.getAuthToken() !== to.query.masterToken) { // userIdentify на сервере аннулирует текущую сессию
         await AuthApi.userIdentify(null, to.query.masterToken)
         await AuthApi.userAuthenticate(null)
       }

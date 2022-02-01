@@ -59,7 +59,7 @@ class SystemUtils {
    }
 
    async reset () {
-      await systemReset(false, true, true, true)
+      await systemReset(false, true, true)
       // window.location.reload()
    }
 
@@ -110,7 +110,7 @@ async function initApplication () {
    window.addEventListener('storage', async function (event) {
       try {
          await storageEventMutex.lock('onStorageEvent')// события валятся параллельно (второе приходит не дожидаясь выполнения первого)
-         if (!event.key || !event.key.in('k_login_date', 'k_logout_date', 'k_rxdb_reset_date', 'k_rxdb_set_auth_user')) return
+         if (!event.key || !event.key.in('k_rxdb_ws_ready', 'k_rxdb_set_auth_data')) return
          if (event.newValue) {
             logD('storage sync event:', event)
             const getSyncEventStorageValue = (strValue) => { // В сафари событие срабатывает и на вкладке, которая инициировала изменения
@@ -119,16 +119,8 @@ async function initApplication () {
                if (res.instanceId !== mutexGlobal.getInstanceId()) return res.value // не реагируем сами на себя
             }
             switch (event.key) {
-               case 'k_login_date':
-                  logD(`localStorage auth event: ${event.key}`, event)
-                  if (getSyncEventStorageValue(event.newValue)) await router.replace('/home')
-                  break
-               case 'k_logout_date':
-                  logD(`localStorage auth event: ${event.key}`, event)
-                  if (getSyncEventStorageValue(event.newValue)) await router.replace('/auth')
-                  break
-               case 'k_rxdb_reset_date':
-               case 'k_rxdb_set_auth_user':
+               case 'k_rxdb_set_auth_data':
+               case 'k_rxdb_ws_ready':
                   if (getSyncEventStorageValue(event.newValue)) await rxdb.processStoreEvent(event.key)
                   break
             }
@@ -146,7 +138,7 @@ async function initApplication () {
 function setSyncEventStorageValue (key, value) {
    const f = setSyncEventStorageValue
    logD(f, key, value, mutexGlobal.getInstanceId())
-   assert(key.in('k_login_date', 'k_logout_date', 'k_rxdb_reset_date', 'k_rxdb_set_auth_user'), 'bad key: ' + key)
+   assert(key.in('k_rxdb_ws_ready', 'k_rxdb_set_auth_data'), 'bad key: ' + key)
    assert(key && value && mutexGlobal.getInstanceId(), '!key && value' + key + value)
    localStorage.setItem(key, JSON.stringify({ value, instanceId: mutexGlobal.getInstanceId() })) // сообщаем другим вкладкам
 }
@@ -253,97 +245,57 @@ async function resetLocalStorage () {
 
 // очистить кэши и БД
 // todo если systemReset не помогает вызывается слишком часто - во второй попробовать hardReset
-async function systemReset (clearAuthData = false, clearRxdb = true, pwaResetFlag = true, autoInit = true) {
+async function systemReset (clearAuthData = false, clearRxdb = true, pwaResetFlag = true) {
    const f = systemReset
    const t1 = performance.now()
    logT(f, 'start')
    try {
       await mutexGlobal.lock('system::systemReset')
-      if (clearRxdb) await rxdb.reset(store) // сначала очистим базу, потом resetLocalStorage (ей может понадобиться k_token)
-      if (clearAuthData) await resetLocalStorage()
+      await resetLocalStorage()
+      if (clearRxdb) await rxdb.clear() // сначала очистим базу, потом resetLocalStorage (ей может понадобиться k_token)
+      if (clearAuthData) await rxdb.clearAuthData()
       if (pwaResetFlag && process.env.MODE === 'pwa') await pwaReset()
-      if (clearAuthData) {
-         // сообщаем другим вкладкам
-         setSyncEventStorageValue('k_logout_date', Date.now().toString())
-      }
-      if (autoInit) await systemInit()
+      await systemInit()
       await mutexGlobal.release('system::systemReset')
       logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    } catch (err) {
       await mutexGlobal.release('system::systemReset')
       logE('Критическая ошибка в systemReset', err)
-      alert(`Критическая ошибка в systemReset err=${JSON.stringify(err)}.\n Очистка данных и перезагрузка`)
-      await systemHardReset() // вызовет перезагрузку страницы
+      let hr = confirm('critical error on systemReset\n make systemHardReset?')
+      if (hr) await systemHardReset()
    }
 }
 
-// если уже войдено - ничего не сделает (опирается на k_user_oid и k_token)
-// если не войдено - попытается войти
+// если надо - создаст сессиию. инициализирует rxdb
 async function systemInit (recursive = false) {
    const f = systemInit
    logT(f, 'start')
    const t1 = performance.now()
    try {
-      if (await rxdb.getAuthUser() && localStorage.getItem('k_token')) { // уже войдено!
-         logT(f, 'skip systemInit')
-         // alert('skip systemInit')
-         window.KALPA_LOAD_COMPLETE = true
-      } else { // войти
-         try {
-            await mutexGlobal.lock('system::systemInit')
-            let userOid = localStorage.getItem('k_user_oid')
-            if (userOid) { // пользователь зарегистрирован
-               // alert(' systemInit 1 ')
-               await rxdb.setAuthUser({ userOid })
-            } else { // пытаемся войти без регистрации
-               // alert(' systemInit 2 ')
-               if (localStorage.getItem('k_token') && await rxdb.getAuthUser()) {
-                  // есть k_token, но нет userOid
-                  try { // если токен уже подтвержден, то userAuthenticate сработает нормально
-                     await AuthApi.userAuthenticate(null)
-                  } catch (err) {
-                     logW('не удалось войти по токену', localStorage.getItem('k_token'))
-                     localStorage.removeItem('k_token')
-                  }
-               }
-               if (!localStorage.getItem('k_token') || !(await rxdb.getAuthUser())) {
-                  // alert(' systemInit 3 ')
-                  const {
-                     userExist,
-                     userId,
-                     needInvite,
-                     needConfirm,
-                     dummyUser,
-                     loginType
-                  } = await AuthApi.userIdentify(null)
-                  logT('userIdentify = ', { userExist, userId, needInvite, needConfirm, dummyUser, loginType })
-                  if (needConfirm === false && dummyUser) {
-                     await rxdb.setAuthUser({ dummyUser })
-                  }
-               }
-            }
-            setSyncEventStorageValue('k_login_date', Date.now().toString()) // сообщаем другим вкладкам
-            // alert(' systemInit 7 ')
-         } finally {
-            await mutexGlobal.release('system::systemInit')
-         }
+      await mutexGlobal.lock('system::systemInit')
+      if (!rxdb.getAuthToken()) { // откроем сессию
+         const {
+            userExist,
+            userId,
+            needInvite,
+            needConfirm,
+            dummyUser,
+            loginType
+         } = await AuthApi.userIdentify(null)
+         logT('userIdentify = ', { userExist, userId, needInvite, needConfirm, dummyUser, loginType })
       }
-      let settings = await rxdb.get(RxCollectionEnum.GQL_QUERY, 'settings')
-      let authUser = await rxdb.getAuthUser()
-      assert(settings) // заполняется в boot::apollo
-      assert(authUser) // заполняется при первом запуске
-      await rxdb.setup(authUser, settings)
-      assert(rxdb.getCurrentUser())
+      await rxdb.init() // запросит юзера на основе userOid
+      assert(rxdb.getCurrentUser()) // либо DummyUser, либо настоящий
       await setLocale(rxdb.getCurrentUser().profile.lang)
       window.KALPA_LOAD_COMPLETE = true
       logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+      await mutexGlobal.release('system::systemInit')
    } catch (err) {
+      await mutexGlobal.release('system::systemInit')
       logC('error on systemInit!', err)
-      if (!recursive){
-         logT('try systemReset')
-         await systemReset(true, true, true, true)
-         logT('systemInit after error complete')
-      }
+      alert('critical error on systemInit!')
+      let hr = confirm('critical error on systemInit\n make systemHardReset?')
+      if (hr) await systemHardReset()
    }
 }
 

@@ -11,10 +11,7 @@ import { eventBus } from 'src/boot/libs'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_EVENT)
 
 class Event {
-   async destroy (clearStorage) {
-      if (this.created) {
-         this.created = false
-      }
+   async clear () {
    }
 
    async create (workspace, objects, lists, cache) {

@@ -31,13 +31,17 @@ class QueryAccumulator {
       }, 300, { maxWait: 1500 })
    }
 
-   // Данные были запрошены, но уже не нужны. отменит запрос во всех очередях
-   cancel (queryId) {
-      assert(queryId)
-      let canceledItems = [...this.queueMaster.filter(item => item.queryId === queryId), ...this.queueSecondary.filter(item => item.queryId === queryId)]
+   // Данные были запрошены, но уже не нужны. отменит запрос во всех очередях. Если queryId не указано, то отменит все
+   cancel (queryId = null) {
+      let canceledItems = [...this.queueMaster, ...this.queueSecondary]
+      if (queryId) canceledItems = canceledItems.filter(item => item.queryId === queryId)
       for (let item of canceledItems) item.reject('queued item was evicted by cancel')
-      this.queueMaster = this.queueMaster.filter(item => item.queryId !== queryId)
-      this.queueSecondary = this.queueSecondary.filter(item => item.queryId !== queryId)
+      if (queryId) {
+         this.queueMaster = this.queueMaster.filter(item => item.queryId !== queryId)
+         this.queueSecondary = this.queueSecondary.filter(item => item.queryId !== queryId)
+      } else {
+         this.queueMaster = this.queueSecondary = []
+      }
       logD('cancel queue. size=', this.queueSz(this.queueMaster), this.queueMaster.length, Array.from(new Set(this.queueMaster.map(item => item.oid))))
       return null
    }
@@ -269,10 +273,9 @@ function getOidFromId (id) {
 
 // класс для запроса списков и отдельных объектов
 class Objects {
-   async destroy (clearStorage) {
-      if (this.created) {
-         this.created = false
-      }
+   async clear () {
+      assert(this.created)
+      this.queryAccumulator.cancel() // отменим все запросы в очереди
    }
 
    async create (cache) {

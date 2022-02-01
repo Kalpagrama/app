@@ -3,12 +3,12 @@ import gql from 'graphql-tag'
 import { getLogFunctions, LogSystemModulesEnum, performance } from 'src/boot/log'
 import { systemInit, systemReset } from 'src/system/services'
 import {assert} from 'src/system/common/utils'
-import { rxdb } from 'src/system/rxdb'
+import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import { apiCall } from 'src/api'
 import { fragments } from 'src/api/fragments'
 import { EventApi } from 'src/api/event'
 import { LangEnum } from 'src/system/common/enums'
-import { getLocale } from 'src/boot/i18n'
+import { getLocale, t } from 'src/boot/i18n'
 
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.AUTH)
 
@@ -70,10 +70,7 @@ class AuthApi {
    }
 
    static async checkExpire () {
-      if (localStorage.getItem('k_token_expires')) {
-         let expires = localStorage.getItem('k_token_expires')
-         // todo при необходимости продлить токен (если скоро истекает)
-      }
+      // todo при необходимости продлить токен (если скоро истекает)
    }
 
    // static async services () {
@@ -132,7 +129,7 @@ class AuthApi {
    }
 
    // если токен = null - выйдет из всех сессий
-   static async logout (token = localStorage.getItem('k_token')) {
+   static async logout (token = rxdb.getAuthToken()) {
       const f = AuthApi.logout
       logD(f, 'start')
       const t1 = performance.now()
@@ -154,12 +151,10 @@ class AuthApi {
          await apiCall(f, cb)
       } catch (err) {
          logE('err on logout', err)
-         await systemReset(true, true, true, true) // вне cb (иначе дедлок)
-         // window.location.reload()
          return
       }
-      if (!token || token === localStorage.getItem('k_token')) {
-         await systemReset(true, true, true, true) // вне cb (иначе дедлок)
+      if (!token || token === rxdb.getAuthToken()) {
+         await rxdb.clearAuthData()
       }
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
@@ -167,10 +162,10 @@ class AuthApi {
    // после вызова этого метода - система непригодна для использования тк нет юзера. юзер устанавливается либо через userAuthenticate->systemInit, либо systemInit->userIdentify
    static async userIdentify (userId_, masterToken = null, forceSendConfirmation = false) {
       const f = AuthApi.userIdentify
-      logD(f, 'start. userId= ', userId_)
+      logT(f, 'start. userId= ', userId_)
       const t1 = performance.now()
       // autoInit=false - systemInit не вызывается!
-      await systemReset(true, true, false, false) // вне cb (иначе дедлок)
+      await rxdb.clearAuthData()
       const cb = async () => {
          let {
             data: {
@@ -213,11 +208,8 @@ class AuthApi {
             }
          })
          if (!token) { // сервер отверг userIdentify
-            alert('cant login!') // TODO
+            alert('cant login!' + t('сервер отверг запрос на userIdentify')) // TODO
          }
-         localStorage.setItem('k_token', token)
-         localStorage.setItem('k_token_expires', expires)
-         await EventApi.init()
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
          return {
             userId,
@@ -232,7 +224,9 @@ class AuthApi {
          }
       }
       let res = await apiCall(f, cb)
+      await rxdb.setAuthData({authToken: res.token, dummyUser: res.dummyUser})
       await EventApi.init() // нужно для получения эвента с кодом после перехода по ссылке с почты
+      logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       return res
    }
 
@@ -244,7 +238,7 @@ class AuthApi {
       const t1 = performance.now()
       assert(route && route.query && route.query.token, '!route && route.query && route.query.token')
       // autoInit=false - systemInit не вызывается!
-      await systemReset(true, true, false, false) // вне cb (иначе дедлок)
+      await rxdb.clearAuthData()
       const cb = async () => {
          let token, expires, userId, loginType, needInvite, needConfirm, userExist
          // take token from redirect url
@@ -255,13 +249,13 @@ class AuthApi {
          needInvite = route.query.needInvite === 'true'
          needConfirm = route.query.needConfirm === 'true'
          userExist = route.query.userExist === 'true'
-         localStorage.setItem('k_token', token)
-         localStorage.setItem('k_token_expires', expires)
-         await EventApi.init()
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
          return { userId, loginType, userExist, needInvite, needConfirm, token, expires }
       }
-      return await apiCall(f, cb)
+      let res = await apiCall(f, cb)
+      await rxdb.setAuthData({authToken: res.token})
+      await EventApi.init()
+      return res
    }
 
    static async userAuthenticate (password, inviteCode) {
@@ -295,12 +289,12 @@ class AuthApi {
             `,
             variables: { password: password || '', inviteCode }
          })
-         if (oid) localStorage.setItem('k_user_oid', oid)
-         return { result, role, nextAttemptDate, attempts, failReason }
+         return { result, oid, role, nextAttemptDate, attempts, failReason }
       }
       let res = await apiCall(f, cb)
       if (res.result) {
-         await systemInit() // вне cb (иначе дедлок)
+         assert(res.oid)
+         await rxdb.setAuthData({userOid: res.oid})
          // setWebPushToken мог быть вызван до userIdentify
          if (currentWebPushToken) await AuthApi.setWebPushToken(currentWebPushToken) // вне cb (иначе дедлок)
       }
@@ -340,23 +334,19 @@ class AuthApi {
       const cb = async () => {
          assert(token)
          currentWebPushToken = token
-         if (!localStorage.getItem('k_token')) {
-            // запомнили currentWebPushToken. вызовем setWebPushToken повторно в userAuthenticate
-            return
-         }
-         if (AuthApi.isGuest()) {
-            return
-         }
-         if (localStorage.getItem('k_web_push_token') === currentWebPushToken) { // (чтобы не дергать сервер каждый раз с одим и тем же токеном)
-            return
-         }
+         // запомнили currentWebPushToken. вызовем setWebPushToken повторно в userAuthenticate
+         if (!rxdb.getAuthToken()) return
+         if (AuthApi.isGuest()) return
+         // (чтобы не дергать сервер каждый раз с одим и тем же токеном)
+         if (await rxdb.get(RxCollectionEnum.META, 'webPushToken') === currentWebPushToken) return
+
          let { data: { setWebPushToken } } = await apollo.clients.auth.query({
             query: gql`query ($token: String!) {
                 setWebPushToken (token: $token)
             }`,
             variables: { token: currentWebPushToken }
          })
-         localStorage.setItem('k_web_push_token', currentWebPushToken)
+         await rxdb.set(RxCollectionEnum.META, { id: 'webPushToken', value: currentWebPushToken })
          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       }
       return await apiCall(f, cb)

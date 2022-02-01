@@ -31,7 +31,6 @@ async function apiCall (func, cb, serialize = true) {
    } catch (err) {
       logE('apiCall ERROR', err)
       notify('error', `ошибка при выполнении запроса: ${err.message}`)
-      // if (localStorage.getItem('k_token')) throw err // если нет k_token - ошибку не генерим (надо для входа по dev.kalpa.app/?token=...)
       throw err
    } finally {
       if (serialize) apiMutex.release()

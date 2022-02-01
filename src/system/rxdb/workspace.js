@@ -18,11 +18,12 @@ import intersectionWith from 'lodash/intersectionWith'
 import { getRxCollectionEnumFromId, rxdb } from 'src/system/rxdb'
 import { isRxDocument } from 'rxdb'
 import { updateRxDocPayload } from 'src/system/rxdb/reactive'
+import { setSyncEventStorageValue } from 'src/system/services'
 
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_WS)
 
-const synchroTimeDefault = 1000 * 60 * 1 // раз в 1 минут шлем изменения на сервер
-// const synchroTimeDefault = 1000 * 10 // раз в 1 минут шлем изменения на сервер
+// const synchroTimeDefault = 1000 * 60 * 1 // раз в 1 минут шлем изменения на сервер
+const synchroTimeDefault = 1000 * 10 // раз в 1 минут шлем изменения на сервер
 if (synchroTimeDefault < 1000 * 60 * 1) logE('TODO increase synchroTimeDefault')
 
 // logE('synchroTimeDefault!!! 1000 * 10')
@@ -64,56 +65,49 @@ class Workspace {
       this.synchroLoopWaitObj = new WaitBreakable(synchroTimeDefault)
    }
 
-   async destroy (clearStorageMethod) {
+   async clear () {
+      const f = this.clear
+      const t1 = performance.now()
+      logT(f, 'start')
       await this.switchOffSynchro() // до await this.lock
+      this.store.commit('core/stateSet', ['wsReady', false])
       try {
-         await this.lock('ws::destroy')
-         this.created = false
-         if (clearStorageMethod === 'destroy') {
-            if (this.db && this.db.ws_items) await rxdbOperationProxyExec(this.db.ws_items, 'destroy')
-            if (this.db && this.db.ws_changes) await rxdbOperationProxyExec(this.db.ws_changes, 'destroy')
-         } else if (clearStorageMethod === 'remove_collections') {
-            if (this.db && this.db.ws_items) await rxdbOperationProxyExec(this.db.ws_items, 'remove')
-            if (this.db && this.db.ws_changes) await rxdbOperationProxyExec(this.db.ws_changes, 'remove')
-         } else if (clearStorageMethod === 'remove_rows') {
-            if (this.db && this.db.ws_items) {
-               let query = rxdbOperationProxy(this.db.ws_items, 'find')
-               await query.remove();
-            }
-            if (this.db && this.db.ws_changes) {
-               let query = rxdbOperationProxy(this.db.ws_changes, 'find')
-               await query.remove();
-            }
-         }
-         this.db = null
-         this.store.commit('core/stateSet', ['wsReady', false])
+         await this.lock('ws::clear')
+         this.clearInProgress = true
+         assert(this.db && this.db.ws_items && this.db.ws_changes)
+         await rxdbOperationProxy(this.db.ws_items, 'find').remove()
+         await rxdbOperationProxy(this.db.ws_changes, 'find').remove()
+         this.synchroLoopWaitObj.break()// форсировать синхронизацию (см synchroLoop)
       } finally {
+         delete this.clearInProgress
          this.release()
       }
+      logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
+   // один раз на старте
    async create (db, store) {
       const f = this.create
       const t1 = performance.now()
       assert(db && store)
+      assert(!this.clearInProgress)
       try {
          await this.lock('create')
          this.db = db
          this.store = store
-         if (!this.db.ws_items) {
-            await this.db.addCollections({
-               ws_items: {
-                  schema: wsSchemaItem,
-                  migrationStrategies: {
-                     // ..., - см wsSchemaItem.version (из schema.js)
-                     1: oldDoc => oldDoc,
-                     2: oldDoc => oldDoc,
-                     3: oldDoc => oldDoc
-                  }
+         assert(!this.db.ws_items && !this.db.ws_changes)
+         await this.db.addCollections({
+            ws_items: {
+               schema: wsSchemaItem,
+               migrationStrategies: {
+                  // ..., - см wsSchemaItem.version (из schema.js)
+                  1: oldDoc => oldDoc,
+                  2: oldDoc => oldDoc,
+                  3: oldDoc => oldDoc
                }
-            })
-         }
-         if (!this.db.ws_changes) await this.db.addCollections({ ws_changes: { schema: wsSchemaLocalChanges } })
+            }
+         })
+         await this.db.addCollections({ ws_changes: { schema: wsSchemaLocalChanges } })
          assert(this.db.ws_items && this.db.ws_changes, '!this.db.ws_items && this.db.ws_changes')
          // обработка события измения мастерской пользователем (запоминает измененные элементы)
          let onWsChangedByUser = async (id, operation, plainData) => {
@@ -170,10 +164,11 @@ class Workspace {
             await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT, plainData)
          }, false)
          this.db.ws_items.postRemove(async (plainData) => {
-            if (!this.created) return // см. destroy ('remove_rows')
+            // todo проверить что эта схема корректно отрабатывает с this.clear()
+            if (this.clearInProgress) return // см. this.clear
             // сработает НЕ на всех вкладках (только на той, что изменила итем)
             // если !rev - то элемент еще не создавался на сервере (удалять с сервера не надо его) либо его там УЖЕ нет (см synchronize)
-            logD('postRemove')
+            logT('postRemove', plainData.id)
             if (plainData.rev) await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE, plainData)
             rxdb.onRxDocDelete(plainData.id) // удалить из lru(иначе он будет находиться через rxdb.get())
             // plainData.deletedAt = Date.now()
@@ -186,7 +181,7 @@ class Workspace {
                f.nameExtra = 'synchroLoop'
                logD(f, 'start')
                while (true) {
-                  if (this.created && this.db && this.reactiveUser && this.synchro && rxdb.hasCurrentUser && mutexGlobal.isLeader()) {
+                  if (this.created && this.db && this.reactiveUser && this.synchro && rxdb.getCurrentUser() && mutexGlobal.isLeader()) {
                      try {
                         await mutexGlobal.lock('ws::synchroLoop')
                         await this.lock('ws::synchroLoop')
@@ -215,6 +210,7 @@ class Workspace {
       const f = this.switchOnSynchro
       assert(reactiveUser, '!reactiveUser')
       assert(reactiveUser.oid, '!reactiveUser.oid')
+      assert(!this.clearInProgress)
       // reactiveUser.wsRevision - версия мастерской по мнению сервера
       assert(reactiveUser.wsRevision >= 0, '!reactiveUser.wsRevision')
       assert(reactiveUser.wsVersion, '!reactiveUser.wsVersion')
@@ -235,6 +231,7 @@ class Workspace {
    async synchronize () {
       const f = this.synchronize
       logT(f, 'start')
+      assert(!this.clearInProgress)
       const t1 = performance.now()
       // запросит при необходимости данные и сольет с локальными изменениями
       const synchronizeWsWhole = async (forceMerge = false) => {
@@ -370,6 +367,7 @@ class Workspace {
          }
       }
       this.store.commit('core/stateSet', ['wsReady', true])
+      setSyncEventStorageValue('k_rxdb_ws_ready', Date.now().toString()) // сообщаем другим вкладкам (они вызовут this.store.commit('core/stateSet', ['wsReady', true]))
       logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`, unsavedItems)
    }
 
@@ -378,6 +376,7 @@ class Workspace {
       const f = this.processEvent
       const t1 = performance.now()
       logT(f, 'start', event)
+      assert(!this.clearInProgress)
       let { type: typeOperationServer, wsItem: itemServer, wsRevision: wsRevisionServer } = event
       assert(this.created, '!this.created')
       assert(this.reactiveUser, '!this.reactiveUser') // почему я получил этот эвент, если я гость???
@@ -426,6 +425,7 @@ class Workspace {
 
    async find (mangoQuery) {
       const f = this.find
+      assert(!this.clearInProgress)
       assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 2' + JSON.stringify(mangoQuery))
       let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
       assert(rxCollectionEnum in WsCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
@@ -440,10 +440,11 @@ class Workspace {
 
    // изменить существующий либо добавить новый
    async set (item) {
-      assert(item.wsItemType in WsItemTypeEnum, '!itemCopy.wsItemType in WsItemTypeEnum')
       const f = this.set
       logD(f, 'start')
       const t1 = performance.now()
+      assert(!this.clearInProgress)
+      assert(item.wsItemType in WsItemTypeEnum, '!itemCopy.wsItemType in WsItemTypeEnum')
       let existingOtherRxDoc
       try {
          await this.lock('rxdb::ws::set') // нельзя чтобы метод сработал во время synchronize
@@ -508,6 +509,7 @@ class Workspace {
 
    // проанализировать wsItem. Вытащить из него все сферы и добавить их в мастерскую
    async updateWsSpheres (wsItemRxDoc) {
+      assert(!this.clearInProgress)
       if (wsItemRxDoc.wsItemType === WsItemTypeEnum.WS_HISTORY) return // не обновляем сферы для ядер, которые пользователь просто серфит
       // найдем все сферы этой сути и добавим их в мастерскую + добавим себя в newSphere.wsSphereItems
       if (wsItemRxDoc.type && wsItemRxDoc.type.in('NODE', 'JOINT', 'BLOCK') && wsItemRxDoc.oid) {
@@ -550,6 +552,7 @@ class Workspace {
 
    // добавить на wsItem contentOids(для позиционирования черновиков на контенте)
    async updateContentOids (wsItemRxDoc) {
+      assert(!this.clearInProgress)
       assert(wsItemRxDoc && isRxDocument(wsItemRxDoc))
       let getContentOids = (item, type) => {
          assert(type && type in WsItemTypeEnum)
@@ -591,6 +594,7 @@ class Workspace {
       const f = this.get
       logD(f, 'start', id)
       const t1 = performance.now()
+      assert(!this.clearInProgress)
       let rxDoc = await rxdbOperationProxyExec(this.db.ws_items, 'findOne', id)
       logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       return rxDoc
@@ -603,6 +607,7 @@ class Workspace {
          await this.lock('rxdb::ws::remove') // нельзя чтобы метод сработал во время synchronize
          // logD(f, 'locked')
          assert(this.created, '!this.created')
+         assert(!this.clearInProgress)
          let removedItem = await rxdb.get(null, null, { id })
          assert(removedItem, '!removedItem')
          await removedItem.remove(permanent)
