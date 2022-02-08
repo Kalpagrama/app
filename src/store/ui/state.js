@@ -8,7 +8,7 @@ export default {
   // page
   // pageHeight: 0,
   // pageWidthDefault: 700,
-  pageWidth: 690,
+  pageWidth: 700,
   pageWidthMini: 400,
   pageWidthMedi: 600,
   pageWidthMaxi: 800,

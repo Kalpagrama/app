@@ -59,10 +59,6 @@ const routes = [
          // // если уже авторизованы, то нельзя переходить на /auth (сначала надо выйти по кнопке logout)
          window.KALPA_LOAD_COMPLETE = true // чтобы крутилка не показывалась
          return next('/')
-         // if (localStorage.getItem('k_user_oid')) {
-         //    logD('user is Auth! goto /root')
-         //    return next('/')
-         // } else return next()
       }
    },
    {
@@ -93,30 +89,6 @@ const routes = [
          window.KALPA_LOAD_COMPLETE = true // чтобы крутилка не показывалась
          next()
       }
-      // beforeEnter: async (to, from, next) => {
-      //    if (to.query.originalUrl) { // редирект на полную версию (после успешного входа перейдет на этот url)
-      //       logD('redirect command received!', to.query.originalUrl)
-      //       sessionStorage.setItem('k_originalUrl', to.query.originalUrl)
-      //    }
-      //    if (to.query.masterToken) {
-      //       logD('clone session!', to.query.masterToken)
-      //       if (localStorage.getItem('k_token') !== to.query.masterToken) { // userIdentify на сервере аннулирует текущую сессию
-      //          await AuthApi.userIdentify(null, to.query.masterToken)
-      //          await AuthApi.userAuthenticate(null)
-      //       }
-      //    }
-      //    logD('router :: try systemInit...')
-      //    // alert(' /root router :: try systemInit... from=' + from.path + JSON.stringify(from.query) + '. to=' + to.path + JSON.stringify(to.query))
-      //    await systemInit() // для гостей тоже надо входить (если уже войдено - ничего не сделает)
-      //    //  assert(to.meta.roleMinimal, '!to.meta.roleMinimal')
-      //    if (!AuthApi.userMatchMinimalRole(to.meta.roleMinimal || 'GUEST')) {
-      //       logD('router::need more privileges')
-      //       return next('/auth') // если маршрут требует повышения - переходим на форму входа
-      //    } else {
-      //       logD('router:: its ok! ')
-      //       return next()
-      //    }
-      // }
    },
    {
       path: '/share' // этот маршрут обрабатыватся хуком в initPWA()
@@ -386,7 +358,6 @@ const routes = [
       beforeEnter: async (to, from, next) => {
          // alert('router / beforeEnter...' + to.path)
          // logD('router / beforeEnter...', to, from)
-         await systemInit() // для гостей тоже надо входить (если уже войдено - ничего не сделает)
          return next()
       }
    }

@@ -103,7 +103,11 @@ export default {
     }
   },
   mounted () {
-    this.updateState()
+    // this.updateState()
+    if (this.timerMounted) clearTimeout(this.timerMounted)
+    this.timerMounted = setTimeout(() => {
+      this.updateState()
+    }, 2000)
   }
 }
 </script>

@@ -64,10 +64,7 @@ class GqlQueries {
       return fetchFunc
    }
 
-   async destroy (clearStorage) {
-      if (this.created) {
-         this.created = false
-      }
+   async clear () {
    }
 
    async create (cache) {
@@ -75,11 +72,11 @@ class GqlQueries {
       this.created = true
    }
 
-   async get (id, clientFirst, force, onFetchFunc = null, params = null) {
+   async get (id, priority, clientFirst, force, onFetchFunc = null, params = null) {
       let fetchFunc = GqlQueries.getFetchFunc(id, params)
 
       logD('objects::get start')
-      let rxDoc = await this.cache.get(id, fetchFunc, clientFirst, force, onFetchFunc)
+      let rxDoc = await this.cache.get(id, priority >= 0 ? fetchFunc : null, clientFirst, force, onFetchFunc)
       if (!rxDoc) return null // см "queued item was evicted by queue overflow"
       assert(rxDoc.cached, '!rxDoc.cached')
       return rxDoc

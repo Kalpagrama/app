@@ -98,7 +98,7 @@ class UserApi {
     const f = UserApi.isSubscribed
     logD(f, 'start', oid)
     const t1 = performance.now()
-    let currentUserOid = rxdb.getCurrentUser().oid // localStorage.getItem('k_user_oid')
+    let currentUserOid = rxdb.getCurrentUser().oid
     // assert(oid === currentUserOid, 'разрешено только для текущего юзера')
     let { items } = await rxdb.find({
       selector: {

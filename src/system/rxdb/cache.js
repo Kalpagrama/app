@@ -23,39 +23,33 @@ class Cache {
       this.mutex = new MutexLocal('rxdb::cache')
    }
 
-   async destroy (clearStorageMethod) {
+   async clear () {
+      const f = this.clear
+      const t1 = performance.now()
+      logT(f, 'start')
       try {
-         await this.lock('destroy')
-
-         this.created = false
+         await this.lock('clear')
+         this.clearInProgress = true
          this.debouncedDumpLru.cancel()
-         // if (clearStorageMethod.in('destroy', 'none')) this.debouncedDumpLru.cancel()
-         // else await this.debouncedDumpLru.flush()
-
-         if (clearStorageMethod === 'destroy') {
-            if (this.db && this.db.cache) await rxdbOperationProxyExec(this.db.cache, 'destroy')
-         } else if (clearStorageMethod === 'remove_collections') {
-            if (this.db && this.db.cache) await rxdbOperationProxyExec(this.db.cache, 'remove')
-         } else if (clearStorageMethod === 'remove_rows') {
-            if (this.db && this.db.cache) {
-               let query = rxdbOperationProxy(this.db.cache, 'find')
-               await query.remove();
-            }
-         }
-         this.db = null
-         this.fastCache = null
-         if (this.cacheLru) this.cacheLru.reset() // после this.db = null
-         this.cacheLru = null
+         assert(this.db && this.db.cache)
+         assert(this.fastCache && this.cacheLru)
+         await rxdbOperationProxy(this.db.cache, 'find').remove()
+         this.fastCache.clear()
+         this.cacheLru.reset() // после this.db = null
       } finally {
+         delete this.clearInProgress
          this.release()
       }
+      logT(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
    }
 
+   // один раз на старте
    async create (db) {
       const f = this.create
       logD(f, 'start')
       const t1 = performance.now()
       assert(db, '!rxdb')
+      assert(!this.clearInProgress)
       try {
          await this.lock('create')
          this.db = db
@@ -75,6 +69,7 @@ class Cache {
          }, false)
 
          // кэш только что вставленных элементов (нужен тк после вставки тут же будут запрошены эти элементы и это обычно долго)
+         // TODO уже не надо тк loki работает в памяти!
          this.fastCache = {}
          this.fastCache.insert = (rxDoc) => {
             if (!this.fastCache[rxDoc.id]) {
@@ -85,8 +80,13 @@ class Cache {
             }
          }
          this.fastCache.get = (id) => this.cacheLru.get(id) ? this.fastCache[id] : null
+         this.fastCache.clear = () => {
+            for (let key in this.fastCache){
+               if (!key.in('insert', 'get', 'clear')) delete this.fastCache[key]
+            }
+         }
 
-         // используется для контроля места (при переполнении - объект удалится из rxdb)
+            // используется для контроля места (при переполнении - объект удалится из rxdb)
          this.cacheLru = new LruCache({
             max: defaultCacheSize,
             length: function (n, id) {
@@ -96,7 +96,8 @@ class Cache {
             noDisposeOnSet: true,
             dispose: async (id, { actualUntil, actualAge }) => {
                const f = this.dispose
-               if (this.db && this.db.cache) {
+               if (!this.clearInProgress && this.db && this.db.cache) {
+                  // logT(f, 'cacheLru::dispose', id)
                   assert(actualUntil && actualAge >= 0, `actualUntil && actualAge >= 0 ${actualUntil} ${actualAge}`)
                   let rxDoc = this.fastCache.get(id) || await rxdbOperationProxyExec(this.db.cache, 'findOne', id)
                   if (rxDoc) {
@@ -165,6 +166,7 @@ class Cache {
    }
 
    async find (mangoQuery) {
+      assert(!this.clearInProgress)
       return await rxdbOperationProxyExec(this.db.cache, 'find', mangoQuery)
    }
 
@@ -172,6 +174,7 @@ class Cache {
    //   cached: {data} data может быть как объектом, так и любым другим типом
    async set (id, data, actualAge, notEvict, mangoQuery = {}) {
       assert(this.created, '!this.created')
+      assert(!this.clearInProgress)
       assert(id && data, '!id && data' + id + JSON.stringify(data))
       let rxCollectionEnum = getRxCollectionEnumFromId(id)
       const f = this.set
@@ -325,6 +328,7 @@ class Cache {
       try {
          // await this.lock('rxdb::get') ! нельзя тк необходимо чтобы запросы выполнялись параллельно (см QueryAccumulator)
          assert(this.created, '!this.created')
+         assert(!this.clearInProgress)
          assert(id)
          const f = this.get
          // logD(f, 'start', id)
@@ -402,13 +406,14 @@ class Cache {
          // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`, rxDoc)
          return rxDoc
       } finally {
-         // this.release()
+         // this.release() ! нельзя тк необходимо чтобы запросы выполнялись параллельно (см QueryAccumulator)
       }
    }
 
    async expire (id) {
       try {
          await this.lock('rxdb::cache::expire')
+         assert(!this.clearInProgress)
          let { actualUntil, actualAge } = this.cacheLru.get(id) || {}
          if (actualUntil) this.cacheLru.set(id, { actualUntil: Date.now(), actualAge: 0 })
       } finally {

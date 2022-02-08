@@ -24,7 +24,7 @@ class WorkspaceApi {
          return wsClear
       }
       let res = await apiCall(f, cb)
-      await systemReset(false, true, false, true)
+      await systemReset(false, true, false)
       return res
    }
 

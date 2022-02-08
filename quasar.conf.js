@@ -18,8 +18,8 @@ const ESLintPlugin = require('eslint-webpack-plugin')
 const { configure } = require('quasar/wrappers')
 
 module.exports = configure(function (ctx) {
-   console.log('ctx = ', ctx)
-   console.log('process.env = ', process.env)
+   // console.log('ctx = ', ctx)
+   // console.log('process.env = ', process.env)
    return {
       // https://quasar.dev/quasar-cli/supporting-ts
       supportTS: false,
@@ -76,6 +76,7 @@ module.exports = configure(function (ctx) {
 
          // Quasar plugins
          plugins: [
+            'Meta',
             'Notify',
             'Screen',
             'AppVisibility',
@@ -173,7 +174,7 @@ module.exports = configure(function (ctx) {
                tests: path.resolve(__dirname, './tests')
                // vue: '@vue/compat'
             }
-            if (!ctx.mode.ssr) {
+            if (!ctx.mode.bex && !ctx.mode.ssr) {
                cfg.optimization = {
                   runtimeChunk: 'single',
                   splitChunks: {
@@ -231,7 +232,7 @@ module.exports = configure(function (ctx) {
          // //   'Content-Security-Policy': "default-src 'unsafe-eval' 'unsafe-inline' 'self' wss://*:* http://*:* https://*:*",
          // },
          port: ctx.mode.ssr ? 8585 : ctx.mode.capacitor ? 8484 : ctx.mode.pwa ? 8383 : 8282,
-         host: ctx.mode.capacitor || ctx.mode.spa ? null : 'mac.kalpa.app',
+         host: ctx.mode.capacitor || ctx.mode.spa || ctx.mode.bex ? null : 'mac.kalpa.app',
          https: ctx.mode.capacitor || ctx.mode.spa
             ? false
             : {

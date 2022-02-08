@@ -49,7 +49,7 @@
     figures-controls(v-if="player.node" :player="player" :contentKalpa="contentKalpa").all-pointer-events
     .col
     // кнопка редактирования образа
-    div(v-if="player.nodeMode !== 'focus'").row
+    div(v-if="player.nodeMode !== 'focus' && contentAvailable").row
       q-btn( v-if="player.nodeMode !== 'edit'" dense round flat color="green" icon="add_circle_outline" @click="player.fragmentSelect()")
         q-tooltip(
           anchor="center left" self="center right" :offset="[10, 10]"
@@ -83,7 +83,12 @@ export default {
   computed: {
     figuresAbsolute() {
       return this.player?.node?.items[0]?.layers[0]?.figuresAbsolute || this.player.figures
-    }
+    },
+    contentAvailable() {
+      if (this.contentKalpa.payInfo.paid && this.contentKalpa.payInfo.price) return true
+      else if (!this.contentKalpa.payInfo.paid && !this.contentKalpa.payInfo.price) return true
+      else return false
+    },
   },
   watch: {},
   methods: {
