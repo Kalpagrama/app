@@ -6,7 +6,7 @@
     q-btn(round flat color="white" icon="clear" @click="$emit('close')")
   .row.full-width
     //span.text-white {{item.description}}
-    div(v-html="item.description").text-grey
+    div(v-html="item.description" :style=`{width: '100%', overflow: 'hidden'}`).text-grey
 </template>
 
 <script>

@@ -109,11 +109,13 @@ export default {
       if (this.$store.state.ui.userTyping) return
       if (e.key === 'ArrowLeft') {
         e.preventDefault()
-        this.player.setCurrentTime(this.player.currentTime - 5)
+        this.player.seek(-this.player.seekTime)
+        // this.player.setCurrentTime(this.player.currentTime - 5)
       }
       if (e.key === 'ArrowRight') {
         e.preventDefault()
-        this.player.setCurrentTime(this.player.currentTime + 5)
+        this.player.seek(this.player.seekTime)
+        // this.player.setCurrentTime(this.player.currentTime + 5)
       }
     }
   },

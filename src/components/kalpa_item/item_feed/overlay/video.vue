@@ -1,7 +1,10 @@
 <template lang="pug">
 div(
-  :style=`{background: isOverlayShow ? 'rgba(0,0,0,0.7)':'rgba(0,0,0,0)'}`
-  @click="onClick(), player.playing ? player.pause():player.play()"
+  :style=`{
+    // background: (player.nodeMode && player.nodeMode.in('edit', 'focus')) ? 'linear-gradient(0deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 20%)' : isOverlayShow ? 'rgba(0,0,0,0.7)':'rgba(0,0,0,0)'
+    background: (player.nodeMode && player.nodeMode.in('edit', 'focus')) ? 'linear-gradient(0deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 35%)' : isOverlayShow ? ($q.platform.is.mobile ? 'rgba(0,0,0,0.6)' : 'linear-gradient(0deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0) 35%)'):'rgba(0,0,0,0)'
+  }`
+  @click="onClick(), $q.platform.is.mobile ? '' :(player.playing ? player.pause():player.play())"
   @mousemove="onMouseMove"
   @mouseout="onMouseOut"
   @mouseover="onMouseOver"
@@ -9,7 +12,7 @@ div(
   .column.full-width
     // top
     div(v-show="isOverlayShow"  :style=`{minHeight: 50 + 'px'}`).row.full-width.q-pa-xs
-      div(v-if="player.isFullscreen").row.full-width.cursor-pointer
+      div(v-if="player.isFullscreen && item.contentProvider !== YOTUBE").row.full-width.cursor-pointer
         .row.items-center.content-center.justify-center.q-pr-sm
           img(
             :src="item.author.thumbUrl"
@@ -22,6 +25,7 @@ div(
             small.text-white.text-bold.ellipsis {{ item.author.name }}
         .row.q-pa-sm
           q-icon(name="more_vert" color="white" size="sm")
+      //q-btn(v-if="player.muted" text-color="white" color="grey-10" round dense flat no-caps :label="$t('Без звука')" ).absolute
     // middle
     .row.col
       .row.col-2
@@ -32,7 +36,7 @@ div(
             transition-hide="jump-up"
           ) +{{player.seekTime}}{{$t('сек')}}
       .row.col.items-center.content-center.justify-center
-        q-icon(v-show="isOverlayShow" :name="player.playing ? 'pause' : 'play_arrow'" color="white" size="70px" @click="player.playing ? player.pause():player.play()")
+        q-icon(v-show="(player.nodeMode && player.nodeMode.in('edit', 'focus')) ? false : isOverlayShow" :style=`{opacity: '100%'}` :name="player.playing ? 'pause' : 'play_arrow'" color="white" size="70px" @click="player.playing ? player.pause():player.play()")
       .row.col-2
         q-btn(flat :style=`{borderRadius: '50% 0 0 50%'}` @click.stop="player.seek(player.seekTime)").fit
           q-tooltip(
@@ -41,8 +45,19 @@ div(
             transition-hide="jump-up"
           ) +{{player.seekTime}}{{$t('сек')}}
     // bottom
-    div(v-show="isOverlayShow || (player.nodeMode && player.nodeMode.in('edit', 'focus'))" @click.stop="").row.full-width.q-px-sm
-      player-pult-overlay(:player="player" :contentKalpa="item" @touchPan="onClick()")
+    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      div(v-if="isOverlayShow || (player.nodeMode && player.nodeMode.in('edit', 'focus'))" @click.stop="").row.full-width.q-px-sm
+        player-pult-overlay(:player="player" :contentKalpa="item" @touchPan="onClick()")
+div(v-if="player.muted" @click="player.mutedToggle()").row.content-center.items-center.justify-center.cursor-pointer.absolute-top-right.q-ma-lg.op-90
+  .row.relative-position.content-center.items-center.justify-center
+    div(:style=`{height: '30px', width: '30px'}`).row.b-0.op-40
+    //span.text-white.absolute {{$t('Включить звук')}}
+    q-icon(name="volume_off" color="white" size="sm" ).absolute
+      q-tooltip(
+        anchor="center left" self="center right"
+        transition-show="jump-right"
+        transition-hide="jump-up"
+      ) {{$t('Включить звук')}}
 </template>
 
 <script>

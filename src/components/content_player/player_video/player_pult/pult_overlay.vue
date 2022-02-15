@@ -1,45 +1,56 @@
+<style lang="sass" scoped>
+.container
+  transition: height .3s
+</style>
+
 <template lang="pug">
 .row.full-width
   // полоса таймлайн
-  div(ref="bar" :style=`{ height: '30px'}` v-touch-pan.mouse.prevent="tintOnPan" @mouseout="tintMouseout" @mousemove="tintMousemove" @click="tintClick").row.full-width.relative-position
-    div(:style=`{ height: '12px', pointerEvents: 'none'}`).row.full-width.absolute-bottom.b-70.br-5.op-60
-      //- clusters
-      clusters(v-if="player.clusters.length" v-bind="$props" :style=`{ pointerEvents: 'none'}`).br-5
-      // fragment selected
-      div(
-        v-if="figuresAbsolute"
-        :style=`{
-          position: 'absolute',
-          top: '-2px',
-          left: (figuresAbsolute[0].t/player.duration)*100+'%',
-          width: ((figuresAbsolute[1].t-figuresAbsolute[0].t)/player.duration)*100+'%',
-          height: 'calc(100% + 4px)',
-          border: '1px solid ' + $getPaletteColor('green-5'),
-          borderRadius: '2px',
-          pointerEvents: 'none',
-        }`
-      ).row.bg-green-8.br-5.op-90
-      //- currentTime
-      div(:style=`{ position: 'absolute', left: (player.currentTime/player.duration)*100+'%', height: '100%', width: '2px', pointerEvents: 'none'}`).row.bg-green-10.br-5
-      //- currentTime hover
-      div(v-if="currentTimeHoverPercent && $screenProps.isDesktop"
-        :style=`{
+  div(ref="bar" :style=`{ height: '30px'}` v-touch-pan.mouse.prevent="tintOnPan" @mouseout="tintMouseout" @mousemove="tintMousemove" @click="tintClick").row.full-width.relative-position.cursor-pointer
+    div(:style=`{ height: '12px', pointerEvents: 'none'}`).row.full-width.absolute-bottom.br-5
+      .row.full-width.relative-position.items-center.content-center
+        div(:style=`{ height: timelineHeight + '%', pointerEvents: 'none'}`).row.full-width.absolute.b-70.br-5.op-60.container
+          //- clusters
+          clusters(v-if="player.clusters.length" v-bind="$props" :style=`{ pointerEvents: 'none'}`).br-5
+        div(:style=`{ height: '12px', pointerEvents: 'none'}`).row.full-width.absolute.br-5.items-center.content-center
+          //- currentTime
+          //div(:style=`{ position: 'absolute', left: (player.currentTime/player.duration)*100+'%', height: '50%', width: '2px', pointerEvents: 'none'}`).row.bg-red.br-5
+          div(:style=`{ position: 'absolute-left', height: timelineHeight + '%', width: (player.currentTime/player.duration)*100+'%', pointerEvents: 'none'}`).row.bg-red.br-5.container
+          transition(enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
+            div(v-if="currentTimeHoverPercent" :style=`{ position: 'absolute', left: (player.currentTime/player.duration)*100+'%', height: '100%', width: '12px', pointerEvents: 'none', marginLeft: '-5px'}`).row.bg-red.br-15
+          //- currentTime hover
+          div(v-if="currentTimeHoverPercent && $screenProps.isDesktop"
+            :style=`{
+                    position: 'absolute',
+                    top: '-14px',
+                    left: currentTimeHoverPercent+'%',
+                    height: '14px',
+                  }`).row.items-center.content-center
+            small.text-white {{ $time(currentTimeHoverTime) }}
+          div(
+            v-if="currentTimeHoverPercent && $q.screen.gt.sm"
+            :style=`{
                 position: 'absolute',
-                top: '-14px',
                 left: currentTimeHoverPercent+'%',
-                height: '14px',
-              }`).row.items-center.content-center
-        small.text-green-8 {{ $time(currentTimeHoverTime) }}
-      div(
-        v-if="currentTimeHoverPercent && $q.screen.gt.sm"
-        :style=`{
-            position: 'absolute',
-            left: currentTimeHoverPercent+'%',
-            height: '100%',
-            width: '2px',
-            pointerEvents: 'none',
-          }`
-      ).row.bg-green-8
+                height: '50%',
+                width: '2px',
+                pointerEvents: 'none',
+              }`
+          ).row.bg-red
+          // fragment selected
+          div(
+            v-if="figuresAbsolute"
+            :style=`{
+              position: 'absolute',
+              top: '-2px',
+              left: (figuresAbsolute[0].t/player.duration)*100+'%',
+              width: ((figuresAbsolute[1].t-figuresAbsolute[0].t)/player.duration)*100+'%',
+              height: 'calc(100% + 4px)',
+              border: '1px solid ' + $getPaletteColor('green-5'),
+              borderRadius: '2px',
+              pointerEvents: 'none',
+            }`
+          ).row.bg-green-8.br-5.op-70
   //- time bar + actions
   .row.full-width.content-center.items-center.no-wrap.q-py-xs
     q-btn( dense round flat :color="player.muted ? 'red' : 'white'" :icon="player.muted ? 'volume_off' : 'volume_up'" @click="player.mutedToggle()")
@@ -89,6 +100,10 @@ export default {
       else if (!this.contentKalpa.payInfo.paid && !this.contentKalpa.payInfo.price) return true
       else return false
     },
+    timelineHeight() {
+      if (this.currentTimeHoverPercent) return 50
+      else return 30
+    }
   },
   watch: {},
   methods: {
@@ -103,6 +118,7 @@ export default {
       this.player.setCurrentTime(t)
     },
     tintOnPan (e) { // перетаскивание  playhead
+      // this.$logT('tintOnPan')
       let tintRect = this.$refs['bar'].getBoundingClientRect()
       let left = e.position.left - tintRect.left
       let width = tintRect.width
@@ -116,16 +132,25 @@ export default {
       this.player.setCurrentTime(t)
       this.$emit('touchPan') // чтобы при проматывании не скрывался pult_overlay
       // this.$logT('tintOnPan', this.currentTimeHoverPercent, this.currentTimeHoverTime)
+
+      // let rect = this.$refs['bar'].getBoundingClientRect()
+      // let y = e.evt.clientY
+      // let x = e.evt.clientX
+      // if (y < rect.top || y > rect.bottom || x < rect.left || x > rect.right) {
+      //   this.currentTimeHoverPercent = null
+      //   this.currentTimeHoverTime = null
+      // }
     },
     tintMouseout(e) {
+      // this.$logT('tintMouseout')
       this.currentTimeHoverPercent = null
       this.currentTimeHoverTime = null
     },
     tintMousemove (e) {
-      // this.$logT('tintMousemove', e)
       let rect = this.$refs['bar'].getBoundingClientRect()
       let y = e.clientY
       let x = e.clientX
+      // this.$logT('tintMousemove', {x, y}, e)
       // this.$log({y, yMinutes})
       if (y < rect.top || y > rect.bottom || x < rect.left || x > rect.right) {
         this.currentTimeHoverPercent = null

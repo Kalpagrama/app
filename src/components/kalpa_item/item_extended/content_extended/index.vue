@@ -24,7 +24,7 @@ div(:style=`{maxWidth: !isFullscreen ? $store.state.ui.pageWidth+'px' : $q.scree
           @click=""
           round flat color="white" icon="fas fa-info" :style=`{opacity:'0'}`)
     // контент
-    div(:class="$screenProps.isMobile ? '' : 'br-15'" :style=`{overflow: $screenProps.isMobile ? 'visible' : 'hidden'}`).row.full-width.relative-position
+    div(:class="$screenProps.isMobile || isFullscreen ? '' : 'br-15'" :style=`{overflow: $screenProps.isMobile ? 'visible' : 'hidden'}`).row.full-width.relative-position
       q-resize-observer(@resize="bottomHeight = $q.screen.height - $event.height - headerHeight")
       div(:style=`{overflow: 'hidden'}`).row.full-width.relative-position
         content-view(:content="content" :options=`{maxHeight: $q.screen.height - headerHeight}` @player="player=$event").row.full-width
@@ -162,6 +162,7 @@ export default {
         try { // генерит ошибку, если действие вызвано на пользователем
           this.$store.commit('ui/stateSet', ['desktopNavigationShow', !to])
           // eslint-disable-next-line no-constant-condition
+          // if (to && this.$q.platform.is.mobile) await this.$q.fullscreen.request()
           if (to) await this.$q.fullscreen.request()
           else if (from && this.$q.fullscreen.isActive) await this.$q.fullscreen.exit()
         } catch (err) {
