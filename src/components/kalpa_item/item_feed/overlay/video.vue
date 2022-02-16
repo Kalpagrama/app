@@ -12,7 +12,7 @@ div(
   .column.full-width
     // top
     div(v-show="isOverlayShow"  :style=`{minHeight: 50 + 'px'}`).row.full-width.q-pa-xs
-      div(v-if="player.isFullscreen && item.contentProvider !== YOTUBE").row.full-width.cursor-pointer
+      div(v-if="player.isFullscreen && item.contentProvider !== 'YOUTUBE'").row.full-width.cursor-pointer
         .row.items-center.content-center.justify-center.q-pr-sm
           img(
             :src="item.author.thumbUrl"
