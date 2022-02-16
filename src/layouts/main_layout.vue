@@ -24,8 +24,8 @@ q-layout(
   transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
       v-if="$screenProps.isDesktop && $store.state.ui.desktopNavigationShow"
-      :style=`{ maxWidth: ($q.screen.width - $store.state.ui.pageWidth) / 2 + 'px',}`
-      ).fixed-left.row.fit.items-start.content-start.justify-end.q-pa-xs.z-top
+      :style=`{ maxWidth: ($q.screen.width - $store.state.ui.pageWidth) / 2 + 'px', zIndex: 10}`
+      ).fixed-left.row.fit.items-start.content-start.justify-end.q-pa-xs
       kalpa-menu(
         :mini="($q.screen.width - $store.state.ui.pageWidth) / 2 < 280"
         :style=`{ maxWidth: ($q.screen.width - $store.state.ui.pageWidth) / 2 < 280 ? '60px' : '280px'}`
