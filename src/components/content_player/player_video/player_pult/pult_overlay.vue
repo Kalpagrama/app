@@ -26,7 +26,7 @@
                     left: currentTimeHoverPercent+'%',
                     height: '14px',
                   }`).row.items-center.content-center
-            small.text-white {{ $time(currentTimeHoverTime) }}
+            small.text-white.text-bold {{ $time(currentTimeHoverTime) }}
           div(
             v-if="currentTimeHoverPercent && $q.screen.gt.sm"
             :style=`{

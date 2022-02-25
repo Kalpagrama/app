@@ -34,6 +34,7 @@
       :options=`{
         mode: 'feed',
         footerOverlay: true,
+        autoplay: false,
         showBar: false,
         showHeader: false,
       }`

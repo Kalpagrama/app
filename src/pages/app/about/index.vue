@@ -48,7 +48,7 @@ q-layout(
               textAlign: 'justify',
             }`
           ).row.full-width.items-start.content-start
-            p.text-white Добавляйте контент из YouTube, Twitter, Instagram. Можно загрузить файл с устройства. Книги музыка фильмы - все можно сохранять к себе в мастерскую.
+            p.text-white Добавляйте контент из YouTube и Instagram. Можно загрузить файл с устройства. Книги музыка фильмы - все можно сохранять к себе в мастерскую.
             .row.full-width
               q-btn( flat icon="checklist_rtl" color='white'
                 @click="showKalpaTutorial('tutorial_content')"

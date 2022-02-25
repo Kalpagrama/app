@@ -45,9 +45,10 @@ div(
             transition-hide="jump-up"
           ) +{{player.seekTime}}{{$t('сек')}}
     // bottom
-    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      div(v-if="isOverlayShow || (player.nodeMode && player.nodeMode.in('edit', 'focus'))" @click.stop="").row.full-width.q-px-sm
-        player-pult-overlay(:player="player" :contentKalpa="item" @touchPan="onClick()")
+    div(:style=`{minHeight: '72px'}`).row.full-width
+      transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+        div(v-if="isOverlayShow || (player.nodeMode && player.nodeMode.in('edit', 'focus'))" @click.stop="").row.full-width.q-px-sm
+          player-pult-overlay(:player="player" :contentKalpa="item" @touchPan="onClick()")
 div(v-if="player.muted" @click="player.mutedToggle()").row.content-center.items-center.justify-center.cursor-pointer.absolute-top-right.q-ma-lg.op-90
   .row.relative-position.content-center.items-center.justify-center
     div(:style=`{height: '30px', width: '30px'}`).row.b-0.op-40
