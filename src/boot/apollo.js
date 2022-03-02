@@ -51,15 +51,16 @@ export default boot(async ({
                err.message = err.code + ':' + err.message
                if (err.code === 'USER_NOT_AUTH' || err.code === 'BAD_SESSION' || err.code === 'UNCONFIRMED_LOGIN_DISABLED') {
                   // alert('error on gql request: ' + JSON.stringify(err))
-                  AuthApi.logout()
-                     .then(() => {
-                        logT('apollo::after AuthApi.logout()')
-                        // window.location.reload()
-                     })
-                     .catch(err => {
-                        logC('AuthApi.logout error!', err)
-                        // window.location.reload()
-                     })
+                  systemHardReset()
+                  // AuthApi.logout()
+                  //    .then(() => {
+                  //       logT('apollo::after AuthApi.logout()')
+                  //       window.location.reload()
+                  //    })
+                  //    .catch(err => {
+                  //       logC('AuthApi.logout error!', err)
+                  //       window.location.reload()
+                  //    })
                } else if (err.code === 'BAD_DATA') {
                   // alert(err.message)
                }
