@@ -28,7 +28,10 @@ export default boot(async ({ app, router, store, ssrContext, urlPath, publicPath
       },
       messages
    })
+   i18n.global.locale = LangEnum.RUS // navigator.language на мобильниках не работает корректно (всегда английский)
    setLocale = locale => {
+      // const f = { nameExtra: 'boot::setLocale' }
+      // logW(f, 'locale=', locale)
       i18n.global.locale = locale || navigator.language
    }
    getLocale = () => {

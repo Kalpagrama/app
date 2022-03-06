@@ -621,6 +621,22 @@
             "deprecationReason": null
           },
           {
+            "name": "lang",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "LangEnum",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "token",
             "description": null,
             "args": [],
@@ -12557,6 +12573,18 @@
           },
           {
             "name": "SYMPOSIUM",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "NASTYA_HAPPINESS",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "NOOSPHERE_EDUCATION",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null

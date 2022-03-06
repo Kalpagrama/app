@@ -116,7 +116,7 @@ export default {
       followersFollowing: null,
       showFollowDialog: false,
       scrollTop: 0,
-      pageId: 'nodes',
+      pageId: 'contents',
     }
   },
   computed: {
