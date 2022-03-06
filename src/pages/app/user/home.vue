@@ -199,7 +199,7 @@ export default {
 
       return {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_ITEMS,
+          rxCollectionEnum: this.pageId === 'contents' ? RxCollectionEnum.LST_SEARCH : RxCollectionEnum.LST_SPHERE_ITEMS,
           oidSphere: this.user.oid,
           oidAuthor: this.pageId === 'votes' ? { $ne: this.user.oid } : { $eq: this.user.oid },
           objectTypeEnum: { $in: objectTypes },

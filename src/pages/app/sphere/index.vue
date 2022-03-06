@@ -108,6 +108,16 @@ export default {
       return [
         // { id: 'all', name: this.$t('All') },
         // {id: 'contents', name: this.$t('Media')},
+        { id: 'contents',
+          name: this.$t('Контент'),
+          nodataGuardParams: {
+            icon: 'select_all',
+            button: true,
+            message: this.$t('Добавьте контент связанный с этим смыслом и он отобразится здесь'),
+            buttonName: this.$t('Добавить'),
+            title: this.$t('Здесь пока ничего нет'),
+            clickPath: '/workspace',
+          }},
         { id: 'nodes',
           name: this.$t('Nodes'),
           nodataGuardParams: {
@@ -137,16 +147,6 @@ export default {
             buttonName: this.$t('Создать смысловой блок'),
             title: this.$t('Здесь пока ничего нет'),
             clickPath: '/workspace/edit?mode=block',
-          }},
-        { id: 'contents',
-          name: this.$t('Контент'),
-          nodataGuardParams: {
-            icon: 'select_all',
-            button: true,
-            message: this.$t('Добавьте контент связанный с этим смыслом и он отобразится здесь'),
-            buttonName: this.$t('Добавить'),
-            title: this.$t('Здесь пока ничего нет'),
-            clickPath: '/workspace',
           }},
         // {id: 'spheres', name: this.$t('Spheres')},
         // {id: 'users', name: this.$t('Users')}

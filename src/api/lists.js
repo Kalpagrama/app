@@ -87,6 +87,7 @@ class ListsApi {
             res = await ListsApi.find(FindCollectionEnum.COMMENTS, mangoQuery, pagination)
             break
          case RxCollectionEnum.LST_SEARCH:
+            mangoQuery.selector.search = true
             res = await ListsApi.find(FindCollectionEnum.OBJECTS, mangoQuery, pagination)
             break
          case RxCollectionEnum.LST_CONTENT_CUTS:
