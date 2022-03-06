@@ -11,8 +11,8 @@ div(
   ).row.full-width
   .column.full-width
     // top
-    div(v-show="isOverlayShow"  :style=`{minHeight: 50 + 'px'}`).row.full-width.q-pa-xs
-      div(v-if="player.isFullscreen && item.contentProvider !== 'YOUTUBE'").row.full-width.cursor-pointer
+    div(v-show="isOverlayShow"  :style=`{}`).row.full-width
+      div(v-if="player.isFullscreen && item.contentProvider !== 'YOUTUBE'").row.full-width.cursor-pointer.q-pa-xs
         .row.items-center.content-center.justify-center.q-pr-sm
           img(
             :src="item.author.thumbUrl"
@@ -29,23 +29,23 @@ div(
     // middle
     .row.col
       .row.col-2
-        q-btn(flat :style=`{borderRadius: '0 50% 50% 0'}` @click.stop="player.seek(-player.seekTime)").fit
+        q-btn(flat dense :style=`{borderRadius: '0 50% 50% 0', minHeight: '5px'}` @click.stop="player.seek(-player.seekTime)").fit
           q-tooltip(
             anchor="center middle" self="center middle"
             transition-show="jump-right"
             transition-hide="jump-up"
-          ) +{{player.seekTime}}{{$t('сек')}}
+            ) +{{player.seekTime}}{{$t('сек')}}
       .row.col.items-center.content-center.justify-center
         q-icon(v-show="(player.nodeMode && player.nodeMode.in('edit', 'focus')) ? false : isOverlayShow" :style=`{opacity: '100%'}` :name="player.playing ? 'pause' : 'play_arrow'" color="white" size="70px" @click="player.playing ? player.pause():player.play()")
       .row.col-2
-        q-btn(flat :style=`{borderRadius: '50% 0 0 50%'}` @click.stop="player.seek(player.seekTime)").fit
+        q-btn(flat :style=`{borderRadius: '50% 0 0 50%', minHeight: '5px'}` @click.stop="player.seek(player.seekTime)").fit
           q-tooltip(
             anchor="center middle" self="center middle"
             transition-show="jump-right"
             transition-hide="jump-up"
           ) +{{player.seekTime}}{{$t('сек')}}
     // bottom
-    div(:style=`{minHeight: '72px'}`).row.full-width
+    div(:style=`{}`).row.full-width
       transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
         div(v-if="isOverlayShow || (player.nodeMode && player.nodeMode.in('edit', 'focus'))" @click.stop="").row.full-width.q-px-sm
           player-pult-overlay(:player="player" :contentKalpa="item" @touchPan="onClick()")

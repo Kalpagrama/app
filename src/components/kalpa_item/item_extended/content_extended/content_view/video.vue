@@ -21,7 +21,7 @@
       //div(v-if="player && player.duration > 0" :style=`{ maxWidth: 600+'px', background: 'rgba(35,35,35,0.7)', borderRadius: '20px'}`).row.full-width
       q-resize-observer(@resize="editorHeight = $event.height")
       node-focused( v-if="player && player.node && player.nodeMode === 'focus'" :player="player" :contentKalpa="content")
-      page-node-editor(v-if="player && player.duration > 0 && player.node && player.nodeMode === 'edit'" :contentKalpa="content" :player="player" :style=`{maxWidth: '700px'}`).row.full-width.br-10.b-35.q-mt-sm
+      page-node-editor(v-if="player && player.duration > 0 && player.node && player.nodeMode === 'edit'" :contentKalpa="content" :player="player" :style=`{maxWidth: '700px'}`).row.full-width.br-10.b-35
 </template>
 
 <script>
