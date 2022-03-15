@@ -79,7 +79,11 @@ kalpa-layout
               :isVisible="isVisible"
               :isPreload="isPreload"
               :layout="item.type && item.type.in('NODE', 'JOINT', 'BLOCK') ? 'card' : 'line'"
-              :scrolling="scrolling").q-pb-xl
+              :scrolling="scrolling"
+              :class=`{
+                'q-pb-sm': !item.type.in('NODE', 'JOINT', 'BLOCK'),
+                'q-pb-xl': item.type.in('NODE', 'JOINT', 'BLOCK')
+              }`)
           template(v-slot:nodata)
             nodata-guard(
               :button="nodataGuardParams.button"
