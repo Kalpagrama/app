@@ -29,23 +29,23 @@
         kalpa-share(:item="content" :itemState="{}" :isActive="true" inactiveColor="white" color="grey-2" :headerText="$t('Share')")
       // origin
       .row.full-width.items-center.content-center.q-px-sm
-        q-btn(v-if="content.urlOriginal"
+        q-btn(v-if="content.urlOriginal && content.contentProvider !== 'KALPA'"
           @click="goOriginal"
           align="left"
           outline color="grey-3" no-caps
-        :style=`{fontSize: '15px'}`)
+        :style=`{fontSize: '12px'}`)
           //- span.text-bold.text-grey-3 {{ 'Go to original' }}
           span.text-bold.text-grey-3 {{ $t('Источник') }}
           //- handle youtube
           q-icon(
             v-if="content.contentProvider === 'YOUTUBE'"
-            name="fab fa-youtube" color="red" size="30px").q-mx-sm
+            name="fab fa-youtube" color="red" size="25px").q-mx-sm
           q-icon(
             v-if="content.contentProvider === 'INSTAGRAM'"
-            name="fab fa-instagram" color="red" size="30px").q-mx-sm
+            name="fab fa-instagram" color="red" size="25px").q-mx-sm
           q-icon(
             v-if="content.contentProvider === 'CUSTOM_URL'"
-            name="public" color="grey-3" size="30px").q-mx-sm
+            name="public" color="grey-3" size="25px").q-mx-sm
           span(
             v-if="content.contentProvider === 'YOUTUBE'"
           ).text-bold.text-grey-3 YouTube
@@ -55,7 +55,7 @@
           span(
             v-if="content.contentProvider === 'CUSTOM_URL'"
           ).text-bold.text-grey-3 {{ $t('интернет') }}
-      div(v-if="content.contentProvider !== 'YOUTUBE' && content.contentProvider !== 'INSTAGRAM'").row.q-py-md
+      div(v-if="content.contentProvider !== 'YOUTUBE' && content.contentProvider !== 'INSTAGRAM' && content.contentProvider !== 'CUSTOM_URL'").row.q-py-md
         q-btn(:to="'/user/'+content.author.oid" size="sm" round flat no-caps padding="none" :style=`{zIndex: '100'}`).q-px-sm
           q-avatar(:size="'30px'" :style=`{position:'relative', overflow: 'hidden'}`).q-mr-xs
             //img(:src="content.author.thumbUrl" :to="'/user/'+content.author.oid")
@@ -63,7 +63,7 @@
             div(:style=`{background: 'rgba(0,0,0,0.4)', zIndex: '50'}`).fit.absolute
           .column.items-start
             span(:style=`{fontSize: '12px'}`).text-grey-5 {{content.author.name}}
-            small(v-if="author" :style=`{marginTop: '-4px', fontSize: '10px'}`).text-grey-7.text-italic {{author.countStat.countSubscriptions}} {{$getNoun(author.countStat.countSubscriptions.length,$t('подписчик'),$t('подписчика'),$t('подписчиков'))}}
+            small(v-if="author" :style=`{marginTop: '-4px', fontSize: '10px'}`).text-grey-7.text-italic {{author.countStat.countSubscribers}} {{$getNoun(author.countStat.countSubscribers.length,$t('подписчик'),$t('подписчика'),$t('подписчиков'))}}
         q-btn(
           v-if="content.author.oid !== $store.getters.currentUser.oid"
           flat :no-caps="following ? true : false" size="sm" :color="!following ? 'green-8' : 'grey-7'" :label="following ? $t('Вы подписаны') : $t('Follow')"
