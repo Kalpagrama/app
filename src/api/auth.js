@@ -165,7 +165,7 @@ class AuthApi {
       logT(f, 'start. userId= ', userId_)
       const t1 = performance.now()
       // autoInit=false - systemInit не вызывается!
-      await rxdb.clearAuthData()
+      // await rxdb.clearAuthData() -- нельзя вызывать. Иначе бэкенд не сможет удалить временную сессию (ему нужен authToken)
       const cb = async () => {
          let {
             data: {

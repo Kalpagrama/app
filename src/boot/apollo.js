@@ -40,7 +40,7 @@ export default boot(async ({
       // Vue.use(VueApollo)
       let servicesUrl = process.env.SERVICES_URL
       if (sessionStorage.getItem('k_debug') === '2') servicesUrl = process.env.SERVICES_URL_LOCAL
-      alert('SERVICES_URL=' + servicesUrl)
+      logD('SERVICES_URL=' + servicesUrl)
       const errLink = onError(({
                                   operation,
                                   response,

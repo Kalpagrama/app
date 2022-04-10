@@ -108,6 +108,8 @@ module.exports = configure(function (ctx) {
                   default: return process.env.SERVICES_URL
                }
             })(),
+            SERVICES_URL_LOCAL: process.env.SERVICES_URL_LOCAL,
+            SERVICES_URL_WS_LOCAL: process.env.SERVICES_URL_WS_LOCAL,
             BUILD_DATE: (new Date().toISOString()).split('T')[0],
             BUILD_VERSION: require('./package.json').version
          },
