@@ -38,8 +38,8 @@ export default boot(async ({
       let kDebug = sessionStorage.getItem('k_debug')// запросы переренаправляются на машину разработчика
       kDebug = kDebug === '1'
       // Vue.use(VueApollo)
-      const servicesUrl = sessionStorage.getItem('k_debug') === '2' ? process.env.SERVICES_URL_LOCAL : process.env.SERVICES_URL
-      logD('SERVICES_URL=' + servicesUrl)
+      const servicesUrl = process.env.SERVICES_URL
+      alert('SERVICES_URL=' + servicesUrl)
       const errLink = onError(({
                                   operation,
                                   response,
