@@ -100,7 +100,6 @@ module.exports = configure(function (ctx) {
                }
             })(),
             SERVICES_URL: (() => {
-               if (sessionStorage.getItem('k_debug') === '2') return process.env.SERVICES_URL_LOCAL
                if (ctx.mode.capacitor && ctx.prod) return process.env.SERVICES_URL
                switch (process.env.DOCKER_MACHINE_NAME || '') {
                   case 'vercel': return process.env.SERVICES_URL_VERCEL
