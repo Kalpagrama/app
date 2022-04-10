@@ -38,7 +38,8 @@ export default boot(async ({
       let kDebug = sessionStorage.getItem('k_debug')// запросы переренаправляются на машину разработчика
       kDebug = kDebug === '1'
       // Vue.use(VueApollo)
-      logD('SERVICES_URL=' + process.env.SERVICES_URL)
+      const servicesUrl = sessionStorage.getItem('k_debug') === '2' ? process.env.SERVICES_URL_LOCAL : process.env.SERVICES_URL
+      logD('SERVICES_URL=' + servicesUrl)
       const errLink = onError(({
                                   operation,
                                   response,
@@ -116,7 +117,7 @@ export default boot(async ({
       }
       const settingsApollo = new ApolloClient({
          link: createHttpLink({
-            uri: process.env.SERVICES_URL,
+            uri: servicesUrl,
             fetch (uri, options) {
                if (kDebug) options.headers['X-Kalpagrama-debug'] = 'k_debug'
                return fetchFunc(uri, options)
@@ -154,8 +155,8 @@ export default boot(async ({
          })
       logD('settings=', settings)
       assert(settings && settings.services, '!services!!!')
-      let urlLocal = sessionStorage.getItem('k_debug') === '2' ? 'http://localhost:9000/graphql' : null
-      let urlLocalWs = sessionStorage.getItem('k_debug') === '2' ? 'ws://localhost:9000/graphql' : null
+      let urlLocal = sessionStorage.getItem('k_debug') === '2' ? process.env.SERVICES_URL_LOCAL : null
+      let urlLocalWs = sessionStorage.getItem('k_debug') === '2' ? process.env.SERVICES_URL_WS_LOCAL : null
       let linkAuth = urlLocal || settings.services.authUrl
       let linkApi = urlLocal || settings.services.apiUrl
       let linkWs = urlLocalWs || settings.services.subscriptionsUrl
