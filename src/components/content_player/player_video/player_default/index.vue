@@ -7,7 +7,7 @@ div(:style=`{height: videoHeight+'px'}`).row.full-width.relative-position
     @pause="videoPaused"
     @play="videoPlaying").row.fit
   video(v-else
-    ref="videoRef"
+  ref="videoRef"
     :src="url"
     :playsinline="true"
     :autoplay="options.autoplay"
@@ -61,7 +61,7 @@ export default {
       playerNative: null,
       playing: false,
       muted: true,
-      duration: 0,
+      durationNative: 0,
       currentTime__: 0,
       currentTime: 0,
       currentTimeFreeze: false,
@@ -75,9 +75,12 @@ export default {
     }
   },
   computed: {
+    duration () {
+      return this.durationNative || this.contentKalpa.duration
+    },
     seekTime () {
-      if (!this.duration) return 0
-      return Math.max(5, Math.min(Math.floor(this.duration * 0.05 / 10) * 10, 15))
+      if (!this.durationNative) return 0
+      return Math.max(5, Math.min(Math.floor(this.durationNative * 0.05 / 10) * 10, 15))
     },
     videoHeight () {
       if (!this.pageWidth || !this.contentKalpa.height || !this.contentKalpa.width) return Math.min(this.$q.screen.height, this.options.maxHeight * 1.5 || 400)
@@ -112,8 +115,8 @@ export default {
     muted: {
       handler(to) {
         if (this.playerYoutube) {
-           if (to) this.playerYoutube.mute()
-           else this.playerYoutube.unMute()
+          if (to) this.playerYoutube.mute()
+          else this.playerYoutube.unMute()
         } else if (this.playerNative) {
           this.playerNative.muted = !!to
         }
@@ -152,7 +155,7 @@ export default {
       this.nodeMode = null
       let t = this.currentTime
       t += offset
-      t = Math.max(0, Math.min(this.duration, t))
+      t = Math.max(0, Math.min(this.durationNative, t))
       this.setCurrentTime(t, true)
     },
     setCurrentTime (t, freeze = false) {
@@ -178,19 +181,19 @@ export default {
       }
     },
     videoLoadeddata (e) {
-      if (this.playerYoutube) this.duration = this.playerYoutube.getDuration()
-      else if (this.playerNative) this.duration = this.playerNative.duration
+      if (this.playerYoutube) this.durationNative = this.playerYoutube.getDuration()
+      else if (this.playerNative) this.durationNative = this.playerNative.duration
     },
     videoTimeupdate (e) {
       // this.$logT('videoTimeupdate', e)
       if (this.playerYoutube) {
         this.currentTime__ = e
         if (!this.currentTimeFreeze) this.currentTime = e
-        this.duration = this.playerYoutube.getDuration()
+        this.durationNative = this.playerYoutube.getDuration()
       } else if (this.playerNative) {
         this.currentTime__ = this.playerNative.currentTime
         if (!this.currentTimeFreeze) this.currentTime = this.playerNative.currentTime
-        this.duration = this.playerNative.duration
+        this.durationNative = this.playerNative.duration
       }
     },
     videoPaused (e) {
