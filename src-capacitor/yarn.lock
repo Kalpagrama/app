@@ -3,19 +3,19 @@
 
 
 "@capacitor/android@^3.3.4":
-  version "3.4.1"
-  resolved "https://registry.yarnpkg.com/@capacitor/android/-/android-3.4.1.tgz#d4accc41c843927853d27c7f638487bd52633486"
-  integrity sha512-4qQGEdZTW8W01PTOzSScmx9NBDcsi1GRl32tyYnpQrjdH2f7hI9OX2MLbNkirtOwKNCDeinQfEqqn0hVCkgHag==
+  version "3.4.3"
+  resolved "https://registry.yarnpkg.com/@capacitor/android/-/android-3.4.3.tgz#1bfaa5bbe83872f7ba5c7d7bd38b54a47827124b"
+  integrity sha512-G/6+mbOde9LMWl5KvA5rB/xEQF05sKrQFMBwo8y3C8pYF+axtcrS0Dgze9rOB7nCjH4NXv/bLw58E9+q8/sQUA==
 
 "@capacitor/app@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@capacitor/app/-/app-1.1.0.tgz#33a993a1f78723dad1f75bd949d15ba87de8279f"
-  integrity sha512-CjcMLThYfPBGBexb6Xy98MHA9olduS0OL0X8Ot9z9x5RN/Cx5K5OmlZkGMKOncR2R1h2n/whdO5tmDbjeqS6tw==
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@capacitor/app/-/app-1.1.1.tgz#bde7202faad1b47c4ae2c4a622285d7569384c5e"
+  integrity sha512-8ADkldHnoE1xkWvPUsGlERVGm6/Zvcxy6hCI80AxydIKyaCG7kbDAvUclebbnw/eFRxj2zBoVatGLjmJNvTbYw==
 
 "@capacitor/cli@^3.3.4":
-  version "3.4.1"
-  resolved "https://registry.yarnpkg.com/@capacitor/cli/-/cli-3.4.1.tgz#0664ee82215071553174a7a0cb3378d77f9a5d2b"
-  integrity sha512-48MA50ExfMJgndunsoh9kI3ItNJDwJrl6+DNocdEZfnIw45IUtmmeu+V3JsoDM2LfwxG9tamJV4zXWM0o4MSOw==
+  version "3.4.3"
+  resolved "https://registry.yarnpkg.com/@capacitor/cli/-/cli-3.4.3.tgz#15a14cbd9574980da5f9f04b6ce8623455784c6e"
+  integrity sha512-mu2pGoIh/OapMzWwXGXUlOmapXthW9XcHGERpZxNE45aBEYC9eTJWmbcXVlJuyx/9GFnnV+pXjGl3i0grci/Zw==
   dependencies:
     "@ionic/cli-framework-output" "^2.2.1"
     "@ionic/utils-fs" "^3.1.5"
@@ -35,14 +35,14 @@
     xml2js "^0.4.23"
 
 "@capacitor/clipboard@^1.0.7":
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/@capacitor/clipboard/-/clipboard-1.0.7.tgz#a88c09be46443660bd07bdb50db3c30fc207ace3"
-  integrity sha512-vYf6wFPdZwhfM2NzT1qo/Yyhjh/czTSZXKvVlPP8DM28QufQzh9llIwqrEao9Jt59zw8fvvmh5nUqxyXqHpLUQ==
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/@capacitor/clipboard/-/clipboard-1.0.8.tgz#5799cad4518618d45501509348a5c20d3ed32647"
+  integrity sha512-q8Fb5imJHQtYA+1sGqqigCrXmf0R1ZGXf/XMRtTznQqm0jhiayUusQN63Rv1YtKIPTJeeVJqy/i6rv72d4GH0Q==
 
 "@capacitor/core@^3.4.0":
-  version "3.4.1"
-  resolved "https://registry.yarnpkg.com/@capacitor/core/-/core-3.4.1.tgz#110e59eef7344ddc2d5642fbdc48a79caf0435d7"
-  integrity sha512-BwN925gwXGEVAhnnVAXH57cp+/YW5PhFZloGYaN3Sm8eKcYDNeti38lV9DQ8A/T5PYkJw/+TSu8SsuoEQD0vwQ==
+  version "3.4.3"
+  resolved "https://registry.yarnpkg.com/@capacitor/core/-/core-3.4.3.tgz#3cf343b7035f1f6f9b73854dfb828600cd8a5e07"
+  integrity sha512-drfu0IiDMyeJtL4QALQgNFqdgN19DZJkbKh945eXyK44Sk2YkFXUs7Ewq1ZlVI30QF79mHGuM13oZeki0gv5Tw==
   dependencies:
     tslib "^2.1.0"
 
@@ -52,9 +52,9 @@
   integrity sha512-+pJIb5X7xAcbrWj6rJaV+cwBlv8aFwB1/Ob6EV4atydThuuVSSsAL4hI4ZYlPNOxM6H5s+ZDLj7Pa2os4eFmtg==
 
 "@capacitor/ios@^3.3.4":
-  version "3.4.1"
-  resolved "https://registry.yarnpkg.com/@capacitor/ios/-/ios-3.4.1.tgz#0ae173056924294aa1e468b70377d603abea790e"
-  integrity sha512-ycFCyKI8DsgedVg7PW5MpCVgqFuD0PMHQGVfC5ichXc2C/jAATX32EVdEMCB0N3guKoH2k6T3Efwg59+Fcdx2w==
+  version "3.4.3"
+  resolved "https://registry.yarnpkg.com/@capacitor/ios/-/ios-3.4.3.tgz#eb7918f3bdf02c71e2e22f47d82a213d2a73abcd"
+  integrity sha512-WG6LHzkclYfiF8yBty31j256SD8XmNN1FlOiJUVeu5wz9gM4vw8FpTYIkj2VJoiBnQiB/OWotfnJp2Mp1Rfbtg==
 
 "@capacitor/keyboard@^1.2.1":
   version "1.2.2"
@@ -72,9 +72,9 @@
   integrity sha512-lhxa70K6vg0QjdddbT9RqFLfQ9a0Fk1OVE54MhUH30DWymv4h2LrC+mJgH6JS46WQbR2UCHRymfmVCq1PS2Qiw==
 
 "@ionic/cli-framework-output@^2.2.1":
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/@ionic/cli-framework-output/-/cli-framework-output-2.2.2.tgz#d03367e2b767a32fa7046c455843555b4971cd4a"
-  integrity sha512-eQYkqIW1/tCwSC6Bd0gjse96U11lDX/ikf3jvsjX7a8z/zwSmGzCHRizb7xogV65Ey+1/zyAZR71cpDRQuFLBQ==
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/@ionic/cli-framework-output/-/cli-framework-output-2.2.3.tgz#61437c4ae1e301daba9fade5820d06552b2d5744"
+  integrity sha512-Ok0DuQseeyEQnpq1eIE9Wt2oy80qmsprmQYu4bMeiaggbXTmzdf0wa+2CIRrAy1Mzh7Lnz95AI4KyYl3h+97GQ==
   dependencies:
     "@ionic/utils-terminal" "2.3.1"
     debug "^4.0.0"
@@ -126,16 +126,16 @@
     tslib "^2.0.1"
 
 "@ionic/utils-subprocess@^2.1.6":
-  version "2.1.8"
-  resolved "https://registry.yarnpkg.com/@ionic/utils-subprocess/-/utils-subprocess-2.1.8.tgz#c8d7ee39ff3f49171d727ecfd263c66b67cf8638"
-  integrity sha512-pkmtf1LtXcEMPn6/cctREL2aZtZoy0+0Sl+nT0NIkOHIoBUcqrcfMWdctCSM4Mp6+2/hLWtgpHE3TOIibkWfIg==
+  version "2.1.9"
+  resolved "https://registry.yarnpkg.com/@ionic/utils-subprocess/-/utils-subprocess-2.1.9.tgz#91d47afaa332cc5c0577c2fcd133c0776fd0635f"
+  integrity sha512-OZ4QKyFOoC3+NCcBW8tvDUdLzWqOMKZPpzOQR009xVsfGbT3LwV8h60os7VRAbRV2KrA7t6YMMDrMQYV5DS+DQ==
   dependencies:
     "@ionic/utils-array" "2.1.5"
     "@ionic/utils-fs" "3.1.5"
     "@ionic/utils-process" "2.1.8"
     "@ionic/utils-stream" "3.1.5"
     "@ionic/utils-terminal" "2.3.1"
-    cross-spawn "^7.0.0"
+    cross-spawn "^7.0.3"
     debug "^4.0.0"
     tslib "^2.0.1"
 
@@ -229,7 +229,7 @@ cordova-plugin-screen-orientation@^3.0.2:
   resolved "https://registry.yarnpkg.com/cordova-plugin-screen-orientation/-/cordova-plugin-screen-orientation-3.0.2.tgz#81290a933cfe84d35482cfcb251c931cc7b71931"
   integrity sha512-2w6CMC+HGvbhogJetalwGurL2Fx8DQCCPy3wlSZHN1/W7WoQ5n9ujVozcoKrY4VaagK6bxrPFih+ElkO8Uqfzg==
 
-cross-spawn@^7.0.0:
+cross-spawn@^7.0.3:
   version "7.0.3"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-7.0.3.tgz#f73a85b9d5d41d045551c177e2882d4ac85728a6"
   integrity sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==
@@ -239,9 +239,9 @@ cross-spawn@^7.0.0:
     which "^2.0.1"
 
 debug@^4.0.0, debug@^4.2.0, debug@^4.3.2:
-  version "4.3.3"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.3.tgz#04266e0b70a98d4462e6e288e38259213332b664"
-  integrity sha512-/zxw5+vh1Tfv+4Qn7a5nsbcJKPaSvCDhojn6FEl9vupwK2VCSDtEiEtqr8DFtzYFOdz63LBkxec7DYuc2jon6Q==
+  version "4.3.4"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.4.tgz#1319f6579357f2338d3337d2cdd4914bb5dcc865"
+  integrity sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==
   dependencies:
     ms "2.1.2"
 
@@ -292,9 +292,9 @@ fs-minipass@^2.0.0:
     minipass "^3.0.0"
 
 graceful-fs@^4.1.6, graceful-fs@^4.2.0:
-  version "4.2.9"
-  resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.9.tgz#041b05df45755e587a24942279b9d113146e1c96"
-  integrity sha512-NtNxqUcXgpW2iMrfqSfR73Glt39K+BLwWsPs94yR63v45T0Wbej7eRmL5cWfwEgqXnmjQp3zaJTshdRW/qC2ZQ==
+  version "4.2.10"
+  resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.10.tgz#147d3a006da4ca3ce14728c7aefc287c367d7a6c"
+  integrity sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==
 
 inherits@^2.0.3:
   version "2.0.4"
@@ -415,9 +415,9 @@ pend@~1.2.0:
   integrity sha1-elfrVQpng/kRUzH89GY9XI4AelA=
 
 plist@^3.0.2, plist@^3.0.4:
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/plist/-/plist-3.0.4.tgz#a62df837e3aed2bb3b735899d510c4f186019cbe"
-  integrity sha512-ksrr8y9+nXOxQB2osVNqrgvX/XQPOXaU4BQMKjYq8PvaY1U18mo+fKgBSwzK+luSyinOuPae956lSVcBwxlAMg==
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/plist/-/plist-3.0.5.tgz#2cbeb52d10e3cdccccf0c11a63a85d830970a987"
+  integrity sha512-83vX4eYdQp3vP9SxuYgEM/G/pJQqLUz/V/xzPrzruLs7fz7jxGQ1msZ/mg1nwZxUSuOp4sb+/bEIbRrbzZRxDA==
   dependencies:
     base64-js "^1.5.1"
     xmlbuilder "^9.0.7"
@@ -455,9 +455,9 @@ sax@>=0.6.0:
   integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
 
 semver@^7.3.2:
-  version "7.3.5"
-  resolved "https://registry.yarnpkg.com/semver/-/semver-7.3.5.tgz#0b621c879348d8998e4b0e4be94b3f12e6018ef7"
-  integrity sha512-PoeGJYh8HK4BTO/a9Tf6ZG3veo/A7ZVsYrSA6J8ny9nb3B1VrpkuN+z9OE5wfE5p6H4LchYZsegiQgbJD94ZFQ==
+  version "7.3.7"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.3.7.tgz#12c5b649afdbf9049707796e22a4028814ce523f"
+  integrity sha512-QlYTucUYOews+WeEujDoEGziz4K6c47V/Bd+LjSSYcA94p+DmINdf7ncaUinThfvZyu13lN9OY1XDxt8C0Tw0g==
   dependencies:
     lru-cache "^6.0.0"
 
