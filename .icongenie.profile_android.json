@@ -1,0 +1,15 @@
+{
+  "params": {
+    "quality": 8,
+    "include":  ["capacitor"],
+    "skipTrim": true,
+    "padding": [
+      0,
+      0
+    ],
+    "icon": "app-icon-android.png",
+    "themeColor": "111",
+    "splashscreenIconRatio": "33"
+  },
+  "assets": []
+}
