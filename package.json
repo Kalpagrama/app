@@ -27,7 +27,7 @@
     "deploy_android": "cd src-capacitor/android &&  fastlane deploy",
     "gql": "apollo schema:download -k ./src/api/graphql.schema.json && node src/api/possible_types.js",
     "icons": "icongenie generate -p .icongenie.profile.json",
-    "icons_android": "icongenie generate -p .icongenie.profile_android.json",
+    "icons_android": "icongenie generate -p .icongenie.profile_android.json &&  git checkout -- src-capacitor/ios/App/App/Assets.xcassets/",
     "tr": "i18next-scanner --config src/i18n/i18next-scanner.config.js",
     "lint": "eslint --ext .js,.vue src",
     "test": "cross-env RUN_TESTS=true yarn dev",

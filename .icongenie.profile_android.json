@@ -4,10 +4,10 @@
     "include":  ["capacitor"],
     "skipTrim": true,
     "padding": [
-      0,
-      0
+      44,
+      44
     ],
-    "icon": "app-icon-android.png",
+    "icon": "app-icon.png",
     "themeColor": "111",
     "splashscreenIconRatio": "33"
   },
