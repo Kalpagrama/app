@@ -20,6 +20,7 @@
       "kalpa.app",
       "dev.kalpa.app",
       "mac.kalpa.app"
-    ]
+    ],
+    "url": "http://192.168.88.33:8484"
   }
 }
