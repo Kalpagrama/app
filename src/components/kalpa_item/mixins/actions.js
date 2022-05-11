@@ -3,13 +3,16 @@ import { ObjectApi } from 'src/api/object'
 
 let mixin = {
    computed: {
+      itemForAction() {
+         return this.essence || this.node || this?.state?.node
+      },
       actions () {
          let res = {
             copyLink: {
                name: this.$t('Copy Link'),
                cb: async () => {
                   this.$log('copyLink')
-                  // alert('this.essence.oid: ' + this.essence.oid)
+                  // alert('this.itemForAction.oid: ' + this.itemForAction.oid)
                   // TODO: handle copy link...
                }
             },
@@ -17,18 +20,18 @@ let mixin = {
             //   name: this.$t('Go threads'),
             //   cb: async () => {
             //     this.$log('goThreads')
-            //     this.$router.push('/sphere-threads/' + this.essence.sphereFromName.oid)
+            //     this.$router.push('/sphere-threads/' + this.itemForAction.sphereFromName.oid)
             //   }
             // },
             // goGraph: {
             //   name: this.$t('Go graph'),
             //   cb: async () => {
             //     this.$log('goGraph')
-            //     if (this.essence.items.length === 1) {
-            //       this.$router.push(`/graph/${this.essence.oid}`)
+            //     if (this.itemForAction.items.length === 1) {
+            //       this.$router.push(`/graph/${this.itemForAction.oid}`)
             //     }
             //     else {
-            //       this.$router.push(`/graph/${this.essence.items[0].oid}?oid=${this.essence.oid}`)
+            //       this.$router.push(`/graph/${this.itemForAction.items[0].oid}?oid=${this.itemForAction.oid}`)
             //     }
             //   }
             // }
@@ -42,7 +45,7 @@ let mixin = {
                color: 'red',
                cb: async () => {
                   this.$log('hideGlobal...')
-                  await ObjectApi.hide(this.essence.oid)
+                  await ObjectApi.hide(this.itemForAction.oid)
                }
             }
          }
@@ -52,7 +55,7 @@ let mixin = {
                color: 'red',
                cb: async () => {
                   this.$log('essenceDelete...')
-                  await ObjectApi.unPublish(this.essence.oid)
+                  await ObjectApi.unPublish(this.itemForAction.oid)
                }
             }
          } else {
@@ -61,7 +64,7 @@ let mixin = {
                color: 'white',
                cb: async () => {
                   this.$log('hide...')
-                  // await this.$rxdb.hideObjectOrSource(this.essence.oid, null)
+                  // await this.$rxdb.hideObjectOrSource(this.itemForAction.oid, null)
                   this.data.hideShow = true
                }
             }
@@ -76,11 +79,11 @@ let mixin = {
             }
          }
          if (
-            this.essence.hasChanges &&
-            this.essence.type === 'BLOCK' &&
+            this.itemForAction.hasChanges &&
+            this.itemForAction.type === 'BLOCK' &&
             (
-               this.essence.author.oid === this.$store.getters.currentUser.oid ||
-               this.essence.members.find(m => m.oid === this.$store.getters.currentUser.oid)
+               this.itemForAction.author.oid === this.$store.getters.currentUser.oid ||
+               this.itemForAction.members.find(m => m.oid === this.$store.getters.currentUser.oid)
             )
          ) {
             res.update = {
@@ -88,7 +91,7 @@ let mixin = {
                color: 'green',
                cb: async () => {
                   this.$log('essenceUpdate...')
-                  await ObjectApi.blockUpdate(this.essence)
+                  await ObjectApi.blockUpdate(this.itemForAction)
                }
             }
          }
