@@ -21,6 +21,18 @@
         //q-btn(
         //  @click="$store.commit('ui/stateSet', ['kalpaTutorial', {id: 'node_first', useIntro: false, useProfileEditor: false}])"
         //  round flat color="white" icon="fas fa-info")
+    //report
+    q-dialog(
+      v-if="state.node"
+      v-model="isReportDialogShown"
+      :maximized="false")
+      kalpa-report(:essence="state.node")
+    //hide
+    q-dialog(
+      v-if="state.node"
+      v-model="isHideDialogShown"
+      :maximized="false")
+      kalpa-hide(:essence="state.node")
     q-dialog(
       v-model="itemEditorShow"
       :maximized="false"
