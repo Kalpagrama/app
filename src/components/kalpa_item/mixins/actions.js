@@ -4,7 +4,7 @@ import { ObjectApi } from 'src/api/object'
 let mixin = {
    computed: {
       itemForAction() {
-         return this.essence || this.node
+         return this.essence || this.node || this?.state?.node
       },
       actions () {
          let res = {
