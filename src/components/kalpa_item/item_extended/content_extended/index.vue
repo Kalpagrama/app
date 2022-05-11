@@ -19,10 +19,26 @@ div(:style=`{maxWidth: !isFullscreen ? $store.state.ui.pageWidth+'px' : $q.scree
         .col
         h1.text-white.text-bold {{$t('Контент')}}
         .col
+        kalpa-menu-actions(
+          v-if="showActions"
+          icon="more_vert"
+          color="grey-8"
+          :actions="actions")
         //- tutorial
-        q-btn(
-          @click=""
-          round flat color="white" icon="fas fa-info" :style=`{opacity:'0'}`)
+        //q-btn(
+        //  @click=""
+        //  round flat color="white" icon="fas fa-info" :style=`{opacity:'0'}`)
+    q-dialog(
+      v-if="content"
+      v-model="isReportDialogShown"
+      :maximized="false")
+      kalpa-report(:essence="content" @close="isReportDialogShown = false, $router.back()")
+    //hide
+    q-dialog(
+      v-if="content"
+      v-model="isHideDialogShown"
+      :maximized="false")
+      kalpa-hide(:essence="content" @close="isHideDialogShown = false, $router.back()")
     // контент
     div(:class="$screenProps.isMobile || isFullscreen ? '' : 'br-15'" :style=`{overflow: $screenProps.isMobile ? 'visible' : 'hidden'}`).row.full-width.relative-position
       q-resize-observer(@resize="bottomHeight = $q.screen.height - $event.height - headerHeight")
@@ -98,15 +114,27 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import contentView from './content_view'
 import bottomInfo from './bottom_info'
 import navMobile from 'src/components/kalpa_menu_mobile/nav_mobile.vue'
+import {mixin} from 'src/components/kalpa_item/mixins/actions'
+import kalpaReport from 'src/components/kalpa_report/index.vue'
+import kalpaHide from 'src/components/kalpa_hide/index.vue'
 
 export default {
   name: 'contentExtended',
-  props: ['oid'],
+  mixins: [mixin],
+  props: {
+    oid: {
+      type: String,
+      required: true
+    },
+    showActions: {type: Boolean, default: true},
+  },
   components: {
     pageWidth: 0,
     contentView,
     navMobile,
-    bottomInfo
+    bottomInfo,
+    kalpaReport,
+    kalpaHide
   },
   data () {
     return {

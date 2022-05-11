@@ -10,7 +10,7 @@ let mixin = {
    },
    computed: {
       itemForAction() {
-         return this.essence || this.node || this?.state?.node
+         return this.essence || this.node || this?.state?.node || this.content
       },
       actions () {
          let res = {
