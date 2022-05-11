@@ -204,7 +204,7 @@ class AuthApi {
                userId: userId_,
                masterToken,
                forceSendConfirmation,
-               defaultLang: getLocale()
+               defaultLang: LangEnum.ENG// getLocale()
             }
          })
          if (!token) { // сервер отверг userIdentify
