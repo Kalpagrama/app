@@ -32,7 +32,7 @@ borderRadius: '20px'
       )
     .row.full-width.justify-center.q-gutter-sm
       //q-btn(:label= "$t('Cancel')" no-caps outline color="green" v-close-popup)
-      q-btn(:label= "$t('Send Report')" no-caps outline color="red" @click="hide")
+      q-btn(:label= "$t('Send Report')" no-caps outline color="red" :disable="!text && !model" @click="hide")
 </template>
 
 <script>
@@ -45,7 +45,7 @@ export default {
       text: (''),
       model: null,
       options: [
-        this.$t('Image of a naked body'),
+        this.$t('A naked body'),
         this.$t('Violence'),
         this.$t('Harassment'),
         this.$t('Suicide/self-mutilation'),
@@ -61,6 +61,7 @@ export default {
   },
   methods: {
     async hide(){
+      await this.$notify('success', this.$t('сообщение отправлено'))
       await this.$rxdb.hideObjectOrSource(this.essence.oid, null)
     }
   }
