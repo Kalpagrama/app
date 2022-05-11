@@ -11,7 +11,7 @@
         .col
         //- tutorial
         kalpa-menu-actions(
-          v-if="showDropdown"
+          v-if="showDropdown && node"
           icon="more_vert"
           color="grey-8"
           :actions="actions")
