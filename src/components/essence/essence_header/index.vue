@@ -7,12 +7,12 @@ div(
 ).row.full-width.items-center.content-center
   //report
   q-dialog(
-    v-model="data.reportShow"
+    v-model="isReportDialogShown"
     :maximized="false")
     kalpa-report(:essence="essence")
   //hide
   q-dialog(
-    v-model="data.hideShow"
+    v-model="isHideDialogShown"
     :maximized="false")
     kalpa-hide(:essence="essence")
   //- user VOTED
@@ -99,10 +99,7 @@ export default {
       assert(this.itemState)
       let key = this.$options.name
       if (!this.itemState[key]) {
-        this.$set_deprecated(this.itemState, key, reactive({
-          reportShow: false,
-          hideShow: false
-        }))
+        this.$set_deprecated(this.itemState, key, reactive({}))
       }
       return this.itemState[key]
     },

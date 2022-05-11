@@ -218,8 +218,6 @@ export default {
         imageActive: true // главный образ играется
       },
       itemEditorShow: false,
-      reportShow: false,
-      hideShow: false,
       pageId: null, // description|comments|essences
       bottomHeight: 0, // сколько места под образом
       imageMaxHeight: 0 // максимальная высота образа

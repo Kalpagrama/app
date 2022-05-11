@@ -23,7 +23,7 @@ import { setSyncEventStorageValue } from 'src/system/services'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.RXDB_WS)
 
 // const synchroTimeDefault = 1000 * 60 * 1 // раз в 1 минут шлем изменения на сервер
-const synchroTimeDefault = 1000 * 10 // раз в 1 минут шлем изменения на сервер
+const synchroTimeDefault = 1000 * 60 // раз в 1 минут шлем изменения на сервер
 if (synchroTimeDefault < 1000 * 60 * 1) logE('TODO increase synchroTimeDefault')
 
 // logE('synchroTimeDefault!!! 1000 * 10')

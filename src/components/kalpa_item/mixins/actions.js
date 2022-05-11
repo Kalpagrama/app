@@ -2,6 +2,12 @@ import { UserRoleEnum } from 'src/api/user'
 import { ObjectApi } from 'src/api/object'
 
 let mixin = {
+   data() {
+      return {
+         isHideDialogShown: false,
+         isReportDialogShown: false,
+      }
+   },
    computed: {
       itemForAction() {
          return this.essence || this.node || this?.state?.node
@@ -65,7 +71,8 @@ let mixin = {
                cb: async () => {
                   this.$log('hide...')
                   // await this.$rxdb.hideObjectOrSource(this.itemForAction.oid, null)
-                  this.data.hideShow = true
+                  // this.data.hideShow = true
+                  this.isHideDialogShown = true
                }
             }
             res.report = {
@@ -74,7 +81,8 @@ let mixin = {
                cb: () => {
                   this.$log('report...')
                   // let reason = prompt(this.$t('Why?'))
-                  this.data.reportShow = true
+                  // this.data.reportShow = true
+                  this.isReportDialogShown = true
                }
             }
          }
