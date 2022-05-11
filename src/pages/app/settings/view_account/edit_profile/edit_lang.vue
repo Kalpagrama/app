@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width.q-pa-sm
   .row.full-width.q-px-sm.q-pb-sm
-    span.text-white.text-bold {{$t('Pick language')}}
+    span.text-white.text-bold {{$t('Choose language')}}
   q-btn-group(
     flat
     :style=`{

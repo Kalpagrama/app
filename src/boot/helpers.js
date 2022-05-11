@@ -45,14 +45,14 @@ const nodeItemTypes = [
 ]
 
 const nodeItemTypesPairs = [
-  {id: ['ESSENCE', 'ESSENCE'], name: 'Указать суть'},
-  {id: ['ASSOCIATIVE', 'ASSOCIATIVE'], name: 'Ассоциация'},
-  {id: ['CAUSE', 'EFFECT'], name: 'Причина - Следствие'},
-  {id: ['PROBLEM', 'SOLUTION'], name: 'Проблема - Решение'},
-  {id: ['FROM', 'TO'], name: 'До - После'},
-  {id: ['FAKE', 'DISPROOF'], name: 'Фейк - Опровержение'},
-  {id: ['FACT', 'PROOF'], name: 'Факт - Подтверждение'},
-  {id: ['QUESTION', 'ANSWER'], name: 'Вопрос - Ответ'},
+  {id: ['ESSENCE', 'ESSENCE'], name: 'which link'},
+  {id: ['ASSOCIATIVE', 'ASSOCIATIVE'], name: 'Association'},
+  {id: ['CAUSE', 'EFFECT'], name: 'Cause - Effect'},
+  {id: ['PROBLEM', 'SOLUTION'], name: 'Problem - Solution'},
+  {id: ['FROM', 'TO'], name: 'Before - After'},
+  {id: ['FAKE', 'DISPROOF'], name: 'Fake - Disproof'},
+  {id: ['FACT', 'PROOF'], name: 'Fact - Proof'},
+  {id: ['QUESTION', 'ANSWER'], name: 'Question - Answer'},
 ]
 
 const nodeItemType = (type) => {

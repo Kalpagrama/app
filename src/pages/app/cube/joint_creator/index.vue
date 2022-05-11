@@ -46,7 +46,7 @@ div(
             minHeight: '300px',
           }`
           ).full-width.b-40
-          span(:style=`{fontSize: '18px'}`) {{$t('Pick element for join')}}
+          // span(:style=`{fontSize: '18px'}`) {{$t('Pick element for join')}}
       //- item PREVIEW
       div(
         v-if="joint.items[1]"

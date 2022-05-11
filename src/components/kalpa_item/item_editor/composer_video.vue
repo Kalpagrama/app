@@ -1,10 +1,34 @@
 <template lang="pug">
-.row.fit.bg-black
-  content-player( v-if="contentKalpa" @player="playerReady" :contentKalpa="contentKalpa").row.full-width
-    template(v-slot:pult)
-      div(v-if="false && player").row.full-width.justify-center
+.row.fit.bg-black.items-start.content-start.justify-center
+  div(:style=`{maxWidth: Math.min($store.state.ui.pageWidth, $q.screen.width)+'px'}`).row.full-width
+    content-player(v-if="contentKalpa" @player="playerReady" :contentKalpa="contentKalpa").row.full-width.br-15
+      //template(v-slot:pult)
+      //  div(v-if="player").row.full-width.justify-center
+      //    div( :style=`{ maxWidth: 600+'px', borderRadius: '30px',}`).row.full-width.items-center.content-center
+      //      div(v-if="!player.figures" :style=`{ lineHeight: 1,}`).row.full-width.items-start.content-start.q-px-md.q-py-sm
+      //        .col.q-px-sm
+      //          span.text-white {{$t('Click')}}
+      //          q-icon(name="add_circle_outline" color="green" size="sm")
+      //          span.text-white {{$t('at the bottom to select a fragment from the video.')}}
+      //      //- bottom
+      //      .row.full-width.q-py-sm.q-px-md
+      //        q-btn(
+      //          v-if="true"
+      //          @click="$emit('close')"
+      //          flat no-caps color="red"
+      //          :style=`{
+      //            borderRadius: '40px',
+      //          }`
+      //          ).q-mr-sm {{$t('Close')}}
+      //        .col
+    .row.fit.justify-center.content-start
+      q-resize-observer(@resize="editorHeight = $event.height")
+      div(v-if="player && player.duration > 0 && player.node && player.nodeMode === 'edit'").row.full-width
+        fragment-editor(:player="player" :contentKalpa="contentKalpa").row.br-10.b-35.op-70
+        q-btn( flat no-caps color="green" :disable="!player.figures" :label="$t('Ready')" @click="compositionUpdate" ).full-width
+      div(v-else).row.full-width.justify-center
         div( :style=`{ maxWidth: 600+'px', borderRadius: '30px',}`).row.full-width.items-center.content-center
-          div(v-if="!player.figures" :style=`{ lineHeight: 1,}`).row.full-width.items-start.content-start.q-px-md.q-py-sm
+          div(:style=`{ lineHeight: 1,}`).row.full-width.items-start.content-start.q-px-md.q-py-sm
             .col.q-px-sm
               span.text-white {{$t('Click')}}
               q-icon(name="add_circle_outline" color="green" size="sm")
@@ -16,15 +40,10 @@
               @click="$emit('close')"
               flat no-caps color="red"
               :style=`{
-                borderRadius: '40px',
-              }`
-              ).q-mr-sm {{$t('Close')}}
+                  borderRadius: '40px',
+                }`
+            ).q-mr-sm {{$t('Close')}}
             .col
-  .row.fit.justify-center.content-start
-    q-resize-observer(@resize="editorHeight = $event.height")
-    div(v-if="player && player.duration > 0 && player.node && player.nodeMode === 'edit'").row.full-width
-      fragment-editor(:player="player" :contentKalpa="contentKalpa").row.br-10.b-35.op-70
-      q-btn( flat no-caps color="green" :disable="!player.figures" :label="$t('Ready')" @click="compositionUpdate" ).full-width
 </template>
 
 <script>

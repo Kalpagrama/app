@@ -5,12 +5,12 @@ div(
   }`
   ).row.full-width.q-px-xs
   .row.full-width.q-pl-sm
-    small.text-grey-6 {{$t('Status (tell about you)')}}
+    small.text-grey-6 {{$t('Bio')}}
   q-input(
     v-model="status"
     type="textarea" autogrow dark color="white"
     borderless
-    placeholder="Расскажи о себе"
+    :placeholder = "$t('Расскажи о себе')"
     :debounce="500"
     :input-style=`{
       background: 'rgb(45,45,45)',

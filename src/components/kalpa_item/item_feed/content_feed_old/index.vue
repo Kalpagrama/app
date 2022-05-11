@@ -8,7 +8,7 @@ div(
   maxHeight: height + 'px',
   minWidth: height + 'px',
   // background: 'linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(40,40,40,0) 100%)',
-  }`).b-0.br
+  }`).b-0
   //image
   img(
     :src="item.thumbUrl"

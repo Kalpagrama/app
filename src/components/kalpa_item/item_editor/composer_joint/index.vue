@@ -34,7 +34,7 @@
         flat color="white" no-caps icon="add" size="lg" stack
       :style=`{minHeight: '200px'}`
       ).full-width.b-40
-        span(:style=`{fontSize: '18px'}`) {{$t('Pick element for join')}}
+        // span(:style=`{fontSize: '18px'}`) {{$t('Pick element for join')}}
     q-btn(v-if="joint.items[1]" flat round icon="close" color="red" :style=`{zIndex: 100}` @click="itemDelete").absolute-top-right
   q-btn(
     :label="$t('Create joint')"

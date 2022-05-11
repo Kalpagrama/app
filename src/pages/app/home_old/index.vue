@@ -22,48 +22,31 @@ kalpa-layout
         guest-guard
       div(v-if="!$store.getters.isGuest" :style=`{maxWidth: $store.state.ui.pageWidth+'px'}`).row.full-width
         // подписки
-        //span.text-grey-5.text-h6.q-py-sm.q-pl-sm {{$t('Мои подписки')}}
-        //list-feed-custom-horizontalPPV(
-        //  ref="listFeedHorizontal"
-        //  :scrollAreaWidth="$store.state.ui.pageWidth"
-        //  :scrollAreaHeight="150"
-        //  :query="querySubscriptions"
-        //  :itemWidthApprox="150*1.618"
-        //  :itemHeightApprox="150"
-        //  :itemActivePersist="itemActivePersist"
-        //  @count="$emit('count', $event)"
-        //  @items="$emit('items', $event)")
-        //  template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload,scrolling}`)
-        //    item-feed(
-        //      :itemShortOrFull="item"
-        //      :itemState="itemState"
-        //      :itemIndex="itemIndex"
-        //      :isActive="isActive"
-        //      :isVisible="isVisible"
-        //      :isPreload="isPreload"
-        //      :scrolling="scrolling"
-        //      :showContext="false"
-        //      :layout="'card-tiny'"
-        //      :height="150"
-        //      :muted="true").q-px-xs
-        div(v-if="$screenProps.isMobile"
-          @click="$go('/home')"
-        ).row.full-width.items-center.content-center.q-pa-xs
-          div(
-            :style=`{zIndex: 100, height: '45px', width: '45px', cursor: 'pointer !important'}`
-          ).row.items-center.content-center.justify-center.cursor-pointer
-            kalpa-logo(:width="35" :height="35" :style=`{pointEvents: 'none'}`)
-          div.col
-            div(
-            ).row.fit.items-center.content-center.cursor-pointer
-              span(:style=`{fontSize: '18px'}`).text-grey-5.text-bold {{$t('Kalpagrama')}}
-              //.row.full-width
-              //  small.text-grey-4 {{$t('Connect the dots')}}
-        //div(
-        //  :style=`{zIndex: 100, height: '60px', width: '60px', cursor: 'pointer !important'}`
-        //).row.items-center.content-center.justify-center.cursor-pointer
-        //kalpa-logo(:width="40" :height="40" :style=`{pointEvents: 'none'}`)
-        //span(v-if="$screenProps.isMobile").text-grey-5.text-h6.q-pt-md.q-pl-sm {{$t('Kalpagrama')}}
+        span.text-grey-5.text-h6.q-py-sm.q-pl-sm {{$t('Мои подписки')}}
+        list-feed-custom-horizontalPPV(
+          ref="listFeedHorizontal"
+          :scrollAreaWidth="$store.state.ui.pageWidth"
+          :scrollAreaHeight="150"
+          :query="querySubscriptions"
+          :itemWidthApprox="150*1.618"
+          :itemHeightApprox="150"
+          :itemActivePersist="itemActivePersist"
+          @count="$emit('count', $event)"
+          @items="$emit('items', $event)")
+          template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload,scrolling}`)
+            item-feed(
+              :itemShortOrFull="item"
+              :itemState="itemState"
+              :itemIndex="itemIndex"
+              :isActive="isActive"
+              :isVisible="isVisible"
+              :isPreload="isPreload"
+              :scrolling="scrolling"
+              :showContext="false"
+              :layout="'card-tiny'"
+              :height="150"
+              :muted="true").q-px-xs
+        span.text-grey-5.text-h6.q-py-md.q-pl-sm {{$t('Новое по подпискам')}}
         tab-list-feed(
           ref="listFeed"
           :type="'customPPV'"
@@ -72,7 +55,7 @@ kalpa-layout
           :query="query"
           :itemHeightApprox="Math.min($store.state.ui.pageWidth, $q.screen.width) * 0.6 + 222"
           :itemActivePersist="true"
-        ).row.full-width.q-mt-xs
+        ).row.full-width
           template(v-slot:item=`{item,itemState,itemIndex,isActive,isVisible,isPreload, scrolling}`)
             item-feed(
               :itemShortOrFull="item.object"

@@ -83,7 +83,7 @@ div(
       }`
       ).row.full-width.justify-center
       //- small(:style=`{whiteSpace: 'nowrap'}`).text-grey-9 {{ $rateMeta.find(r => essence.rate >= r.valueMin && essence.rate <= r.valueMax).name }}
-      small(v-if="showBottomText" :style=`{whiteSpace: 'nowrap'}`).text-grey-9 {{ essence.rateUser !== null ? rateMax.name : 'Проголосуйте' }}
+      small(v-if="showBottomText" :style=`{whiteSpace: 'nowrap'}`).text-grey-9 {{ essence.rateUser !== null ? rateMax.name : $t('Проголосуйте') }}
 </template>
 
 <script>

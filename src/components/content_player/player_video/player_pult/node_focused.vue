@@ -23,7 +23,7 @@ div(
         div(
           v-if="nodeCreating"
           :style=`{textAlign: 'center'}`).row.full-width.justify-center.q-pa-lg
-          h1(:style=`{fontSize: '36px',}`).text-white.text-bold Ядро создано 🎉
+          h1(:style=`{fontSize: '36px',}`).text-white.text-bold {{$t('Ядро создано 🎉')}}
       item-feed(
         :itemState="{}"
         :isActive="true"
@@ -121,7 +121,7 @@ export default {
           this.nodeCreated = true
           this.$q.notify({
             type: 'positive',
-            message: 'Ядро создано 🎉',
+            message: 'Node created 🎉',
             position: 'top',
             actions: [
               {

@@ -136,9 +136,9 @@ export default {
         //   }
         // }
       }
-      if (this.$store.getters.isGuest) {
-        return res
-      }
+      // if (this.$store.getters.isGuest) {
+      //   return res
+      // }
       if (this.$store.getters.currentUser.profile.role.in(UserRoleEnum.MODERATOR, UserRoleEnum.ADMIN)) {
         res.hideGlobal = {
           name: this.$t('hide global'),

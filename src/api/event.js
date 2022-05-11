@@ -9,16 +9,17 @@ import { AuthApi } from 'src/api/auth'
 import { router } from 'src/boot/system'
 import { notify } from 'src/boot/notify'
 import { store } from 'src/store/index'
+import { t } from 'src/boot/i18n'
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.API)
 
 class EventApi {
    static verbalizeRate(float){
       assert(float >= 0 && float <= 1)
-      if (float <= 0.2) return 'Очень далеко'
-      else if (float <= 0.4) return 'Далеко'
-      else if (float <= 0.6) return 'Где-то рядом'
-      else if (float <= 0.8) return 'Близко'
-      else if (float <= 1) return 'Прямо в точку!'
+      if (float <= 0.2) return 'Very far' // 'Очень далеко'
+      else if (float <= 0.4) return 'Far' // 'Далеко'
+      else if (float <= 0.6) return 'Quite close' // 'Где-то рядом'
+      else if (float <= 0.8) return 'Close' // 'Близко'
+      else if (float <= 1) return 'Spot on' // 'Прямо в точку!'
    }
 
    // ф-я дублируется на сервере (при изменении - синхронизировать)

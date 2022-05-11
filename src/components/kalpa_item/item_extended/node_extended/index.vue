@@ -12,7 +12,7 @@
         //- tutorial
         q-btn(
           @click=""
-          round flat color="white" icon="fas fa-info" :style=`{opacity:'0'}`)
+          round flat color="white" icon="more_vert" :style=`{opacity:'100'}`)
         //q-btn(
         //  @click="$store.commit('ui/stateSet', ['kalpaTutorial', {id: 'node_first', useIntro: false, useProfileEditor: false}])"
         //  round flat color="white" icon="fas fa-info")

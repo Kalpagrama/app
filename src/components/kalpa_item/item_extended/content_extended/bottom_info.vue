@@ -128,7 +128,7 @@
     // похожие
     div(v-if="showSimilar").row.full-width.q-pt-lg
       .row.full-width.justify-start
-        small.text-grey-8.q-pb-xs.q-px-xs {{$t('похожее')}}
+        small.text-grey-8.q-pb-xs.q-px-xs {{$t('Рекомендации')}}
       //small.text-grey.text-center.text-italic.q-px-xs "{{content.name.substring(0, 22)}}{{content.name.length>22 ? '...': ''}}"
       page-similar(:item="content")
 </template>

@@ -48,7 +48,7 @@ q-layout(
               textAlign: 'justify',
             }`
           ).row.full-width.items-start.content-start
-            p.text-white Добавляйте контент из YouTube и Instagram. Можно загрузить файл с устройства. Книги музыка фильмы - все можно сохранять к себе в мастерскую.
+            p.text-white Добавляйте контент из YouTube. Можно загрузить файл с устройства. Книги музыка фильмы - все можно сохранять к себе в мастерскую.
             .row.full-width
               q-btn( flat icon="checklist_rtl" color='white'
                 @click="showKalpaTutorial('tutorial_content')"
@@ -70,7 +70,7 @@ q-layout(
         //- nodes
         .row.full-width.justify-center.q-pt-xl
           q-icon(name="adjust" color="grey-5" size="40px").q-pr-xs
-          p.text-h4.text-bold.text-white {{$t('Смысловое ядро')}}
+          p.text-h4.text-bold.text-white {{$t('Смысловые ядра')}}
         div(:style=`{zIndex: 10,}`).row.full-width.justify-center
           div(
             :style=`{
@@ -240,7 +240,7 @@ q-layout(
         //- blocks
         .row.full-width.justify-center
           q-icon(name="dashboard_customize" color="grey-5" size="40px").q-pr-xs
-          p.text-h4.text-bold.text-white {{$t('Essence block')}}
+          p.text-h4.text-bold.text-white {{$t('Semantic block')}}
         div(:style=`{zIndex: 10,}`).row.full-width.justify-center
           div(
             :style=`{
