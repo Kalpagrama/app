@@ -26,13 +26,13 @@
       v-if="state.node"
       v-model="isReportDialogShown"
       :maximized="false")
-      kalpa-report(:essence="state.node")
+      kalpa-report(:essence="state.node" @close="isReportDialogShown = false")
     //hide
     q-dialog(
       v-if="state.node"
       v-model="isHideDialogShown"
       :maximized="false")
-      kalpa-hide(:essence="state.node")
+      kalpa-hide(:essence="state.node" @close="isHideDialogShown = false, $router.back()")
     q-dialog(
       v-model="itemEditorShow"
       :maximized="false"

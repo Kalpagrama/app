@@ -63,6 +63,7 @@ export default {
     async hide(){
       await this.$notify('success', this.$t('сообщение отправлено'))
       await this.$rxdb.hideObjectOrSource(this.essence.oid, null)
+      this.$emit('close')
     }
   }
 }

@@ -50,6 +50,7 @@ export default {
           await this.$rxdb.hideObjectOrSource(this.essence.oid, null)
           break
       }
+      this.$emit('close')
     }
   }
 }

@@ -9,12 +9,12 @@ div(
   q-dialog(
     v-model="isReportDialogShown"
     :maximized="false")
-    kalpa-report(:essence="essence")
+    kalpa-report(:essence="essence" @close="isReportDialogShown = false")
   //hide
   q-dialog(
     v-model="isHideDialogShown"
     :maximized="false")
-    kalpa-hide(:essence="essence")
+    kalpa-hide(:essence="essence" @close="isHideDialogShown = false")
   //- user VOTED
   q-btn(
     v-if="showAuthorAlways || essence.rateUser !== null"
