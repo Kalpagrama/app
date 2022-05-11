@@ -10,9 +10,14 @@
         h1.text-white.text-bold {{$t('Смысловое ядро')}}
         .col
         //- tutorial
-        q-btn(
-          @click=""
-          round flat color="white" icon="more_vert" :style=`{opacity:'100'}`)
+        kalpa-menu-actions(
+          v-if="showDropdown"
+          icon="more_vert"
+          color="grey-8"
+          :actions="actions")
+        //q-btn(
+        //  @click=""
+        //  round flat color="white" icon="more_vert" :style=`{opacity:'100'}`)
         //q-btn(
         //  @click="$store.commit('ui/stateSet', ['kalpaTutorial', {id: 'node_first', useIntro: false, useProfileEditor: false}])"
         //  round flat color="white" icon="fas fa-info")
@@ -161,17 +166,22 @@ import pageEssence from './page_essence/index.vue'
 import pageImage from './page_image/index.vue'
 import navMobile from 'src/components/kalpa_menu_mobile/nav_mobile.vue'
 import widgetImages from './widget_images/index.vue'
+import {mixin} from 'src/components/kalpa_item/mixins/actions'
+import kalpaReport from 'src/components/kalpa_report/index.vue'
+import kalpaHide from 'src/components/kalpa_hide/index.vue'
 
 import { assert } from 'src/system/common/utils'
 import cloneDeep from 'lodash/cloneDeep'
 
 export default {
   name: 'nodeExtended',
+  mixins: [mixin],
   props: {
     oid: {
       type: String,
       required: true
     },
+    showDropdown: { default: true },
     showActions: { default: true },
     showAuthor: { default: true },
     showComments: { default: true },
@@ -188,7 +198,9 @@ export default {
     pageImages,
     pageEssence,
     pageImage,
-    widgetImages
+    widgetImages,
+    kalpaReport,
+    kalpaHide
   },
   data () {
     return {
@@ -206,6 +218,8 @@ export default {
         imageActive: true // главный образ играется
       },
       itemEditorShow: false,
+      reportShow: false,
+      hideShow: false,
       pageId: null, // description|comments|essences
       bottomHeight: 0, // сколько места под образом
       imageMaxHeight: 0 // максимальная высота образа
