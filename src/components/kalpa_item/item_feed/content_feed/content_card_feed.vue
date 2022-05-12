@@ -77,7 +77,7 @@ div(
       height: '35px', minHeight: '35px', maxHeight: '35px',
       borderRadius: '50%',
     }`).q-ma-sm
-    .col.q-pt-xs.br
+    .col.q-pt-xs
       .collumn
         .row
           span.text-grey-5.q-pb-xs.full-width.q-pr-xs {{ item.name }}
@@ -87,12 +87,12 @@ div(
           //small.text-grey-8.q-mr-sm {{ $date(item.createdAt, 'DD.MM.YYYY') }}
           small(size="sm").row.items-center.text-grey-7 {{ item.author.name }} {{$t(' 🞄 ')}} {{item.countStat.countViews}} {{$getNoun(item.countStat.countViews,$t('просмотр'),$t('просмотра'),$t('просмотров'))}} {{$t(' 🞄 ')}} {{ $date(item.createdAt, 'DD.MM.YYYY') }}
           //small.text-grey-5.q-pb-xs.ellipsis {{$t(' 🞄 ')}} {{ item.countStat.countViews }} {{$t('просмотров')}}
-      .col
-        kalpa-menu-actions(
-          v-if="data.showDropdown && item"
-          icon="more_vert"
-          color="grey-8"
-          :actions="actions").bb
+    .row
+      kalpa-menu-actions(
+        v-if="data.showDropdown && item"
+        icon="more_vert"
+        color="grey-8"
+        :actions="actions")
 </template>
 
 <script>
@@ -115,9 +115,6 @@ export default {
     kalpaHide
   },
   computed: {
-    actions () {
-      return {}
-    },
     data () {
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
       assert(this.itemState)
@@ -125,7 +122,7 @@ export default {
       if (!this.itemState[key]) {
         this.$set_deprecated(this.itemState, key, reactive({
           itemActive: 0,
-          showDropdown: false
+          showDropdown: true
         }))
       }
       return this.itemState[key]
