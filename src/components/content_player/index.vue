@@ -33,6 +33,6 @@ export default {
         BOOK: 'player-book'
       }
     }
-  }
+  },
 }
 </script>

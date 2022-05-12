@@ -1,5 +1,5 @@
 <template lang="pug">
-component(:is="item.type === 'VIDEO' ? 'video-overlay' : 'video-overlay'" :item="item" :player="player")
+component(:is="options.footerOverlay ? 'video-feed-overlay' : item.type === 'VIDEO' ? 'video-overlay' : 'video-overlay'" :item="item" :player="player")
 </template>
 // content-video-overlay
 // node-video-overlay
@@ -7,11 +7,13 @@ component(:is="item.type === 'VIDEO' ? 'video-overlay' : 'video-overlay'" :item=
 
 <script>
 import videoOverlay from './video'
+import videoFeedOverlay from './video_feed'
 export default {
   name: 'itemOverlay',
-  props: ['item', 'player'],
+  props: ['item', 'player', 'options'],
   components: {
-    videoOverlay
+    videoOverlay,
+    videoFeedOverlay
   },
   // emits: ['play', 'pause']
 }

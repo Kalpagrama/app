@@ -8,7 +8,7 @@ div(
   // maxHeight: height + 'px',
   // minWidth: height + 'px',
   // background: 'linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(40,40,40,0) 100%)',
-  }`).row.full-width.items-start.content-start
+  }`).row.full-width.items-start.content-start.q-mb-xs
   //report
   q-dialog(
     v-if="item"
@@ -36,21 +36,21 @@ div(
   //).row.full-width
   div(
     :style=`{
-    position: 'relative',
+    position: 'relative', overflow: 'hidden', borderRadius: $screenProps.isMobile ? '00px' : '10px',
   }`
   ).row.full-width.items-stat.content-start
     img(
       draggable="false"
       :src="item.thumbUrl"
       :style=`{
-        borderRadius: '00px',
+        borderRadius: '00px', objectFit: 'contain', maxHeight: '80vh'
       }`).full-width
     content-player(
-      v-if="item"
+      v-if="isActive && isVisible"
       @player="playerReady"
       :contentKalpa="item"
       :style=`{
-        position: 'absolute', zIndex: 100, top: '0px',
+        position: 'absolute', zIndex: 100, top: '0px', maxHeight: '80vh'
       }`
       :options=`{
         loop: true,
@@ -60,13 +60,13 @@ div(
         showHeader: true,
         showFooter: true,
         showContext: false,
+        feedOverlay: true,
         mode: 'feed',
       }`
       :styles=`{
         height: '100%',
         objectFit: 'contain',
-      }`
-  ).fit
+      }`).fit
   //div(:style=`{pointerEvents: 'none', background: 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 50%)', zIndex: 10}`).fit.absolute-center
   //div(:style=`{zIndex: 10}`).row.full-width.absolute-bottom.full-height
   //  //- NAME: dynamic link/ dynamic fontSize
@@ -80,24 +80,28 @@ div(
   //  ).row.full-width.items-center.content-end.justify-center
   //    span.text-grey-5.q-px-sm.q-pb-xs.ellipsis {{ item.name }}
   div.row.full-width
-    .row
-      img(
-        draggable="false"
-        :src="item.author.thumbUrl"
-        :style=`{
+    //q-btn(
+    //  :to="'/user/'+item.author.oid"
+    //  round flat color="white" no-caps
+    //).row
+    img(
+      draggable="false"
+      :src="item.author.thumbUrl"
+      @click="$router.push('/user/'+item.author.oid)"
+      :style=`{
       width: '35px', minWidth: '35px', maxWidth: '35px',
       height: '35px', minHeight: '35px', maxHeight: '35px',
       borderRadius: '50%',
-    }`).q-ma-sm
+    }`).q-ma-sm.cursor-pointer
     .col.q-pt-xs
       .collumn
         .row
-          span.text-grey-5.q-pb-xs.full-width.q-pr-xs {{ item.name }}
+          span(@click="$router.push('/content/'+item.oid)").text-grey-5.q-pb-xs.full-width.q-pr-xs.cursor-pointer {{ item.name }}
         .col
           //small.text-grey-5.q-pb-xs.ellipsis {{ item.author.name }}
           //small.text-grey-5.q-pb-xs.ellipsis {{$t(' 🞄 ')}} {{ item.countStat.countViews }} {{$t('просмотров')}}
           //small.text-grey-8.q-mr-sm {{ $date(item.createdAt, 'DD.MM.YYYY') }}
-          small(size="sm").row.items-center.text-grey-7 {{ item.author.name }} {{$t(' 🞄 ')}} {{item.countStat.countViews}} {{$getNoun(item.countStat.countViews,$t('просмотр'),$t('просмотра'),$t('просмотров'))}} {{$t(' 🞄 ')}} {{ $date(item.createdAt, 'DD.MM.YYYY') }}
+          small(size="sm", @click="$router.push('/user/'+item.author.oid)").row.items-center.text-grey-7.cursor-pointer {{ item.author.name }} {{$t(' 🞄 ')}} {{item.countStat.countViews}} {{$getNoun(item.countStat.countViews,$t('просмотр'),$t('просмотра'),$t('просмотров'))}} {{$t(' 🞄 ')}} {{ $date(item.createdAt, 'DD.MM.YYYY') }}
           //small.text-grey-5.q-pb-xs.ellipsis {{$t(' 🞄 ')}} {{ item.countStat.countViews }} {{$t('просмотров')}}
     .row
       kalpa-menu-actions(

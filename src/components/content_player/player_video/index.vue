@@ -16,12 +16,7 @@ export default {
   },
   props: {
     contentKalpa: { type: Object, required: true },
-    options: {
-      type: Object,
-      default () {
-        return {}
-      }
-    }
+    options: {type: Object},
   },
   emits: ['player'],
   data () {

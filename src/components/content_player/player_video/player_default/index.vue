@@ -28,7 +28,7 @@ div(:style=`{height: videoHeight+'px'}`).row.full-width.relative-position
       ).row.full-width
   // оверлэй для видео
   .row.fit.absolute
-    item-overlay(:item="contentKalpa" :player="thiz" :style=`{zIndex: 100}`)
+    item-overlay(:item="contentKalpa" :player="thiz" :options="options" :style=`{zIndex: 100}`)
 </template>
 
 <script>
@@ -44,12 +44,7 @@ export default {
   components: { itemOverlay, youtubePlayer },
   props: {
     contentKalpa: { type: Object, required: true },
-    options: {
-      type: Object,
-      default () {
-        return {}
-      }
-    }
+    options: {type: Object},
   },
   emits: ['player', 'error'],
   data () {
