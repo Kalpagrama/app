@@ -14,13 +14,13 @@ div(
     v-if="item"
     v-model="isReportDialogShown"
     :maximized="false")
-      kalpa-report(:essence="item" @close="isReportDialogShown = false, $router.back()")
+      kalpa-report(:essence="item" @close="isReportDialogShown = false")
   //hide
   q-dialog(
     v-if="item"
     v-model="isHideDialogShown"
     :maximized="false")
-    kalpa-hide(:essence="item" @close="isHideDialogShown = false, $router.back()")
+    kalpa-hide(:essence="item" @close="isHideDialogShown = false")
   //image
   //img(
   //  :src="item.thumbUrl"
