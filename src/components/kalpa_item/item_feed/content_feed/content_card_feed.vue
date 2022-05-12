@@ -9,6 +9,18 @@ div(
   // minWidth: height + 'px',
   // background: 'linear-gradient(0deg, rgba(40,40,40,1) 0%, rgba(40,40,40,0) 100%)',
   }`).row.full-width.items-start.content-start
+  //report
+  q-dialog(
+    v-if="item"
+    v-model="isReportDialogShown"
+    :maximized="false")
+      kalpa-report(:essence="item" @close="isReportDialogShown = false, $router.back()")
+  //hide
+  q-dialog(
+    v-if="item"
+    v-model="isHideDialogShown"
+    :maximized="false")
+    kalpa-hide(:essence="item" @close="isHideDialogShown = false, $router.back()")
   //image
   //img(
   //  :src="item.thumbUrl"
