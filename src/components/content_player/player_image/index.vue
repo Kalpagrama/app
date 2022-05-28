@@ -14,6 +14,8 @@ div(
     ...styles,
   }`
   ).row.full-width.justify-center
+  .row.full-width
+    slot(name="top")
   //- preview your crop...
   div(
     v-if="false && figure"
@@ -70,12 +72,12 @@ div(
       ).row.q-pa-sm
       slot(name="left")
       q-btn(
-        v-if="!figure"
+        v-if="false && !figure"
         no-caps round flat
         icon="crop" color="grey"
         @click="startCrop")
       q-btn(
-        v-else
+        v-else-if="false"
         no-caps round flat
         icon="crop" color="green"
         @click="cancelCrop")

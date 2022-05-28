@@ -2,7 +2,7 @@
 div(
   :style=`{
   position: 'relative',
-  height: $q.screen.height+'px',
+  height: $q.screen.height/2+'px',
 }`
 ).column.full-width
   //- body
@@ -64,7 +64,7 @@ div(
           height: '100%',
         }`
         ).full-width
-          template(v-slot:tint-bar=`{tintFocused}`)
+          template(v-slot:top)
             node-editor(
               v-if="nodeEditorShow"
               :player="player"
