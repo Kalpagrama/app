@@ -3,8 +3,6 @@ div(
   :style=`{
 position: 'fixed',
 borderRadius: '10px',
-// paddingBottom: $screenProps.isMobile ? '0px' : '0px'
-// paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)'
 }`
 ).relative-position.row.full-width.b-40
   // header
@@ -40,7 +38,10 @@ borderRadius: '10px',
         paddingRight: $screenProps.isMobile ? '0px' : '10px'
   }`).row.full-width
       // progress
-      q-linear-progress(v-if="progress" size='5px' :value="progress / 100" color="green-10").row.full-width.q-px-sm
+      q-linear-progress(v-if="progress" size='25px' :value="progress / 100" :color="progressColor").row.full-width.q-px-sm.b-40
+        .row.absolute-center
+          small.text-grey-4 {{progressLabel}}
+          //q-badge(color="grey-8" :text-color="progressColor" :label="progressLabel")
       .row.full-width.q-pl-lg
         small.text-grey-6 {{$t('Название')}}
       q-input(
@@ -160,7 +161,7 @@ borderRadius: '10px',
         q-tooltip(dense dark) {{$t('Удалить контент')}}
     .col
     q-btn(outline no-caps color="red" :label="$t('Cancel')" v-close-popup).q-mr-sm.q-mb-xs
-    q-btn(outline no-caps color="green" :loading="loading" :label="$t('Save')" @click="save").q-mb-xs
+    q-btn(outline no-caps color="green" :loading="loading" :label="$t('Save')" :disable="!canSave" @click="save").q-mb-xs
     slot(v-if="showBottomMenu" name="bottomMenu")
       div(v-if="showBottomMenu").row.full-width
         div(:style=`{
@@ -234,6 +235,9 @@ export default {
     needSave () {
       return this.content && (this.rangeModel || this.nameChanged || this.descriptionChanged || this.priceChanged || this.thumbUrlChanged || this.previewUrlChanged || this.spheresChanged || this.urlOriginalChanged)
     },
+    canSave () {
+      return this.content && this.content.uploadStage !== 'BLANK'
+    },
     nameChanged () {
       return this.contentCopy.name !== this.content.name
     },
@@ -272,6 +276,14 @@ export default {
     previewUrlOrig () {
       let res = this.content.previewUrlWithFormats && this.content.previewUrlWithFormats.length ? this.content.previewUrlWithFormats[0].url : null
       return res
+    },
+    progressLabel () {
+      if (this.content.uploadStage === 'BLANK') return this.$t('Загрузка') + `: ${this.progress}%`
+      return this.$t('Обработка') + `: ${this.progress}%`
+    },
+    progressColor () {
+      if (this.content.uploadStage === 'BLANK') return 'green-10'
+      return 'grey-8'
     }
   },
   watch: {
@@ -367,8 +379,11 @@ export default {
       this.$set_deprecated(this.contentCopy, 'previewUrlWithFormats', [])
     },
     onProgressEvent(event) {
-      this.$log('onProgressEvent', 'event', event)
+      this.$log('onProgressEvent', 'event', this.content.uploadStage, event.progress)
       if (this.content && event.oid === this.content.oid) this.progress = event.progress
+      if (event.progress === 100 && this.content.uploadStage === 'BLANK'){
+        this.$notify('success', this.$t('контент загружен и сохранен в мастерской'))
+      }
     }
   },
   async mounted () {

@@ -621,22 +621,6 @@
             "deprecationReason": null
           },
           {
-            "name": "lang",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "LangEnum",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "token",
             "description": null,
             "args": [],
@@ -2325,34 +2309,18 @@
             "deprecationReason": null
           },
           {
-            "name": "contentCreateFromFile",
-            "description": "Загрузить новые данные для создания ядра. length - длина видео",
+            "name": "contentCreate",
+            "description": "сначала создаем конент, а потом делаем contentReload для загрузки файла",
             "args": [
               {
-                "name": "file",
+                "name": "type",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "SCALAR",
-                    "name": "Upload",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null,
-                "isDeprecated": false,
-                "deprecationReason": null
-              },
-              {
-                "name": "size",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "Float",
+                    "kind": "ENUM",
+                    "name": "ObjectTypeEnum",
                     "ofType": null
                   }
                 },
@@ -2597,6 +2565,30 @@
                 "deprecationReason": null
               },
               {
+                "name": "file",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Upload",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
+                "name": "size",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Float",
+                  "ofType": null
+                },
+                "defaultValue": null,
+                "isDeprecated": false,
+                "deprecationReason": null
+              },
+              {
                 "name": "extractProviderContent",
                 "description": null,
                 "type": {
@@ -2617,8 +2609,8 @@
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
+                "kind": "INTERFACE",
+                "name": "Object",
                 "ofType": null
               }
             },
@@ -12566,6 +12558,12 @@
             "deprecationReason": null
           },
           {
+            "name": "COMPETITION_20220412",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "KINOUROKI",
             "description": null,
             "isDeprecated": false,
@@ -12735,6 +12733,12 @@
           },
           {
             "name": "NATURE",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "IDEA",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null

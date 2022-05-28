@@ -49,7 +49,7 @@ export default {
   data () {
     return {
       progressValue: 0,
-      contentVideo: {name: '', description: '', spheres: []},
+      contentVideo: {name: this.file.name, description: '', spheres: []},
       loading: false,
       createdContent: null,
       contentCardEditorShow: false,
@@ -72,7 +72,8 @@ export default {
       this.$log('uploadContent')
       try {
         this.loading = true
-        this.createdContent = await ContentApi.contentCreateFromFile(this.file, this.contentVideo.name, this.contentVideo.description, this.contentVideo.spheres)
+        this.createdContent = await ContentApi.contentCreate(ObjectTypeEnum.VIDEO, this.contentVideo.name, this.contentVideo.description, this.contentVideo.spheres)
+        this.createdContent = await ContentApi.contentReload(this.createdContent, this.file)
         this.$logT('this.createdContent=', cloneDeep(this.createdContent))
         this.contentCardEditorShow = true
         // бэкенд сам вставит в мастерскую WS_CONTENT и пришлет события о создании контента

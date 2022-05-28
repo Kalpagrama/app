@@ -5,6 +5,7 @@ import { fragments } from 'src/api/fragments'
 import { apiCall } from 'src/api/index'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import gql from 'graphql-tag'
+import { ObjectTypeEnum } from 'src/system/common/enums'
 
 let { logD, logT, logI, logW, logE, logC } = getLogFunctions(LogSystemModulesEnum.API)
 
@@ -100,6 +101,67 @@ class ContentApi {
          logD('contentCreateFromFile complete', contentCreateFromFile.oid)
          let reactiveContent = await rxdb.set(RxCollectionEnum.OBJ, contentCreateFromFile, { actualAge: 'day' })
          return contentCreateFromFile
+      }
+      return await apiCall(f, cb, false) // это долгий запрос
+   }
+
+   static async contentReload (content, file) {
+      const f = ContentApi.contentCreateFromFile
+      logD(f, 'start', file)
+      const t1 = performance.now()
+      const cb = async () => {
+         assert(file)
+         let { data: { contentReload } } = await apollo.clients.upload.mutate({
+            mutation: gql`
+                ${fragments.objectFullFragment}
+                mutation ($contentOid: OID!, $file: Upload, $size: Float, $extractProviderContent: Boolean!) {
+                    contentReload(contentOid: $contentOid, file: $file, size: $size, extractProviderContent: $extractProviderContent) {
+                        ...objectFullFragment
+                    }
+                }
+            `,
+            variables: {
+               contentOid: content.oid,
+               file: file,
+               size: file.size,
+               extractProviderContent: false,
+            }
+         })
+         logD('contentCreateFromFile complete', contentReload.oid)
+         let reactiveContent = await rxdb.set(RxCollectionEnum.OBJ, contentReload, { actualAge: 'day' })
+         return contentReload
+      }
+      return await apiCall(f, cb, false) // это долгий запрос
+   }
+
+   static async contentCreate (type, name, description, spheres) {
+      const f = ContentApi.contentCreateFromFile
+      assert(type in ObjectTypeEnum)
+      logD(f, 'start', type, name, description)
+      name = name || ''
+      description = description || ''
+      spheres = spheres || []
+      const t1 = performance.now()
+      const cb = async () => {
+         let { data: { contentCreate } } = await apollo.clients.upload.mutate({
+            mutation: gql`
+                ${fragments.objectFullFragment}
+                mutation ($type: ObjectTypeEnum!, $name: String!, $description: String!, $spheres: [ObjectShortInput!]!) {
+                    contentCreate(type: $type, name: $name, description: $description, spheres: $spheres) {
+                        ...objectFullFragment
+                    }
+                }
+            `,
+            variables: {
+               type: type,
+               name,
+               spheres,
+               description,
+            }
+         })
+         logD('contentCreateFromFile complete', contentCreate.oid)
+         let reactiveContent = await rxdb.set(RxCollectionEnum.OBJ, contentCreate, { actualAge: 'day' })
+         return contentCreate
       }
       return await apiCall(f, cb, false) // это долгий запрос
    }
