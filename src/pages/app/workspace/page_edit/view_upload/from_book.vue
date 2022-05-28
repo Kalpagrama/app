@@ -45,7 +45,7 @@ export default {
   methods: {
     async uploadContent () {
       this.$log('uploadContent')
-      this.createdContent = await ContentApi.contentCreateFromFile(this.file)
+      this.createdContent = await ContentApi.contentCreateFromFile(ObjectTypeEnum.BOOK, this.file)
       this.contentCardEditorShow = true
       // бэкенд сам вставит в мастерскую WS_CONTENT и пришлет события о создании контента
     },

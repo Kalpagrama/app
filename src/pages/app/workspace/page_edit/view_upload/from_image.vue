@@ -179,7 +179,7 @@ export default {
       // let confirmed = confirm(this.uploadContentConfirmMessage)
       // if (!confirmed) return
       // get contentKalpa by file
-      this.createdContent = await ContentApi.contentCreateFromFile(this.file)
+      this.createdContent = await ContentApi.contentCreateFromFile(ObjectTypeEnum.IMAGE, this.file)
       this.contentCardEditorShow = true
       // бэкенд сам вставит в мастерскую WS_CONTENT и пришлет события о создании контента
     },

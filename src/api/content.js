@@ -67,42 +67,18 @@ class ContentApi {
       return await apiCall(f, cb)
    }
 
-   static async contentCreateFromFile (file, name, description, spheres) {
+   static async contentCreateFromFile (type, file, name, description, spheres) {
       const f = ContentApi.contentCreateFromFile
-      logD(f, 'start', file, name, description)
-      name = name || ''
+      logD(f, 'start', type, file, name, description)
+      assert(type in ObjectTypeEnum, 'bad type')
+      assert(file, 'file is missing')
+      name = name || file.name || ''
       description = description || ''
       spheres = spheres || []
       const t1 = performance.now()
-      const cb = async () => {
-         assert(file)
-         // file.lastModifiedDate = file.lastModifiedDate || new Date()
-         // file.name = file.name || '*empty*'
-         // if (file.size > 5 * 1024 * 1024){
-         //   throw new Error('client_max_body_size 5M')
-         // }
-         let { data: { contentCreateFromFile } } = await apollo.clients.upload.mutate({
-            mutation: gql`
-                ${fragments.objectFullFragment}
-                mutation ($file: Upload!, $size: Float!, $name: String!, $description: String!, $spheres: [ObjectShortInput!]!) {
-                    contentCreateFromFile(file: $file, size: $size, name: $name, description: $description, spheres: $spheres) {
-                        ...objectFullFragment
-                    }
-                }
-            `,
-            variables: {
-               file: file,
-               size: file.size,
-               name,
-               spheres,
-               description,
-            }
-         })
-         logD('contentCreateFromFile complete', contentCreateFromFile.oid)
-         let reactiveContent = await rxdb.set(RxCollectionEnum.OBJ, contentCreateFromFile, { actualAge: 'day' })
-         return contentCreateFromFile
-      }
-      return await apiCall(f, cb, false) // это долгий запрос
+      let createdContent = await ContentApi.contentCreate(type, name, description, spheres)
+      createdContent = await ContentApi.contentReload(createdContent, file)
+      return createdContent
    }
 
    static async contentReload (content, file) {
